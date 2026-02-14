@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cellar Compass (Wine Pairing Restaurants)
 
-## Getting Started
+Production-ready demo website for a multi-restaurant menu + wine pairing flow.
 
-First, run the development server:
+## What is implemented
+
+- 5 restaurants with dedicated pages (`/restaurants/[slug]`)
+- Realistic seed content: dishes, wines, pairing reasons
+- Pairing UX:
+  - selected dish is highlighted
+  - non-selected dishes are dimmed
+  - matching wines are highlighted
+  - each match shows "Why it works"
+- Admin panel (`/admin`):
+  - edit dishes/wines/pairings
+  - add/remove items
+  - save/revert/reset
+  - import/export JSON backup
+- Local-first persistence via `localStorage` with runtime data normalization
+- Responsive design for desktop/mobile
+- E2E smoke test with Playwright
+
+## Stack
+
+- Next.js 16 (App Router)
+- React 19 + TypeScript
+- Tailwind CSS 4
+- Playwright
+
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Validation before demo
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+npm run build
+npm run test:e2e
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Main routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Catalog: [http://localhost:3000](http://localhost:3000)
+- Admin: [http://localhost:3000/admin](http://localhost:3000/admin)
+- Example restaurant: [http://localhost:3000/restaurants/trattoria-bellavista](http://localhost:3000/restaurants/trattoria-bellavista)
 
-## Deploy on Vercel
+## Data notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- All edits are stored locally in browser storage.
+- Use **Export JSON** in admin to move data between machines/browsers.
+- Use **Import JSON** to restore data.
+- **Reset all** returns to seeded demo data.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project structure
+
+- `/Users/Andrey/App/web_wn/src/app/page.tsx` - catalog and restaurant tree
+- `/Users/Andrey/App/web_wn/src/app/restaurants/[slug]/page.tsx` - menu + pairing UI
+- `/Users/Andrey/App/web_wn/src/app/admin/page.tsx` - content editor
+- `/Users/Andrey/App/web_wn/src/context/restaurants-context.tsx` - data store + persistence
+- `/Users/Andrey/App/web_wn/src/data/seed-restaurants.ts` - initial dataset
+- `/Users/Andrey/App/web_wn/e2e/smoke.spec.ts` - end-to-end smoke test
+
+## Current scope
+
+This is a strong demo build. For a full production SaaS release, the next step is backend storage (PostgreSQL), server auth/roles, and API-based admin operations.
