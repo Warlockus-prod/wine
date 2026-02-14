@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseURL = process.env.BASE_URL || 'http://127.0.0.1:4173';
+const useLocalServer = !process.env.BASE_URL;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -7,15 +10,19 @@ export default defineConfig({
   workers: 1,
   reporter: 'line',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL,
     trace: 'off',
   },
-  webServer: {
-    command: 'PORT=4173 npm run start',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: true,
-    timeout: 120_000,
-  },
+  ...(useLocalServer
+    ? {
+        webServer: {
+          command: 'PORT=4173 npm run start',
+          url: 'http://127.0.0.1:4173',
+          reuseExistingServer: true,
+          timeout: 120_000,
+        },
+      }
+    : {}),
   projects: [
     {
       name: 'chromium',
