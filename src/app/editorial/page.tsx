@@ -70,7 +70,7 @@ export default function EditorialPage() {
           </div>
           <div className="flex items-center gap-4">
             <Link
-              href="/v1/admin"
+              href="/admin"
               className="rounded-full border border-white/20 px-5 py-2 text-sm font-medium transition hover:border-primary hover:bg-primary hover:text-white"
             >
               Admin

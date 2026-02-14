@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/pairing", label: "Pairing", icon: "wine_bar" },
+  { href: "/admin", label: "Admin", icon: "settings" },
   { href: "/v1", label: "Backup", icon: "inventory_2" },
-  { href: "/v1/admin", label: "Admin", icon: "settings" },
 ];
 
 export default function MobileTabBar() {
@@ -20,6 +20,7 @@ export default function MobileTabBar() {
           const active =
             pathname === tab.href ||
             (tab.href === "/v1" && pathname.startsWith("/v1/restaurants/")) ||
+            (tab.href === "/admin" && pathname === "/v1/admin") ||
             (tab.href !== "/" &&
               tab.href !== "/v1" &&
               pathname.startsWith(`${tab.href}/`));

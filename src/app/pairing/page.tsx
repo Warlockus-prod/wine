@@ -6,188 +6,65 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
-
-type Dish = {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  image: string;
-  tags: string[];
-};
-
-type Wine = {
-  id: string;
-  name: string;
-  region: string;
-  year: number;
-  price: number;
-  rating: number;
-  description: string;
-  image: string;
-  tags: string[];
-};
+import { usePairingDataset } from "@/lib/pairing-store";
+import type { PairingDish, PairingWine } from "@/types/pairing";
 
 type MatchDetails = {
   score: number;
   reason: string;
 };
 
-const DISHES: Dish[] = [
-  {
-    id: "escargots",
-    name: "Escargots de Bourgogne",
-    price: 18,
-    description:
-      "Burgundy snails with garlic herb butter, parsley and toasted baguette points.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBhlI46dafXSZ08utjSWbYOYBXZcyqovonosZ2MUis2T4FrSvjy7_Er5VMFJGAyjeWp6cx4bAhd_fI7SJMDIIwahIUPZlC02XtIhiDwCHmPSxPugT4iWUD67WMW99bbqs2xkNY5bYvdOaPa6jOirgJHjo9wV0NTJewH4our6G4GtxHwO9VnE0K3h93WLpEAD80eTfNnFdE31B3kcA4ndUFvOistF3Se_VuL9iOVmF5AN-mDj830CgfHP0aDivk8iqNlJQeBWp8M6L0",
-    tags: ["Starter", "Classic", "Garlic"],
-  },
-  {
-    id: "duck-confit",
-    name: "Duck Confit",
-    price: 34,
-    description:
-      "Slow-cooked duck leg with crispy skin, sarladaise potatoes and thyme jus.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCPhT2eBSA_1VVLpnQm9-cravzJ5Gc6FyawGxH5Takx28R2xtCFpag0eczWbZHEqE3gyaMGP0cvt9nLzATLU6A-7LS1erp38xnUTU91m3FZDe-dnxX88rni9PsT8essOHKPlgzsFX52buk-L2YJNIFb8moz3A5MaFooxURC6ri2hJ1J6sH5vfOLDCW3aU_dz9FOz9D9602DKJ_AY9GA3Z1eoG8bqbSgyRnKXiyjYHZzuIfZUVUIkLabvoLkmxtJ_IzNH_obOFeSUSQ",
-    tags: ["Main", "Rich", "Savory"],
-  },
-  {
-    id: "beef-tartare",
-    name: "Beef Tartare",
-    price: 22,
-    description:
-      "Hand-cut beef fillet, capers, shallots, egg yolk and house spice blend.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBE3Sa94YOEcabLhKzWAZ1hVizzQofzK2Z4E5bDpnb40C_Y7kjftpAIvfPRUvuRTv9i2R4yl2Jyas9yYjBSdg-TB95Y5sHjwlgXp0C5qu1WuvXdmBwrewbREclI2Qm3t1GSI7I2tRy0h0-uJWU7AE8RcD4OIZSj_MCLqex08-Yw5sMlLAY610w_NvRLCYyHK30eYl_t2qEEz-6QioSMB_5z-9TrP1ivcg5AOiYglAF-KcAtKAuyc_s8SkJBIcMDsOL9hhwBpVrU47c",
-    tags: ["Starter", "Raw", "Peppery"],
-  },
-  {
-    id: "scallops",
-    name: "Seared Scallops",
-    price: 28,
-    description: "Jumbo scallops, cauliflower puree, truffle oil and micro greens.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAaiwxSmTLYTg2ZH3EFQxN-shWqR6ZLwQpI0z5SMPyJTaXY2mMiVVpwoVF-pqkdZU3upPy3La9j4mQfCanZGieFBcp6xyeSrSY82SN97CSDaaShFsNj7aA9cHnJxWOdNjYl13uEmlgRGlUWJTDIeFbl6lwNJQP547qRRdN-Zk43iFIZUevpZz0PNN2dQKNOgJxv0hPw1NuOXYzxB8zVyfrewxB1XetEi7on87zLHr9jOrkiMkRF0WT6CPcSqn2iO4DTpH263EN9O6A",
-    tags: ["Main", "Seafood", "Delicate"],
-  },
-];
+const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[]) => {
+  const dishText = [dish.name, dish.description, dish.tags.join(" ")].join(" ").toLowerCase();
 
-const WINES: Wine[] = [
-  {
-    id: "riesling",
-    name: "Trimbach Riesling",
-    region: "Alsace, France",
-    year: 2020,
-    price: 52,
-    rating: 4.8,
-    description: "Bone-dry profile with mineral finish and focused citrus backbone.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuABMH3ZAPvQDWYLpx-j0KtibgdkAUtyn9irKC3oXRspQSs0L9BsBfegaa05g4i_0tSTAW2oZUOVeLU0TtyFc1K6gp9TfjjgZ7Lh0uRB-UYI67OyHB5bXgnk2CgEXCNZJm2Su_74shDXO5hQdBWcAooOCdq4ysIJzg54UF46RvRo01GL2ZqihghrKbGQqaoITAMvMzcLiiJaVn6TBq2OkAquPEoUQVI81Wgbb-9V35UAkU0E365Iug6VT10azf1carabk54uYi1aZ9Q",
-    tags: ["Dry", "High Acid"],
-  },
-  {
-    id: "pinot",
-    name: "Cristom Pinot Noir",
-    region: "Willamette Valley, USA",
-    year: 2018,
-    price: 68,
-    rating: 4.2,
-    description: "Red cherry fruit, bright acidity and earthy undertones.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDE5USocOgYDhITeOQgMjG7LsiFuP3dqCZ6ueQfcYZ8fhmANSDP1Ms-UZ9B9oJVJPYSOaZ3VpdtN3zyNF8TlHglSTJVg9gHSm_0tFfHPX5s97iOrE5dkxl8WQVXA0nFYyNZWuN2uKMWMhyYj5Bo2XsLZP1kAg3uWQqsMZZWtxGUHxxvebDE7WZyPDwuWr3r-VBADpbh-N9Sqxz6jI6vK_L0e7aPNXfeLMb5unfSqT2DCc9df0kvGi7FH92cvQDILKSbktOz8E-Xxjk",
-    tags: ["Light Body", "Earthy"],
-  },
-  {
-    id: "cabernet",
-    name: "Stag's Leap Cabernet",
-    region: "Napa Valley, USA",
-    year: 2019,
-    price: 85,
-    rating: 4.5,
-    description: "Powerful tannins and dark fruit built for heavier proteins.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC0K331aFTTh8xf47OiTmQkjzYyZgsVD8dtLxHbYmrVTeRYnzM9_sxSUJNLifZ7_opq23tVHQwU759mDWEjQC09iYiQIw7WnQmDCo82059t1Elow-QvBZreisUpw7R37nPZGSPem6SAgjbQsp7J8EKLHZVJyIOg2Fa2GO67LBWEF1MdpmF3llAdkLBrQy2Wz24RK7T5Z7Jo7BthcvqGi_Gzm_KZROTfmpEl17VY34aF6paOjoGOelftLHRxt0AGBc4zkKmYCt2tB7Y",
-    tags: ["Bold", "Tannic"],
-  },
-  {
-    id: "rose",
-    name: "Chateau d'Esclans Rose",
-    region: "Provence, France",
-    year: 2021,
-    price: 45,
-    rating: 4,
-    description: "Crisp and floral with a light body and summer-fruit profile.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBTbxB_RLGGuNNlEY6_aWuM1r77Q-7NQwx10_8Y_xN-XYN6hS0sMOpNmzpTvTNYMpWx4NIGkf-fEv4DIhN8O8y5hsTrWAplmhMkwsEOFhpMyfLP5c5w5pID7cRlk8quUWEF70XRhU38CCLnXTghZt1pykh4bkZK0OKa3EG56NHBS3LDlOy0CXoZCORtSZZe2mSMjK7GvAntDHQWy8RVWuqVtaSUUsluhysKaKk7N_OPwl-iURyfGpR3lun0WfF_nkagtyvx7PU2kQs",
-    tags: ["Crisp", "Fruity"],
-  },
-];
+  const scored = wines
+    .map((wine) => {
+      const wineText = [wine.name, wine.description, wine.tags.join(" ")]
+        .join(" ")
+        .toLowerCase();
 
-const FALLBACK_MATCHES: Record<string, MatchDetails[]> = {
-  "duck-confit": [
-    {
-      score: 98,
-      reason: "High acidity slices through duck fat and lifts savory herbs.",
-    },
-    {
-      score: 95,
-      reason: "Red-fruit and earth mirror the confit depth without overpowering.",
-    },
-  ],
-  escargots: [
-    {
-      score: 96,
-      reason: "Citrus + minerality balance garlic butter and parsley freshness.",
-    },
-    {
-      score: 74,
-      reason: "Fresh but lighter than the butter texture needs.",
-    },
-  ],
-  "beef-tartare": [
-    {
-      score: 92,
-      reason: "Bright acidity and gentle tannin support raw beef and capers.",
-    },
-    {
-      score: 70,
-      reason: "Structure works, but tannins can dominate texture.",
-    },
-  ],
-  scallops: [
-    {
-      score: 90,
-      reason: "Mineral edge supports seafood sweetness and truffle notes.",
-    },
-    {
-      score: 83,
-      reason: "Light red-berry aromatics play well with delicate scallops.",
-    },
-  ],
-};
+      let score = 58;
+      if (dishText.includes("duck") && wineText.includes("riesling")) {
+        score += 26;
+      }
+      if (dishText.includes("duck") && wineText.includes("pinot")) {
+        score += 18;
+      }
+      if ((dishText.includes("delicate") || dishText.includes("scallop")) && wineText.includes("tannic")) {
+        score -= 16;
+      }
+      if (dishText.includes("garlic") && wineText.includes("acid")) {
+        score += 14;
+      }
 
-const buildFallbackMatchMap = (dishId: string) => {
-  const matchMap = new Map<string, MatchDetails>();
-  const fallback = FALLBACK_MATCHES[dishId] ?? [];
+      return {
+        wineId: wine.id,
+        score: Math.max(35, Math.min(98, Math.round(score))),
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 
-  fallback.forEach((item, index) => {
-    const wineId = WINES[index]?.id;
-    if (wineId) {
-      matchMap.set(wineId, item);
-    }
-  });
+  const map = new Map<string, MatchDetails>();
+  for (const item of scored) {
+    map.set(item.wineId, {
+      score: item.score,
+      reason:
+        item.score >= 85
+          ? "Structure and acidity align well with the dish profile."
+          : "Acceptable pairing, but may be less balanced than top matches.",
+    });
+  }
 
-  return matchMap;
+  return map;
 };
 
 export default function PairingPage() {
-  const [activeDishId, setActiveDishId] = useState<string>("duck-confit");
-  const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(
-    () => buildFallbackMatchMap("duck-confit"),
-  );
+  const { dataset } = usePairingDataset();
+  const dishes = dataset.dishes;
+  const wines = dataset.wines;
+
+  const [activeDishId, setActiveDishId] = useState<string>(dishes[0]?.id ?? "");
+  const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(new Map());
   const [aiStatus, setAiStatus] = useState<"loading" | "ready" | "fallback">("ready");
   const firstClickTracked = useRef(false);
   const openTimestamp = useRef<number>(0);
@@ -198,12 +75,22 @@ export default function PairingPage() {
     trackEvent("pairing_page_open", { device: "mobile-first" });
   }, []);
 
+  const effectiveDishId =
+    activeDishId && dishes.some((dish) => dish.id === activeDishId)
+      ? activeDishId
+      : dishes[0]?.id ?? "";
+
   const activeDish = useMemo(
-    () => DISHES.find((dish) => dish.id === activeDishId) ?? DISHES[0],
-    [activeDishId],
+    () => dishes.find((dish) => dish.id === effectiveDishId) ?? dishes[0] ?? null,
+    [effectiveDishId, dishes],
   );
 
   useEffect(() => {
+    if (!activeDish || wines.length === 0) {
+      setMatchMap(new Map());
+      return;
+    }
+
     const controller = new AbortController();
 
     const loadAiMatches = async () => {
@@ -222,7 +109,7 @@ export default function PairingPage() {
               description: activeDish.description,
               tags: activeDish.tags,
             },
-            wines: WINES,
+            wines,
           }),
           signal: controller.signal,
         });
@@ -241,20 +128,26 @@ export default function PairingPage() {
         }
 
         if (nextMap.size === 0) {
-          throw new Error("AI returned empty matches");
+          throw new Error("AI returned no matches");
         }
 
         setMatchMap(nextMap);
         setAiStatus("ready");
+
+        const topScore = Math.max(...Array.from(nextMap.values()).map((item) => item.score));
         trackEvent("pairing_ai_success", {
           dish_id: activeDish.id,
-          top_score: Math.max(...Array.from(nextMap.values()).map((item) => item.score)),
+          top_score: topScore,
+          wines_count: wines.length,
         });
       } catch {
-        const fallbackMap = buildFallbackMatchMap(activeDish.id);
+        const fallbackMap = buildFallbackMatchMap(activeDish, wines);
         setMatchMap(fallbackMap);
         setAiStatus("fallback");
-        trackEvent("pairing_ai_fallback", { dish_id: activeDish.id });
+        trackEvent("pairing_ai_fallback", {
+          dish_id: activeDish.id,
+          wines_count: wines.length,
+        });
       }
     };
 
@@ -263,7 +156,7 @@ export default function PairingPage() {
     return () => {
       controller.abort();
     };
-  }, [activeDish]);
+  }, [activeDish, wines]);
 
   const selectDish = (dishId: string, source: "cards" | "chips") => {
     setActiveDishId(dishId);
@@ -278,8 +171,38 @@ export default function PairingPage() {
 
   const scrollToWineList = () => {
     wineListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    trackEvent("pairing_scroll_to_wines", { dish_id: activeDish.id });
+    if (activeDish) {
+      trackEvent("pairing_scroll_to_wines", { dish_id: activeDish.id });
+    }
   };
+
+  if (!activeDish || wines.length === 0) {
+    return (
+      <div className="mobile-safe-bottom min-h-screen bg-background-dark text-white">
+        <main className="mx-auto max-w-3xl px-6 pt-28 pb-20 text-center">
+          <p className="mb-3 inline-flex rounded-full border border-primary/40 bg-primary/15 px-3 py-1 text-xs font-semibold tracking-wider text-primary uppercase">
+            Pairing Data Required
+          </p>
+          <h1 className="text-3xl font-bold">No pairing data available</h1>
+          <p className="mt-3 text-sm text-gray-300">
+            Add dishes and wines from the new admin panel, then return to the pairing screen.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <Link href="/admin" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold">
+              Open Admin
+            </Link>
+            <Link
+              href="/v1/admin"
+              className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-gray-200"
+            >
+              Open Backup V1 Admin
+            </Link>
+          </div>
+        </main>
+        <MobileTabBar />
+      </div>
+    );
+  }
 
   return (
     <div className="mobile-safe-bottom flex min-h-screen flex-col overflow-hidden bg-background-dark text-gray-200 selection:bg-primary selection:text-white">
@@ -299,7 +222,7 @@ export default function PairingPage() {
           <Link href="/" className="text-gray-300 transition hover:text-primary">
             Discover
           </Link>
-          <Link href="/v1/admin" className="text-gray-300 transition hover:text-primary">
+          <Link href="/admin" className="text-gray-300 transition hover:text-primary">
             Admin
           </Link>
         </div>
@@ -319,7 +242,7 @@ export default function PairingPage() {
           </div>
 
           <div className="hide-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
-            {DISHES.map((dish) => {
+            {dishes.map((dish) => {
               const selected = dish.id === activeDish.id;
               return (
                 <button
@@ -373,8 +296,8 @@ export default function PairingPage() {
           </div>
 
           <div className="space-y-4 pb-6">
-            {DISHES.map((dish) => {
-              const isActive = activeDishId === dish.id;
+            {dishes.map((dish) => {
+              const isActive = dish.id === activeDish.id;
 
               return (
                 <button
@@ -471,7 +394,7 @@ export default function PairingPage() {
           </div>
 
           <div className="space-y-3 pb-8 sm:space-y-4">
-            {WINES.map((wine) => {
+            {wines.map((wine) => {
               const match = matchMap.get(wine.id);
               const isMatch = Boolean(match);
               const isTopMatch = (match?.score ?? 0) >= 92;

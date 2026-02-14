@@ -8,6 +8,7 @@ type RouteCheck = {
 const routes: RouteCheck[] = [
   { path: "/", mustSee: /sommelier/i },
   { path: "/pairing", mustSee: /pairing room/i },
+  { path: "/admin", mustSee: /admin studio/i },
   { path: "/immersive", mustSee: /epicurean/i },
   { path: "/editorial", mustSee: /lux/i },
   { path: "/v1", mustSee: /cellar compass/i },

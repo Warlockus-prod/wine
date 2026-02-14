@@ -34,10 +34,10 @@ export default function HeroSection() {
             Open Backup V1
           </Link>
           <Link
-            href="/v1/admin"
+            href="/admin"
             className="rounded-lg border border-primary/40 bg-primary/15 px-5 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/25"
           >
-            V1 Admin Panel
+            V2 Admin Studio
           </Link>
         </div>
       </div>

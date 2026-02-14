@@ -129,8 +129,8 @@ export default function Home() {
           <div>
             <p className="text-xs tracking-widest text-gray-400 uppercase">Admin</p>
             <p className="mt-1 text-lg font-semibold text-white">
-              <Link href="/v1/admin" className="text-primary hover:text-rose-300">
-                Open V1 Admin Panel
+              <Link href="/admin" className="text-primary hover:text-rose-300">
+                Open V2 Admin Studio
               </Link>
             </p>
           </div>

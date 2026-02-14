@@ -9,8 +9,9 @@ const menuLinks = [
   { href: "/pairing", label: "Wine Pairing" },
   { href: "/immersive", label: "Reservations" },
   { href: "/editorial", label: "Events" },
+  { href: "/admin", label: "Admin V2" },
   { href: "/v1", label: "Backup V1" },
-  { href: "/v1/admin", label: "Admin" },
+  { href: "/v1/admin", label: "Admin V1" },
 ];
 
 export default function Navigation() {
@@ -56,7 +57,7 @@ export default function Navigation() {
           <div className="flex items-center gap-2">
             <Link
               className="hidden rounded-lg border border-white/20 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/16 md:inline-flex"
-              href="/v1/admin"
+              href="/admin"
             >
               Admin
             </Link>
@@ -88,7 +89,10 @@ export default function Navigation() {
           >
             <div className="grid gap-2">
               {menuLinks.map((link) => {
-                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const active =
+                  pathname === link.href ||
+                  pathname.startsWith(`${link.href}/`) ||
+                  (link.href === "/admin" && pathname === "/v1/admin");
                 return (
                   <Link
                     key={link.href}

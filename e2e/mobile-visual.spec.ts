@@ -18,6 +18,7 @@ const mobileUse = (() => {
 const pages = [
   { name: "home", path: "/" },
   { name: "pairing", path: "/pairing" },
+  { name: "admin", path: "/admin" },
   { name: "editorial", path: "/editorial" },
   { name: "v1-catalog", path: "/v1" },
   { name: "v1-admin", path: "/v1/admin" },
