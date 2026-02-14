@@ -1,0 +1,92 @@
+.v1-shell {
+  --v1-bg: #f6efe4;
+  --v1-bg-soft: #fdf8ef;
+  --v1-surface: #fff8ee;
+  --v1-surface-strong: #fff2df;
+  --v1-text: #1f1d1a;
+  --v1-text-muted: #6b665d;
+  --v1-accent: #a2432f;
+  --v1-line: #dccfbe;
+
+  min-height: 100vh;
+  color: var(--v1-text);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 18% 14%, #f8dcb9 0%, transparent 25%),
+    radial-gradient(circle at 84% 8%, #d0e5d8 0%, transparent 24%),
+    linear-gradient(180deg, var(--v1-bg-soft) 0%, var(--v1-bg) 100%);
+}
+
+.v1-shell .site-frame {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.2rem;
+}
+
+@media (min-width: 768px) {
+  .v1-shell .site-frame {
+    padding: 2rem;
+  }
+}
+
+.v1-shell .site-panel {
+  border: 1px solid color-mix(in srgb, var(--v1-line) 76%, white);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--v1-surface) 88%, white);
+  box-shadow: 0 18px 40px rgba(34, 28, 18, 0.08);
+}
+
+.v1-shell .tilt-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+}
+
+.v1-shell .tilt-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 30px rgba(42, 35, 22, 0.12);
+}
+
+.v1-shell .fade-dim {
+  opacity: 0.38;
+}
+
+.v1-shell .badge {
+  border: 1px solid color-mix(in srgb, var(--v1-line) 80%, white);
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--v1-text-muted);
+  background: color-mix(in srgb, var(--v1-surface-strong) 70%, white);
+}
+
+.v1-shell .focus-ring {
+  outline: 2px solid color-mix(in srgb, var(--v1-accent) 60%, white);
+  outline-offset: 2px;
+}
+
+.v1-shell .fade-in {
+  animation: v1-fade-in-up 420ms ease forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes v1-fade-in-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v1-shell .fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .v1-shell .tilt-card,
+  .v1-shell .tilt-card:hover {
+    transition: none;
+    transform: none;
+  }
+}
