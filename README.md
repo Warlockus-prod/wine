@@ -46,9 +46,7 @@ npm run start
 ## Validation before demo
 
 ```bash
-npm run lint
-npm run build
-npm run test:e2e
+npm run check
 ```
 
 ## Main routes
