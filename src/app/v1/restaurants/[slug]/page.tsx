@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRestaurants } from "@/context/restaurants-context";
+import { trackEvent } from "@/lib/analytics";
 import { formatMoney } from "@/lib/format";
 
 export default function RestaurantPage() {
@@ -12,6 +13,8 @@ export default function RestaurantPage() {
   const [selectedDishId, setSelectedDishId] = useState<string | null>(null);
   const [dishQuery, setDishQuery] = useState("");
   const [wineQuery, setWineQuery] = useState("");
+  const openedAt = useRef(0);
+  const firstSelectionTracked = useRef(false);
 
   const restaurant = useMemo(
     () => restaurants.find((item) => item.slug === params.slug),
@@ -69,6 +72,27 @@ export default function RestaurantPage() {
         .includes(normalized),
     );
   }, [restaurant, wineQuery]);
+
+  useEffect(() => {
+    openedAt.current = performance.now();
+    trackEvent("v1_restaurant_open", { restaurant_slug: params.slug });
+  }, [params.slug]);
+
+  const handleDishSelect = (dishId: string, eventTimestamp?: number) => {
+    setSelectedDishId(dishId);
+    trackEvent("v1_restaurant_dish_selected", { restaurant_slug: params.slug, dish_id: dishId });
+
+    if (!firstSelectionTracked.current && openedAt.current > 0) {
+      firstSelectionTracked.current = true;
+      trackEvent("v1_restaurant_time_to_first_selection_ms", {
+        restaurant_slug: params.slug,
+        elapsed:
+          typeof eventTimestamp === "number"
+            ? Math.max(0, Math.round(eventTimestamp - openedAt.current))
+            : 0,
+      });
+    }
+  };
 
   if (!ready) {
     return (
@@ -159,7 +183,7 @@ export default function RestaurantPage() {
                   key={dish.id}
                   type="button"
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedDishId(dish.id)}
+                  onClick={(event) => handleDishSelect(dish.id, event.timeStamp)}
                   className={`tilt-card rounded-2xl border p-4 text-left transition-all ${
                     isSelected
                       ? "border-[#a2432f] bg-[#fff0dc] shadow-[0_10px_20px_rgba(150,70,40,0.15)]"

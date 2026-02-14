@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import MobileTabBar from "@/components/v2/MobileTabBar";
+import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 const RESTAURANTS = [
   {
@@ -79,13 +81,17 @@ export default function ImmersivePage() {
                 src={restaurant.image}
                 alt={restaurant.name}
                 fill
+                quality={68}
+                placeholder="blur"
+                blurDataURL={GENERIC_BLUR_DATA_URL}
+                priority={restaurant.id === 1}
                 sizes="100vw"
                 className="object-cover brightness-50 transition-transform duration-[2000ms] ease-out group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-black/40" />
             </div>
 
-            <div className="relative z-10 flex w-full max-w-4xl flex-col items-center px-6 pb-20 text-center md:pb-28">
+            <div className="relative z-10 flex w-full max-w-4xl flex-col items-center px-6 pb-28 text-center md:pb-28">
               <div className="mb-6 flex gap-3 opacity-0 animate-[fade-in-up_1s_ease-out_0.2s_forwards]">
                 {restaurant.tags.map((tag) => (
                   <span
@@ -139,6 +145,7 @@ export default function ImmersivePage() {
           </span>
         </Link>
       </div>
+      <MobileTabBar />
     </div>
   );
 }

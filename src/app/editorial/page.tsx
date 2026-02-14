@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import MobileTabBar from "@/components/v2/MobileTabBar";
+import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 const CURATED_CARDS = [
   {
@@ -42,7 +44,7 @@ const CURATED_CARDS = [
 
 export default function EditorialPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background-dark text-gray-100">
+    <div className="mobile-safe-bottom flex min-h-screen flex-col bg-background-dark text-gray-100">
       <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-background-dark/80 backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-12">
@@ -152,6 +154,10 @@ export default function EditorialPage() {
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhZxDy6hqO7CNqk9-AF3FashU3VLamsUMLPv3l-xJtXmCugTxVZymPBgWqs4069aoXIDYuINpXEP4Gq7ybwc-aAmiW-AjW72Fo2TDbD1t0zfOj2tSOC4s8Z9qK_rY3zNilxIMQLKkRRJgPiCj45sZqhogNTAj5sjlu2gfWqKekffRSgf9gM2ijNH35JQ9Kh0hYxD84eKClvFnl8Q-IWMRChRx2vbGyy6cVXndYsvJaJ_nZRiKy7zSzJcdY3n_1PJBez2hWBm6d19s"
             alt="Luxury restaurant interior"
             fill
+            quality={72}
+            placeholder="blur"
+            blurDataURL={GENERIC_BLUR_DATA_URL}
+            priority
             sizes="100vw"
             className="object-cover object-center transition-transform duration-[2s] hover:scale-105"
           />
@@ -200,6 +206,9 @@ export default function EditorialPage() {
                 src={card.image}
                 alt={card.name}
                 fill
+                quality={68}
+                placeholder="blur"
+                blurDataURL={GENERIC_BLUR_DATA_URL}
                 sizes="320px"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
@@ -243,6 +252,7 @@ export default function EditorialPage() {
           </div>
         </div>
       </footer>
+      <MobileTabBar />
     </div>
   );
 }

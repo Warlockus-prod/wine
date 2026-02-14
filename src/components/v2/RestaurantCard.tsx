@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 type RestaurantCardProps = {
   name: string;
@@ -13,6 +14,7 @@ type RestaurantCardProps = {
   className?: string;
   description?: string;
   variant?: "large" | "medium";
+  priority?: boolean;
 };
 
 export default function RestaurantCard({
@@ -28,6 +30,7 @@ export default function RestaurantCard({
   className = "",
   description,
   variant = "medium",
+  priority = false,
 }: RestaurantCardProps) {
   const isLarge = variant === "large";
 
@@ -38,6 +41,10 @@ export default function RestaurantCard({
       <Image
         alt={name}
         className="card-zoom-image absolute inset-0 h-full w-full object-cover brightness-75 transition-all duration-500 group-hover:brightness-90"
+        quality={70}
+        placeholder="blur"
+        blurDataURL={GENERIC_BLUR_DATA_URL}
+        priority={priority}
         fill
         sizes={isLarge ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
         src={image}

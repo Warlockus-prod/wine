@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HeroSection from "@/components/v2/HeroSection";
+import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import RestaurantCard from "@/components/v2/RestaurantCard";
 
@@ -17,6 +18,7 @@ const RESTAURANT_SHOWCASE = [
     variant: "large" as const,
     className: "h-full md:col-span-8",
     href: "/pairing",
+    priority: true,
   },
   {
     name: "Prime Cut",
@@ -28,6 +30,7 @@ const RESTAURANT_SHOWCASE = [
     matchScore: 95,
     className: "h-full md:col-span-4",
     href: "/pairing",
+    priority: false,
   },
   {
     name: "Ocean Blue",
@@ -40,6 +43,7 @@ const RESTAURANT_SHOWCASE = [
     description: "Fresh catch daily, flown in from Tsukiji Market.",
     className: "h-full md:col-span-5",
     href: "/immersive",
+    priority: false,
   },
   {
     name: "Trattoria Roma",
@@ -51,6 +55,7 @@ const RESTAURANT_SHOWCASE = [
     matchScore: 92,
     className: "h-full md:col-span-4",
     href: "/editorial",
+    priority: false,
   },
   {
     name: "Zen",
@@ -62,6 +67,7 @@ const RESTAURANT_SHOWCASE = [
     pairingAvailable: true,
     className: "h-full md:col-span-3",
     href: "/pairing",
+    priority: false,
   },
 ];
 
@@ -70,7 +76,7 @@ export default function Home() {
     <div className="min-h-screen bg-background-dark text-gray-100">
       <Navigation />
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl flex-1 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
         <HeroSection />
 
         <div className="grid auto-rows-[300px] grid-cols-1 gap-6 md:auto-rows-[380px] md:grid-cols-12">
@@ -86,6 +92,7 @@ export default function Home() {
                 name={restaurant.name}
                 pairingAvailable={restaurant.pairingAvailable}
                 price={restaurant.price}
+                priority={restaurant.priority}
                 rating={restaurant.rating}
                 reviewCount={restaurant.reviewCount}
                 variant={restaurant.variant}
@@ -141,6 +148,7 @@ export default function Home() {
           </span>
         </Link>
       </div>
+      <MobileTabBar />
     </div>
   );
 }

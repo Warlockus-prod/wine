@@ -1,13 +1,36 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRestaurants } from "@/context/restaurants-context";
+import { trackEvent } from "@/lib/analytics";
 import { makeId } from "@/lib/format";
 import { parseRestaurantImport } from "@/lib/restaurant-validation";
 import { Dish, Restaurant, Wine } from "@/types/restaurant";
 
 const cloneRestaurant = (restaurant: Restaurant) =>
   JSON.parse(JSON.stringify(restaurant)) as Restaurant;
+
+const readAutosaveDraft = (restaurantId: string): Restaurant | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(`web_wn_v1_admin_draft_${restaurantId}`);
+    if (!raw) {
+      return null;
+    }
+
+    const restored = JSON.parse(raw) as Restaurant;
+    if (restored?.id !== restaurantId) {
+      return null;
+    }
+
+    return cloneRestaurant(restored);
+  } catch {
+    return null;
+  }
+};
 
 const EMPTY_DISH = {
   name: "",
@@ -61,6 +84,7 @@ export default function AdminPage() {
     anchor.download = `restaurants-export-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
+    trackEvent("v1_admin_export_json", { restaurants_count: restaurants.length });
   };
 
   const handleImportJson = () => {
@@ -74,6 +98,7 @@ export default function AdminPage() {
     replaceRestaurants(normalized);
     setImportStatus(`Imported ${normalized.length} restaurants.`);
     setImportText("");
+    trackEvent("v1_admin_import_json", { restaurants_count: normalized.length });
   };
 
   if (!ready) {
@@ -176,13 +201,22 @@ function RestaurantEditor({
   onSave: (restaurant: Restaurant) => void;
   onResetAll: () => void;
 }) {
-  const [draft, setDraft] = useState<Restaurant>(() => cloneRestaurant(restaurant));
+  const [draft, setDraft] = useState<Restaurant>(
+    () => readAutosaveDraft(restaurant.id) ?? cloneRestaurant(restaurant),
+  );
   const [dishForm, setDishForm] = useState(EMPTY_DISH);
   const [wineForm, setWineForm] = useState(EMPTY_WINE);
-  const [pairingDishId, setPairingDishId] = useState<string>(restaurant.dishes[0]?.id ?? "");
-  const [statusText, setStatusText] = useState<string>("");
+  const [pairingDishId, setPairingDishId] = useState<string>(() => {
+    const restored = readAutosaveDraft(restaurant.id);
+    return restored?.dishes[0]?.id ?? restaurant.dishes[0]?.id ?? "";
+  });
+  const [statusText, setStatusText] = useState<string>(() =>
+    readAutosaveDraft(restaurant.id) ? "Autosaved draft restored." : "",
+  );
   const [dishFilter, setDishFilter] = useState("");
   const [wineFilter, setWineFilter] = useState("");
+  const [mobilePanel, setMobilePanel] = useState<"dishes" | "wines" | "pairings">("dishes");
+  const autosaveKey = `web_wn_v1_admin_draft_${restaurant.id}`;
 
   const effectivePairingDishId =
     pairingDishId && draft.dishes.some((item) => item.id === pairingDishId)
@@ -222,15 +256,37 @@ function RestaurantEditor({
     );
   }, [draft.wines, wineFilter]);
 
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(autosaveKey, JSON.stringify(draft));
+      } catch {
+        // Ignore storage write issues in private mode.
+      }
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [autosaveKey, draft]);
+
   const saveDraft = () => {
     onSave(draft);
+    window.localStorage.removeItem(autosaveKey);
     setStatusText("Saved. Restaurant updates are live now.");
+    trackEvent("v1_admin_save_restaurant", {
+      restaurant_id: draft.id,
+      dishes_count: draft.dishes.length,
+      wines_count: draft.wines.length,
+    });
   };
 
   const restoreFromStore = () => {
     setDraft(cloneRestaurant(restaurant));
     setPairingDishId(restaurant.dishes[0]?.id ?? "");
+    window.localStorage.removeItem(autosaveKey);
     setStatusText("Reverted unsaved changes.");
+    trackEvent("v1_admin_revert_restaurant", { restaurant_id: restaurant.id });
   };
 
   const updateDish = (dishId: string, patch: Partial<Dish>) => {
@@ -283,6 +339,7 @@ function RestaurantEditor({
     if (!effectivePairingDishId) {
       setPairingDishId(created.id);
     }
+    trackEvent("v1_admin_add_dish", { restaurant_id: draft.id, dish_id: created.id });
   };
 
   const removeDish = (dishId: string) => {
@@ -324,6 +381,7 @@ function RestaurantEditor({
       wines: [...current.wines, created],
     }));
     setWineForm(EMPTY_WINE);
+    trackEvent("v1_admin_add_wine", { restaurant_id: draft.id, wine_id: created.id });
   };
 
   const removeWine = (wineId: string) => {
@@ -365,6 +423,13 @@ function RestaurantEditor({
             ],
           },
     );
+
+    trackEvent("v1_admin_toggle_pairing", {
+      restaurant_id: draft.id,
+      dish_id: pairingDish.id,
+      wine_id: wineId,
+      selected: !exists,
+    });
   };
 
   const updatePairingReason = (wineId: string, reason: string) => {
@@ -413,7 +478,9 @@ function RestaurantEditor({
               type="button"
               onClick={() => {
                 onResetAll();
+                window.localStorage.removeItem(autosaveKey);
                 setStatusText("All restaurants reset to initial seed data.");
+                trackEvent("v1_admin_reset_all", { restaurant_id: draft.id });
               }}
               className="rounded-full border border-[#c8725c] bg-[#fff2eb] px-4 py-2 text-sm font-medium text-[#8d3a2b]"
             >
@@ -427,10 +494,54 @@ function RestaurantEditor({
             {statusText}
           </p>
         ) : null}
+
+        <div className="mt-3 text-xs font-medium text-[#6b665d]">
+          Autosave draft is enabled for this restaurant.
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2 xl:hidden">
+          <button
+            type="button"
+            onClick={() => setMobilePanel("dishes")}
+            className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+              mobilePanel === "dishes"
+                ? "border border-[#c8b8a6] bg-[#fff0de] text-[#8d3a2b]"
+                : "border border-[#e0d2c1] bg-[#fff8ef] text-[#6b665d]"
+            }`}
+          >
+            Dishes
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobilePanel("wines")}
+            className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+              mobilePanel === "wines"
+                ? "border border-[#b9d5c6] bg-[#e7f5ee] text-[#2f6a6e]"
+                : "border border-[#d7ddd2] bg-[#f8fcfa] text-[#6b665d]"
+            }`}
+          >
+            Wines
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobilePanel("pairings")}
+            className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+              mobilePanel === "pairings"
+                ? "border border-[#b8d7cf] bg-[#e8f4f0] text-[#2f6a6e]"
+                : "border border-[#d7ddd2] bg-[#f8fcfa] text-[#6b665d]"
+            }`}
+          >
+            Pairings
+          </button>
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <article className="site-panel p-4 md:p-6">
+        <article
+          className={`site-panel p-4 md:p-6 ${
+            mobilePanel !== "dishes" ? "hidden xl:block" : ""
+          }`}
+        >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               Dishes
@@ -541,7 +652,9 @@ function RestaurantEditor({
           </div>
         </article>
 
-        <article className="site-panel p-4 md:p-6">
+        <article
+          className={`site-panel p-4 md:p-6 ${mobilePanel !== "wines" ? "hidden xl:block" : ""}`}
+        >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               Wines
@@ -664,7 +777,9 @@ function RestaurantEditor({
         </article>
       </section>
 
-      <section className="site-panel p-4 md:p-6">
+      <section
+        className={`site-panel p-4 md:p-6 ${mobilePanel !== "pairings" ? "hidden xl:block" : ""}`}
+      >
         <div className="mb-4 flex flex-wrap items-end gap-3">
           <div>
             <h2 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
@@ -723,6 +838,16 @@ function RestaurantEditor({
           </div>
         )}
       </section>
+
+      <div className="fixed right-4 bottom-4 z-50 xl:hidden">
+        <button
+          type="button"
+          onClick={saveDraft}
+          className="rounded-full border border-[#35776d] bg-[#3e8f82] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(26,59,53,0.25)]"
+        >
+          Save
+        </button>
+      </div>
     </>
   );
 }

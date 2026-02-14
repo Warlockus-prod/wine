@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import MobileTabBar from "@/components/v2/MobileTabBar";
+import { trackEvent } from "@/lib/analytics";
+import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 type Dish = {
   id: string;
@@ -23,6 +26,11 @@ type Wine = {
   description: string;
   image: string;
   tags: string[];
+};
+
+type MatchDetails = {
+  score: number;
+  reason: string;
 };
 
 const DISHES: Dish[] = [
@@ -118,72 +126,163 @@ const WINES: Wine[] = [
   },
 ];
 
-const MATCHES: Record<string, Array<{ wineId: string; score: number; reason: string }>> = {
+const FALLBACK_MATCHES: Record<string, MatchDetails[]> = {
   "duck-confit": [
     {
-      wineId: "riesling",
       score: 98,
       reason: "High acidity slices through duck fat and lifts savory herbs.",
     },
     {
-      wineId: "pinot",
       score: 95,
       reason: "Red-fruit and earth mirror the confit depth without overpowering.",
     },
   ],
   escargots: [
     {
-      wineId: "riesling",
       score: 96,
       reason: "Citrus + minerality balance garlic butter and parsley freshness.",
     },
     {
-      wineId: "rose",
       score: 74,
       reason: "Fresh but lighter than the butter texture needs.",
     },
   ],
   "beef-tartare": [
     {
-      wineId: "pinot",
       score: 92,
       reason: "Bright acidity and gentle tannin support raw beef and capers.",
     },
     {
-      wineId: "cabernet",
       score: 70,
       reason: "Structure works, but tannins can dominate texture.",
     },
   ],
   scallops: [
     {
-      wineId: "riesling",
       score: 90,
       reason: "Mineral edge supports seafood sweetness and truffle notes.",
     },
     {
-      wineId: "rose",
       score: 83,
       reason: "Light red-berry aromatics play well with delicate scallops.",
     },
   ],
 };
 
+const buildFallbackMatchMap = (dishId: string) => {
+  const matchMap = new Map<string, MatchDetails>();
+  const fallback = FALLBACK_MATCHES[dishId] ?? [];
+
+  fallback.forEach((item, index) => {
+    const wineId = WINES[index]?.id;
+    if (wineId) {
+      matchMap.set(wineId, item);
+    }
+  });
+
+  return matchMap;
+};
+
 export default function PairingPage() {
   const [activeDishId, setActiveDishId] = useState<string>("duck-confit");
+  const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(
+    () => buildFallbackMatchMap("duck-confit"),
+  );
+  const [aiStatus, setAiStatus] = useState<"loading" | "ready" | "fallback">("ready");
+  const firstClickTracked = useRef(false);
+  const openTimestamp = useRef<number>(0);
+  const wineListRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    openTimestamp.current = performance.now();
+    trackEvent("pairing_page_open", { device: "mobile-first" });
+  }, []);
 
   const activeDish = useMemo(
     () => DISHES.find((dish) => dish.id === activeDishId) ?? DISHES[0],
     [activeDishId],
   );
 
-  const matchMap = useMemo(() => {
-    const entries = MATCHES[activeDish.id] ?? [];
-    return new Map(entries.map((item) => [item.wineId, item]));
-  }, [activeDish.id]);
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadAiMatches = async () => {
+      setAiStatus("loading");
+
+      try {
+        const response = await fetch("/api/pairing", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            dish: {
+              id: activeDish.id,
+              name: activeDish.name,
+              description: activeDish.description,
+              tags: activeDish.tags,
+            },
+            wines: WINES,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("AI pairing failed");
+        }
+
+        const data = (await response.json()) as {
+          matches?: Array<{ wineId: string; score: number; reason: string }>;
+        };
+
+        const nextMap = new Map<string, MatchDetails>();
+        for (const result of data.matches ?? []) {
+          nextMap.set(result.wineId, { score: result.score, reason: result.reason });
+        }
+
+        if (nextMap.size === 0) {
+          throw new Error("AI returned empty matches");
+        }
+
+        setMatchMap(nextMap);
+        setAiStatus("ready");
+        trackEvent("pairing_ai_success", {
+          dish_id: activeDish.id,
+          top_score: Math.max(...Array.from(nextMap.values()).map((item) => item.score)),
+        });
+      } catch {
+        const fallbackMap = buildFallbackMatchMap(activeDish.id);
+        setMatchMap(fallbackMap);
+        setAiStatus("fallback");
+        trackEvent("pairing_ai_fallback", { dish_id: activeDish.id });
+      }
+    };
+
+    void loadAiMatches();
+
+    return () => {
+      controller.abort();
+    };
+  }, [activeDish]);
+
+  const selectDish = (dishId: string, source: "cards" | "chips") => {
+    setActiveDishId(dishId);
+    trackEvent("pairing_dish_selected", { dish_id: dishId, source });
+
+    if (!firstClickTracked.current && openTimestamp.current > 0) {
+      firstClickTracked.current = true;
+      const elapsed = Math.round(performance.now() - openTimestamp.current);
+      trackEvent("pairing_time_to_first_selection_ms", { elapsed });
+    }
+  };
+
+  const scrollToWineList = () => {
+    wineListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    trackEvent("pairing_scroll_to_wines", { dish_id: activeDish.id });
+  };
 
   return (
-    <div className="flex min-h-screen flex-col overflow-hidden bg-background-dark text-gray-200 selection:bg-primary selection:text-white">
+    <div className="mobile-safe-bottom flex min-h-screen flex-col overflow-hidden bg-background-dark text-gray-200 selection:bg-primary selection:text-white">
       <header className="glass-nav z-20 flex h-16 shrink-0 items-center justify-between border-b border-primary/20 px-4 shadow-md sm:px-6">
         <div className="flex items-center gap-3">
           <Link
@@ -192,20 +291,77 @@ export default function PairingPage() {
           >
             S
           </Link>
-          <h1 className="text-lg font-bold tracking-tight text-white">Sommelier AI Pairing Room</h1>
+          <h1 className="text-base font-bold tracking-tight text-white sm:text-lg">
+            Sommelier AI Pairing Room
+          </h1>
         </div>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-4 text-xs sm:text-sm">
           <Link href="/" className="text-gray-300 transition hover:text-primary">
             Discover
           </Link>
-          <Link href="/v1" className="text-gray-300 transition hover:text-primary">
-            Backup V1
+          <Link href="/v1/admin" className="text-gray-300 transition hover:text-primary">
+            Admin
           </Link>
         </div>
       </header>
 
       <main className="relative flex flex-1 flex-col overflow-hidden lg:flex-row">
-        <section className="relative z-10 w-full overflow-y-auto border-b border-primary/10 bg-background-dark p-5 lg:w-1/2 lg:border-r lg:border-b-0 lg:p-8">
+        <section className="border-b border-primary/10 bg-background-dark px-4 pt-4 pb-5 lg:hidden">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-white">Choose Dish</h2>
+            <button
+              type="button"
+              onClick={scrollToWineList}
+              className="rounded-full border border-primary/40 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary uppercase"
+            >
+              To Wines
+            </button>
+          </div>
+
+          <div className="hide-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
+            {DISHES.map((dish) => {
+              const selected = dish.id === activeDish.id;
+              return (
+                <button
+                  key={dish.id}
+                  type="button"
+                  onClick={() => selectDish(dish.id, "chips")}
+                  className={`whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold ${
+                    selected
+                      ? "border border-primary/30 bg-primary/15 text-primary"
+                      : "border border-white/10 bg-surface-dark text-gray-300"
+                  }`}
+                >
+                  {dish.name}
+                </button>
+              );
+            })}
+          </div>
+
+          <article className="mt-3 rounded-xl border border-primary/25 bg-surface-dark p-3">
+            <div className="flex gap-3">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                <Image
+                  src={activeDish.image}
+                  alt={activeDish.name}
+                  fill
+                  quality={66}
+                  placeholder="blur"
+                  blurDataURL={GENERIC_BLUR_DATA_URL}
+                  sizes="64px"
+                  className="object-cover"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-white">{activeDish.name}</p>
+                <p className="line-clamp-2 text-xs text-gray-400">{activeDish.description}</p>
+                <p className="mt-1 text-xs font-semibold text-primary">${activeDish.price}</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section className="relative z-10 hidden w-full overflow-y-auto border-b border-primary/10 bg-background-dark p-5 lg:block lg:w-1/2 lg:border-r lg:border-b-0 lg:p-8">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-3xl font-bold text-white">Menu</h2>
@@ -224,7 +380,7 @@ export default function PairingPage() {
                 <button
                   key={dish.id}
                   type="button"
-                  onClick={() => setActiveDishId(dish.id)}
+                  onClick={() => selectDish(dish.id, "cards")}
                   className={`relative flex w-full gap-4 rounded-xl border p-4 text-left shadow-sm transition-all duration-300 ${
                     isActive
                       ? "active-dish-glow border-primary bg-surface-dark"
@@ -241,6 +397,9 @@ export default function PairingPage() {
                     <Image
                       alt={dish.name}
                       fill
+                      quality={66}
+                      placeholder="blur"
+                      blurDataURL={GENERIC_BLUR_DATA_URL}
                       sizes="128px"
                       src={dish.image}
                       className="object-cover"
@@ -278,37 +437,49 @@ export default function PairingPage() {
           </div>
         </section>
 
-        <section className="w-full overflow-y-auto bg-surface-darker p-5 lg:w-1/2 lg:p-8">
-          <div className="sticky top-0 z-10 mb-6 border-b border-primary/10 bg-surface-darker pb-5">
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="flex items-center gap-3 text-3xl font-bold text-white">
+        <section
+          ref={wineListRef}
+          className="w-full overflow-y-auto bg-surface-darker p-4 pb-28 sm:p-5 lg:w-1/2 lg:p-8"
+        >
+          <div className="sticky top-0 z-10 mb-4 border-b border-primary/10 bg-surface-darker pb-4 sm:mb-6 sm:pb-5">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+              <h2 className="flex items-center gap-2 text-xl font-bold text-white sm:gap-3 sm:text-3xl">
                 Wine List
-                <span className="rounded bg-primary/15 px-2 py-1 text-xs font-bold tracking-wider text-primary uppercase">
+                <span className="rounded bg-primary/15 px-2 py-1 text-[10px] font-bold tracking-wider text-primary uppercase sm:text-xs">
                   {activeDish.name}
                 </span>
               </h2>
-              <Link
-                href="/v1/admin"
-                className="text-xs font-semibold text-primary uppercase hover:text-rose-300"
+              <span
+                className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase ${
+                  aiStatus === "loading"
+                    ? "bg-white/10 text-gray-300"
+                    : aiStatus === "fallback"
+                      ? "bg-amber-900/35 text-amber-300"
+                      : "bg-emerald-900/30 text-emerald-300"
+                }`}
               >
-                Open Admin
-              </Link>
+                {aiStatus === "loading"
+                  ? "AI analyzing"
+                  : aiStatus === "fallback"
+                    ? "Fallback mode"
+                    : "AI ready"}
+              </span>
             </div>
             <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
-              <div className="h-full w-1/3 animate-pulse bg-primary" />
+              <div className={`h-full bg-primary ${aiStatus === "loading" ? "w-1/3 animate-pulse" : "w-3/4"}`} />
             </div>
           </div>
 
-          <div className="space-y-4 pb-8">
+          <div className="space-y-3 pb-8 sm:space-y-4">
             {WINES.map((wine) => {
               const match = matchMap.get(wine.id);
               const isMatch = Boolean(match);
-              const isTopMatch = (match?.score ?? 0) >= 95;
+              const isTopMatch = (match?.score ?? 0) >= 92;
 
               return (
                 <article
                   key={wine.id}
-                  className={`relative rounded-xl border p-4 transition-all duration-300 ${
+                  className={`relative rounded-xl border p-3 transition-all duration-300 sm:p-4 ${
                     isMatch
                       ? isTopMatch
                         ? "ai-match-glow border-primary bg-surface-dark"
@@ -329,21 +500,30 @@ export default function PairingPage() {
                     </div>
                   ) : null}
 
-                  <div className="flex gap-4">
-                    <div className="relative h-36 w-16 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20">
-                      <Image alt={wine.name} fill sizes="64px" src={wine.image} className="object-cover" />
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className="relative h-28 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20 sm:h-36 sm:w-16">
+                      <Image
+                        alt={wine.name}
+                        fill
+                        quality={64}
+                        placeholder="blur"
+                        blurDataURL={GENERIC_BLUR_DATA_URL}
+                        sizes="64px"
+                        src={wine.image}
+                        className="object-cover"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                     </div>
 
                     <div className="flex-1">
                       <div className="mb-1 flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-lg font-bold text-white">{wine.name}</h3>
-                          <p className="text-sm text-primary">
+                          <h3 className="text-base font-bold text-white sm:text-lg">{wine.name}</h3>
+                          <p className="text-xs text-primary sm:text-sm">
                             {wine.region} • {wine.year}
                           </p>
                         </div>
-                        <p className="text-lg font-bold text-white">${wine.price}</p>
+                        <p className="text-base font-bold text-white sm:text-lg">${wine.price}</p>
                       </div>
 
                       <div className="mb-2 flex items-center gap-1">
@@ -360,14 +540,14 @@ export default function PairingPage() {
                         <span className="ml-1 text-xs text-gray-500">({wine.rating})</span>
                       </div>
 
-                      <p className="text-sm text-gray-400">{wine.description}</p>
+                      <p className="text-xs text-gray-400 sm:text-sm">{wine.description}</p>
 
                       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap gap-2">
                           {wine.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="rounded border border-white/10 bg-black/20 px-2 py-1 text-xs text-gray-300"
+                              className="rounded border border-white/10 bg-black/20 px-2 py-1 text-[10px] text-gray-300 sm:text-xs"
                             >
                               {tag}
                             </span>
@@ -375,7 +555,14 @@ export default function PairingPage() {
                         </div>
                         <button
                           type="button"
-                          className={`rounded-lg px-3 py-2 text-xs font-bold uppercase transition ${
+                          onClick={() =>
+                            trackEvent("pairing_wine_action_click", {
+                              dish_id: activeDish.id,
+                              wine_id: wine.id,
+                              action: isMatch ? "add" : "skip",
+                            })
+                          }
+                          className={`rounded-lg px-3 py-2 text-[10px] font-bold uppercase transition sm:text-xs ${
                             isMatch
                               ? "bg-primary text-white hover:bg-primary-dark"
                               : "border border-white/10 text-gray-400 hover:text-white"
@@ -392,6 +579,18 @@ export default function PairingPage() {
           </div>
         </section>
       </main>
+
+      <div className="fixed right-3 left-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-[65] rounded-xl border border-primary/30 bg-[#1a0f11e6] p-2 backdrop-blur-md lg:hidden">
+        <button
+          type="button"
+          onClick={scrollToWineList}
+          className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
+        >
+          Choose wine for {activeDish.name}
+        </button>
+      </div>
+
+      <MobileTabBar />
     </div>
   );
 }
