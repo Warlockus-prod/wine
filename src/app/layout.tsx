@@ -44,8 +44,18 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <head>
         <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined"
           rel="stylesheet"
+          fetchPriority="low"
         />
       </head>
       <body

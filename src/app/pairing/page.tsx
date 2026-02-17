@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
+import Navigation from "@/components/v2/Navigation";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 import { usePairingDataset } from "@/lib/pairing-store";
@@ -206,29 +207,9 @@ export default function PairingPage() {
 
   return (
     <div className="mobile-safe-bottom flex min-h-screen flex-col overflow-hidden bg-background-dark text-gray-200 selection:bg-primary selection:text-white">
-      <header className="glass-nav z-20 flex h-16 shrink-0 items-center justify-between border-b border-primary/20 px-4 shadow-md sm:px-6">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="flex h-8 w-8 items-center justify-center rounded bg-primary text-sm font-bold text-white"
-          >
-            S
-          </Link>
-          <h1 className="text-base font-bold tracking-tight text-white sm:text-lg">
-            Sommelier AI Pairing Room
-          </h1>
-        </div>
-        <div className="flex items-center gap-4 text-xs sm:text-sm">
-          <Link href="/" className="text-gray-300 transition hover:text-primary">
-            Discover
-          </Link>
-          <Link href="/admin" className="text-gray-300 transition hover:text-primary">
-            Admin
-          </Link>
-        </div>
-      </header>
+      <Navigation />
 
-      <main className="relative flex flex-1 flex-col overflow-hidden lg:flex-row">
+      <main className="relative flex flex-1 flex-col overflow-hidden pt-20 lg:flex-row">
         <section className="border-b border-primary/10 bg-background-dark px-4 pt-4 pb-5 lg:hidden">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-xl font-bold text-white">Choose Dish</h2>
@@ -249,7 +230,7 @@ export default function PairingPage() {
                   key={dish.id}
                   type="button"
                   onClick={() => selectDish(dish.id, "chips")}
-                  className={`whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold ${
+                  className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold ${
                     selected
                       ? "border border-primary/30 bg-primary/15 text-primary"
                       : "border border-white/10 bg-surface-dark text-gray-300"
@@ -362,7 +343,7 @@ export default function PairingPage() {
 
         <section
           ref={wineListRef}
-          className="w-full overflow-y-auto bg-surface-darker p-4 pb-28 sm:p-5 lg:w-1/2 lg:p-8"
+          className="w-full overflow-y-auto bg-surface-darker p-4 pb-44 sm:p-5 sm:pb-44 lg:w-1/2 lg:p-8 lg:pb-8"
         >
           <div className="sticky top-0 z-10 mb-4 border-b border-primary/10 bg-surface-darker pb-4 sm:mb-6 sm:pb-5">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
@@ -485,7 +466,7 @@ export default function PairingPage() {
                               action: isMatch ? "add" : "skip",
                             })
                           }
-                          className={`rounded-lg px-3 py-2 text-[10px] font-bold uppercase transition sm:text-xs ${
+                          className={`rounded-lg px-4 py-2.5 text-xs font-bold uppercase transition ${
                             isMatch
                               ? "bg-primary text-white hover:bg-primary-dark"
                               : "border border-white/10 text-gray-400 hover:text-white"

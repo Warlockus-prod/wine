@@ -7,10 +7,10 @@ type RouteCheck = {
 
 const routes: RouteCheck[] = [
   { path: "/", mustSee: /sommelier/i },
-  { path: "/pairing", mustSee: /pairing room/i },
+  { path: "/pairing", mustSee: /choose dish/i },
   { path: "/admin", mustSee: /admin studio/i },
-  { path: "/immersive", mustSee: /epicurean/i },
-  { path: "/editorial", mustSee: /lux/i },
+  { path: "/immersive", mustSee: /sommelier/i },
+  { path: "/editorial", mustSee: /sommelier/i },
   { path: "/v1", mustSee: /cellar compass/i },
   { path: "/v1/admin", mustSee: /restaurant content manager/i },
   { path: "/v1/restaurants/trattoria-bellavista", mustSee: /wine list/i },

@@ -36,6 +36,10 @@ body {
   min-height: 100%;
 }
 
+html {
+  scroll-padding-top: 5.5rem;
+}
+
 body {
   font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
   color: #f4f2f1;

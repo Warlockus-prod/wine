@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import MobileTabBar from "@/components/v2/MobileTabBar";
+import Navigation from "@/components/v2/Navigation";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 const CURATED_CARDS = [
@@ -45,39 +46,7 @@ const CURATED_CARDS = [
 export default function EditorialPage() {
   return (
     <div className="mobile-safe-bottom flex min-h-screen flex-col bg-background-dark text-gray-100">
-      <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-background-dark/80 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-12">
-            <Link href="/" className="flex items-center gap-2 text-2xl tracking-tight">
-              <span className="h-8 w-2 rounded-full bg-primary" />
-              <span className="font-bold">LUX</span>
-              <span>DINING</span>
-            </Link>
-            <div className="hidden items-center gap-8 text-sm font-medium tracking-wide text-gray-400 md:flex">
-              <Link href="/" className="hover:text-primary">
-                DISCOVER
-              </Link>
-              <Link href="/pairing" className="flex items-center gap-1 hover:text-primary">
-                AI PAIRING
-                <span className="ml-1 rounded bg-primary/20 px-1.5 py-0.5 text-[10px] text-primary">
-                  BETA
-                </span>
-              </Link>
-              <Link href="/v1" className="hover:text-primary">
-                BACKUP V1
-              </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="rounded-full border border-white/20 px-5 py-2 text-sm font-medium transition hover:border-primary hover:bg-primary hover:text-white"
-            >
-              Admin
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       <header className="relative flex min-h-[90vh] flex-col overflow-hidden pt-20 lg:flex-row">
         <div className="z-20 flex bg-background-dark px-6 py-16 lg:w-5/12 lg:justify-end lg:py-0 lg:pl-24 lg:pr-12">
@@ -196,6 +165,9 @@ export default function EditorialPage() {
           </Link>
         </div>
 
+        <p className="mx-auto mb-3 max-w-7xl px-6 text-xs tracking-wider text-gray-500 uppercase md:hidden">
+          <span className="material-icons align-middle text-sm">swipe</span> Swipe to explore
+        </p>
         <div className="carousel-mask hide-scrollbar flex gap-6 overflow-x-auto px-6 pb-10">
           {CURATED_CARDS.map((card) => (
             <article

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 const menuLinks = [
   { href: "/", label: "Discover" },
@@ -14,9 +15,26 @@ const menuLinks = [
   { href: "/v1/admin", label: "Admin V1" },
 ];
 
+const PHONE_WIDTH = 390;
+const PHONE_HEIGHT = 844;
+
 export default function Navigation() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [isIframe, setIsIframe] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("viewport") === "mobile") {
+      setIsIframe(true);
+    }
+  }, []);
+
+  // Hide the viewport toggle inside the iframe preview
+  const showViewportToggle = mounted && !isIframe;
 
   return (
     <>
@@ -55,6 +73,17 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Viewport switcher toggle — only on desktop, hidden inside iframe */}
+            {showViewportToggle ? (
+              <button
+                type="button"
+                onClick={() => setPreviewMode(true)}
+                className="hidden items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/15 px-3 py-2 text-xs font-semibold text-primary transition-all hover:bg-primary hover:text-white md:flex"
+              >
+                <span className="material-icons text-sm">smartphone</span>
+                <span>Mobile</span>
+              </button>
+            ) : null}
             <Link
               className="hidden rounded-lg border border-white/20 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/16 md:inline-flex"
               href="/admin"
@@ -71,7 +100,7 @@ export default function Navigation() {
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileOpen((prev) => !prev)}
-              className="inline-flex rounded-lg border border-white/20 bg-white/10 p-2 text-white transition hover:bg-white/20 md:hidden"
+              className="inline-flex rounded-lg border border-white/20 bg-white/10 p-2.5 text-white transition hover:bg-white/20 md:hidden"
             >
               <span className="material-icons text-base">{mobileOpen ? "close" : "menu"}</span>
             </button>
@@ -79,6 +108,7 @@ export default function Navigation() {
         </div>
       </nav>
 
+      {/* Mobile navigation dropdown */}
       {mobileOpen ? (
         <div className="fixed inset-0 z-[55] bg-black/55 md:hidden" onClick={() => setMobileOpen(false)}>
           <aside
@@ -112,6 +142,61 @@ export default function Navigation() {
           </aside>
         </div>
       ) : null}
+
+      {/* Mobile preview overlay — portalled to body */}
+      {previewMode && mounted
+        ? createPortal(
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm">
+              {/* Top bar */}
+              <div className="absolute top-0 right-0 left-0 z-[105] flex items-center justify-between px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="rounded-full bg-primary/20 px-3 py-1.5 text-xs font-bold tracking-wider text-primary uppercase">
+                    Mobile Preview
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {PHONE_WIDTH}×{PHONE_HEIGHT}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode(false)}
+                  className="flex items-center gap-2 rounded-full border border-white/20 bg-surface-dark px-4 py-2.5 text-sm font-semibold text-white shadow-2xl transition hover:border-primary hover:bg-primary"
+                >
+                  <span className="material-icons text-sm">close</span>
+                  Close
+                </button>
+              </div>
+
+              {/* Phone frame */}
+              <div
+                className="relative flex flex-col overflow-hidden rounded-[3rem] border-[6px] border-gray-700 bg-black shadow-[0_0_80px_rgba(209,21,52,0.15)]"
+                style={{
+                  width: PHONE_WIDTH + 12,
+                  height: PHONE_HEIGHT + 12,
+                }}
+              >
+                {/* Dynamic Island */}
+                <div className="absolute top-2 left-1/2 z-10 h-[26px] w-[100px] -translate-x-1/2 rounded-full bg-black" />
+
+                {/* iframe with the actual mobile view */}
+                <iframe
+                  src={`${pathname}?viewport=mobile`}
+                  title="Mobile preview"
+                  className="h-full w-full border-0"
+                  style={{
+                    width: PHONE_WIDTH,
+                    height: PHONE_HEIGHT,
+                    background: "#1a0f11",
+                  }}
+                />
+
+                {/* Home indicator */}
+                <div className="absolute bottom-2 left-1/2 h-[5px] w-[134px] -translate-x-1/2 rounded-full bg-gray-600" />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

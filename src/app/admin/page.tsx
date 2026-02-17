@@ -52,6 +52,7 @@ export default function AdminPage() {
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
   const [importText, setImportText] = useState("");
   const [statusText, setStatusText] = useState("");
+  const [mobileTab, setMobileTab] = useState<"dishes" | "wines">("dishes");
 
   const effectiveDishId =
     apiDishId && dataset.dishes.some((dish) => dish.id === apiDishId)
@@ -362,8 +363,33 @@ export default function AdminPage() {
           />
         </section>
 
-        <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <article className="min-w-0 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5">
+        <div className="sticky top-20 z-30 mt-6 flex gap-2 border-b border-white/10 bg-background-dark pb-3 xl:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileTab("dishes")}
+            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition ${
+              mobileTab === "dishes"
+                ? "bg-primary text-white"
+                : "border border-white/10 bg-surface-dark text-gray-300"
+            }`}
+          >
+            Dishes ({dataset.dishes.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("wines")}
+            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition ${
+              mobileTab === "wines"
+                ? "bg-primary text-white"
+                : "border border-white/10 bg-surface-dark text-gray-300"
+            }`}
+          >
+            Wines ({dataset.wines.length})
+          </button>
+        </div>
+
+        <section className="mt-4 grid grid-cols-1 gap-6 xl:mt-6 xl:grid-cols-2">
+          <article className={`min-w-0 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5 ${mobileTab !== "dishes" ? "hidden xl:block" : ""}`}>
             <h2 className="text-xl font-semibold text-white">Dishes</h2>
             <p className="mt-1 text-xs text-gray-400">Add menu items used by pairing AI.</p>
 
@@ -459,7 +485,7 @@ export default function AdminPage() {
             </div>
           </article>
 
-          <article className="min-w-0 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5">
+          <article className={`min-w-0 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5 ${mobileTab !== "wines" ? "hidden xl:block" : ""}`}>
             <h2 className="text-xl font-semibold text-white">Wines</h2>
             <p className="mt-1 text-xs text-gray-400">Manage cellar options for AI scoring.</p>
 

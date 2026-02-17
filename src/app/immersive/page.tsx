@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import MobileTabBar from "@/components/v2/MobileTabBar";
+import Navigation from "@/components/v2/Navigation";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 const RESTAURANTS = [
@@ -44,37 +45,14 @@ const RESTAURANTS = [
 
 export default function ImmersivePage() {
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background-dark text-white">
-      <nav className="pointer-events-none fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-gradient-to-b from-black/80 to-transparent px-6 py-6">
-        <Link href="/" className="pointer-events-auto flex items-center space-x-2">
-          <span className="material-icons text-2xl text-primary">wine_bar</span>
-          <span className="font-serif text-xl tracking-wide italic">Epicurean</span>
-        </Link>
-        <div className="pointer-events-auto hidden items-center gap-7 text-sm tracking-widest text-gray-200 uppercase md:flex">
-          <Link href="/" className="hover:text-primary">
-            Collections
-          </Link>
-          <Link href="/pairing" className="hover:text-primary">
-            Sommelier AI
-          </Link>
-          <Link href="/v1" className="hover:text-primary">
-            Backup V1
-          </Link>
-        </div>
-        <Link
-          href="/admin"
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-primary"
-          aria-label="Open admin"
-        >
-          <span className="material-icons text-sm">person</span>
-        </Link>
-      </nav>
+    <div className="mobile-safe-bottom h-screen w-screen overflow-hidden bg-background-dark text-white">
+      <Navigation />
 
-      <main className="hide-scrollbar relative h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth">
+      <main className="hide-scrollbar relative h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth pt-20">
         {RESTAURANTS.map((restaurant) => (
           <section
             key={restaurant.id}
-            className="group relative flex h-screen w-full shrink-0 snap-start items-end justify-center overflow-hidden"
+            className="group relative flex h-[calc(100vh-5rem)] w-full shrink-0 snap-start items-end justify-center overflow-hidden"
           >
             <div className="absolute inset-0 z-0">
               <Image
@@ -91,7 +69,7 @@ export default function ImmersivePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-black/40" />
             </div>
 
-            <div className="relative z-10 flex w-full max-w-4xl flex-col items-center px-6 pb-28 text-center md:pb-28">
+            <div className="relative z-10 flex w-full max-w-4xl flex-col items-center px-6 pb-36 text-center md:pb-28">
               <div className="mb-6 flex gap-3 opacity-0 animate-[fade-in-up_1s_ease-out_0.2s_forwards]">
                 {restaurant.tags.map((tag) => (
                   <span
@@ -103,11 +81,11 @@ export default function ImmersivePage() {
                 ))}
               </div>
 
-              <h1 className="mb-6 font-serif text-6xl leading-none tracking-tight text-white opacity-0 animate-[fade-in-up_1s_ease-out_0.4s_forwards] md:text-8xl">
+              <h1 className="mb-6 font-serif text-4xl leading-none tracking-tight text-white opacity-0 animate-[fade-in-up_1s_ease-out_0.4s_forwards] sm:text-6xl md:text-8xl">
                 {restaurant.name}
               </h1>
 
-              <p className="mb-10 max-w-2xl font-serif text-xl leading-relaxed text-gray-200 italic opacity-0 animate-[fade-in-up_1s_ease-out_0.6s_forwards] md:text-2xl">
+              <p className="mb-10 max-w-2xl font-serif text-base leading-relaxed text-gray-200 italic opacity-0 animate-[fade-in-up_1s_ease-out_0.6s_forwards] sm:text-xl md:text-2xl">
                 {restaurant.description}
               </p>
 
@@ -123,10 +101,11 @@ export default function ImmersivePage() {
         ))}
       </main>
 
-      <div className="pointer-events-none fixed right-6 top-1/2 z-40 flex -translate-y-1/2 flex-col space-y-3">
+      <div className="pointer-events-none fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col space-y-3 md:flex">
         {RESTAURANTS.map((restaurant, index) => (
           <div
             key={restaurant.id}
+            aria-hidden="true"
             className={`rounded-full transition-all duration-300 ${
               index === 0 ? "h-8 w-1 bg-primary" : "h-2 w-1 bg-white/20"
             }`}
@@ -134,7 +113,7 @@ export default function ImmersivePage() {
         ))}
       </div>
 
-      <div className="fixed right-8 bottom-8 z-50">
+      <div className="fixed right-8 bottom-8 z-50 hidden lg:block">
         <Link
           href="/pairing"
           className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/30 transition-transform duration-300 hover:scale-110"

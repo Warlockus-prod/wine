@@ -29,7 +29,7 @@ export default function MobileTabBar() {
             <li key={tab.href}>
               <Link
                 href={tab.href}
-                className={`flex flex-col items-center rounded-lg px-2 py-2 text-[11px] font-semibold ${
+                className={`flex flex-col items-center rounded-lg px-3 py-2.5 text-[11px] font-semibold ${
                   active ? "bg-primary/20 text-primary" : "text-gray-300"
                 }`}
               >
