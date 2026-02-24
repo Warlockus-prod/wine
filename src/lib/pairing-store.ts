@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { seedPairingDataset } from "@/data/seed-pairing";
 import type { PairingDataset, WineAcidity, WineBody, WineTannin } from "@/types/pairing";
 
-const STORAGE_KEY = "web_wn_pairing_dataset_v2";
+const STORAGE_KEY = "web_wn_pairing_dataset_v3";
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 

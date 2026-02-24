@@ -82,7 +82,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 16;
     reasons.push({
       weight: 16,
-      text: "Высокая кислотность освежает блюдо и балансирует жирную текстуру.",
+      text: "High acidity refreshes the palate and balances richer textures.",
     });
   }
 
@@ -90,7 +90,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score -= 18;
     reasons.push({
       weight: 12,
-      text: "Сильные танины и плотное тело могут перебить деликатный вкус блюда.",
+      text: "High tannin or full body can overpower delicate flavors.",
     });
   }
 
@@ -98,7 +98,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 18;
     reasons.push({
       weight: 18,
-      text: "Минеральность и кислотность вина поддерживают морскую солоноватость и свежесть.",
+      text: "Acidity and minerality support seafood freshness and salinity.",
     });
   }
 
@@ -106,7 +106,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 20;
     reasons.push({
       weight: 20,
-      text: "Танины и структура вина хорошо связываются с белком и жиром красного мяса.",
+      text: "Tannin structure pairs well with the protein and fat in red meat.",
     });
   }
 
@@ -114,7 +114,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score -= 14;
     reasons.push({
       weight: 10,
-      text: "Легкое тело вина может выглядеть слишком тонким для насыщенного мясного блюда.",
+      text: "A light-bodied wine can feel too thin for a rich meat dish.",
     });
   }
 
@@ -122,7 +122,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score -= 10;
     reasons.push({
       weight: 9,
-      text: "Высокий алкоголь усиливает ощущение остроты.",
+      text: "Higher alcohol can amplify perceived heat in spicy dishes.",
     });
   }
 
@@ -134,7 +134,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 9;
     reasons.push({
       weight: 9,
-      text: "Легкое/среднее тело и мягкие танины аккуратно работают с остротой и специями.",
+      text: "Light to medium body with softer tannin handles spice more gracefully.",
     });
   }
 
@@ -142,7 +142,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 10;
     reasons.push({
       weight: 10,
-      text: "Кислотность вина совпадает с кислотным профилем томатного соуса.",
+      text: "Wine acidity aligns with the acid profile of tomato-based sauces.",
     });
   }
 
@@ -150,7 +150,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 8;
     reasons.push({
       weight: 8,
-      text: "Игристая структура очищает нёбо после жареной текстуры.",
+      text: "Sparkling texture cleanses the palate after fried textures.",
     });
   }
 
@@ -158,7 +158,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 7;
     reasons.push({
       weight: 7,
-      text: "Классическое региональное сочетание белого вина с морепродуктами.",
+      text: "Classic regional white-wine-and-seafood pairing profile.",
     });
   }
 
@@ -166,14 +166,14 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
     score += 8;
     reasons.push({
       weight: 8,
-      text: "Pinot Noir поддерживает утку и грибные тона, не перегружая блюдо.",
+      text: "Pinot Noir complements duck and mushroom notes without overpowering them.",
     });
   }
 
   if (reasons.length === 0) {
     reasons.push({
       weight: 1,
-      text: "Базовый баланс тела, кислотности и ароматического профиля корректный.",
+      text: "Overall body, acidity, and aromatic profile are broadly compatible.",
     });
   }
 
@@ -182,7 +182,7 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
   return {
     wineId: wine.id,
     score: clamp(Math.round(score), 25, 99),
-    reason: primaryReason ?? "Общий профиль вина совместим с выбранным блюдом.",
+    reason: primaryReason ?? "Overall wine structure is compatible with the selected dish.",
   };
 }
 

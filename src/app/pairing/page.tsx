@@ -690,15 +690,15 @@ export default function PairingPage() {
       </div>
 
       {selectedWine ? (
-        <div className="fixed inset-0 z-[90] lg:hidden">
+        <div className="fixed inset-0 z-[90]">
           <button
             type="button"
             aria-label="Close wine details"
             onClick={() => setSelectedWineId(null)}
             className="absolute inset-0 bg-black/60"
           />
-          <section className="absolute right-0 bottom-0 left-0 max-h-[78vh] overflow-y-auto rounded-t-3xl border-t border-white/15 bg-[#150d10f2] px-4 pt-4 pb-[calc(1.2rem+env(safe-area-inset-bottom))]">
-            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-white/25" />
+          <section className="absolute right-0 bottom-0 left-0 max-h-[78vh] overflow-y-auto rounded-t-3xl border-t border-white/15 bg-[#150d10f2] px-4 pt-4 pb-[calc(1.2rem+env(safe-area-inset-bottom))] lg:top-1/2 lg:right-auto lg:bottom-auto lg:left-1/2 lg:max-h-[84vh] lg:w-[min(760px,92vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-2xl lg:border lg:px-6 lg:pb-6">
+            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-white/25 lg:hidden" />
 
             <div className="flex items-start justify-between gap-3">
               <div>
