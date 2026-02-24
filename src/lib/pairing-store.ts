@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { seedPairingDataset } from "@/data/seed-pairing";
-import type { PairingDataset } from "@/types/pairing";
+import type { PairingDataset, WineAcidity, WineBody, WineTannin } from "@/types/pairing";
 
 const STORAGE_KEY = "web_wn_pairing_dataset_v2";
 
@@ -17,6 +17,70 @@ const normalizeTags = (value: unknown): string[] => {
     .map((item) => String(item).trim())
     .filter((item) => item.length > 0)
     .slice(0, 8);
+};
+
+const bodyValues = new Set<WineBody>(["light", "medium", "full"]);
+const acidityValues = new Set<WineAcidity>(["low", "medium", "high"]);
+const tanninValues = new Set<WineTannin>(["none", "soft", "medium", "high"]);
+
+const fromSet = <T extends string>(value: unknown, allowed: Set<T>, fallback: T): T => {
+  const normalized = String(value ?? "").trim().toLowerCase() as T;
+  return allowed.has(normalized) ? normalized : fallback;
+};
+
+const inferPassportFromTags = (tags: string[]) => {
+  const normalized = tags.join(" ").toLowerCase();
+
+  const body: WineBody = normalized.includes("bold")
+    ? "full"
+    : normalized.includes("light")
+      ? "light"
+      : "medium";
+
+  const acidity: WineAcidity = normalized.includes("high acid")
+    ? "high"
+    : normalized.includes("low acid")
+      ? "low"
+      : "medium";
+
+  const tannin: WineTannin = normalized.includes("tannic")
+    ? "high"
+    : normalized.includes("soft tannin")
+      ? "soft"
+      : normalized.includes("none")
+        ? "none"
+        : "medium";
+
+  return {
+    grape: "Blend",
+    abv: 13,
+    body,
+    acidity,
+    tannin,
+    servingTempC: body === "full" ? "16-18" : "8-12",
+    decant: body === "full" ? "Decant 30 minutes." : "No decant.",
+  };
+};
+
+const normalizePassport = (value: unknown, tags: string[]) => {
+  const fallback = inferPassportFromTags(tags);
+  if (!value || typeof value !== "object") {
+    return fallback;
+  }
+
+  const raw = value as Record<string, unknown>;
+  const abv = Number(raw.abv ?? fallback.abv);
+  const safeAbv = Number.isFinite(abv) ? Math.max(5, Math.min(20, Number(abv.toFixed(1)))) : fallback.abv;
+
+  return {
+    grape: String(raw.grape ?? fallback.grape).trim() || fallback.grape,
+    abv: safeAbv,
+    body: fromSet(raw.body, bodyValues, fallback.body),
+    acidity: fromSet(raw.acidity, acidityValues, fallback.acidity),
+    tannin: fromSet(raw.tannin, tanninValues, fallback.tannin),
+    servingTempC: String(raw.servingTempC ?? fallback.servingTempC).trim() || fallback.servingTempC,
+    decant: String(raw.decant ?? fallback.decant).trim() || fallback.decant,
+  };
 };
 
 const normalizeDataset = (input: unknown): PairingDataset | null => {
@@ -72,6 +136,7 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
       const year = Number(value.year ?? 0);
       const price = Number(value.price ?? 0);
       const rating = Number(value.rating ?? 0);
+      const tags = normalizeTags(value.tags);
 
       if (
         !id ||
@@ -97,7 +162,8 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
         year,
         price,
         rating,
-        tags: normalizeTags(value.tags),
+        tags,
+        passport: normalizePassport(value.passport, tags),
       };
     })
     .filter((item) => item !== null);

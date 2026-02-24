@@ -15,6 +15,25 @@ type MatchDetails = {
   reason: string;
 };
 
+const bodyLabel = {
+  light: "Light",
+  medium: "Medium",
+  full: "Full",
+} as const;
+
+const acidityLabel = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+} as const;
+
+const tanninLabel = {
+  none: "None",
+  soft: "Soft",
+  medium: "Medium",
+  high: "High",
+} as const;
+
 const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[]) => {
   const dishText = [dish.name, dish.description, dish.tags.join(" ")].join(" ").toLowerCase();
 
@@ -66,6 +85,7 @@ export default function PairingPage() {
 
   const [activeDishId, setActiveDishId] = useState<string>(dishes[0]?.id ?? "");
   const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(new Map());
+  const [selectedWineId, setSelectedWineId] = useState<string | null>(null);
   const [aiStatus, setAiStatus] = useState<"loading" | "ready" | "fallback">("ready");
   const firstClickTracked = useRef(false);
   const openTimestamp = useRef<number>(0);
@@ -85,6 +105,42 @@ export default function PairingPage() {
     () => dishes.find((dish) => dish.id === effectiveDishId) ?? dishes[0] ?? null,
     [effectiveDishId, dishes],
   );
+
+  const rankedMatches = useMemo(() => {
+    const ranked = wines
+      .map((wine) => {
+        const match = matchMap.get(wine.id);
+        if (!match) {
+          return null;
+        }
+        return { wine, match };
+      })
+      .filter((item): item is { wine: PairingWine; match: MatchDetails } => item !== null)
+      .sort((a, b) => b.match.score - a.match.score);
+
+    const best = ranked[0] ?? null;
+    const alternative = ranked[1] ?? null;
+    const budgetPool = ranked.filter((item) => item.match.score >= 70);
+    const budgetSource = budgetPool.length > 0 ? budgetPool : ranked;
+    const budget =
+      budgetSource.length > 0
+        ? [...budgetSource].sort((a, b) => a.wine.price - b.wine.price)[0]
+        : null;
+
+    return { best, alternative, budget };
+  }, [wines, matchMap]);
+
+  const selectedWine = useMemo(
+    () => wines.find((wine) => wine.id === selectedWineId) ?? null,
+    [selectedWineId, wines],
+  );
+  const selectedWineMatch = selectedWine ? matchMap.get(selectedWine.id) : null;
+
+  useEffect(() => {
+    if (selectedWineId && !wines.some((wine) => wine.id === selectedWineId)) {
+      setSelectedWineId(null);
+    }
+  }, [selectedWineId, wines]);
 
   useEffect(() => {
     if (!activeDish || wines.length === 0) {
@@ -161,6 +217,7 @@ export default function PairingPage() {
 
   const selectDish = (dishId: string, source: "cards" | "chips") => {
     setActiveDishId(dishId);
+    setSelectedWineId(null);
     trackEvent("pairing_dish_selected", { dish_id: dishId, source });
 
     if (!firstClickTracked.current && openTimestamp.current > 0) {
@@ -372,6 +429,47 @@ export default function PairingPage() {
             <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
               <div className={`h-full bg-primary ${aiStatus === "loading" ? "w-1/3 animate-pulse" : "w-3/4"}`} />
             </div>
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {[
+                { rank: "#1", label: "Best Match", item: rankedMatches.best, tone: "border-primary/40 bg-primary/10" },
+                {
+                  rank: "#2",
+                  label: "Alternative",
+                  item: rankedMatches.alternative,
+                  tone: "border-white/15 bg-white/5",
+                },
+                {
+                  rank: "#3",
+                  label: "Budget Pick",
+                  item: rankedMatches.budget,
+                  tone: "border-emerald-400/30 bg-emerald-500/10",
+                },
+              ].map((entry) => (
+                <button
+                  key={entry.rank}
+                  type="button"
+                  onClick={() => entry.item && setSelectedWineId(entry.item.wine.id)}
+                  disabled={!entry.item}
+                  className={`rounded-lg border px-3 py-2 text-left transition ${
+                    entry.item ? `${entry.tone} hover:border-primary/50` : "border-white/10 bg-black/20 opacity-50"
+                  }`}
+                >
+                  <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+                    {entry.rank} {entry.label}
+                  </p>
+                  {entry.item ? (
+                    <>
+                      <p className="mt-1 text-sm font-semibold text-white">{entry.item.wine.name}</p>
+                      <p className="text-xs text-gray-300">
+                        {entry.item.match.score}% • ${entry.item.wine.price}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-xs text-gray-500">Not available yet</p>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-3 pb-8 sm:space-y-4">
@@ -457,23 +555,39 @@ export default function PairingPage() {
                             </span>
                           ))}
                         </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            trackEvent("pairing_wine_action_click", {
-                              dish_id: activeDish.id,
-                              wine_id: wine.id,
-                              action: isMatch ? "add" : "skip",
-                            })
-                          }
-                          className={`rounded-lg px-4 py-2.5 text-xs font-bold uppercase transition ${
-                            isMatch
-                              ? "bg-primary text-white hover:bg-primary-dark"
-                              : "border border-white/10 text-gray-400 hover:text-white"
-                          }`}
-                        >
-                          {isMatch ? "Add" : "Skip"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedWineId(wine.id);
+                              trackEvent("pairing_open_passport", {
+                                dish_id: activeDish.id,
+                                wine_id: wine.id,
+                                source: "wine-card",
+                              });
+                            }}
+                            className="rounded-lg border border-white/20 px-3 py-2.5 text-[11px] font-semibold uppercase text-gray-200 transition hover:border-primary/40 hover:text-white"
+                          >
+                            Why + Passport
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              trackEvent("pairing_wine_action_click", {
+                                dish_id: activeDish.id,
+                                wine_id: wine.id,
+                                action: isMatch ? "add" : "skip",
+                              })
+                            }
+                            className={`rounded-lg px-4 py-2.5 text-xs font-bold uppercase transition ${
+                              isMatch
+                                ? "bg-primary text-white hover:bg-primary-dark"
+                                : "border border-white/10 text-gray-400 hover:text-white"
+                            }`}
+                          >
+                            {isMatch ? "Add" : "Skip"}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -493,6 +607,100 @@ export default function PairingPage() {
           Choose wine for {activeDish.name}
         </button>
       </div>
+
+      {selectedWine ? (
+        <div className="fixed inset-0 z-[90] lg:hidden">
+          <button
+            type="button"
+            aria-label="Close wine details"
+            onClick={() => setSelectedWineId(null)}
+            className="absolute inset-0 bg-black/60"
+          />
+          <section className="absolute right-0 bottom-0 left-0 max-h-[78vh] overflow-y-auto rounded-t-3xl border-t border-white/15 bg-[#150d10f2] px-4 pt-4 pb-[calc(1.2rem+env(safe-area-inset-bottom))]">
+            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-white/25" />
+
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold tracking-wider text-primary uppercase">
+                  Wine Passport
+                </p>
+                <h3 className="text-lg font-bold text-white">{selectedWine.name}</h3>
+                <p className="text-xs text-gray-300">
+                  {selectedWine.region} • {selectedWine.year}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedWineId(null)}
+                className="rounded-lg border border-white/20 px-3 py-1 text-xs font-semibold text-gray-200"
+              >
+                Close
+              </button>
+            </div>
+
+            {selectedWineMatch ? (
+              <div className="mt-4 rounded-xl border border-primary/35 bg-primary/12 p-3">
+                <p className="text-xs font-bold tracking-wider text-primary uppercase">
+                  Why it matches • {selectedWineMatch.score}%
+                </p>
+                <p className="mt-1 text-sm text-gray-100">{selectedWineMatch.reason}</p>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-white/15 bg-black/20 p-3">
+                <p className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                  Why it matches
+                </p>
+                <p className="mt-1 text-sm text-gray-300">
+                  This wine is currently outside the best match zone for the selected dish.
+                </p>
+              </div>
+            )}
+
+            <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Grape</p>
+                <p className="mt-1 text-white">{selectedWine.passport.grape}</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                <p className="text-[10px] tracking-wider text-gray-400 uppercase">ABV</p>
+                <p className="mt-1 text-white">{selectedWine.passport.abv}%</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Body</p>
+                <p className="mt-1 text-white">{bodyLabel[selectedWine.passport.body]}</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Acidity</p>
+                <p className="mt-1 text-white">{acidityLabel[selectedWine.passport.acidity]}</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Tannin</p>
+                <p className="mt-1 text-white">{tanninLabel[selectedWine.passport.tannin]}</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
+                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Serve</p>
+                <p className="mt-1 text-white">{selectedWine.passport.servingTempC}°C</p>
+              </div>
+            </div>
+
+            <div className="mt-3 rounded-lg border border-white/10 bg-black/25 p-3">
+              <p className="text-[10px] tracking-wider text-gray-400 uppercase">Decant</p>
+              <p className="mt-1 text-sm text-gray-100">{selectedWine.passport.decant}</p>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {selectedWine.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded border border-white/10 bg-black/20 px-2 py-1 text-[10px] text-gray-300"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <MobileTabBar />
     </div>

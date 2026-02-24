@@ -261,7 +261,7 @@ export const seedRestaurants: Restaurant[] = [
     id: "r2",
     slug: "sakura-ember",
     name: "Sakura Ember",
-    cuisine: "Japanese",
+    cuisine: "Asian",
     city: "Tokyo",
     description:
       "Modern Japanese kitchen with robata grill, pristine seafood, and precise pairings.",
@@ -517,7 +517,7 @@ export const seedRestaurants: Restaurant[] = [
     id: "r3",
     slug: "brasa-iberica",
     name: "Brasa Iberica",
-    cuisine: "Spanish",
+    cuisine: "European Mix",
     city: "Madrid",
     description:
       "Spanish tapas and grill house focused on coastal seafood and cast-iron fire.",
@@ -1029,7 +1029,7 @@ export const seedRestaurants: Restaurant[] = [
     id: "r5",
     slug: "andes-fuego",
     name: "Andes Fuego",
-    cuisine: "Peruvian Nikkei",
+    cuisine: "Asian-Latin Mix",
     city: "Lima",
     description:
       "Peruvian and Nikkei signatures with bright citrus, chili, and charcoal notes.",

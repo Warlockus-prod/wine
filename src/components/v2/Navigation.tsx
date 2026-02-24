@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 
 const menuLinks = [
@@ -22,19 +22,12 @@ export default function Navigation() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
-  const [isIframe, setIsIframe] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("viewport") === "mobile") {
-      setIsIframe(true);
-    }
-  }, []);
+  const isIframe =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("viewport") === "mobile";
 
   // Hide the viewport toggle inside the iframe preview
-  const showViewportToggle = mounted && !isIframe;
+  const showViewportToggle = !isIframe;
 
   return (
     <>
@@ -144,7 +137,7 @@ export default function Navigation() {
       ) : null}
 
       {/* Mobile preview overlay — portalled to body */}
-      {previewMode && mounted
+      {previewMode
         ? createPortal(
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm">
               {/* Top bar */}

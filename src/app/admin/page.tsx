@@ -6,7 +6,14 @@ import Navigation from "@/components/v2/Navigation";
 import { trackEvent } from "@/lib/analytics";
 import { makeId } from "@/lib/format";
 import { usePairingDataset } from "@/lib/pairing-store";
-import type { PairingDataset, PairingDish, PairingWine } from "@/types/pairing";
+import type {
+  PairingDataset,
+  PairingDish,
+  PairingWine,
+  WineAcidity,
+  WineBody,
+  WineTannin,
+} from "@/types/pairing";
 
 type ApiResponse = {
   matches?: Array<{ wineId: string; score: number; reason: string }>;
@@ -21,6 +28,10 @@ const parseTags = (input: string) =>
     .slice(0, 8);
 
 const toTagInput = (tags: string[]) => tags.join(", ");
+
+const bodyOptions: WineBody[] = ["light", "medium", "full"];
+const acidityOptions: WineAcidity[] = ["low", "medium", "high"];
+const tanninOptions: WineTannin[] = ["none", "soft", "medium", "high"];
 
 export default function AdminPage() {
   const { dataset, setDataset, resetDataset, exportDataset, importDataset } = usePairingDataset();
@@ -42,6 +53,13 @@ export default function AdminPage() {
     description: "",
     image: "",
     tags: "Balanced, Pairing",
+    grape: "Blend",
+    abv: "13",
+    body: "medium" as WineBody,
+    acidity: "medium" as WineAcidity,
+    tannin: "soft" as WineTannin,
+    servingTempC: "10-14",
+    decant: "No decant.",
   });
 
   const [apiDishId, setApiDishId] = useState<string>(dataset.dishes[0]?.id ?? "");
@@ -134,6 +152,15 @@ export default function AdminPage() {
       description: wineForm.description.trim() || "Pairing-friendly wine profile.",
       image: wineForm.image.trim(),
       tags: parseTags(wineForm.tags),
+      passport: {
+        grape: wineForm.grape.trim() || "Blend",
+        abv: Math.max(5, Math.min(20, Number(wineForm.abv) || 13)),
+        body: wineForm.body,
+        acidity: wineForm.acidity,
+        tannin: wineForm.tannin,
+        servingTempC: wineForm.servingTempC.trim() || "10-14",
+        decant: wineForm.decant.trim() || "No decant.",
+      },
     };
 
     updateDataset(
@@ -154,6 +181,13 @@ export default function AdminPage() {
       description: "",
       image: "",
       tags: "Balanced, Pairing",
+      grape: "Blend",
+      abv: "13",
+      body: "medium",
+      acidity: "medium",
+      tannin: "soft",
+      servingTempC: "10-14",
+      decant: "No decant.",
     });
     setApiSelectedWineIds((current) => [...current, created.id]);
     setStatusText("Wine added.");
@@ -545,6 +579,81 @@ export default function AdminPage() {
                 value={wineForm.tags}
                 onChange={(event) => setWineForm({ ...wineForm, tags: event.target.value })}
               />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  placeholder="Grape"
+                  value={wineForm.grape}
+                  onChange={(event) => setWineForm({ ...wineForm, grape: event.target.value })}
+                />
+                <input
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  type="number"
+                  step={0.1}
+                  min={5}
+                  max={20}
+                  placeholder="ABV %"
+                  value={wineForm.abv}
+                  onChange={(event) => setWineForm({ ...wineForm, abv: event.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <select
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  value={wineForm.body}
+                  onChange={(event) =>
+                    setWineForm({ ...wineForm, body: event.target.value as WineBody })
+                  }
+                >
+                  {bodyOptions.map((option) => (
+                    <option key={option} value={option}>
+                      Body: {option}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  value={wineForm.acidity}
+                  onChange={(event) =>
+                    setWineForm({ ...wineForm, acidity: event.target.value as WineAcidity })
+                  }
+                >
+                  {acidityOptions.map((option) => (
+                    <option key={option} value={option}>
+                      Acidity: {option}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  value={wineForm.tannin}
+                  onChange={(event) =>
+                    setWineForm({ ...wineForm, tannin: event.target.value as WineTannin })
+                  }
+                >
+                  {tanninOptions.map((option) => (
+                    <option key={option} value={option}>
+                      Tannin: {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  placeholder="Serving temp C (e.g. 8-10)"
+                  value={wineForm.servingTempC}
+                  onChange={(event) =>
+                    setWineForm({ ...wineForm, servingTempC: event.target.value })
+                  }
+                />
+                <input
+                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                  placeholder="Decant notes"
+                  value={wineForm.decant}
+                  onChange={(event) => setWineForm({ ...wineForm, decant: event.target.value })}
+                />
+              </div>
               <textarea
                 className="min-h-16 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
                 placeholder="Wine description"
@@ -613,6 +722,103 @@ export default function AdminPage() {
                     value={toTagInput(wine.tags)}
                     onChange={(event) => updateWine(wine.id, { tags: parseTags(event.target.value) })}
                   />
+                  <div className="mb-2 grid grid-cols-2 gap-2">
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      value={wine.passport.grape}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: { ...wine.passport, grape: event.target.value || "Blend" },
+                        })
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      type="number"
+                      min={5}
+                      max={20}
+                      step={0.1}
+                      value={wine.passport.abv}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: {
+                            ...wine.passport,
+                            abv: Math.max(5, Math.min(20, Number(event.target.value) || 13)),
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="mb-2 grid grid-cols-3 gap-2">
+                    <select
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      value={wine.passport.body}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: { ...wine.passport, body: event.target.value as WineBody },
+                        })
+                      }
+                    >
+                      {bodyOptions.map((option) => (
+                        <option key={option} value={option}>
+                          Body: {option}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      value={wine.passport.acidity}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: { ...wine.passport, acidity: event.target.value as WineAcidity },
+                        })
+                      }
+                    >
+                      {acidityOptions.map((option) => (
+                        <option key={option} value={option}>
+                          Acidity: {option}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      value={wine.passport.tannin}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: { ...wine.passport, tannin: event.target.value as WineTannin },
+                        })
+                      }
+                    >
+                      {tanninOptions.map((option) => (
+                        <option key={option} value={option}>
+                          Tannin: {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-2 grid grid-cols-2 gap-2">
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      value={wine.passport.servingTempC}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: {
+                            ...wine.passport,
+                            servingTempC: event.target.value || "10-14",
+                          },
+                        })
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      value={wine.passport.decant}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          passport: { ...wine.passport, decant: event.target.value || "No decant." },
+                        })
+                      }
+                    />
+                  </div>
                   <textarea
                     className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
                     value={wine.description}
