@@ -119,16 +119,59 @@ export default function PairingPage() {
       .sort((a, b) => b.match.score - a.match.score);
 
     const best = ranked[0] ?? null;
-    const alternative = ranked[1] ?? null;
-    const budgetPool = ranked.filter((item) => item.match.score >= 70);
+    const alternative =
+      ranked.find((item) => item.wine.id !== best?.wine.id) ?? null;
+
+    const excludedIds = new Set([best?.wine.id, alternative?.wine.id].filter(Boolean));
+    const budgetPool = ranked.filter(
+      (item) => item.match.score >= 70 && !excludedIds.has(item.wine.id),
+    );
     const budgetSource = budgetPool.length > 0 ? budgetPool : ranked;
     const budget =
       budgetSource.length > 0
         ? [...budgetSource].sort((a, b) => a.wine.price - b.wine.price)[0]
         : null;
 
-    return { best, alternative, budget };
+    const rankByWineId = new Map<string, 1 | 2 | 3>();
+    if (best) {
+      rankByWineId.set(best.wine.id, 1);
+    }
+    if (alternative && !rankByWineId.has(alternative.wine.id)) {
+      rankByWineId.set(alternative.wine.id, 2);
+    }
+    if (budget && !rankByWineId.has(budget.wine.id)) {
+      rankByWineId.set(budget.wine.id, 3);
+    }
+
+    return { best, alternative, budget, rankByWineId };
   }, [wines, matchMap]);
+
+  const sortedWines = useMemo(() => {
+    const list = [...wines];
+    list.sort((a, b) => {
+      const rankA = rankedMatches.rankByWineId.get(a.id) ?? 99;
+      const rankB = rankedMatches.rankByWineId.get(b.id) ?? 99;
+      if (rankA !== rankB) {
+        return rankA - rankB;
+      }
+
+      const matchA = matchMap.get(a.id);
+      const matchB = matchMap.get(b.id);
+      if (Boolean(matchA) !== Boolean(matchB)) {
+        return matchA ? -1 : 1;
+      }
+
+      const scoreA = matchA?.score ?? -1;
+      const scoreB = matchB?.score ?? -1;
+      if (scoreA !== scoreB) {
+        return scoreB - scoreA;
+      }
+
+      return a.price - b.price;
+    });
+
+    return list;
+  }, [wines, matchMap, rankedMatches.rankByWineId]);
 
   const selectedWine = useMemo(
     () => wines.find((wine) => wine.id === selectedWineId) ?? null,
@@ -451,7 +494,13 @@ export default function PairingPage() {
                   onClick={() => entry.item && setSelectedWineId(entry.item.wine.id)}
                   disabled={!entry.item}
                   className={`rounded-lg border px-3 py-2 text-left transition ${
-                    entry.item ? `${entry.tone} hover:border-primary/50` : "border-white/10 bg-black/20 opacity-50"
+                    entry.item
+                      ? `${entry.tone} ${
+                          selectedWineId === entry.item.wine.id
+                            ? "ring-2 ring-white/70"
+                            : "hover:border-primary/50"
+                        }`
+                      : "border-white/10 bg-black/20 opacity-50"
                   }`}
                 >
                   <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
@@ -470,34 +519,62 @@ export default function PairingPage() {
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-[11px] text-gray-400">
+              Top 3 wines are highlighted. Other options are intentionally dimmed.
+            </p>
           </div>
 
           <div className="space-y-3 pb-8 sm:space-y-4">
-            {wines.map((wine) => {
+            {sortedWines.map((wine) => {
               const match = matchMap.get(wine.id);
               const isMatch = Boolean(match);
-              const isTopMatch = (match?.score ?? 0) >= 92;
+              const topRank = rankedMatches.rankByWineId.get(wine.id) ?? null;
+              const rankLabel =
+                topRank === 1
+                  ? "Best Match"
+                  : topRank === 2
+                    ? "Alternative"
+                    : topRank === 3
+                      ? "Budget Pick"
+                      : null;
+
+              const toneClass =
+                topRank === 1
+                  ? "ring-2 ring-amber-300 border-amber-200 bg-gradient-to-br from-amber-300/15 via-surface-dark to-surface-dark shadow-[0_0_24px_rgba(251,191,36,0.28)]"
+                  : topRank === 2
+                    ? "ring-2 ring-sky-300/70 border-sky-200/70 bg-gradient-to-br from-sky-300/10 via-surface-dark to-surface-dark shadow-[0_0_20px_rgba(125,211,252,0.18)]"
+                    : topRank === 3
+                      ? "ring-2 ring-emerald-300/70 border-emerald-200/70 bg-gradient-to-br from-emerald-300/12 via-surface-dark to-surface-dark shadow-[0_0_18px_rgba(110,231,183,0.18)]"
+                      : isMatch
+                        ? "border-primary/25 bg-surface-dark/85 opacity-70"
+                        : "border-transparent bg-surface-dark/70 opacity-25 grayscale";
 
               return (
                 <article
                   key={wine.id}
-                  className={`relative rounded-xl border p-3 transition-all duration-300 sm:p-4 ${
-                    isMatch
-                      ? isTopMatch
-                        ? "ai-match-glow border-primary bg-surface-dark"
-                        : "border-primary/50 bg-surface-dark shadow-[0_0_12px_rgba(209,21,52,0.2)]"
-                      : "border-transparent bg-surface-dark/70 opacity-35 grayscale hover:opacity-80"
-                  }`}
+                  className={`relative rounded-xl border p-3 transition-all duration-300 sm:p-4 ${toneClass}`}
                 >
+                  {topRank ? (
+                    <div className="absolute -top-2 -left-2 z-20 rounded-full border border-black/10 bg-white px-2.5 py-1 text-[10px] font-extrabold tracking-wide text-black uppercase shadow-lg">
+                      #{topRank} {rankLabel}
+                    </div>
+                  ) : null}
+
                   {match ? (
                     <div
                       className={`mb-3 rounded-lg px-3 py-2 text-xs ${
-                        isTopMatch
-                          ? "border border-primary/20 bg-gradient-to-r from-primary/95 to-rose-600 text-white"
-                          : "border border-primary/30 bg-primary/10 text-gray-200"
+                        topRank === 1
+                          ? "border border-amber-200/50 bg-gradient-to-r from-amber-400 to-orange-500 text-black"
+                          : topRank === 2
+                            ? "border border-sky-200/50 bg-sky-300/20 text-sky-50"
+                            : topRank === 3
+                              ? "border border-emerald-200/50 bg-emerald-400/20 text-emerald-50"
+                              : "border border-primary/25 bg-primary/10 text-gray-200"
                       }`}
                     >
-                      <p className="font-bold uppercase tracking-wider">AI Match {match.score}%</p>
+                      <p className="font-bold uppercase tracking-wider">
+                        {topRank ? `Top ${topRank} • ` : ""}AI Match {match.score}%
+                      </p>
                       <p className="mt-1 text-sm normal-case tracking-normal">{match.reason}</p>
                     </div>
                   ) : null}
@@ -549,7 +626,11 @@ export default function PairingPage() {
                           {wine.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="rounded border border-white/10 bg-black/20 px-2 py-1 text-[10px] text-gray-300 sm:text-xs"
+                              className={`rounded border px-2 py-1 text-[10px] sm:text-xs ${
+                                topRank
+                                  ? "border-white/25 bg-black/30 text-gray-100"
+                                  : "border-white/10 bg-black/20 text-gray-300"
+                              }`}
                             >
                               {tag}
                             </span>
