@@ -1,4 +1,4 @@
-const CACHE_NAME = "wine-shell-v2";
+const CACHE_NAME = "wine-shell-v3";
 const OFFLINE_URL = "/offline";
 const SHELL_ROUTES = ["/", "/pairing", "/immersive", "/editorial", "/v1", "/v1/admin", OFFLINE_URL];
 
