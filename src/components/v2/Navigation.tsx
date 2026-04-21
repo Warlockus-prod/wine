@@ -8,11 +8,7 @@ import { createPortal } from "react-dom";
 const menuLinks = [
   { href: "/", label: "Discover" },
   { href: "/pairing", label: "Wine Pairing" },
-  { href: "/immersive", label: "Reservations" },
-  { href: "/editorial", label: "Events" },
-  { href: "/admin", label: "Admin V2" },
-  { href: "/v1", label: "Backup V1" },
-  { href: "/v1/admin", label: "Admin V1" },
+  { href: "/admin", label: "Admin" },
 ];
 
 const PHONE_WIDTH = 390;
@@ -43,7 +39,7 @@ export default function Navigation() {
           </Link>
 
           <div className="hidden items-center gap-7 md:flex">
-            {menuLinks.slice(0, 4).map((link) => {
+            {menuLinks.map((link) => {
               const active = pathname === link.href;
               return (
                 <Link
@@ -57,12 +53,6 @@ export default function Navigation() {
                 </Link>
               );
             })}
-            <Link
-              className="rounded-md border border-primary/40 bg-primary/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary hover:bg-primary/25"
-              href="/v1"
-            >
-              Backup V1
-            </Link>
           </div>
 
           <div className="flex items-center gap-2">
@@ -114,8 +104,7 @@ export default function Navigation() {
               {menuLinks.map((link) => {
                 const active =
                   pathname === link.href ||
-                  pathname.startsWith(`${link.href}/`) ||
-                  (link.href === "/admin" && pathname === "/v1/admin");
+                  pathname.startsWith(`${link.href}/`);
                 return (
                   <Link
                     key={link.href}

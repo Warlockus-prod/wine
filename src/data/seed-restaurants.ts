@@ -262,9 +262,9 @@ export const seedRestaurants: Restaurant[] = [
     slug: "sakura-ember",
     name: "Sakura Ember",
     cuisine: "Asian",
-    city: "Tokyo",
+    city: "Copenhagen",
     description:
-      "Modern Japanese kitchen with robata grill, pristine seafood, and precise pairings.",
+      "Modern Japanese kitchen in Copenhagen with robata grill, pristine seafood, and precise pairings.",
     coverGradient: "from-[#1f3b5f] via-[#3f6d8f] to-[#9cc3d5]",
     wines: [
       {
@@ -1030,9 +1030,9 @@ export const seedRestaurants: Restaurant[] = [
     slug: "andes-fuego",
     name: "Andes Fuego",
     cuisine: "Asian-Latin Mix",
-    city: "Lima",
+    city: "Lisbon",
     description:
-      "Peruvian and Nikkei signatures with bright citrus, chili, and charcoal notes.",
+      "Peruvian and Nikkei signatures in Lisbon with bright citrus, chili, and charcoal notes.",
     coverGradient: "from-[#38472f] via-[#6a8b53] to-[#d7c88f]",
     wines: [
       {

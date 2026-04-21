@@ -18,7 +18,7 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: "Sommelier AI | Wine Pairing Platform",
   description:
-    "V2 premium restaurant showcase with AI wine pairing demo and V1 backup catalog/admin mode.",
+    "Restaurant discovery catalog with Europe map, unique restaurant pages, QR entry points, and AI-assisted wine pairing.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/app-icon.svg", type: "image/svg+xml" }],

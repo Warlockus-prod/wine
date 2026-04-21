@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("v2 admin + pairing and v1 backup flow", async ({ page }) => {
+test("v2 admin + discover + restaurant flow", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("link", { name: /sommelier/i }).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: /backup v1/i }).first()).toBeVisible();
+  await expect(page.getByText(/europe overview/i)).toBeVisible();
+  await expect(page.getByText("Unique URLs + QR")).toBeVisible();
 
   await page.goto("/admin");
   await expect(page).toHaveURL(/\/admin$/);
@@ -21,18 +22,12 @@ test("v2 admin + pairing and v1 backup flow", async ({ page }) => {
   await page.goto("/pairing");
   await expect(page.getByRole("button", { name: dishName }).first()).toBeVisible();
 
-  await page.goto("/v1");
-  await expect(page.getByRole("link", { name: "Cellar Compass", exact: true })).toBeVisible();
+  await page.goto("/restaurants/trattoria-bellavista");
+  await expect(page).toHaveURL(/\/restaurants\/trattoria-bellavista/);
+  await expect(page.getByText(/direct access qr/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: /open pairing/i }).first()).toBeVisible();
 
-  const trattoriaLink = page
-    .getByRole("link", { name: "Trattoria Bellavista", exact: true })
-    .first();
-  await expect(trattoriaLink).toBeVisible();
-  await trattoriaLink.click();
-
-  await expect(page).toHaveURL(/\/v1\/restaurants\/trattoria-bellavista/);
-  await expect(page.getByText("Wine list")).toBeVisible();
-
-  await page.getByRole("button", { name: /Tagliatelle al Ragu/i }).click();
-  await expect(page.getByText("Why it works:").first()).toBeVisible();
+  await page.getByRole("link", { name: /open pairing/i }).first().click();
+  await expect(page).toHaveURL(/\/pairing\?restaurant=trattoria-bellavista/);
+  await expect(page.getByText(/context: trattoria bellavista/i)).toBeVisible();
 });

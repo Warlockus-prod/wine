@@ -7,6 +7,7 @@ import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
+import { getCatalogRestaurant } from "@/lib/restaurant-directory";
 import { usePairingDataset } from "@/lib/pairing-store";
 import type { PairingDish, PairingWine } from "@/types/pairing";
 
@@ -82,6 +83,10 @@ export default function PairingPage() {
   const { dataset } = usePairingDataset();
   const dishes = dataset.dishes;
   const wines = dataset.wines;
+  const [restaurantContextSlug, setRestaurantContextSlug] = useState<string | null>(null);
+  const restaurantContext = restaurantContextSlug
+    ? getCatalogRestaurant(restaurantContextSlug)
+    : null;
 
   const [activeDishId, setActiveDishId] = useState<string>(dishes[0]?.id ?? "");
   const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(new Map());
@@ -94,6 +99,15 @@ export default function PairingPage() {
   useEffect(() => {
     openTimestamp.current = performance.now();
     trackEvent("pairing_page_open", { device: "mobile-first" });
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const nextSlug = new URLSearchParams(window.location.search).get("restaurant");
+    setRestaurantContextSlug(nextSlug);
   }, []);
 
   const effectiveDishId =
@@ -178,6 +192,53 @@ export default function PairingPage() {
     [selectedWineId, wines],
   );
   const selectedWineMatch = selectedWine ? matchMap.get(selectedWine.id) : null;
+
+  const dishRankings = useMemo(() => {
+    if (!selectedWine) {
+      return new Map<string, MatchDetails>();
+    }
+
+    const nextMap = new Map<string, MatchDetails>();
+    for (const dish of dishes) {
+      const details = buildFallbackMatchMap(dish, [selectedWine]).get(selectedWine.id);
+      if (details) {
+        nextMap.set(dish.id, details);
+      }
+    }
+
+    return nextMap;
+  }, [dishes, selectedWine]);
+
+  const sortedDishes = useMemo(() => {
+    const list = [...dishes];
+    if (!selectedWine) {
+      return list;
+    }
+
+    list.sort((a, b) => {
+      const scoreA = dishRankings.get(a.id)?.score ?? -1;
+      const scoreB = dishRankings.get(b.id)?.score ?? -1;
+      if (scoreA !== scoreB) {
+        return scoreB - scoreA;
+      }
+
+      return a.name.localeCompare(b.name);
+    });
+
+    return list;
+  }, [dishes, dishRankings, selectedWine]);
+
+  const resolvedSelectedWineMatch = useMemo(() => {
+    if (!selectedWine || !activeDish) {
+      return null;
+    }
+
+    return (
+      selectedWineMatch ??
+      buildFallbackMatchMap(activeDish, [selectedWine]).get(selectedWine.id) ??
+      null
+    );
+  }, [activeDish, selectedWine, selectedWineMatch]);
 
   useEffect(() => {
     if (selectedWineId && !wines.some((wine) => wine.id === selectedWineId)) {
@@ -277,6 +338,28 @@ export default function PairingPage() {
     }
   };
 
+  const selectWine = (wineId: string, source: "list" | "top-3") => {
+    setSelectedWineId(wineId);
+    if (activeDish) {
+      trackEvent("pairing_wine_selected", {
+        dish_id: activeDish.id,
+        wine_id: wineId,
+        source,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (selectedWineId && wines.some((wine) => wine.id === selectedWineId)) {
+      return;
+    }
+
+    const nextWineId = rankedMatches.best?.wine.id ?? sortedWines[0]?.id ?? null;
+    if (nextWineId) {
+      setSelectedWineId(nextWineId);
+    }
+  }, [rankedMatches.best, selectedWineId, sortedWines, wines]);
+
   if (!activeDish || wines.length === 0) {
     return (
       <div className="mobile-safe-bottom min-h-screen bg-background-dark text-white">
@@ -309,152 +392,30 @@ export default function PairingPage() {
     <div className="mobile-safe-bottom flex min-h-screen flex-col overflow-hidden bg-background-dark text-gray-200 selection:bg-primary selection:text-white">
       <Navigation />
 
-      <main className="relative flex flex-1 flex-col overflow-hidden pt-20 lg:flex-row">
-        <section className="border-b border-primary/10 bg-background-dark px-4 pt-4 pb-5 lg:hidden">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white">Choose Dish</h2>
-            <button
-              type="button"
-              onClick={scrollToWineList}
-              className="rounded-full border border-primary/40 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary uppercase"
-            >
-              To Wines
-            </button>
-          </div>
-
-          <div className="hide-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
-            {dishes.map((dish) => {
-              const selected = dish.id === activeDish.id;
-              return (
-                <button
-                  key={dish.id}
-                  type="button"
-                  onClick={() => selectDish(dish.id, "chips")}
-                  className={`whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold ${
-                    selected
-                      ? "border border-primary/30 bg-primary/15 text-primary"
-                      : "border border-white/10 bg-surface-dark text-gray-300"
-                  }`}
-                >
-                  {dish.name}
-                </button>
-              );
-            })}
-          </div>
-
-          <article className="mt-3 rounded-xl border border-primary/25 bg-surface-dark p-3">
-            <div className="flex gap-3">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
-                <Image
-                  src={activeDish.image}
-                  alt={activeDish.name}
-                  fill
-                  quality={66}
-                  placeholder="blur"
-                  blurDataURL={GENERIC_BLUR_DATA_URL}
-                  sizes="64px"
-                  className="object-cover"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-white">{activeDish.name}</p>
-                <p className="line-clamp-2 text-xs text-gray-400">{activeDish.description}</p>
-                <p className="mt-1 text-xs font-semibold text-primary">${activeDish.price}</p>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <section className="relative z-10 hidden w-full overflow-y-auto border-b border-primary/10 bg-background-dark p-5 lg:block lg:w-1/2 lg:border-r lg:border-b-0 lg:p-8">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-24 pb-8 sm:px-6 lg:px-8">
+        <header className="mb-6 rounded-[28px] border border-white/10 bg-black/15 px-4 py-5 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-sm sm:px-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-white">Menu</h2>
-              <p className="text-sm text-gray-400">Select a dish to highlight matching wines.</p>
+              <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
+                Pairing Workspace
+              </p>
+              <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">
+                Choose a dish. Choose a wine. Read the rationale below.
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm text-gray-400 sm:text-base">
+                The screen is organized as two side-by-side lists. Dish selection updates the wine
+                ranking, wine selection reorders the menu list, and the lower panel acts like a
+                bot chat without text input.
+              </p>
+              {restaurantContext ? (
+                <p className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-gray-200 uppercase">
+                  Context: {restaurantContext.name} • {restaurantContext.city}
+                </p>
+              ) : null}
             </div>
-            <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white uppercase">
-              AI Live
-            </span>
-          </div>
-
-          <div className="space-y-4 pb-6">
-            {dishes.map((dish) => {
-              const isActive = dish.id === activeDish.id;
-
-              return (
-                <button
-                  key={dish.id}
-                  type="button"
-                  onClick={() => selectDish(dish.id, "cards")}
-                  className={`relative flex w-full gap-4 rounded-xl border p-4 text-left shadow-sm transition-all duration-300 ${
-                    isActive
-                      ? "active-dish-glow border-primary bg-surface-dark"
-                      : "border-transparent bg-surface-dark/70 opacity-45 hover:border-primary/30 hover:opacity-100"
-                  }`}
-                >
-                  {isActive ? (
-                    <span className="absolute -top-3 -right-2 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">
-                      Selected
-                    </span>
-                  ) : null}
-
-                  <div className={`relative overflow-hidden rounded-lg ${isActive ? "h-32 w-32" : "h-24 w-24"}`}>
-                    <Image
-                      alt={dish.name}
-                      fill
-                      quality={66}
-                      placeholder="blur"
-                      blurDataURL={GENERIC_BLUR_DATA_URL}
-                      sizes="128px"
-                      src={dish.image}
-                      className="object-cover"
-                    />
-                  </div>
-
-                  <div className="flex flex-1 flex-col justify-between">
-                    <div>
-                      <div className="mb-1 flex items-start justify-between gap-3">
-                        <h3 className={`font-bold text-white ${isActive ? "text-xl" : "text-lg"}`}>
-                          {dish.name}
-                        </h3>
-                        <span className="text-lg font-bold text-primary">${dish.price}</span>
-                      </div>
-                      <p className="text-sm text-gray-400">{dish.description}</p>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {dish.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`rounded px-2 py-0.5 text-[10px] tracking-wider uppercase ${
-                            isActive
-                              ? "border border-primary/40 bg-primary/10 text-primary"
-                              : "border border-gray-700 text-gray-500"
-                          }`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <section
-          ref={wineListRef}
-          className="w-full overflow-y-auto bg-surface-darker p-4 pb-44 sm:p-5 sm:pb-44 lg:w-1/2 lg:p-8 lg:pb-8"
-        >
-          <div className="sticky top-0 z-10 mb-4 border-b border-primary/10 bg-surface-darker pb-4 sm:mb-6 sm:pb-5">
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-              <h2 className="flex items-center gap-2 text-xl font-bold text-white sm:gap-3 sm:text-3xl">
-                Wine List
-                <span className="rounded bg-primary/15 px-2 py-1 text-[10px] font-bold tracking-wider text-primary uppercase sm:text-xs">
-                  {activeDish.name}
-                </span>
-              </h2>
+            <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase ${
+                className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
                   aiStatus === "loading"
                     ? "bg-white/10 text-gray-300"
                     : aiStatus === "fallback"
@@ -468,320 +429,455 @@ export default function PairingPage() {
                     ? "Fallback mode"
                     : "AI ready"}
               </span>
+              <button
+                type="button"
+                onClick={scrollToWineList}
+                className="rounded-full border border-primary/40 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary uppercase lg:hidden"
+              >
+                Jump to wines
+              </button>
             </div>
-            <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
-              <div className={`h-full bg-primary ${aiStatus === "loading" ? "w-1/3 animate-pulse" : "w-3/4"}`} />
-            </div>
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {[
-                { rank: "#1", label: "Best Match", item: rankedMatches.best, tone: "border-primary/40 bg-primary/10" },
-                {
-                  rank: "#2",
-                  label: "Alternative",
-                  item: rankedMatches.alternative,
-                  tone: "border-white/15 bg-white/5",
-                },
-                {
-                  rank: "#3",
-                  label: "Budget Pick",
-                  item: rankedMatches.budget,
-                  tone: "border-emerald-400/30 bg-emerald-500/10",
-                },
-              ].map((entry) => (
-                <button
-                  key={entry.rank}
-                  type="button"
-                  onClick={() => entry.item && setSelectedWineId(entry.item.wine.id)}
-                  disabled={!entry.item}
-                  className={`rounded-lg border px-3 py-2 text-left transition ${
-                    entry.item
-                      ? `${entry.tone} ${
-                          selectedWineId === entry.item.wine.id
-                            ? "ring-2 ring-white/70"
-                            : "hover:border-primary/50"
-                        }`
-                      : "border-white/10 bg-black/20 opacity-50"
-                  }`}
-                >
-                  <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
-                    {entry.rank} {entry.label}
-                  </p>
-                  {entry.item ? (
-                    <>
-                      <p className="mt-1 text-sm font-semibold text-white">{entry.item.wine.name}</p>
-                      <p className="text-xs text-gray-300">
-                        {entry.item.match.score}% • ${entry.item.wine.price}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="mt-1 text-xs text-gray-500">Not available yet</p>
-                  )}
-                </button>
-              ))}
-            </div>
-            <p className="mt-2 text-[11px] text-gray-400">
-              Top 3 wines are highlighted. Other options are intentionally dimmed.
-            </p>
           </div>
+        </header>
 
-          <div className="space-y-3 pb-8 sm:space-y-4">
-            {sortedWines.map((wine) => {
-              const match = matchMap.get(wine.id);
-              const isMatch = Boolean(match);
-              const topRank = rankedMatches.rankByWineId.get(wine.id) ?? null;
-              const rankLabel =
-                topRank === 1
-                  ? "Best Match"
-                  : topRank === 2
-                    ? "Alternative"
-                    : topRank === 3
-                      ? "Budget Pick"
-                      : null;
+        <div className="grid flex-1 gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <section className="rounded-[30px] border border-white/10 bg-black/15 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5">
+            <div className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
+                  Column 1
+                </p>
+                <h2 className="mt-1 text-2xl font-bold text-white">Menu</h2>
+                <p className="mt-1 text-sm text-gray-400">
+                  Reordered for <span className="font-semibold text-white">{selectedWine?.name ?? "selected wine"}</span>
+                </p>
+              </div>
+              <span className="rounded-full bg-white/6 px-3 py-1 text-[11px] font-semibold text-gray-300">
+                {dishes.length} dishes
+              </span>
+            </div>
 
-              const toneClass =
-                topRank === 1
-                  ? "ring-2 ring-amber-300 border-amber-200 bg-gradient-to-br from-amber-300/15 via-surface-dark to-surface-dark shadow-[0_0_24px_rgba(251,191,36,0.28)]"
-                  : topRank === 2
-                    ? "ring-2 ring-sky-300/70 border-sky-200/70 bg-gradient-to-br from-sky-300/10 via-surface-dark to-surface-dark shadow-[0_0_20px_rgba(125,211,252,0.18)]"
-                    : topRank === 3
-                      ? "ring-2 ring-emerald-300/70 border-emerald-200/70 bg-gradient-to-br from-emerald-300/12 via-surface-dark to-surface-dark shadow-[0_0_18px_rgba(110,231,183,0.18)]"
-                      : isMatch
-                        ? "border-primary/25 bg-surface-dark/85 opacity-70"
-                        : "border-transparent bg-surface-dark/70 opacity-25 grayscale";
+            <div className="hide-scrollbar flex max-h-[62vh] flex-col gap-3 overflow-y-auto pr-1">
+              {sortedDishes.map((dish) => {
+                const isActive = dish.id === activeDish.id;
+                const ranking = selectedWine ? dishRankings.get(dish.id) : null;
 
-              return (
-                <article
-                  key={wine.id}
-                  className={`relative rounded-xl border p-3 transition-all duration-300 sm:p-4 ${toneClass}`}
-                >
-                  {topRank ? (
-                    <div className="absolute -top-2 -left-2 z-20 rounded-full border border-black/10 bg-white px-2.5 py-1 text-[10px] font-extrabold tracking-wide text-black uppercase shadow-lg">
-                      #{topRank} {rankLabel}
-                    </div>
-                  ) : null}
-
-                  {match ? (
-                    <div
-                      className={`mb-3 rounded-lg px-3 py-2 text-xs ${
-                        topRank === 1
-                          ? "border border-amber-200/50 bg-gradient-to-r from-amber-400 to-orange-500 text-black"
-                          : topRank === 2
-                            ? "border border-sky-200/50 bg-sky-300/20 text-sky-50"
-                            : topRank === 3
-                              ? "border border-emerald-200/50 bg-emerald-400/20 text-emerald-50"
-                              : "border border-primary/25 bg-primary/10 text-gray-200"
+                return (
+                  <button
+                    key={dish.id}
+                    type="button"
+                    onClick={() => selectDish(dish.id, "cards")}
+                    className={`group flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${
+                      isActive
+                        ? "active-dish-glow border-primary bg-gradient-to-r from-primary/18 to-white/5"
+                        : "border-white/8 bg-black/18 opacity-65 hover:border-white/16 hover:opacity-100"
+                    }`}
+                  >
+                    <span
+                      className={`mt-5 h-2.5 w-2.5 shrink-0 rounded-full transition ${
+                        isActive ? "bg-primary shadow-[0_0_12px_rgba(209,21,52,0.7)]" : "bg-white/20"
                       }`}
-                    >
-                      <p className="font-bold uppercase tracking-wider">
-                        {topRank ? `Top ${topRank} • ` : ""}AI Match {match.score}%
-                      </p>
-                      <p className="mt-1 text-sm normal-case tracking-normal">{match.reason}</p>
-                    </div>
-                  ) : null}
+                    />
 
-                  <div className="flex gap-3 sm:gap-4">
-                    <div className="relative h-28 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20 sm:h-36 sm:w-16">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10">
+                      <Image
+                        alt={dish.name}
+                        fill
+                        quality={66}
+                        placeholder="blur"
+                        blurDataURL={GENERIC_BLUR_DATA_URL}
+                        sizes="64px"
+                        src={dish.image}
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-base font-semibold text-white">{dish.name}</p>
+                          <p className="mt-1 line-clamp-2 text-xs text-gray-400 sm:text-sm">
+                            {dish.description}
+                          </p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <span className="block text-sm font-bold text-primary sm:text-base">
+                            ${dish.price}
+                          </span>
+                          {ranking ? (
+                            <span className="mt-1 block text-[10px] font-semibold tracking-wide text-white/70 uppercase">
+                              {ranking.score}% fit
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {dish.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className={`rounded-full px-2 py-1 text-[10px] tracking-wide uppercase ${
+                              isActive
+                                ? "border border-primary/35 bg-primary/12 text-primary"
+                                : "border border-white/10 bg-white/4 text-gray-400"
+                            }`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section
+            ref={wineListRef}
+            className="rounded-[30px] border border-white/10 bg-[#120a0ccc] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5"
+          >
+            <div className="mb-4 border-b border-white/8 pb-4">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
+                    Column 2
+                  </p>
+                  <h2 className="mt-1 text-2xl font-bold text-white">Wine List</h2>
+                  <p className="mt-1 text-sm text-gray-400">
+                    Ranked for <span className="font-semibold text-white">{activeDish.name}</span>
+                  </p>
+                </div>
+                <span className="rounded-full bg-primary/12 px-3 py-1 text-[11px] font-semibold text-primary">
+                  {sortedWines.length} wines
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {[
+                  { rank: "#1", label: "Best Match", item: rankedMatches.best, tone: "border-primary/40 bg-primary/10" },
+                  {
+                    rank: "#2",
+                    label: "Alternative",
+                    item: rankedMatches.alternative,
+                    tone: "border-sky-300/25 bg-sky-300/10",
+                  },
+                  {
+                    rank: "#3",
+                    label: "Budget Pick",
+                    item: rankedMatches.budget,
+                    tone: "border-emerald-400/30 bg-emerald-500/10",
+                  },
+                ].map((entry) => (
+                  <button
+                    key={entry.rank}
+                    type="button"
+                    onClick={() => entry.item && selectWine(entry.item.wine.id, "top-3")}
+                    disabled={!entry.item}
+                    className={`rounded-2xl border px-3 py-3 text-left transition ${
+                      entry.item
+                        ? `${entry.tone} ${
+                            selectedWineId === entry.item.wine.id
+                              ? "ring-2 ring-white/65"
+                              : "hover:border-primary/45"
+                          }`
+                        : "border-white/10 bg-black/20 opacity-45"
+                    }`}
+                  >
+                    <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+                      {entry.rank} {entry.label}
+                    </p>
+                    {entry.item ? (
+                      <>
+                        <p className="mt-1 line-clamp-1 text-sm font-semibold text-white">
+                          {entry.item.wine.name}
+                        </p>
+                        <p className="text-xs text-gray-300">
+                          {entry.item.match.score}% match • ${entry.item.wine.price}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-1 text-xs text-gray-500">No ranked wine</p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="hide-scrollbar flex max-h-[62vh] flex-col gap-3 overflow-y-auto pr-1">
+              {sortedWines.map((wine) => {
+                const match = matchMap.get(wine.id);
+                const isMatch = Boolean(match);
+                const isSelected = wine.id === selectedWineId;
+                const topRank = rankedMatches.rankByWineId.get(wine.id) ?? null;
+                const rankLabel =
+                  topRank === 1
+                    ? "Best Match"
+                    : topRank === 2
+                      ? "Alternative"
+                      : topRank === 3
+                        ? "Budget Pick"
+                        : null;
+
+                const toneClass =
+                  isSelected
+                    ? "border-white/40 bg-gradient-to-r from-white/10 to-primary/10 shadow-[0_0_0_1px_rgba(255,255,255,0.18),0_16px_32px_rgba(0,0,0,0.18)] opacity-100"
+                    : topRank === 1
+                      ? "border-amber-200/65 bg-amber-300/10 opacity-100"
+                      : topRank === 2
+                        ? "border-sky-300/50 bg-sky-300/10 opacity-95"
+                        : topRank === 3
+                          ? "border-emerald-300/50 bg-emerald-300/10 opacity-90"
+                          : isMatch
+                            ? "border-primary/20 bg-white/4 opacity-72 hover:opacity-100"
+                            : "border-white/6 bg-black/14 opacity-35 grayscale hover:opacity-55";
+
+                return (
+                  <button
+                    key={wine.id}
+                    type="button"
+                    onClick={() => selectWine(wine.id, "list")}
+                    className={`relative flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${toneClass}`}
+                  >
+                    {topRank ? (
+                      <span className="absolute top-2 right-2 rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-black uppercase">
+                        #{topRank}
+                      </span>
+                    ) : null}
+
+                    <span
+                      className={`mt-5 h-2.5 w-2.5 shrink-0 rounded-full transition ${
+                        isSelected
+                          ? "bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]"
+                          : isMatch
+                            ? "bg-primary"
+                            : "bg-white/18"
+                      }`}
+                    />
+
+                    <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10">
                       <Image
                         alt={wine.name}
                         fill
                         quality={64}
                         placeholder="blur"
                         blurDataURL={GENERIC_BLUR_DATA_URL}
-                        sizes="64px"
+                        sizes="48px"
                         src={wine.image}
                         className="object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                     </div>
 
-                    <div className="flex-1">
-                      <div className="mb-1 flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="text-base font-bold text-white sm:text-lg">{wine.name}</h3>
-                          <p className="text-xs text-primary sm:text-sm">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-base font-semibold text-white">{wine.name}</p>
+                          <p className="mt-1 text-xs text-gray-400 sm:text-sm">
                             {wine.region} • {wine.year}
                           </p>
                         </div>
-                        <p className="text-base font-bold text-white sm:text-lg">${wine.price}</p>
+                        <span className="shrink-0 text-sm font-bold text-white sm:text-base">
+                          ${wine.price}
+                        </span>
                       </div>
 
-                      <div className="mb-2 flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <span
-                            key={star}
-                            className={`material-icons text-xs ${
-                              star <= Math.round(wine.rating) ? "text-yellow-500" : "text-gray-700"
-                            }`}
-                          >
-                            star
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        {match ? (
+                          <span className="rounded-full border border-primary/30 bg-primary/12 px-2 py-1 text-[10px] font-semibold tracking-wide text-primary uppercase">
+                            {match.score}% match
                           </span>
-                        ))}
-                        <span className="ml-1 text-xs text-gray-500">({wine.rating})</span>
-                      </div>
-
-                      <p className="text-xs text-gray-400 sm:text-sm">{wine.description}</p>
-
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex flex-wrap gap-2">
-                          {wine.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className={`rounded border px-2 py-1 text-[10px] sm:text-xs ${
-                                topRank
-                                  ? "border-white/25 bg-black/30 text-gray-100"
-                                  : "border-white/10 bg-black/20 text-gray-300"
-                              }`}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedWineId(wine.id);
-                              trackEvent("pairing_open_passport", {
-                                dish_id: activeDish.id,
-                                wine_id: wine.id,
-                                source: "wine-card",
-                              });
-                            }}
-                            className="rounded-lg border border-white/20 px-3 py-2.5 text-[11px] font-semibold uppercase text-gray-200 transition hover:border-primary/40 hover:text-white"
-                          >
-                            Why + Passport
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              trackEvent("pairing_wine_action_click", {
-                                dish_id: activeDish.id,
-                                wine_id: wine.id,
-                                action: isMatch ? "add" : "skip",
-                              })
-                            }
-                            className={`rounded-lg px-4 py-2.5 text-xs font-bold uppercase transition ${
-                              isMatch
-                                ? "bg-primary text-white hover:bg-primary-dark"
-                                : "border border-white/10 text-gray-400 hover:text-white"
-                            }`}
-                          >
-                            {isMatch ? "Add" : "Skip"}
-                          </button>
-                        </div>
+                        ) : (
+                          <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1 text-[10px] font-semibold tracking-wide text-gray-500 uppercase">
+                            Exploratory
+                          </span>
+                        )}
+                        <span className="text-[11px] text-gray-400">
+                          {wine.passport.grape}
+                        </span>
+                        {rankLabel ? (
+                          <span className="text-[11px] font-semibold text-white/85">{rankLabel}</span>
+                        ) : null}
                       </div>
                     </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      </main>
-
-      <div className="fixed right-3 left-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-[65] rounded-xl border border-primary/30 bg-[#1a0f11e6] p-2 backdrop-blur-md lg:hidden">
-        <button
-          type="button"
-          onClick={scrollToWineList}
-          className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
-        >
-          Choose wine for {activeDish.name}
-        </button>
-      </div>
-
-      {selectedWine ? (
-        <div className="fixed inset-0 z-[90]">
-          <button
-            type="button"
-            aria-label="Close wine details"
-            onClick={() => setSelectedWineId(null)}
-            className="absolute inset-0 bg-black/60"
-          />
-          <section className="absolute right-0 bottom-0 left-0 max-h-[78vh] overflow-y-auto rounded-t-3xl border-t border-white/15 bg-[#150d10f2] px-4 pt-4 pb-[calc(1.2rem+env(safe-area-inset-bottom))] lg:top-1/2 lg:right-auto lg:bottom-auto lg:left-1/2 lg:max-h-[84vh] lg:w-[min(760px,92vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-2xl lg:border lg:px-6 lg:pb-6">
-            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-white/25 lg:hidden" />
-
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold tracking-wider text-primary uppercase">
-                  Wine Passport
-                </p>
-                <h3 className="text-lg font-bold text-white">{selectedWine.name}</h3>
-                <p className="text-xs text-gray-300">
-                  {selectedWine.region} • {selectedWine.year}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedWineId(null)}
-                className="rounded-lg border border-white/20 px-3 py-1 text-xs font-semibold text-gray-200"
-              >
-                Close
-              </button>
-            </div>
-
-            {selectedWineMatch ? (
-              <div className="mt-4 rounded-xl border border-primary/35 bg-primary/12 p-3">
-                <p className="text-xs font-bold tracking-wider text-primary uppercase">
-                  Why it matches • {selectedWineMatch.score}%
-                </p>
-                <p className="mt-1 text-sm text-gray-100">{selectedWineMatch.reason}</p>
-              </div>
-            ) : (
-              <div className="mt-4 rounded-xl border border-white/15 bg-black/20 p-3">
-                <p className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                  Why it matches
-                </p>
-                <p className="mt-1 text-sm text-gray-300">
-                  This wine is currently outside the best match zone for the selected dish.
-                </p>
-              </div>
-            )}
-
-            <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Grape</p>
-                <p className="mt-1 text-white">{selectedWine.passport.grape}</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">ABV</p>
-                <p className="mt-1 text-white">{selectedWine.passport.abv}%</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Body</p>
-                <p className="mt-1 text-white">{bodyLabel[selectedWine.passport.body]}</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Acidity</p>
-                <p className="mt-1 text-white">{acidityLabel[selectedWine.passport.acidity]}</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Tannin</p>
-                <p className="mt-1 text-white">{tanninLabel[selectedWine.passport.tannin]}</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-black/25 p-2.5">
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Serve</p>
-                <p className="mt-1 text-white">{selectedWine.passport.servingTempC}°C</p>
-              </div>
-            </div>
-
-            <div className="mt-3 rounded-lg border border-white/10 bg-black/25 p-3">
-              <p className="text-[10px] tracking-wider text-gray-400 uppercase">Decant</p>
-              <p className="mt-1 text-sm text-gray-100">{selectedWine.passport.decant}</p>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {selectedWine.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded border border-white/10 bg-black/20 px-2 py-1 text-[10px] text-gray-300"
-                >
-                  {tag}
-                </span>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </section>
         </div>
-      ) : null}
+
+        {selectedWine ? (
+          <section className="mt-6 rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(209,21,52,0.18),transparent_28%),rgba(0,0,0,0.18)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
+                  Explanation
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
+                  {activeDish.name} × {selectedWine.name}
+                </h2>
+                <p className="mt-2 text-sm text-gray-400">
+                  The explanation is shown as a bot response based only on the selected records.
+                </p>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
+                  resolvedSelectedWineMatch
+                    ? "bg-primary/15 text-primary"
+                    : "bg-white/8 text-gray-300"
+                }`}
+              >
+                {resolvedSelectedWineMatch
+                  ? `${resolvedSelectedWineMatch.score}% matched`
+                  : "Manual selection"}
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              <article className="rounded-[26px] border border-white/10 bg-black/18 p-4">
+                <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
+                  Menu item
+                </p>
+                <div className="mt-3 flex items-start gap-4">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-white/10">
+                    <Image
+                      src={activeDish.image}
+                      alt={activeDish.name}
+                      fill
+                      quality={68}
+                      placeholder="blur"
+                      blurDataURL={GENERIC_BLUR_DATA_URL}
+                      sizes="96px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-semibold text-white">{activeDish.name}</h3>
+                    <p className="mt-2 text-sm text-gray-400">{activeDish.description}</p>
+                    <p className="mt-3 text-sm font-bold text-primary">${activeDish.price}</p>
+                  </div>
+                </div>
+              </article>
+
+              <article className="rounded-[26px] border border-white/10 bg-black/18 p-4">
+                <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
+                  Wine selection
+                </p>
+                <div className="mt-3 flex items-start gap-4">
+                  <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-2xl border border-white/10">
+                    <Image
+                      src={selectedWine.image}
+                      alt={selectedWine.name}
+                      fill
+                      quality={64}
+                      placeholder="blur"
+                      blurDataURL={GENERIC_BLUR_DATA_URL}
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-semibold text-white">{selectedWine.name}</h3>
+                    <p className="mt-1 text-sm text-primary">
+                      {selectedWine.region} • {selectedWine.year}
+                    </p>
+                    <p className="mt-2 text-sm text-gray-400">{selectedWine.description}</p>
+                    <p className="mt-3 text-sm font-bold text-white">${selectedWine.price}</p>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+              <article className="rounded-[28px] border border-primary/16 bg-[#170d0ff0] p-5">
+                <div className="flex items-center gap-3 border-b border-white/8 pb-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/18 text-primary">
+                    <span className="material-icons text-lg">smart_toy</span>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold tracking-[0.22em] text-primary uppercase">
+                      Sommelier Bot
+                    </p>
+                    <p className="text-sm text-gray-400">Automated rationale based on selected records</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <div className="max-w-[88%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
+                    <p className="text-sm leading-6 text-gray-100">
+                      I am comparing <span className="font-semibold text-white">{activeDish.name}</span> with{" "}
+                      <span className="font-semibold text-white">{selectedWine.name}</span>.
+                    </p>
+                  </div>
+
+                  <div className="max-w-[92%] rounded-[22px] rounded-bl-md border border-primary/20 bg-primary/10 px-4 py-3">
+                    <p className="text-sm leading-6 text-gray-100">
+                      {resolvedSelectedWineMatch
+                        ? resolvedSelectedWineMatch.reason
+                        : "This wine sits outside the top match zone for the selected dish, but the style can still be reviewed through the passport and ranking signals."}
+                    </p>
+                  </div>
+
+                  <div className="max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
+                    <p className="text-sm leading-6 text-gray-100">
+                      Service note: serve at {selectedWine.passport.servingTempC}°C.{" "}
+                      {selectedWine.passport.decant}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {selectedWine.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[10px] tracking-wide text-gray-300 uppercase"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </article>
+
+              <article className="rounded-[28px] border border-white/10 bg-black/18 p-5">
+                <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
+                  Wine passport
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Grape</p>
+                    <p className="mt-1 text-white">{selectedWine.passport.grape}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">ABV</p>
+                    <p className="mt-1 text-white">{selectedWine.passport.abv}%</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Body</p>
+                    <p className="mt-1 text-white">{bodyLabel[selectedWine.passport.body]}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Acidity</p>
+                    <p className="mt-1 text-white">{acidityLabel[selectedWine.passport.acidity]}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Tannin</p>
+                    <p className="mt-1 text-white">{tanninLabel[selectedWine.passport.tannin]}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Serve</p>
+                    <p className="mt-1 text-white">{selectedWine.passport.servingTempC}°C</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 rounded-xl border border-white/10 bg-black/25 p-3">
+                  <p className="text-[10px] tracking-wider text-gray-400 uppercase">Decant</p>
+                  <p className="mt-1 text-sm text-gray-100">{selectedWine.passport.decant}</p>
+                </div>
+              </article>
+            </div>
+          </section>
+        ) : null}
+      </main>
 
       <MobileTabBar />
     </div>
