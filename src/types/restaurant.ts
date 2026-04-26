@@ -1,23 +1,25 @@
+import type { LocalizedString } from "./pairing";
+
 export type Wine = {
   id: string;
-  name: string;
+  name: LocalizedString;
   region: string;
   grape: string;
   style: string;
   vintage?: string;
-  notes: string;
+  notes: LocalizedString;
 };
 
 export type DishPairing = {
   wineId: string;
-  reason: string;
+  reason: LocalizedString;
 };
 
 export type Dish = {
   id: string;
-  name: string;
+  name: LocalizedString;
   category: string;
-  description: string;
+  description: LocalizedString;
   price: number;
   pairings: DishPairing[];
 };
@@ -25,10 +27,13 @@ export type Dish = {
 export type Restaurant = {
   id: string;
   slug: string;
-  name: string;
+  /** Brand name — usually identical across languages, but kept localized for
+      consistency with Dish/Wine and to allow operators to provide a localized
+      transliteration if needed. */
+  name: LocalizedString;
   cuisine: string;
   city: string;
-  description: string;
+  description: LocalizedString;
   coverGradient: string;
   dishes: Dish[];
   wines: Wine[];

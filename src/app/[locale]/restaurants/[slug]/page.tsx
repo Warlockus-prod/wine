@@ -1,27 +1,41 @@
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
+import { Link } from "@/i18n/navigation";
+import { t } from "@/lib/localized";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { catalogRestaurants, getCatalogRestaurant } from "@/lib/restaurant-directory";
 
 export function generateStaticParams() {
-  return catalogRestaurants.map((restaurant) => ({
-    slug: restaurant.slug,
-  }));
+  const out: Array<{ locale: string; slug: string }> = [];
+  for (const locale of routing.locales) {
+    for (const r of catalogRestaurants) {
+      out.push({ locale, slug: r.slug });
+    }
+  }
+  return out;
 }
 
 export default async function RestaurantPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  setRequestLocale(locale);
+  const tx = await getTranslations("restaurant");
+
   const restaurant = getCatalogRestaurant(slug);
 
   if (!restaurant) {
     notFound();
   }
+
+  const lng = locale as Locale;
+  const fallbackReason = tx("suggestedByWorkflow");
 
   const highlightedPairings = restaurant.dishes.slice(0, 4).map((dish) => {
     const primaryPairing = dish.pairings[0];
@@ -30,7 +44,7 @@ export default async function RestaurantPage({
     return {
       dish,
       wine,
-      reason: primaryPairing?.reason ?? "Suggested by the sommelier workflow.",
+      reason: primaryPairing ? t(primaryPairing.reason, lng) : fallbackReason,
     };
   });
 
@@ -57,10 +71,10 @@ export default async function RestaurantPage({
               </div>
 
               <h1 className="mt-5 max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                {restaurant.name}
+                {t(restaurant.name, lng)}
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-white/90">
-                {restaurant.description}
+                {t(restaurant.description, lng)}
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -101,7 +115,7 @@ export default async function RestaurantPage({
               <div className="mt-4 flex flex-col items-center rounded-[24px] border border-white/10 bg-white/95 p-4">
                 <Image
                   src={restaurant.qrUrl}
-                  alt={`QR code for ${restaurant.name}`}
+                  alt={`QR code for ${t(restaurant.name, lng)}`}
                   width={192}
                   height={192}
                   unoptimized
@@ -138,11 +152,11 @@ export default async function RestaurantPage({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-lg font-semibold text-white">{dish.name}</p>
+                      <p className="text-lg font-semibold text-white">{t(dish.name, lng)}</p>
                       <p className="mt-1 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
                         {dish.category}
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-gray-300">{dish.description}</p>
+                      <p className="mt-2 text-sm leading-6 text-gray-300">{t(dish.description, lng)}</p>
                     </div>
                     <span className="text-base font-bold text-primary">${dish.price}</span>
                   </div>
@@ -170,14 +184,14 @@ export default async function RestaurantPage({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-lg font-semibold text-white">{wine.name}</p>
+                      <p className="text-lg font-semibold text-white">{t(wine.name, lng)}</p>
                       <p className="mt-1 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
                         {wine.style} • {wine.grape}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-gray-300">
                         {wine.region} {wine.vintage ? `• ${wine.vintage}` : ""}
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-gray-400">{wine.notes}</p>
+                      <p className="mt-2 text-sm leading-6 text-gray-400">{t(wine.notes, lng)}</p>
                     </div>
                   </div>
                 </article>
@@ -209,9 +223,9 @@ export default async function RestaurantPage({
                 <p className="text-[11px] font-semibold tracking-[0.22em] text-primary uppercase">
                   {item.dish.category}
                 </p>
-                <h3 className="mt-2 text-xl font-bold text-white">{item.dish.name}</h3>
+                <h3 className="mt-2 text-xl font-bold text-white">{t(item.dish.name, lng)}</h3>
                 <p className="mt-2 text-sm text-gray-300">
-                  {item.wine?.name ?? "Sommelier selection"}
+                  {item.wine ? t(item.wine.name, lng) : tx("sommelierSelection")}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-gray-200">{item.reason}</p>
               </article>

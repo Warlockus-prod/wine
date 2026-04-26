@@ -1,4 +1,14 @@
-import type { PairingDataset, PairingDish, PairingWine, WineAcidity, WineBody, WineTannin } from "@/types/pairing";
+import type { Locale } from "@/i18n/routing";
+import { t } from "@/lib/localized";
+import type {
+  CuratedPairing,
+  PairingDataset,
+  PairingDish,
+  PairingWine,
+  WineAcidity,
+  WineBody,
+  WineTannin,
+} from "@/types/pairing";
 import type { Restaurant, Wine } from "@/types/restaurant";
 
 export type RestaurantMatchDetails = {
@@ -72,8 +82,13 @@ const parseVintageYear = (vintage: string | undefined) => {
   return Number.isFinite(parsed) && parsed >= 1900 ? parsed : 2024;
 };
 
+// Inference helpers run on stable English text — pairing-style heuristics rely
+// on English keywords and are language-agnostic w.r.t. the displayed UI.
+const wineEnText = (wine: Wine) =>
+  `${t(wine.name, "en")} ${wine.grape} ${wine.style} ${t(wine.notes, "en")}`.toLowerCase();
+
 const getWineImage = (wine: Wine) => {
-  const text = `${wine.name} ${wine.grape} ${wine.style}`.toLowerCase();
+  const text = `${t(wine.name, "en")} ${wine.grape} ${wine.style}`.toLowerCase();
 
   if (text.includes("riesling")) {
     return wineImages.riesling;
@@ -92,7 +107,7 @@ const getWineImage = (wine: Wine) => {
 };
 
 const inferBody = (wine: Wine): WineBody => {
-  const text = `${wine.name} ${wine.grape} ${wine.style} ${wine.notes}`.toLowerCase();
+  const text = wineEnText(wine);
   if (/(cabernet|malbec|syrah|shiraz|tignanello|brunello|valbuena|chateauneuf|beaucastel|santa rita|cob os|cobos)/.test(text)) {
     return "full";
   }
@@ -103,7 +118,7 @@ const inferBody = (wine: Wine): WineBody => {
 };
 
 const inferAcidity = (wine: Wine): WineAcidity => {
-  const text = `${wine.name} ${wine.grape} ${wine.style} ${wine.notes}`.toLowerCase();
+  const text = wineEnText(wine);
   if (/(riesling|sancerre|chablis|albarino|gavi|pinot grigio|sparkling|champagne|brut|citrus|crisp|saline|mineral)/.test(text)) {
     return "high";
   }
@@ -114,7 +129,7 @@ const inferAcidity = (wine: Wine): WineAcidity => {
 };
 
 const inferTannin = (wine: Wine): WineTannin => {
-  const text = `${wine.name} ${wine.grape} ${wine.style} ${wine.notes}`.toLowerCase();
+  const text = wineEnText(wine);
   if (!text.includes("red") && !/(cabernet|malbec|tempranillo|sangiovese|merlot|pinot noir|zinfandel|carmenere)/.test(text)) {
     return "none";
   }
@@ -163,7 +178,7 @@ const decantFor = (wine: Wine) => {
 
 const getWineTags = (wine: Wine) => {
   const tags = [wine.style, wine.grape];
-  const notes = wine.notes.toLowerCase();
+  const notes = t(wine.notes, "en").toLowerCase();
 
   if (notes.includes("citrus") || notes.includes("lime") || notes.includes("lemon")) {
     tags.push("Citrus");
@@ -190,33 +205,46 @@ export const buildPairingDatasetFromRestaurant = (restaurant: Restaurant): Pairi
     image: dishImagePool[index % dishImagePool.length],
     tags: [dish.category, restaurant.cuisine].filter(Boolean),
   })),
-  wines: restaurant.wines.map<PairingWine>((wine) => ({
-    id: wine.id,
-    name: wine.name,
-    region: wine.region,
-    year: parseVintageYear(wine.vintage),
-    vintageLabel: wine.vintage ?? String(parseVintageYear(wine.vintage)),
-    price: knownBottlePrices[wine.name] ?? (wine.style.toLowerCase().includes("sparkling") ? 78 : 58),
-    rating: wine.style.toLowerCase().includes("red") ? 4.5 : 4.4,
-    description: wine.notes,
-    image: getWineImage(wine),
-    tags: getWineTags(wine),
-    passport: {
-      grape: wine.grape,
-      abv: inferAbv(wine),
-      body: inferBody(wine),
-      acidity: inferAcidity(wine),
-      tannin: inferTannin(wine),
-      servingTempC: servingTempFor(wine),
-      decant: decantFor(wine),
-    },
-  })),
+  pairings: restaurant.dishes.flatMap<CuratedPairing>((dish) =>
+    dish.pairings.map((pairing) => ({
+      dishId: dish.id,
+      wineId: pairing.wineId,
+      reason: pairing.reason,
+    })),
+  ),
+  wines: restaurant.wines.map<PairingWine>((wine) => {
+    const enName = t(wine.name, "en");
+    return {
+      id: wine.id,
+      name: wine.name,
+      region: wine.region,
+      year: parseVintageYear(wine.vintage),
+      vintageLabel: wine.vintage ?? String(parseVintageYear(wine.vintage)),
+      price:
+        knownBottlePrices[enName] ??
+        (wine.style.toLowerCase().includes("sparkling") ? 78 : 58),
+      rating: wine.style.toLowerCase().includes("red") ? 4.5 : 4.4,
+      description: wine.notes,
+      image: getWineImage(wine),
+      tags: getWineTags(wine),
+      passport: {
+        grape: wine.grape,
+        abv: inferAbv(wine),
+        body: inferBody(wine),
+        acidity: inferAcidity(wine),
+        tannin: inferTannin(wine),
+        servingTempC: servingTempFor(wine),
+        decant: decantFor(wine),
+      },
+    };
+  }),
 });
 
 export const getRestaurantMatchForDishWine = (
   restaurant: Restaurant | null,
   dishId: string,
   wineId: string,
+  locale: Locale,
 ): RestaurantMatchDetails | null => {
   const dish = restaurant?.dishes.find((item) => item.id === dishId);
   if (!dish) {
@@ -230,7 +258,7 @@ export const getRestaurantMatchForDishWine = (
 
   return {
     score: Math.max(82, 96 - pairingIndex * 5),
-    reason: dish.pairings[pairingIndex].reason,
+    reason: t(dish.pairings[pairingIndex].reason, locale),
   };
 };
 
@@ -239,6 +267,7 @@ export const applyRestaurantPairingOverrides = (
   restaurant: Restaurant | null,
   dishId: string,
   wines: PairingWine[],
+  locale: Locale,
 ) => {
   if (!restaurant) {
     return baseMap;
@@ -256,7 +285,7 @@ export const applyRestaurantPairingOverrides = (
   }
 
   for (const wine of wines) {
-    const curated = getRestaurantMatchForDishWine(restaurant, dishId, wine.id);
+    const curated = getRestaurantMatchForDishWine(restaurant, dishId, wine.id, locale);
     if (curated) {
       nextMap.set(wine.id, curated);
     }

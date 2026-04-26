@@ -7,8 +7,10 @@ export type RestaurantMeta = {
   country: string;
   format: string;
   district: string;
-  mapX: number;
-  mapY: number;
+  /** Latitude — real-world coordinates for the Leaflet map. */
+  lat: number;
+  /** Longitude — real-world coordinates for the Leaflet map. */
+  lng: number;
 };
 
 export type CatalogRestaurant = Restaurant &
@@ -18,41 +20,44 @@ export type CatalogRestaurant = Restaurant &
     qrUrl: string;
   };
 
+// Real-world coordinates for the cities/districts each demo restaurant claims.
+// Picked roughly in the named district — placeholder until verified addresses
+// are sourced for the commercial pitch.
 const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
   "trattoria-bellavista": {
     country: "Italy",
     format: "Trattoria",
     district: "Santa Croce",
-    mapX: 57,
-    mapY: 63,
+    lat: 45.4408, // Venice, Santa Croce
+    lng: 12.3155,
   },
   "sakura-ember": {
     country: "Denmark",
     format: "Chef's Table",
     district: "Christianshavn",
-    mapX: 58,
-    mapY: 25,
+    lat: 55.6717, // Copenhagen, Christianshavn
+    lng: 12.5912,
   },
   "brasa-iberica": {
     country: "Spain",
     format: "Grill House",
     district: "Salamanca",
-    mapX: 23,
-    mapY: 65,
+    lat: 40.4286, // Madrid, Salamanca
+    lng: -3.6772,
   },
   "bistro-maree": {
     country: "France",
     format: "Bistro",
     district: "Presqu'ile",
-    mapX: 41,
-    mapY: 48,
+    lat: 45.7595, // Lyon, Presqu'ile
+    lng: 4.8346,
   },
   "andes-fuego": {
     country: "Portugal",
     format: "Fusion Bar",
     district: "Chiado",
-    mapX: 14,
-    mapY: 68,
+    lat: 38.7110, // Lisbon, Chiado
+    lng: -9.1416,
   },
 };
 

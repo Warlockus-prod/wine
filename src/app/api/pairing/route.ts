@@ -29,6 +29,12 @@ type PairingResult = {
   reason: string;
 };
 
+type CuratedInput = {
+  dishId?: string;
+  wineId?: string;
+  reason?: string;
+};
+
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
@@ -188,15 +194,48 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { dish?: DishInput; wines?: WineInput[] };
+    const body = (await request.json()) as {
+      dish?: DishInput;
+      wines?: WineInput[];
+      curated?: CuratedInput[];
+    };
 
     if (!body?.dish || !Array.isArray(body.wines) || body.wines.length === 0) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
+    const dish = body.dish;
+    const dishId = dish.id ?? "";
+
+    const curatedForDish = new Map<string, string>();
+    if (Array.isArray(body.curated) && dishId) {
+      for (const entry of body.curated) {
+        if (
+          entry?.dishId === dishId &&
+          typeof entry.wineId === "string" &&
+          entry.wineId.length > 0 &&
+          typeof entry.reason === "string" &&
+          entry.reason.trim().length > 0
+        ) {
+          curatedForDish.set(entry.wineId, entry.reason.trim());
+        }
+      }
+    }
+
     const matches = body.wines
       .filter((wine) => Boolean(wine.id))
-      .map((wine) => scoreWine(body.dish as DishInput, wine))
+      .map((wine) => {
+        const result = scoreWine(dish, wine);
+        const curatedReason = curatedForDish.get(wine.id);
+        if (curatedReason) {
+          return {
+            ...result,
+            score: clamp(Math.max(result.score, 88), 25, 99),
+            reason: curatedReason,
+          };
+        }
+        return result;
+      })
       .sort((a, b) => b.score - a.score);
 
     return NextResponse.json({ matches });

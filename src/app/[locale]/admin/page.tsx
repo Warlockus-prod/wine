@@ -1,12 +1,17 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { trackEvent } from "@/lib/analytics";
 import { makeId } from "@/lib/format";
+import { t } from "@/lib/localized";
 import { usePairingDataset } from "@/lib/pairing-store";
+import type { Locale } from "@/i18n/routing";
 import type {
+  CuratedPairing,
+  LocalizedString,
   PairingDataset,
   PairingDish,
   PairingWine,
@@ -14,6 +19,20 @@ import type {
   WineBody,
   WineTannin,
 } from "@/types/pairing";
+
+const mirroredLocalized = (value: string): LocalizedString => ({
+  en: value,
+  pl: value,
+});
+
+const setLocalized = (
+  current: LocalizedString,
+  locale: Locale,
+  value: string,
+): LocalizedString => ({
+  ...current,
+  [locale]: value,
+});
 
 type ApiResponse = {
   matches?: Array<{ wineId: string; score: number; reason: string }>;
@@ -35,6 +54,8 @@ const tanninOptions: WineTannin[] = ["none", "soft", "medium", "high"];
 
 export default function AdminPage() {
   const { dataset, setDataset, resetDataset, exportDataset, importDataset } = usePairingDataset();
+  const locale = useLocale() as Locale;
+  const tx = useTranslations("admin");
 
   const [dishForm, setDishForm] = useState({
     name: "",
@@ -62,6 +83,7 @@ export default function AdminPage() {
     decant: "No decant.",
   });
 
+  const [pairingDishId, setPairingDishId] = useState<string>(dataset.dishes[0]?.id ?? "");
   const [apiDishId, setApiDishId] = useState<string>(dataset.dishes[0]?.id ?? "");
   const [apiSelectedWineIds, setApiSelectedWineIds] = useState<string[]>(
     dataset.wines.map((wine) => wine.id),
@@ -109,9 +131,9 @@ export default function AdminPage() {
 
     const created: PairingDish = {
       id: makeId("dish"),
-      name: dishForm.name.trim(),
+      name: mirroredLocalized(dishForm.name.trim()),
       price: Math.max(1, Number(dishForm.price) || 1),
-      description: dishForm.description.trim(),
+      description: mirroredLocalized(dishForm.description.trim()),
       image: dishForm.image.trim(),
       tags: parseTags(dishForm.tags),
     };
@@ -144,12 +166,14 @@ export default function AdminPage() {
 
     const created: PairingWine = {
       id: makeId("wine"),
-      name: wineForm.name.trim(),
+      name: mirroredLocalized(wineForm.name.trim()),
       region: wineForm.region.trim(),
       year: Math.max(1900, Number(wineForm.year) || 2021),
       price: Math.max(1, Number(wineForm.price) || 1),
       rating: Math.min(5, Math.max(1, Number(wineForm.rating) || 4)),
-      description: wineForm.description.trim() || "Pairing-friendly wine profile.",
+      description: mirroredLocalized(
+        wineForm.description.trim() || "Pairing-friendly wine profile.",
+      ),
       image: wineForm.image.trim(),
       tags: parseTags(wineForm.tags),
       passport: {
@@ -225,6 +249,7 @@ export default function AdminPage() {
       (current) => ({
         ...current,
         dishes: current.dishes.filter((dish) => dish.id !== dishId),
+        pairings: current.pairings.filter((pairing) => pairing.dishId !== dishId),
       }),
       "v2_admin_remove_dish",
       { dish_id: dishId },
@@ -243,6 +268,7 @@ export default function AdminPage() {
       (current) => ({
         ...current,
         wines: current.wines.filter((wine) => wine.id !== wineId),
+        pairings: current.pairings.filter((pairing) => pairing.wineId !== wineId),
       }),
       "v2_admin_remove_wine",
       { wine_id: wineId },
@@ -250,6 +276,69 @@ export default function AdminPage() {
 
     setApiSelectedWineIds((current) => current.filter((id) => id !== wineId));
     setStatusText("Wine removed.");
+  };
+
+  const effectivePairingDishId =
+    pairingDishId && dataset.dishes.some((dish) => dish.id === pairingDishId)
+      ? pairingDishId
+      : dataset.dishes[0]?.id ?? "";
+
+  const pairingsByWineId = useMemo(() => {
+    const map = new Map<string, CuratedPairing>();
+    for (const pairing of dataset.pairings) {
+      if (pairing.dishId === effectivePairingDishId) {
+        map.set(pairing.wineId, pairing);
+      }
+    }
+    return map;
+  }, [dataset.pairings, effectivePairingDishId]);
+
+  const togglePairing = (wineId: string) => {
+    if (!effectivePairingDishId) {
+      return;
+    }
+
+    const exists = pairingsByWineId.has(wineId);
+
+    updateDataset(
+      (current) => ({
+        ...current,
+        pairings: exists
+          ? current.pairings.filter(
+              (pairing) =>
+                !(pairing.dishId === effectivePairingDishId && pairing.wineId === wineId),
+            )
+          : [
+              ...current.pairings,
+              {
+                dishId: effectivePairingDishId,
+                wineId,
+                reason: mirroredLocalized("Balanced acidity and texture for this dish."),
+              },
+            ],
+      }),
+      "v2_admin_toggle_pairing",
+      { dish_id: effectivePairingDishId, wine_id: wineId, selected: exists ? 0 : 1 },
+    );
+  };
+
+  const updatePairingReason = (wineId: string, lang: Locale, value: string) => {
+    if (!effectivePairingDishId) {
+      return;
+    }
+
+    updateDataset(
+      (current) => ({
+        ...current,
+        pairings: current.pairings.map((pairing) =>
+          pairing.dishId === effectivePairingDishId && pairing.wineId === wineId
+            ? { ...pairing, reason: setLocalized(pairing.reason, lang, value) }
+            : pairing,
+        ),
+      }),
+      "v2_admin_update_pairing_reason",
+      { dish_id: effectivePairingDishId, wine_id: wineId, lang },
+    );
   };
 
   const runApiPairing = async () => {
@@ -474,11 +563,24 @@ export default function AdminPage() {
             <div className="mt-4 space-y-3 max-h-[560px] overflow-auto pr-1">
               {dataset.dishes.map((dish) => (
                 <div key={dish.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <input
-                    className="mb-2 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    value={dish.name}
-                    onChange={(event) => updateDish(dish.id, { name: event.target.value })}
-                  />
+                  <div className="mb-2 grid grid-cols-2 gap-2">
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="EN name"
+                      value={dish.name.en}
+                      onChange={(event) =>
+                        updateDish(dish.id, { name: setLocalized(dish.name, "en", event.target.value) })
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="PL nazwa"
+                      value={dish.name.pl}
+                      onChange={(event) =>
+                        updateDish(dish.id, { name: setLocalized(dish.name, "pl", event.target.value) })
+                      }
+                    />
+                  </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
@@ -500,11 +602,28 @@ export default function AdminPage() {
                     value={dish.image}
                     onChange={(event) => updateDish(dish.id, { image: event.target.value })}
                   />
-                  <textarea
-                    className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    value={dish.description}
-                    onChange={(event) => updateDish(dish.id, { description: event.target.value })}
-                  />
+                  <div className="mb-1 grid gap-2 sm:grid-cols-2">
+                    <textarea
+                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="EN description"
+                      value={dish.description.en}
+                      onChange={(event) =>
+                        updateDish(dish.id, {
+                          description: setLocalized(dish.description, "en", event.target.value),
+                        })
+                      }
+                    />
+                    <textarea
+                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="PL opis"
+                      value={dish.description.pl}
+                      onChange={(event) =>
+                        updateDish(dish.id, {
+                          description: setLocalized(dish.description, "pl", event.target.value),
+                        })
+                      }
+                    />
+                  </div>
                   <div className="mt-2 flex justify-end">
                     <button
                       type="button"
@@ -672,11 +791,24 @@ export default function AdminPage() {
             <div className="mt-4 space-y-3 max-h-[560px] overflow-auto pr-1">
               {dataset.wines.map((wine) => (
                 <div key={wine.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <input
-                    className="mb-2 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    value={wine.name}
-                    onChange={(event) => updateWine(wine.id, { name: event.target.value })}
-                  />
+                  <div className="mb-2 grid grid-cols-2 gap-2">
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="EN name"
+                      value={wine.name.en}
+                      onChange={(event) =>
+                        updateWine(wine.id, { name: setLocalized(wine.name, "en", event.target.value) })
+                      }
+                    />
+                    <input
+                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="PL nazwa"
+                      value={wine.name.pl}
+                      onChange={(event) =>
+                        updateWine(wine.id, { name: setLocalized(wine.name, "pl", event.target.value) })
+                      }
+                    />
+                  </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
@@ -819,11 +951,28 @@ export default function AdminPage() {
                       }
                     />
                   </div>
-                  <textarea
-                    className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    value={wine.description}
-                    onChange={(event) => updateWine(wine.id, { description: event.target.value })}
-                  />
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <textarea
+                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="EN description"
+                      value={wine.description.en}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          description: setLocalized(wine.description, "en", event.target.value),
+                        })
+                      }
+                    />
+                    <textarea
+                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      placeholder="PL opis"
+                      value={wine.description.pl}
+                      onChange={(event) =>
+                        updateWine(wine.id, {
+                          description: setLocalized(wine.description, "pl", event.target.value),
+                        })
+                      }
+                    />
+                  </div>
                   <div className="mt-2 flex justify-end">
                     <button
                       type="button"
@@ -864,7 +1013,7 @@ export default function AdminPage() {
               >
                 {dataset.dishes.map((dish) => (
                   <option key={dish.id} value={dish.id}>
-                    {dish.name}
+                    {t(dish.name, locale)}
                   </option>
                 ))}
               </select>
@@ -888,7 +1037,7 @@ export default function AdminPage() {
                           );
                         }}
                       />
-                      <span>{wine.name}</span>
+                      <span>{t(wine.name, locale)}</span>
                     </label>
                   );
                 })}
@@ -900,7 +1049,8 @@ export default function AdminPage() {
               {apiResponse?.matches?.length ? (
                 <div className="space-y-2">
                   {apiResponse.matches.map((item) => {
-                    const wineName = dataset.wines.find((wine) => wine.id === item.wineId)?.name ?? item.wineId;
+                    const wineMatch = dataset.wines.find((wine) => wine.id === item.wineId);
+                    const wineName = wineMatch ? t(wineMatch.name, locale) : item.wineId;
                     return (
                       <div key={item.wineId} className="rounded-lg border border-primary/20 bg-primary/10 p-2">
                         <p className="text-sm font-semibold text-white">{wineName} • {item.score}%</p>
@@ -930,6 +1080,83 @@ export default function AdminPage() {
               </pre>
             </article>
           </div>
+        </section>
+
+        <section className="mt-6 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-white">{tx("curatedPairings.title")}</h2>
+              <p className="mt-1 text-xs text-gray-400">{tx("curatedPairings.subtitle")}</p>
+            </div>
+            <select
+              className="rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
+              value={effectivePairingDishId}
+              onChange={(event) => setPairingDishId(event.target.value)}
+            >
+              {dataset.dishes.map((dish) => (
+                <option key={dish.id} value={dish.id}>
+                  {t(dish.name, locale)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {dataset.dishes.length === 0 ? (
+            <p className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-gray-400">
+              {tx("curatedPairings.noDishes")}
+            </p>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              {dataset.wines.map((wine) => {
+                const curated = pairingsByWineId.get(wine.id);
+                const selected = Boolean(curated);
+                return (
+                  <div
+                    key={wine.id}
+                    className={`rounded-xl border p-3 ${
+                      selected
+                        ? "border-primary/45 bg-primary/12"
+                        : "border-white/10 bg-black/20"
+                    }`}
+                  >
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-white">
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => togglePairing(wine.id)}
+                      />
+                      <span>{t(wine.name, locale)}</span>
+                      <span className="ml-auto text-[10px] tracking-wider text-gray-400 uppercase">
+                        {wine.region}
+                      </span>
+                    </label>
+                    {selected && curated ? (
+                      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                        <textarea
+                          className="min-h-20 w-full rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
+                          placeholder={tx("curatedPairings.reasonEnPlaceholder")}
+                          value={curated.reason.en}
+                          onChange={(event) =>
+                            updatePairingReason(wine.id, "en", event.target.value)
+                          }
+                        />
+                        <textarea
+                          className="min-h-20 w-full rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
+                          placeholder={tx("curatedPairings.reasonPlPlaceholder")}
+                          value={curated.reason.pl}
+                          onChange={(event) =>
+                            updatePairingReason(wine.id, "pl", event.target.value)
+                          }
+                        />
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-xs text-gray-500">{tx("curatedPairings.notCurated")}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </main>
 

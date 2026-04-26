@@ -20,8 +20,6 @@ const pages = [
   { name: "pairing", path: "/pairing" },
   { name: "admin", path: "/admin" },
   { name: "editorial", path: "/editorial" },
-  { name: "v1-catalog", path: "/v1" },
-  { name: "v1-admin", path: "/v1/admin" },
 ];
 
 test.describe("mobile visual regression", () => {

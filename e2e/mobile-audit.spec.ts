@@ -11,9 +11,7 @@ const routes: RouteCheck[] = [
   { path: "/admin", mustSee: /admin studio/i },
   { path: "/immersive", mustSee: /sommelier/i },
   { path: "/editorial", mustSee: /sommelier/i },
-  { path: "/v1", mustSee: /cellar compass/i },
-  { path: "/v1/admin", mustSee: /restaurant content manager/i },
-  { path: "/v1/restaurants/trattoria-bellavista", mustSee: /wine list/i },
+  { path: "/restaurants/trattoria-bellavista", mustSee: /wine list/i },
 ];
 
 const makeMobileUse = (device: (typeof devices)[keyof typeof devices]): TestOptions => ({

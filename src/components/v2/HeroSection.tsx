@@ -28,12 +28,6 @@ export default function HeroSection() {
             Open Pairing Demo
           </Link>
           <Link
-            href="/v1"
-            className="rounded-lg border border-white/10 bg-surface-dark px-5 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/5 hover:text-white"
-          >
-            Open Backup V1
-          </Link>
-          <Link
             href="/admin"
             className="rounded-lg border border-primary/40 bg-primary/15 px-5 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/25"
           >

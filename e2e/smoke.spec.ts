@@ -12,11 +12,13 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
   await expect(page.getByText("V2 Admin Studio")).toBeVisible();
 
   const dishName = `Smoke Dish ${Date.now()}`;
-  await page.getByPlaceholder("Dish name").fill(dishName);
+  // The new-dish form uses the single-language input; admin's edit grid splits
+  // into EN/PL fields, but the create form remains a single-language quick-add.
+  await page.locator('input[placeholder="Dish name"]').first().fill(dishName);
   await page.getByPlaceholder("Image URL").first().fill(
     "https://images.unsplash.com/photo-1544025162-d76694265947?w=1200",
   );
-  await page.getByPlaceholder("Dish description").fill("Automated dish for smoke test");
+  await page.locator('textarea[placeholder="Dish description"]').first().fill("Automated dish for smoke test");
   await page.getByRole("button", { name: "Add Dish" }).click();
 
   await page.goto("/pairing");

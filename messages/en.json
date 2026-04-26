@@ -1,0 +1,202 @@
+{
+  "nav": {
+    "home": "Discover",
+    "pairing": "Pairing",
+    "admin": "Admin",
+    "openLanguage": "Language",
+    "english": "English",
+    "polish": "Polski"
+  },
+  "home": {
+    "tagline": "AI sommelier for restaurant menus",
+    "mapTitle": "Europe overview",
+    "mapSubtitle": "Restaurants on the map",
+    "filteredListTitle": "Restaurants",
+    "filteredListSubtitle": "Unique URLs + QR",
+    "selectedRestaurant": "Selected restaurant",
+    "openRestaurant": "Open restaurant page",
+    "openPairing": "Open pairing",
+    "directUrl": "Direct URL",
+    "scanToOpen": "Scan to open",
+    "dishes": "{count, plural, one {# dish} other {# dishes}}",
+    "wines": "{count, plural, one {# wine} other {# wines}}",
+    "filters": {
+      "cuisine": "Cuisine",
+      "city": "City",
+      "format": "Format",
+      "all": "All"
+    },
+    "visible": "{count} visible",
+    "loadingMap": "Loading map…",
+    "europe": "Europe"
+  },
+  "restaurant": {
+    "menuTitle": "Signature dishes",
+    "wineListTitle": "Current cellar",
+    "qrTitle": "Direct access QR",
+    "qrHint": "Scan this QR code to open the restaurant page directly on a phone.",
+    "menu": "Menu",
+    "wineList": "Wine list",
+    "items": "{count} items",
+    "labels": "{count} labels",
+    "openPairing": "Open pairing",
+    "backToDiscover": "Back to discover",
+    "suggestedPairings": "Suggested pairings",
+    "recommendedCombinations": "Recommended combinations",
+    "openPairingView": "Open pairing view",
+    "district": "District",
+    "menuStat": "Menu",
+    "wineCard": "Wine card",
+    "sommelierSelection": "Sommelier selection",
+    "suggestedByWorkflow": "Suggested by the sommelier workflow."
+  },
+  "pairing": {
+    "workspace": "Pairing Workspace",
+    "headline": "Choose a dish. Choose a wine. Read the rationale below.",
+    "subheading": "The screen is organized as two side-by-side lists. Dish selection updates the wine ranking, wine selection reorders the menu list, and the lower panel acts like a bot chat without text input.",
+    "context": "Context: {name} • {city}",
+    "aiAnalyzing": "AI analyzing",
+    "aiReady": "AI ready",
+    "fallbackMode": "Fallback mode",
+    "jumpToWines": "Jump to wines",
+    "column1": "Column 1",
+    "column2": "Column 2",
+    "menu": "Menu",
+    "wineList": "Wine List",
+    "reorderedFor": "Reordered for {name}",
+    "rankedFor": "Ranked for {name}",
+    "selectedWine": "selected wine",
+    "dishesCount": "{count, plural, one {# dish} other {# dishes}}",
+    "winesCount": "{count, plural, one {# wine} other {# wines}}",
+    "bestMatch": "Best Match",
+    "alternative": "Alternative",
+    "budgetPick": "Budget Pick",
+    "noRankedWine": "No ranked wine",
+    "matchPercent": "{score}% match",
+    "fitPercent": "{score}% fit",
+    "exploratory": "Exploratory",
+    "manualSelection": "Manual selection",
+    "matched": "{score}% matched",
+    "explanationKicker": "Explanation",
+    "explanationLine": "The explanation is shown as a bot response based only on the selected records.",
+    "menuItem": "Menu item",
+    "wineSelection": "Wine selection",
+    "sommelierBot": "Sommelier Bot",
+    "sommelierBotSubtitle": "Automated rationale based on selected records",
+    "botCompare": "I am comparing <hl>{dish}</hl> with <hl>{wine}</hl>.",
+    "botFallbackReason": "This wine sits outside the top match zone for the selected dish, but the style can still be reviewed through the passport and ranking signals.",
+    "botServiceNote": "Service note: serve at {temp}°C. {decant}",
+    "winePassport": "Wine passport",
+    "passport": {
+      "grape": "Grape",
+      "abv": "ABV",
+      "body": "Body",
+      "acidity": "Acidity",
+      "tannin": "Tannin",
+      "serve": "Serve",
+      "decant": "Decant"
+    },
+    "body": {
+      "light": "Light",
+      "medium": "Medium",
+      "full": "Full"
+    },
+    "acidity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "tannin": {
+      "none": "None",
+      "soft": "Soft",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "noData": {
+      "kicker": "Pairing Data Required",
+      "title": "No pairing data available",
+      "subtitle": "Add dishes and wines from the new admin panel, then return to the pairing screen.",
+      "openAdmin": "Open Admin"
+    }
+  },
+  "admin": {
+    "kicker": "New Style Admin",
+    "title": "V2 Admin Studio",
+    "subtitle": "Manage pairing API data: add/edit dishes and wines, then run live API checks.",
+    "stats": {
+      "dishes": "Dishes",
+      "wines": "Wines",
+      "endpoint": "Endpoint"
+    },
+    "actions": {
+      "exportJson": "Export JSON",
+      "importJson": "Import JSON",
+      "resetToSeed": "Reset to Seed",
+      "addDish": "Add Dish",
+      "addWine": "Add Wine",
+      "runApiPairing": "Run /api/pairing",
+      "running": "Running...",
+      "delete": "Delete"
+    },
+    "dishes": {
+      "title": "Dishes",
+      "subtitle": "Add menu items used by pairing AI.",
+      "namePlaceholder": "Dish name (English)",
+      "namePlPlaceholder": "Dish name (Polish)",
+      "pricePlaceholder": "Price",
+      "tagsPlaceholder": "Tags (comma separated)",
+      "imagePlaceholder": "Image URL",
+      "descriptionPlaceholder": "Dish description (English)",
+      "descriptionPlPlaceholder": "Dish description (Polish)"
+    },
+    "wines": {
+      "title": "Wines",
+      "subtitle": "Manage cellar options for AI scoring.",
+      "namePlaceholder": "Wine name (English)",
+      "namePlPlaceholder": "Wine name (Polish)",
+      "regionPlaceholder": "Region",
+      "yearPlaceholder": "Year",
+      "ratingPlaceholder": "Rating",
+      "tagsPlaceholder": "Tags (comma separated)",
+      "imagePlaceholder": "Image URL",
+      "grapePlaceholder": "Grape",
+      "abvPlaceholder": "ABV %",
+      "bodyOption": "Body: {value}",
+      "acidityOption": "Acidity: {value}",
+      "tanninOption": "Tannin: {value}",
+      "servingTempPlaceholder": "Serving temp C (e.g. 8-10)",
+      "decantPlaceholder": "Decant notes",
+      "descriptionPlaceholder": "Wine description (English)",
+      "descriptionPlPlaceholder": "Wine description (Polish)"
+    },
+    "playground": {
+      "title": "API Playground",
+      "subtitle": "Run `/api/pairing` with custom payload from current dataset.",
+      "dish": "Dish",
+      "wines": "Wines",
+      "result": "Result",
+      "noRun": "Run API to see pairing response."
+    },
+    "curatedPairings": {
+      "title": "Curated Pairings",
+      "subtitle": "Hand-pick wines for a dish and write the rationale shown to the guest in the chat panel. Curated entries override the algorithm.",
+      "noDishes": "Add at least one dish to configure pairings.",
+      "notCurated": "Not curated for this dish — algorithm decides.",
+      "reasonEnPlaceholder": "Why it works (English)",
+      "reasonPlPlaceholder": "Dlaczego pasuje (polski)"
+    },
+    "status": {
+      "fillDish": "Fill dish name, description and image URL.",
+      "fillWine": "Fill wine name, region and image URL.",
+      "dishAdded": "Dish added.",
+      "wineAdded": "Wine added.",
+      "dishRemoved": "Dish removed.",
+      "wineRemoved": "Wine removed.",
+      "datasetImported": "Dataset imported.",
+      "datasetImportFailed": "Import failed: invalid JSON format.",
+      "datasetReset": "Dataset reset to defaults.",
+      "apiCompleted": "API pairing completed.",
+      "apiError": "API error. Check payload and try again."
+    }
+  }
+}

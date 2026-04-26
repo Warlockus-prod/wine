@@ -1,21 +1,31 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-
-const menuLinks = [
-  { href: "/", label: "Discover" },
-  { href: "/pairing", label: "Wine Pairing" },
-  { href: "/admin", label: "Admin" },
-];
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 
 const PHONE_WIDTH = 390;
 const PHONE_HEIGHT = 844;
 
 export default function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const locale = useLocale() as Locale;
+  const tx = useTranslations("nav");
+
+  const menuLinks = [
+    { href: "/", label: tx("home") },
+    { href: "/pairing", label: tx("pairing") },
+    { href: "/admin", label: tx("admin") },
+  ];
+
+  const switchLocale = (next: Locale) => {
+    if (next === locale) return;
+    router.replace(pathname, { locale: next });
+  };
   const [mobileOpen, setMobileOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const isIframe =
@@ -56,6 +66,24 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Language switcher */}
+            <div className="hidden items-center gap-1 rounded-lg border border-white/15 bg-white/5 p-1 md:flex">
+              {routing.locales.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => switchLocale(option as Locale)}
+                  className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
+                    option === locale
+                      ? "bg-primary text-white"
+                      : "text-gray-300 hover:text-white"
+                  }`}
+                  aria-label={tx(option === "en" ? "english" : "polish")}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
             {/* Viewport switcher toggle — only on desktop, hidden inside iframe */}
             {showViewportToggle ? (
               <button
@@ -71,7 +99,7 @@ export default function Navigation() {
               className="hidden rounded-lg border border-white/20 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/16 md:inline-flex"
               href="/admin"
             >
-              Admin
+              {tx("admin")}
             </Link>
             <button
               type="button"

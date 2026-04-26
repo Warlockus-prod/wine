@@ -2,11 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { seedPairingDataset } from "@/data/seed-pairing";
-import type { PairingDataset, WineAcidity, WineBody, WineTannin } from "@/types/pairing";
+import { toLocalizedString } from "@/lib/localized";
+import type {
+  CuratedPairing,
+  LocalizedString,
+  PairingDataset,
+  WineAcidity,
+  WineBody,
+  WineTannin,
+} from "@/types/pairing";
 
 const STORAGE_KEY = "web_wn_pairing_dataset_v3";
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+
+const isMeaningful = (value: LocalizedString) =>
+  value.en.trim().length > 0 || value.pl.trim().length > 0;
 
 const normalizeTags = (value: unknown): string[] => {
   if (!Array.isArray(value)) {
@@ -88,7 +99,7 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
     return null;
   }
 
-  const raw = input as { dishes?: unknown[]; wines?: unknown[] };
+  const raw = input as { dishes?: unknown[]; wines?: unknown[]; pairings?: unknown[] };
   if (!Array.isArray(raw.dishes) || !Array.isArray(raw.wines)) {
     return null;
   }
@@ -101,12 +112,19 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
 
       const value = item as Record<string, unknown>;
       const id = String(value.id ?? "").trim();
-      const name = String(value.name ?? "").trim();
-      const description = String(value.description ?? "").trim();
+      const name = toLocalizedString(value.name);
+      const description = toLocalizedString(value.description);
       const image = String(value.image ?? "").trim();
       const price = Number(value.price ?? 0);
 
-      if (!id || !name || !description || !image || !Number.isFinite(price) || price <= 0) {
+      if (
+        !id ||
+        !isMeaningful(name) ||
+        !isMeaningful(description) ||
+        !image ||
+        !Number.isFinite(price) ||
+        price <= 0
+      ) {
         return null;
       }
 
@@ -129,8 +147,8 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
 
       const value = item as Record<string, unknown>;
       const id = String(value.id ?? "").trim();
-      const name = String(value.name ?? "").trim();
-      const description = String(value.description ?? "").trim();
+      const name = toLocalizedString(value.name);
+      const description = toLocalizedString(value.description);
       const image = String(value.image ?? "").trim();
       const region = String(value.region ?? "").trim();
       const year = Number(value.year ?? 0);
@@ -140,8 +158,8 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
 
       if (
         !id ||
-        !name ||
-        !description ||
+        !isMeaningful(name) ||
+        !isMeaningful(description) ||
         !image ||
         !region ||
         !Number.isFinite(year) ||
@@ -172,7 +190,34 @@ const normalizeDataset = (input: unknown): PairingDataset | null => {
     return null;
   }
 
-  return { dishes, wines };
+  const dishIds = new Set(dishes.map((dish) => dish.id));
+  const wineIds = new Set(wines.map((wine) => wine.id));
+
+  const pairings = Array.isArray(raw.pairings)
+    ? (raw.pairings as unknown[])
+        .map((entry): CuratedPairing | null => {
+          if (!entry || typeof entry !== "object") {
+            return null;
+          }
+
+          const value = entry as Record<string, unknown>;
+          const dishId = String(value.dishId ?? "").trim();
+          const wineId = String(value.wineId ?? "").trim();
+          const reason = toLocalizedString(value.reason);
+
+          if (!dishId || !wineId || !isMeaningful(reason)) {
+            return null;
+          }
+          if (!dishIds.has(dishId) || !wineIds.has(wineId)) {
+            return null;
+          }
+
+          return { dishId, wineId, reason };
+        })
+        .filter((entry): entry is CuratedPairing => entry !== null)
+    : [];
+
+  return { dishes, wines, pairings };
 };
 
 const readInitialDataset = (): PairingDataset => {

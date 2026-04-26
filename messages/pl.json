@@ -1,0 +1,202 @@
+{
+  "nav": {
+    "home": "Odkrywaj",
+    "pairing": "Łączenie",
+    "admin": "Panel",
+    "openLanguage": "Język",
+    "english": "English",
+    "polish": "Polski"
+  },
+  "home": {
+    "tagline": "AI sommelier dla restauracyjnych menu",
+    "mapTitle": "Europa — przegląd",
+    "mapSubtitle": "Restauracje na mapie",
+    "filteredListTitle": "Restauracje",
+    "filteredListSubtitle": "Unikalne URL + QR",
+    "selectedRestaurant": "Wybrana restauracja",
+    "openRestaurant": "Otwórz stronę restauracji",
+    "openPairing": "Otwórz łączenie",
+    "directUrl": "Bezpośredni URL",
+    "scanToOpen": "Zeskanuj, aby otworzyć",
+    "dishes": "{count, plural, one {# danie} few {# dania} many {# dań} other {# dań}}",
+    "wines": "{count, plural, one {# wino} few {# wina} many {# win} other {# win}}",
+    "filters": {
+      "cuisine": "Kuchnia",
+      "city": "Miasto",
+      "format": "Format",
+      "all": "Wszystkie"
+    },
+    "visible": "{count} widoczne",
+    "loadingMap": "Ładowanie mapy…",
+    "europe": "Europa"
+  },
+  "restaurant": {
+    "menuTitle": "Dania popisowe",
+    "wineListTitle": "Aktualna piwnica",
+    "qrTitle": "QR — bezpośredni dostęp",
+    "qrHint": "Zeskanuj kod QR, aby od razu otworzyć stronę restauracji na telefonie.",
+    "menu": "Menu",
+    "wineList": "Karta win",
+    "items": "{count} pozycji",
+    "labels": "{count} etykiet",
+    "openPairing": "Otwórz łączenie",
+    "backToDiscover": "Wróć do odkrywania",
+    "suggestedPairings": "Sugerowane połączenia",
+    "recommendedCombinations": "Rekomendowane kombinacje",
+    "openPairingView": "Otwórz widok łączenia",
+    "district": "Dzielnica",
+    "menuStat": "Menu",
+    "wineCard": "Karta win",
+    "sommelierSelection": "Wybór sommeliera",
+    "suggestedByWorkflow": "Sugestia procesu sommelierskiego."
+  },
+  "pairing": {
+    "workspace": "Przestrzeń łączenia",
+    "headline": "Wybierz danie. Wybierz wino. Przeczytaj uzasadnienie poniżej.",
+    "subheading": "Ekran ułożony jest jako dwie listy obok siebie. Wybór dania zmienia ranking win, wybór wina zmienia kolejność menu, a dolny panel działa jak czat bota — bez pola tekstowego.",
+    "context": "Kontekst: {name} • {city}",
+    "aiAnalyzing": "AI analizuje",
+    "aiReady": "AI gotowe",
+    "fallbackMode": "Tryb awaryjny",
+    "jumpToWines": "Przejdź do win",
+    "column1": "Kolumna 1",
+    "column2": "Kolumna 2",
+    "menu": "Menu",
+    "wineList": "Karta win",
+    "reorderedFor": "Posortowane dla {name}",
+    "rankedFor": "Ranking dla {name}",
+    "selectedWine": "wybrane wino",
+    "dishesCount": "{count, plural, one {# danie} few {# dania} many {# dań} other {# dań}}",
+    "winesCount": "{count, plural, one {# wino} few {# wina} many {# win} other {# win}}",
+    "bestMatch": "Najlepsze dopasowanie",
+    "alternative": "Alternatywa",
+    "budgetPick": "Wybór ekonomiczny",
+    "noRankedWine": "Brak rankingu",
+    "matchPercent": "{score}% dopasowania",
+    "fitPercent": "{score}% pasuje",
+    "exploratory": "Do rozważenia",
+    "manualSelection": "Wybór ręczny",
+    "matched": "{score}% trafione",
+    "explanationKicker": "Uzasadnienie",
+    "explanationLine": "Uzasadnienie pojawia się jako odpowiedź bota wyłącznie na podstawie zaznaczonych rekordów.",
+    "menuItem": "Pozycja menu",
+    "wineSelection": "Wybrane wino",
+    "sommelierBot": "Bot sommeliera",
+    "sommelierBotSubtitle": "Automatyczne uzasadnienie na podstawie zaznaczonych rekordów",
+    "botCompare": "Porównuję <hl>{dish}</hl> z <hl>{wine}</hl>.",
+    "botFallbackReason": "To wino jest poza strefą najlepszych dopasowań do wybranego dania, ale styl można jeszcze ocenić poprzez paszport i sygnały rankingowe.",
+    "botServiceNote": "Notatka serwisowa: podawać w {temp}°C. {decant}",
+    "winePassport": "Paszport wina",
+    "passport": {
+      "grape": "Szczep",
+      "abv": "Alkohol",
+      "body": "Treściwość",
+      "acidity": "Kwasowość",
+      "tannin": "Taniny",
+      "serve": "Serwuj",
+      "decant": "Dekantowanie"
+    },
+    "body": {
+      "light": "Lekkie",
+      "medium": "Średnie",
+      "full": "Pełne"
+    },
+    "acidity": {
+      "low": "Niska",
+      "medium": "Średnia",
+      "high": "Wysoka"
+    },
+    "tannin": {
+      "none": "Brak",
+      "soft": "Miękkie",
+      "medium": "Średnie",
+      "high": "Wysokie"
+    },
+    "noData": {
+      "kicker": "Brak danych łączenia",
+      "title": "Brak dostępnych danych łączenia",
+      "subtitle": "Dodaj dania i wina w panelu administracyjnym, a następnie wróć do ekranu łączenia.",
+      "openAdmin": "Otwórz panel"
+    }
+  },
+  "admin": {
+    "kicker": "Panel — nowy styl",
+    "title": "Studio Admin V2",
+    "subtitle": "Zarządzaj danymi API łączenia: dodawaj/edytuj dania i wina, potem uruchamiaj testy API na żywo.",
+    "stats": {
+      "dishes": "Dania",
+      "wines": "Wina",
+      "endpoint": "Endpoint"
+    },
+    "actions": {
+      "exportJson": "Eksport JSON",
+      "importJson": "Import JSON",
+      "resetToSeed": "Przywróć dane",
+      "addDish": "Dodaj danie",
+      "addWine": "Dodaj wino",
+      "runApiPairing": "Uruchom /api/pairing",
+      "running": "Uruchamianie...",
+      "delete": "Usuń"
+    },
+    "dishes": {
+      "title": "Dania",
+      "subtitle": "Dodaj pozycje menu używane przez AI łączenia.",
+      "namePlaceholder": "Nazwa dania (angielski)",
+      "namePlPlaceholder": "Nazwa dania (polski)",
+      "pricePlaceholder": "Cena",
+      "tagsPlaceholder": "Tagi (po przecinku)",
+      "imagePlaceholder": "URL obrazu",
+      "descriptionPlaceholder": "Opis dania (angielski)",
+      "descriptionPlPlaceholder": "Opis dania (polski)"
+    },
+    "wines": {
+      "title": "Wina",
+      "subtitle": "Zarządzaj opcjami piwnicy do scoringu AI.",
+      "namePlaceholder": "Nazwa wina (angielski)",
+      "namePlPlaceholder": "Nazwa wina (polski)",
+      "regionPlaceholder": "Region",
+      "yearPlaceholder": "Rok",
+      "ratingPlaceholder": "Ocena",
+      "tagsPlaceholder": "Tagi (po przecinku)",
+      "imagePlaceholder": "URL obrazu",
+      "grapePlaceholder": "Szczep",
+      "abvPlaceholder": "Alkohol %",
+      "bodyOption": "Treściwość: {value}",
+      "acidityOption": "Kwasowość: {value}",
+      "tanninOption": "Taniny: {value}",
+      "servingTempPlaceholder": "Temp. serwowania °C (np. 8-10)",
+      "decantPlaceholder": "Notatki o dekantowaniu",
+      "descriptionPlaceholder": "Opis wina (angielski)",
+      "descriptionPlPlaceholder": "Opis wina (polski)"
+    },
+    "playground": {
+      "title": "Plac testowy API",
+      "subtitle": "Uruchom `/api/pairing` z własnym payloadem na bieżącym datasecie.",
+      "dish": "Danie",
+      "wines": "Wina",
+      "result": "Wynik",
+      "noRun": "Uruchom API, aby zobaczyć odpowiedź łączenia."
+    },
+    "curatedPairings": {
+      "title": "Kuratorskie połączenia",
+      "subtitle": "Wybierz wina dla dania ręcznie i wpisz uzasadnienie, które gość zobaczy w panelu czatu. Wpisy kuratorskie nadpisują algorytm.",
+      "noDishes": "Dodaj co najmniej jedno danie, aby skonfigurować połączenia.",
+      "notCurated": "Brak wpisu kuratorskiego — decyduje algorytm.",
+      "reasonEnPlaceholder": "Why it works (English)",
+      "reasonPlPlaceholder": "Dlaczego pasuje (polski)"
+    },
+    "status": {
+      "fillDish": "Wypełnij nazwę, opis i URL obrazu dania.",
+      "fillWine": "Wypełnij nazwę, region i URL obrazu wina.",
+      "dishAdded": "Danie dodane.",
+      "wineAdded": "Wino dodane.",
+      "dishRemoved": "Danie usunięte.",
+      "wineRemoved": "Wino usunięte.",
+      "datasetImported": "Dataset zaimportowany.",
+      "datasetImportFailed": "Import nieudany: nieprawidłowy format JSON.",
+      "datasetReset": "Dataset przywrócony do wartości domyślnych.",
+      "apiCompleted": "Łączenie API zakończone.",
+      "apiError": "Błąd API. Sprawdź payload i spróbuj ponownie."
+    }
+  }
+}

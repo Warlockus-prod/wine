@@ -87,7 +87,7 @@ export default function EditorialPage() {
                 </span>
               </Link>
               <Link
-                href="/v1"
+                href="/"
                 className="group flex items-center justify-center gap-3 rounded-lg border border-white/10 px-8 py-4 transition hover:bg-white/5"
               >
                 <span className="font-medium tracking-wide">View Menu</span>
@@ -201,7 +201,7 @@ export default function EditorialPage() {
           ))}
 
           <Link
-            href="/v1"
+            href="/"
             className="group relative flex aspect-[3/4] w-72 flex-none flex-col items-center justify-center rounded-lg border border-dashed border-gray-700 bg-surface-dark/50 transition-colors hover:bg-surface-dark md:w-80"
           >
             <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary transition-transform group-hover:scale-110">
@@ -220,7 +220,7 @@ export default function EditorialPage() {
           <div className="flex gap-6 text-xs text-gray-500">
             <Link href="/">Discover</Link>
             <Link href="/pairing">AI Pairing</Link>
-            <Link href="/v1">Backup V1</Link>
+            <Link href="/admin">Admin</Link>
           </div>
         </div>
       </footer>

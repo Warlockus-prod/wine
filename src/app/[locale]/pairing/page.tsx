@@ -1,12 +1,14 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
+import { Link } from "@/i18n/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
+import { t } from "@/lib/localized";
 import { getCatalogRestaurant } from "@/lib/restaurant-directory";
 import {
   applyRestaurantPairingOverrides,
@@ -14,6 +16,7 @@ import {
   getRestaurantMatchForDishWine,
 } from "@/lib/restaurant-pairing-adapter";
 import { usePairingDataset } from "@/lib/pairing-store";
+import type { Locale } from "@/i18n/routing";
 import type { PairingDish, PairingWine } from "@/types/pairing";
 
 type MatchDetails = {
@@ -21,31 +24,14 @@ type MatchDetails = {
   reason: string;
 };
 
-const bodyLabel = {
-  light: "Light",
-  medium: "Medium",
-  full: "Full",
-} as const;
-
-const acidityLabel = {
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-} as const;
-
-const tanninLabel = {
-  none: "None",
-  soft: "Soft",
-  medium: "Medium",
-  high: "High",
-} as const;
-
-const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[]) => {
-  const dishText = [dish.name, dish.description, dish.tags.join(" ")].join(" ").toLowerCase();
+const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[], locale: Locale) => {
+  const dishText = [t(dish.name, "en"), t(dish.description, "en"), dish.tags.join(" ")]
+    .join(" ")
+    .toLowerCase();
 
   const scored = wines
     .map((wine) => {
-      const wineText = [wine.name, wine.description, wine.tags.join(" ")]
+      const wineText = [t(wine.name, "en"), t(wine.description, "en"), wine.tags.join(" ")]
         .join(" ")
         .toLowerCase();
 
@@ -71,13 +57,16 @@ const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[]) => {
     .sort((a, b) => b.score - a.score);
 
   const map = new Map<string, MatchDetails>();
+  const reasonHigh = locale === "pl"
+    ? "Struktura i kwasowość dobrze pasują do profilu dania."
+    : "Structure and acidity align well with the dish profile.";
+  const reasonOk = locale === "pl"
+    ? "Akceptowalne połączenie, ale mniej zbalansowane niż najlepsze dopasowania."
+    : "Acceptable pairing, but may be less balanced than top matches.";
   for (const item of scored) {
     map.set(item.wineId, {
       score: item.score,
-      reason:
-        item.score >= 85
-          ? "Structure and acidity align well with the dish profile."
-          : "Acceptable pairing, but may be less balanced than top matches.",
+      reason: item.score >= 85 ? reasonHigh : reasonOk,
     });
   }
 
@@ -86,6 +75,8 @@ const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[]) => {
 
 export default function PairingPage() {
   const { dataset } = usePairingDataset();
+  const locale = useLocale() as Locale;
+  const tx = useTranslations("pairing");
   const [restaurantContextSlug, setRestaurantContextSlug] = useState<string | null>(null);
   const restaurantContext = restaurantContextSlug
     ? getCatalogRestaurant(restaurantContextSlug)
@@ -96,6 +87,10 @@ export default function PairingPage() {
   );
   const dishes = activeDataset.dishes;
   const wines = activeDataset.wines;
+  const curatedPairings = useMemo(
+    () => (restaurantContext ? [] : (dataset.pairings ?? [])),
+    [restaurantContext, dataset.pairings],
+  );
 
   const [activeDishId, setActiveDishId] = useState<string>(dishes[0]?.id ?? "");
   const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(new Map());
@@ -210,15 +205,15 @@ export default function PairingPage() {
     const nextMap = new Map<string, MatchDetails>();
     for (const dish of dishes) {
       const details =
-        getRestaurantMatchForDishWine(restaurantContext, dish.id, selectedWine.id) ??
-        buildFallbackMatchMap(dish, [selectedWine]).get(selectedWine.id);
+        getRestaurantMatchForDishWine(restaurantContext, dish.id, selectedWine.id, locale) ??
+        buildFallbackMatchMap(dish, [selectedWine], locale).get(selectedWine.id);
       if (details) {
         nextMap.set(dish.id, details);
       }
     }
 
     return nextMap;
-  }, [dishes, restaurantContext, selectedWine]);
+  }, [dishes, restaurantContext, selectedWine, locale]);
 
   const sortedDishes = useMemo(() => {
     const list = [...dishes];
@@ -233,11 +228,11 @@ export default function PairingPage() {
         return scoreB - scoreA;
       }
 
-      return a.name.localeCompare(b.name);
+      return t(a.name, locale).localeCompare(t(b.name, locale));
     });
 
     return list;
-  }, [dishes, dishRankings, selectedWine]);
+  }, [dishes, dishRankings, selectedWine, locale]);
 
   const resolvedSelectedWineMatch = useMemo(() => {
     if (!selectedWine || !activeDish) {
@@ -246,10 +241,10 @@ export default function PairingPage() {
 
     return (
       selectedWineMatch ??
-      buildFallbackMatchMap(activeDish, [selectedWine]).get(selectedWine.id) ??
+      buildFallbackMatchMap(activeDish, [selectedWine], locale).get(selectedWine.id) ??
       null
     );
-  }, [activeDish, selectedWine, selectedWineMatch]);
+  }, [activeDish, selectedWine, selectedWineMatch, locale]);
 
   useEffect(() => {
     if (selectedWineId && !wines.some((wine) => wine.id === selectedWineId)) {
@@ -277,11 +272,20 @@ export default function PairingPage() {
           body: JSON.stringify({
             dish: {
               id: activeDish.id,
-              name: activeDish.name,
-              description: activeDish.description,
+              name: t(activeDish.name, "en"),
+              description: t(activeDish.description, "en"),
               tags: activeDish.tags,
             },
-            wines,
+            wines: wines.map((wine) => ({
+              ...wine,
+              name: t(wine.name, "en"),
+              description: t(wine.description, "en"),
+            })),
+            curated: curatedPairings.map((c) => ({
+              dishId: c.dishId,
+              wineId: c.wineId,
+              reason: t(c.reason, locale),
+            })),
           }),
           signal: controller.signal,
         });
@@ -304,7 +308,7 @@ export default function PairingPage() {
         }
 
         setMatchMap(
-          applyRestaurantPairingOverrides(nextMap, restaurantContext, activeDish.id, wines),
+          applyRestaurantPairingOverrides(nextMap, restaurantContext, activeDish.id, wines, locale),
         );
         setAiStatus("ready");
 
@@ -316,10 +320,11 @@ export default function PairingPage() {
         });
       } catch {
         const fallbackMap = applyRestaurantPairingOverrides(
-          buildFallbackMatchMap(activeDish, wines),
+          buildFallbackMatchMap(activeDish, wines, locale),
           restaurantContext,
           activeDish.id,
           wines,
+          locale,
         );
         setMatchMap(fallbackMap);
         setAiStatus("fallback");
@@ -335,7 +340,7 @@ export default function PairingPage() {
     return () => {
       controller.abort();
     };
-  }, [activeDish, restaurantContext, wines]);
+  }, [activeDish, restaurantContext, wines, curatedPairings, locale]);
 
   const selectDish = (dishId: string, source: "cards" | "chips") => {
     setActiveDishId(dishId);
@@ -393,12 +398,6 @@ export default function PairingPage() {
             <Link href="/admin" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold">
               Open Admin
             </Link>
-            <Link
-              href="/v1/admin"
-              className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-gray-200"
-            >
-              Open Backup V1 Admin
-            </Link>
           </div>
         </main>
         <MobileTabBar />
@@ -415,19 +414,18 @@ export default function PairingPage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
-                Pairing Workspace
+                {tx("workspace")}
               </p>
-              <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">
-                Choose a dish. Choose a wine. Read the rationale below.
-              </h1>
+              <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{tx("headline")}</h1>
               <p className="mt-2 max-w-3xl text-sm text-gray-400 sm:text-base">
-                The screen is organized as two side-by-side lists. Dish selection updates the wine
-                ranking, wine selection reorders the menu list, and the lower panel acts like a
-                bot chat without text input.
+                {tx("subheading")}
               </p>
               {restaurantContext ? (
                 <p className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-gray-200 uppercase">
-                  Context: {restaurantContext.name} • {restaurantContext.city}
+                  {tx("context", {
+                    name: t(restaurantContext.name, locale),
+                    city: restaurantContext.city,
+                  })}
                 </p>
               ) : null}
             </div>
@@ -442,17 +440,17 @@ export default function PairingPage() {
                 }`}
               >
                 {aiStatus === "loading"
-                  ? "AI analyzing"
+                  ? tx("aiAnalyzing")
                   : aiStatus === "fallback"
-                    ? "Fallback mode"
-                    : "AI ready"}
+                    ? tx("fallbackMode")
+                    : tx("aiReady")}
               </span>
               <button
                 type="button"
                 onClick={scrollToWineList}
                 className="rounded-full border border-primary/40 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary uppercase lg:hidden"
               >
-                Jump to wines
+                {tx("jumpToWines")}
               </button>
             </div>
           </div>
@@ -463,15 +461,17 @@ export default function PairingPage() {
             <div className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
                 <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
-                  Column 1
+                  {tx("column1")}
                 </p>
-                <h2 className="mt-1 text-2xl font-bold text-white">Menu</h2>
+                <h2 className="mt-1 text-2xl font-bold text-white">{tx("menu")}</h2>
                 <p className="mt-1 text-sm text-gray-400">
-                  Reordered for <span className="font-semibold text-white">{selectedWine?.name ?? "selected wine"}</span>
+                  {tx("reorderedFor", {
+                    name: selectedWine ? t(selectedWine.name, locale) : tx("selectedWine"),
+                  })}
                 </p>
               </div>
               <span className="rounded-full bg-white/6 px-3 py-1 text-[11px] font-semibold text-gray-300">
-                {dishes.length} dishes
+                {tx("dishesCount", { count: dishes.length })}
               </span>
             </div>
 
@@ -499,7 +499,7 @@ export default function PairingPage() {
 
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10">
                       <Image
-                        alt={dish.name}
+                        alt={t(dish.name, locale)}
                         fill
                         quality={66}
                         placeholder="blur"
@@ -513,9 +513,9 @@ export default function PairingPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate text-base font-semibold text-white">{dish.name}</p>
+                          <p className="truncate text-base font-semibold text-white">{t(dish.name, locale)}</p>
                           <p className="mt-1 line-clamp-2 text-xs text-gray-400 sm:text-sm">
-                            {dish.description}
+                            {t(dish.description, locale)}
                           </p>
                         </div>
                         <div className="shrink-0 text-right">
@@ -559,30 +559,30 @@ export default function PairingPage() {
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
-                    Column 2
+                    {tx("column2")}
                   </p>
-                  <h2 className="mt-1 text-2xl font-bold text-white">Wine List</h2>
+                  <h2 className="mt-1 text-2xl font-bold text-white">{tx("wineList")}</h2>
                   <p className="mt-1 text-sm text-gray-400">
-                    Ranked for <span className="font-semibold text-white">{activeDish.name}</span>
+                    {tx("rankedFor", { name: t(activeDish.name, locale) })}
                   </p>
                 </div>
                 <span className="rounded-full bg-primary/12 px-3 py-1 text-[11px] font-semibold text-primary">
-                  {sortedWines.length} wines
+                  {tx("winesCount", { count: sortedWines.length })}
                 </span>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {[
-                  { rank: "#1", label: "Best Match", item: rankedMatches.best, tone: "border-primary/40 bg-primary/10" },
+                  { rank: "#1", label: tx("bestMatch"), item: rankedMatches.best, tone: "border-primary/40 bg-primary/10" },
                   {
                     rank: "#2",
-                    label: "Alternative",
+                    label: tx("alternative"),
                     item: rankedMatches.alternative,
                     tone: "border-sky-300/25 bg-sky-300/10",
                   },
                   {
                     rank: "#3",
-                    label: "Budget Pick",
+                    label: tx("budgetPick"),
                     item: rankedMatches.budget,
                     tone: "border-emerald-400/30 bg-emerald-500/10",
                   },
@@ -608,14 +608,14 @@ export default function PairingPage() {
                     {entry.item ? (
                       <>
                         <p className="mt-1 line-clamp-1 text-sm font-semibold text-white">
-                          {entry.item.wine.name}
+                          {t(entry.item.wine.name, locale)}
                         </p>
                         <p className="text-xs text-gray-300">
-                          {entry.item.match.score}% match • ${entry.item.wine.price}
+                          {tx("matchPercent", { score: entry.item.match.score })} • ${entry.item.wine.price}
                         </p>
                       </>
                     ) : (
-                      <p className="mt-1 text-xs text-gray-500">No ranked wine</p>
+                      <p className="mt-1 text-xs text-gray-500">{tx("noRankedWine")}</p>
                     )}
                   </button>
                 ))}
@@ -630,11 +630,11 @@ export default function PairingPage() {
                 const topRank = rankedMatches.rankByWineId.get(wine.id) ?? null;
                 const rankLabel =
                   topRank === 1
-                    ? "Best Match"
+                    ? tx("bestMatch")
                     : topRank === 2
-                      ? "Alternative"
+                      ? tx("alternative")
                       : topRank === 3
-                        ? "Budget Pick"
+                        ? tx("budgetPick")
                         : null;
 
                 const toneClass =
@@ -675,7 +675,7 @@ export default function PairingPage() {
 
                     <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10">
                       <Image
-                        alt={wine.name}
+                        alt={t(wine.name, locale)}
                         fill
                         quality={64}
                         placeholder="blur"
@@ -689,7 +689,7 @@ export default function PairingPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate text-base font-semibold text-white">{wine.name}</p>
+                          <p className="truncate text-base font-semibold text-white">{t(wine.name, locale)}</p>
                           <p className="mt-1 text-xs text-gray-400 sm:text-sm">
                             {wine.region} • {wine.vintageLabel ?? wine.year}
                           </p>
@@ -702,11 +702,11 @@ export default function PairingPage() {
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         {match ? (
                           <span className="rounded-full border border-primary/30 bg-primary/12 px-2 py-1 text-[10px] font-semibold tracking-wide text-primary uppercase">
-                            {match.score}% match
+                            {tx("matchPercent", { score: match.score })}
                           </span>
                         ) : (
                           <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1 text-[10px] font-semibold tracking-wide text-gray-500 uppercase">
-                            Exploratory
+                            {tx("exploratory")}
                           </span>
                         )}
                         <span className="text-[11px] text-gray-400">
@@ -729,14 +729,12 @@ export default function PairingPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
-                  Explanation
+                  {tx("explanationKicker")}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-                  {activeDish.name} × {selectedWine.name}
+                  {t(activeDish.name, locale)} × {t(selectedWine.name, locale)}
                 </h2>
-                <p className="mt-2 text-sm text-gray-400">
-                  The explanation is shown as a bot response based only on the selected records.
-                </p>
+                <p className="mt-2 text-sm text-gray-400">{tx("explanationLine")}</p>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
@@ -746,21 +744,21 @@ export default function PairingPage() {
                 }`}
               >
                 {resolvedSelectedWineMatch
-                  ? `${resolvedSelectedWineMatch.score}% matched`
-                  : "Manual selection"}
+                  ? tx("matched", { score: resolvedSelectedWineMatch.score })
+                  : tx("manualSelection")}
               </span>
             </div>
 
             <div className="mt-5 grid gap-4 lg:grid-cols-2">
               <article className="rounded-[26px] border border-white/10 bg-black/18 p-4">
                 <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
-                  Menu item
+                  {tx("menuItem")}
                 </p>
                 <div className="mt-3 flex items-start gap-4">
                   <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-white/10">
                     <Image
                       src={activeDish.image}
-                      alt={activeDish.name}
+                      alt={t(activeDish.name, locale)}
                       fill
                       quality={68}
                       placeholder="blur"
@@ -770,8 +768,8 @@ export default function PairingPage() {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-xl font-semibold text-white">{activeDish.name}</h3>
-                    <p className="mt-2 text-sm text-gray-400">{activeDish.description}</p>
+                    <h3 className="text-xl font-semibold text-white">{t(activeDish.name, locale)}</h3>
+                    <p className="mt-2 text-sm text-gray-400">{t(activeDish.description, locale)}</p>
                     <p className="mt-3 text-sm font-bold text-primary">${activeDish.price}</p>
                   </div>
                 </div>
@@ -779,13 +777,13 @@ export default function PairingPage() {
 
               <article className="rounded-[26px] border border-white/10 bg-black/18 p-4">
                 <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
-                  Wine selection
+                  {tx("wineSelection")}
                 </p>
                 <div className="mt-3 flex items-start gap-4">
                   <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-2xl border border-white/10">
                     <Image
                       src={selectedWine.image}
-                      alt={selectedWine.name}
+                      alt={t(selectedWine.name, locale)}
                       fill
                       quality={64}
                       placeholder="blur"
@@ -795,11 +793,11 @@ export default function PairingPage() {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-xl font-semibold text-white">{selectedWine.name}</h3>
+                    <h3 className="text-xl font-semibold text-white">{t(selectedWine.name, locale)}</h3>
                     <p className="mt-1 text-sm text-primary">
                       {selectedWine.region} • {selectedWine.vintageLabel ?? selectedWine.year}
                     </p>
-                    <p className="mt-2 text-sm text-gray-400">{selectedWine.description}</p>
+                    <p className="mt-2 text-sm text-gray-400">{t(selectedWine.description, locale)}</p>
                     <p className="mt-3 text-sm font-bold text-white">${selectedWine.price}</p>
                   </div>
                 </div>
@@ -814,17 +812,20 @@ export default function PairingPage() {
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold tracking-[0.22em] text-primary uppercase">
-                      Sommelier Bot
+                      {tx("sommelierBot")}
                     </p>
-                    <p className="text-sm text-gray-400">Automated rationale based on selected records</p>
+                    <p className="text-sm text-gray-400">{tx("sommelierBotSubtitle")}</p>
                   </div>
                 </div>
 
                 <div className="mt-4 space-y-3">
                   <div className="max-w-[88%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
                     <p className="text-sm leading-6 text-gray-100">
-                      I am comparing <span className="font-semibold text-white">{activeDish.name}</span> with{" "}
-                      <span className="font-semibold text-white">{selectedWine.name}</span>.
+                      {tx.rich("botCompare", {
+                        dish: t(activeDish.name, locale),
+                        wine: t(selectedWine.name, locale),
+                        hl: (chunks) => <span className="font-semibold text-white">{chunks}</span>,
+                      })}
                     </p>
                   </div>
 
@@ -832,14 +833,16 @@ export default function PairingPage() {
                     <p className="text-sm leading-6 text-gray-100">
                       {resolvedSelectedWineMatch
                         ? resolvedSelectedWineMatch.reason
-                        : "This wine sits outside the top match zone for the selected dish, but the style can still be reviewed through the passport and ranking signals."}
+                        : tx("botFallbackReason")}
                     </p>
                   </div>
 
                   <div className="max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
                     <p className="text-sm leading-6 text-gray-100">
-                      Service note: serve at {selectedWine.passport.servingTempC}°C.{" "}
-                      {selectedWine.passport.decant}
+                      {tx("botServiceNote", {
+                        temp: selectedWine.passport.servingTempC,
+                        decant: selectedWine.passport.decant,
+                      })}
                     </p>
                   </div>
                 </div>
@@ -858,37 +861,37 @@ export default function PairingPage() {
 
               <article className="rounded-[28px] border border-white/10 bg-black/18 p-5">
                 <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
-                  Wine passport
+                  {tx("winePassport")}
                 </p>
                 <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Grape</p>
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.grape")}</p>
                     <p className="mt-1 text-white">{selectedWine.passport.grape}</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">ABV</p>
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.abv")}</p>
                     <p className="mt-1 text-white">{selectedWine.passport.abv}%</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Body</p>
-                    <p className="mt-1 text-white">{bodyLabel[selectedWine.passport.body]}</p>
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.body")}</p>
+                    <p className="mt-1 text-white">{tx(`body.${selectedWine.passport.body}`)}</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Acidity</p>
-                    <p className="mt-1 text-white">{acidityLabel[selectedWine.passport.acidity]}</p>
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.acidity")}</p>
+                    <p className="mt-1 text-white">{tx(`acidity.${selectedWine.passport.acidity}`)}</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Tannin</p>
-                    <p className="mt-1 text-white">{tanninLabel[selectedWine.passport.tannin]}</p>
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.tannin")}</p>
+                    <p className="mt-1 text-white">{tx(`tannin.${selectedWine.passport.tannin}`)}</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">Serve</p>
+                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.serve")}</p>
                     <p className="mt-1 text-white">{selectedWine.passport.servingTempC}°C</p>
                   </div>
                 </div>
 
                 <div className="mt-3 rounded-xl border border-white/10 bg-black/25 p-3">
-                  <p className="text-[10px] tracking-wider text-gray-400 uppercase">Decant</p>
+                  <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.decant")}</p>
                   <p className="mt-1 text-sm text-gray-100">{selectedWine.passport.decant}</p>
                 </div>
               </article>

@@ -184,3 +184,57 @@ a:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* Leaflet map — restaurant marker and popup styling. */
+.restaurant-map-marker__dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: #2a1416;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+  transition:
+    background 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+.restaurant-map-marker__dot--selected {
+  background: #d11534;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 8px rgba(209, 21, 52, 0.25);
+  transform: scale(1.2);
+}
+.restaurant-map-marker:hover .restaurant-map-marker__dot {
+  background: #d11534;
+}
+
+.restaurant-map-popup {
+  font-family: var(--font-display, "Inter", sans-serif);
+  color: #1a0e10;
+}
+.restaurant-map-popup__name {
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0;
+}
+.restaurant-map-popup__meta {
+  font-size: 12px;
+  color: #6a3540;
+  margin: 4px 0 0;
+}
+
+/* Force the Leaflet container to match the dark theme background while tiles
+   are loading or in the rare gap between zoom levels. */
+.leaflet-container {
+  background: #130a0b !important;
+  font-family: inherit;
+}
+.leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: #e5d6ce !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a {
+  color: #f4c1c8 !important;
+}

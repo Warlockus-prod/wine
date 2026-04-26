@@ -1,15 +1,30 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
+import { Link } from "@/i18n/navigation";
+import { t } from "@/lib/localized";
 import { catalogRestaurants } from "@/lib/restaurant-directory";
+import type { Locale } from "@/i18n/routing";
+
+// Leaflet pulls `window` at module-eval, so it must be client-only.
+const RestaurantMap = dynamic(() => import("@/components/v2/RestaurantMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center rounded-[30px] border border-white/10 bg-[#130a0b] text-xs tracking-[0.22em] text-gray-500 uppercase">
+      Loading map…
+    </div>
+  ),
+});
 
 type FilterValue = "All" | string;
 
 export default function Home() {
+  const locale = useLocale() as Locale;
   const cuisineOptions = useMemo(
     () => ["All", ...new Set(catalogRestaurants.map((restaurant) => restaurant.cuisine))],
     [],
@@ -147,75 +162,26 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_18%_22%,rgba(209,21,52,0.22),transparent_30%),radial-gradient(circle_at_80%_18%,rgba(197,160,89,0.18),transparent_30%),linear-gradient(180deg,#221316_0%,#130a0b_100%)]">
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:44px_44px]" />
-              <svg
-                viewBox="0 0 100 70"
-                className="absolute inset-0 h-full w-full opacity-50"
-                aria-hidden="true"
-              >
-                <path
-                  d="M10 52 L18 43 L26 44 L32 36 L41 36 L46 29 L57 25 L63 17 L73 18 L78 24 L84 25 L86 32 L80 36 L74 36 L70 40 L63 40 L58 47 L48 51 L39 50 L34 56 L27 58 L18 58 Z"
-                  fill="rgba(255,255,255,0.06)"
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth="0.9"
-                />
-                <path
-                  d="M15 61 L19 63 L21 66 L18 68 L13 66 Z"
-                  fill="rgba(255,255,255,0.05)"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="0.8"
-                />
-                <path
-                  d="M60 44 L64 47 L69 46 L72 49 L68 53 L61 52 Z"
-                  fill="rgba(255,255,255,0.04)"
-                  stroke="rgba(255,255,255,0.08)"
-                  strokeWidth="0.8"
-                />
-              </svg>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[30px] border border-white/10 bg-[#130a0b]">
+              <RestaurantMap
+                restaurants={filteredRestaurants}
+                selectedSlug={effectiveSelectedSlug}
+                onSelect={setSelectedSlug}
+              />
 
-              <div className="absolute top-4 left-4 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-gray-300 uppercase">
+              <div className="pointer-events-none absolute top-4 left-4 z-[400] rounded-full border border-white/10 bg-black/55 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-gray-200 uppercase backdrop-blur">
                 Europe
               </div>
 
-              {filteredRestaurants.map((restaurant) => {
-                const selected = restaurant.slug === effectiveSelectedSlug;
-
-                return (
-                  <button
-                    key={restaurant.slug}
-                    type="button"
-                    onClick={() => setSelectedSlug(restaurant.slug)}
-                    className="group absolute -translate-x-1/2 -translate-y-1/2"
-                    style={{ left: `${restaurant.mapX}%`, top: `${restaurant.mapY}%` }}
-                  >
-                    <span
-                      className={`absolute -inset-3 rounded-full transition ${
-                        selected ? "bg-primary/18 blur-md" : "bg-transparent"
-                      }`}
-                    />
-                    <span
-                      className={`relative flex h-4 w-4 items-center justify-center rounded-full border-2 transition ${
-                        selected
-                          ? "border-white bg-primary"
-                          : "border-white/60 bg-black/50 group-hover:bg-primary/80"
-                      }`}
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                    </span>
-                  </button>
-                );
-              })}
-
               {selectedRestaurant ? (
-                <div className="absolute right-3 bottom-3 left-3 rounded-[26px] border border-white/10 bg-[#160d0ff0] p-4 shadow-2xl backdrop-blur-md">
+                <div className="absolute right-3 bottom-3 left-3 z-[400] rounded-[26px] border border-white/10 bg-[#160d0ff0] p-4 shadow-2xl backdrop-blur-md">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="text-[11px] font-semibold tracking-[0.24em] text-primary uppercase">
                         Selected restaurant
                       </p>
                       <h3 className="mt-1 text-2xl font-bold text-white">
-                        {selectedRestaurant.name}
+                        {t(selectedRestaurant.name, locale)}
                       </h3>
                       <p className="mt-1 text-sm text-gray-400">
                         {selectedRestaurant.city}, {selectedRestaurant.country} • {" "}
@@ -230,7 +196,7 @@ export default function Home() {
                   </div>
 
                   <p className="mt-3 text-sm leading-6 text-gray-300">
-                    {selectedRestaurant.description}
+                    {t(selectedRestaurant.description, locale)}
                   </p>
 
                   <div className="mt-4 flex flex-wrap gap-3">
@@ -294,16 +260,16 @@ export default function Home() {
                             {restaurant.city}, {restaurant.country}
                           </span>
                         </div>
-                        <h3 className="mt-3 text-2xl font-bold text-white">{restaurant.name}</h3>
+                        <h3 className="mt-3 text-2xl font-bold text-white">{t(restaurant.name, locale)}</h3>
                         <p className="mt-2 text-sm leading-6 text-gray-300">
-                          {restaurant.description}
+                          {t(restaurant.description, locale)}
                         </p>
                       </button>
 
                       <div className="grid shrink-0 gap-2 rounded-[22px] border border-white/10 bg-[#130b0df0] p-3 text-center">
                         <Image
                           src={restaurant.qrUrl}
-                          alt={`QR code for ${restaurant.name}`}
+                          alt={`QR code for ${t(restaurant.name, locale)}`}
                           width={96}
                           height={96}
                           unoptimized
