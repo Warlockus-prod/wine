@@ -41,7 +41,11 @@ test.describe("mobile visual regression", () => {
         content:
           "*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;}",
       });
-      await page.waitForTimeout(200);
+      if (target.path === "/pairing") {
+        await expect(page.getByText("Sommelier Bot")).toBeVisible({ timeout: 5000 });
+      } else {
+        await page.waitForTimeout(200);
+      }
 
       await expect(page).toHaveScreenshot(`${target.name}.png`, {
         fullPage: true,

@@ -372,11 +372,11 @@ export default function PairingPage() {
       return;
     }
 
-    const nextWineId = rankedMatches.best?.wine.id ?? sortedWines[0]?.id ?? null;
+    const nextWineId = rankedMatches.best?.wine.id ?? null;
     if (nextWineId) {
       setSelectedWineId(nextWineId);
     }
-  }, [rankedMatches.best, selectedWineId, sortedWines, wines]);
+  }, [rankedMatches.best, selectedWineId, wines]);
 
   if (!activeDish || wines.length === 0) {
     return (
