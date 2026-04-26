@@ -26,6 +26,7 @@ export type PairingWine = {
   name: string;
   region: string;
   year: number;
+  vintageLabel?: string;
   price: number;
   rating: number;
   description: string;

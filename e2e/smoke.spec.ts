@@ -30,4 +30,7 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
   await page.getByRole("link", { name: /open pairing/i }).first().click();
   await expect(page).toHaveURL(/\/pairing\?restaurant=trattoria-bellavista/);
   await expect(page.getByText(/context: trattoria bellavista/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /pizza margherita/i }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: /marchesi antinori tignanello/i }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /pizza margherita/i }).first()).toBeVisible();
 });

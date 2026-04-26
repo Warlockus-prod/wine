@@ -8,6 +8,11 @@ import Navigation from "@/components/v2/Navigation";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 import { getCatalogRestaurant } from "@/lib/restaurant-directory";
+import {
+  applyRestaurantPairingOverrides,
+  buildPairingDatasetFromRestaurant,
+  getRestaurantMatchForDishWine,
+} from "@/lib/restaurant-pairing-adapter";
 import { usePairingDataset } from "@/lib/pairing-store";
 import type { PairingDish, PairingWine } from "@/types/pairing";
 
@@ -81,12 +86,16 @@ const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[]) => {
 
 export default function PairingPage() {
   const { dataset } = usePairingDataset();
-  const dishes = dataset.dishes;
-  const wines = dataset.wines;
   const [restaurantContextSlug, setRestaurantContextSlug] = useState<string | null>(null);
   const restaurantContext = restaurantContextSlug
     ? getCatalogRestaurant(restaurantContextSlug)
     : null;
+  const activeDataset = useMemo(
+    () => (restaurantContext ? buildPairingDatasetFromRestaurant(restaurantContext) : dataset),
+    [dataset, restaurantContext],
+  );
+  const dishes = activeDataset.dishes;
+  const wines = activeDataset.wines;
 
   const [activeDishId, setActiveDishId] = useState<string>(dishes[0]?.id ?? "");
   const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(new Map());
@@ -200,14 +209,16 @@ export default function PairingPage() {
 
     const nextMap = new Map<string, MatchDetails>();
     for (const dish of dishes) {
-      const details = buildFallbackMatchMap(dish, [selectedWine]).get(selectedWine.id);
+      const details =
+        getRestaurantMatchForDishWine(restaurantContext, dish.id, selectedWine.id) ??
+        buildFallbackMatchMap(dish, [selectedWine]).get(selectedWine.id);
       if (details) {
         nextMap.set(dish.id, details);
       }
     }
 
     return nextMap;
-  }, [dishes, selectedWine]);
+  }, [dishes, restaurantContext, selectedWine]);
 
   const sortedDishes = useMemo(() => {
     const list = [...dishes];
@@ -292,7 +303,9 @@ export default function PairingPage() {
           throw new Error("AI returned no matches");
         }
 
-        setMatchMap(nextMap);
+        setMatchMap(
+          applyRestaurantPairingOverrides(nextMap, restaurantContext, activeDish.id, wines),
+        );
         setAiStatus("ready");
 
         const topScore = Math.max(...Array.from(nextMap.values()).map((item) => item.score));
@@ -302,7 +315,12 @@ export default function PairingPage() {
           wines_count: wines.length,
         });
       } catch {
-        const fallbackMap = buildFallbackMatchMap(activeDish, wines);
+        const fallbackMap = applyRestaurantPairingOverrides(
+          buildFallbackMatchMap(activeDish, wines),
+          restaurantContext,
+          activeDish.id,
+          wines,
+        );
         setMatchMap(fallbackMap);
         setAiStatus("fallback");
         trackEvent("pairing_ai_fallback", {
@@ -317,7 +335,7 @@ export default function PairingPage() {
     return () => {
       controller.abort();
     };
-  }, [activeDish, wines]);
+  }, [activeDish, restaurantContext, wines]);
 
   const selectDish = (dishId: string, source: "cards" | "chips") => {
     setActiveDishId(dishId);
@@ -673,7 +691,7 @@ export default function PairingPage() {
                         <div className="min-w-0">
                           <p className="truncate text-base font-semibold text-white">{wine.name}</p>
                           <p className="mt-1 text-xs text-gray-400 sm:text-sm">
-                            {wine.region} • {wine.year}
+                            {wine.region} • {wine.vintageLabel ?? wine.year}
                           </p>
                         </div>
                         <span className="shrink-0 text-sm font-bold text-white sm:text-base">
@@ -779,7 +797,7 @@ export default function PairingPage() {
                   <div className="min-w-0">
                     <h3 className="text-xl font-semibold text-white">{selectedWine.name}</h3>
                     <p className="mt-1 text-sm text-primary">
-                      {selectedWine.region} • {selectedWine.year}
+                      {selectedWine.region} • {selectedWine.vintageLabel ?? selectedWine.year}
                     </p>
                     <p className="mt-2 text-sm text-gray-400">{selectedWine.description}</p>
                     <p className="mt-3 text-sm font-bold text-white">${selectedWine.price}</p>
