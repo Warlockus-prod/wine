@@ -11,6 +11,7 @@ const routes: RouteCheck[] = [
   { path: "/admin", mustSee: /admin studio/i },
   { path: "/immersive", mustSee: /sommelier/i },
   { path: "/editorial", mustSee: /sommelier/i },
+  { path: "/pitch", mustSee: /sommelier/i },
   { path: "/restaurants/trattoria-bellavista", mustSee: /wine list/i },
 ];
 

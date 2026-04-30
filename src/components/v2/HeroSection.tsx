@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function HeroSection() {
   return (
@@ -20,7 +20,7 @@ export default function HeroSection() {
           catalog mode for full menu + admin testing.
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
             href="/pairing"
             className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-background-dark shadow-lg transition hover:bg-gray-200"
@@ -32,6 +32,28 @@ export default function HeroSection() {
             className="rounded-lg border border-primary/40 bg-primary/15 px-5 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/25"
           >
             V2 Admin Studio
+          </Link>
+          <Link
+            href="/pitch"
+            className="group inline-flex items-center gap-2 px-2 py-2.5 font-serif text-sm italic text-[var(--color-accent-gold)] transition-colors hover:text-white"
+          >
+            For restaurant owners
+            <svg
+              width="16"
+              height="9"
+              viewBox="0 0 16 9"
+              fill="none"
+              aria-hidden
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            >
+              <path
+                d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </Link>
         </div>
       </div>

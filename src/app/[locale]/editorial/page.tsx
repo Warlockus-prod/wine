@@ -95,6 +95,16 @@ export default function EditorialPage() {
                   restaurant_menu
                 </span>
               </Link>
+              <Link
+                href="/pitch"
+                className="group flex items-center justify-center gap-3 rounded-lg border border-[rgba(197,160,89,0.32)] px-8 py-4 italic text-[var(--color-accent-gold)] transition hover:border-[var(--color-accent-gold)] hover:bg-[rgba(197,160,89,0.06)]"
+                style={{ fontFamily: "var(--font-serif)" }}
+              >
+                <span className="tracking-wide">For restaurant owners</span>
+                <svg width="16" height="9" viewBox="0 0 16 9" fill="none" aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
+                  <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
             </div>
 
             <div

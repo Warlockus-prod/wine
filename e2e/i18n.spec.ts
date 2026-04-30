@@ -29,6 +29,18 @@ test.describe("i18n EN/PL switching", () => {
     await expect(page.getByText(/Kuratorskie połączenia/i)).toBeVisible({ timeout: 10000 });
   });
 
+  test("pitch page renders bilingual marketing copy", async ({ page }) => {
+    // English pitch — distinctive headline copy
+    await page.goto("/pitch");
+    await expect(page.getByText(/A sommelier/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /how it works/i }).first()).toBeVisible();
+
+    // Polish pitch — same headline localized
+    await page.goto("/pl/pitch");
+    await expect(page.getByText(/Sommelier/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /jak to działa/i }).first()).toBeVisible();
+  });
+
   test("scoped pairing in Polish loads PL pairing reasons", async ({ page }) => {
     await page.goto("/pl/pairing?restaurant=trattoria-bellavista");
     // Wait for AI analysis to settle to "ready" or "fallback"
