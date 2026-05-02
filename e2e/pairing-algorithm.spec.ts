@@ -1,31 +1,26 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("pairing algorithm regression", () => {
-  test("Trattoria Bellavista: Pizza Margherita ranks Chianti or Sparkling first", async ({ page }) => {
-    await page.goto("/pairing?restaurant=trattoria-bellavista");
+  test("Atelier Amaro pairing flow surfaces a Chianti or Sparkling for the signature pizza", async ({ page }) => {
+    // Force English to keep accessible names predictable (PL test elsewhere asserts PL chrome)
+    await page.context().addCookies([{ name: "NEXT_LOCALE", value: "en", url: "http://127.0.0.1:4173" }]);
+    await page.goto("/pairing?restaurant=atelier-amaro");
 
-    // Wait for AI to settle
     await expect(page.getByText(/AI ready|Fallback mode/i).first()).toBeVisible({
       timeout: 10000,
     });
 
-    // Pick Pizza Margherita explicitly
     await page.getByRole("button", { name: /pizza margherita/i }).first().click();
 
-    // The "Best Match" card in the top-3 row should reference one of the
-    // wines our seed pairings hand-curated for that dish (Chianti or Brut).
-    const bestMatchCard = page.locator("button", {
-      hasText: /Best Match/i,
-    });
+    const bestMatchCard = page.locator("button", { hasText: /Best Match/i });
     await expect(bestMatchCard.first()).toBeVisible();
 
-    // Either Chianti Rufina (r1-w2) or Ferrari Brut (r1-w5) should be the best match
-    // per the curated pairings on this dish.
     const bestText = await bestMatchCard.first().innerText();
     expect(bestText).toMatch(/Frescobaldi|Ferrari/i);
   });
 
   test("global sandbox: scallops surfaces a curated rationale", async ({ page }) => {
+    await page.context().addCookies([{ name: "NEXT_LOCALE", value: "en", url: "http://127.0.0.1:4173" }]);
     await page.goto("/pairing");
 
     await expect(page.getByText(/AI ready|Fallback mode/i).first()).toBeVisible({
@@ -34,15 +29,10 @@ test.describe("pairing algorithm regression", () => {
 
     await page.getByRole("button", { name: /Seared Scallops/i }).first().click();
 
-    // Wait for the explanation panel (chat) to render — it only mounts after a
-    // wine auto-selects from rankedMatches.best.
     await expect(page.getByText("Sommelier Bot").first()).toBeVisible({ timeout: 10000 });
 
-    // Once the chat is visible, one of the two curated reasons (Champagne OR
-    // Provence rose) must appear. We accept either — both score 88+ and
-    // stable-sort picks whichever appears first in the wines array.
     await expect(
-      page.getByText(/Blanc de blancs|strawberry and citrus|truffle oil|truflow|truskawka/i).first(),
+      page.getByText(/Blanc de blancs|strawberry and citrus|truffle oil/i).first(),
     ).toBeVisible({ timeout: 5000 });
   });
 });

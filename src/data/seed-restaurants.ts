@@ -3,13 +3,13 @@ import { Restaurant } from "@/types/restaurant";
 export const seedRestaurants: Restaurant[] = [
   {
     id: "r1",
-    slug: "trattoria-bellavista",
-    name: { en: "Trattoria Bellavista", pl: "Trattoria Bellavista" },
-    cuisine: "Italian",
-    city: "Florence",
+    slug: "atelier-amaro",
+    name: { en: "Atelier Amaro", pl: "Atelier Amaro" },
+    cuisine: "Polish Modern",
+    city: "Warszawa",
     description:
-      { en: "Warm Tuscan comfort food with classic pasta, seafood, and regional bottles.", pl: "Domowa kuchnia toskańska — klasyczne makarony, owoce morza i regionalne wina." },
-    coverGradient: "from-[#8b3a2f] via-[#c66a4b] to-[#f2c38b]",
+      { en: "Modern Polish fine dining in Łazienki — fermented vegetables, foraged herbs, game and quiet European bottles.", pl: "Nowoczesna kuchnia polska w Łazienkach — fermentowane warzywa, dzika zwierzyna, zioła z lasu i spokojne europejskie wina." },
+    coverGradient: "from-[#2f4a35] via-[#5d7a4d] to-[#c4ad7a]",
     wines: [
       {
         id: "r1-w1",
@@ -259,13 +259,13 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r2",
-    slug: "sakura-ember",
-    name: { en: "Sakura Ember", pl: "Sakura Ember" },
-    cuisine: "Asian",
-    city: "Copenhagen",
+    slug: "senses-warsaw",
+    name: { en: "Senses", pl: "Senses" },
+    cuisine: "Tasting Menu",
+    city: "Warszawa",
     description:
-      { en: "Modern Japanese kitchen in Copenhagen with robata grill, pristine seafood, and precise pairings.", pl: "Nowoczesna kuchnia japońska w Kopenhadze — grill robata, świeże owoce morza i precyzyjne łączenia z winami." },
-    coverGradient: "from-[#1f3b5f] via-[#3f6d8f] to-[#9cc3d5]",
+      { en: "Michelin-starred tasting menu on Bielańska — refined produce-driven cooking with a wine pairing for each course.", pl: "Restauracja z gwiazdką Michelin przy Bielańskiej — wyrafinowane menu degustacyjne z dobranym winem do każdego dania." },
+    coverGradient: "from-[#1f2a4a] via-[#445279] to-[#a3b3d6]",
     wines: [
       {
         id: "r2-w1",
@@ -515,12 +515,12 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r3",
-    slug: "brasa-iberica",
-    name: { en: "Brasa Iberica", pl: "Brasa Iberica" },
-    cuisine: "European Mix",
-    city: "Madrid",
+    slug: "bottiglieria-1881",
+    name: { en: "Bottiglieria 1881", pl: "Bottiglieria 1881" },
+    cuisine: "Italian",
+    city: "Kraków",
     description:
-      { en: "Spanish tapas and grill house focused on coastal seafood and cast-iron fire.", pl: "Hiszpańskie tapas i grill house z naciskiem na nadmorskie owoce morza i ogień z żeliwnego paleniska." },
+      { en: "One-Michelin-star Italian wine bar on ul. Bocheńska — hand-cut pasta, charcoal-grilled fish, and a 600-bottle Italian cellar.", pl: "Włoski wine bar z gwiazdką Michelin przy Bocheńskiej — ręcznie krojone pasta, ryby z węgla i piwnica 600 włoskich butelek." },
     coverGradient: "from-[#5f2f23] via-[#a04d2b] to-[#e1a65b]",
     wines: [
       {
@@ -771,13 +771,13 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r4",
-    slug: "bistro-maree",
-    name: { en: "Bistro Maree", pl: "Bistro Maree" },
-    cuisine: "French",
-    city: "Lyon",
+    slug: "pod-aniolami",
+    name: { en: "Pod Aniołami", pl: "Pod Aniołami" },
+    cuisine: "Polish Heritage",
+    city: "Kraków",
     description:
-      { en: "French bistro classics with seafood focus and cellar-style old world labels.", pl: "Klasyka francuskiego bistro — owoce morza i piwniczne etykiety ze starego świata." },
-    coverGradient: "from-[#2d3b52] via-[#58789a] to-[#c2d4e8]",
+      { en: "Heritage Polish kitchen inside a 13th-century cellar at ul. Grodzka — pierogi, żurek, slow-roasted goose and Hungarian whites.", pl: "Polska kuchnia tradycyjna w XIII-wiecznych piwnicach przy Grodzkiej — pierogi, żurek, gęś z pieca i węgierskie białe wina." },
+    coverGradient: "from-[#3b2520] via-[#7a4f37] to-[#d6b777]",
     wines: [
       {
         id: "r4-w1",
@@ -1027,13 +1027,13 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r5",
-    slug: "andes-fuego",
-    name: { en: "Andes Fuego", pl: "Andes Fuego" },
-    cuisine: "Asian-Latin Mix",
-    city: "Lisbon",
+    slug: "brovariusz-wroclaw",
+    name: { en: "Brovariusz", pl: "Brovariusz" },
+    cuisine: "Polish Gastropub",
+    city: "Wrocław",
     description:
-      { en: "Peruvian and Nikkei signatures in Lisbon with bright citrus, chili, and charcoal notes.", pl: "Peruwiańskie i Nikkei popisy w Lizbonie — żywe cytrusy, papryczki chili i nuty z węgla drzewnego." },
-    coverGradient: "from-[#38472f] via-[#6a8b53] to-[#d7c88f]",
+      { en: "A Wrocław gastropub on the Rynek — house-fermented sauerkraut, beer-aged cheeses, hearty Silesian dishes and a small Italian wine cellar.", pl: "Wrocławski gastropub na Rynku — domowa kapusta kiszona, sery dojrzewające w piwie, sycące śląskie dania i niewielka włoska piwnica win." },
+    coverGradient: "from-[#4a3a1f] via-[#8a6e3a] to-[#d6c188]",
     wines: [
       {
         id: "r5-w1",

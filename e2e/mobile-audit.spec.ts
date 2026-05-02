@@ -12,7 +12,7 @@ const routes: RouteCheck[] = [
   { path: "/immersive", mustSee: /sommelier/i },
   { path: "/editorial", mustSee: /sommelier/i },
   { path: "/pitch", mustSee: /sommelier/i },
-  { path: "/restaurants/trattoria-bellavista", mustSee: /wine list/i },
+  { path: "/restaurants/atelier-amaro", mustSee: /wine list/i },
 ];
 
 const makeMobileUse = (device: (typeof devices)[keyof typeof devices]): TestOptions => ({

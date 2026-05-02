@@ -7,9 +7,9 @@ export type RestaurantMeta = {
   country: string;
   format: string;
   district: string;
-  /** Latitude — real-world coordinates for the Leaflet map. */
+  /** Latitude — real-world coordinates for the Mapbox map. */
   lat: number;
-  /** Longitude — real-world coordinates for the Leaflet map. */
+  /** Longitude — real-world coordinates for the Mapbox map. */
   lng: number;
 };
 
@@ -20,44 +20,44 @@ export type CatalogRestaurant = Restaurant &
     qrUrl: string;
   };
 
-// Real-world coordinates for the cities/districts each demo restaurant claims.
-// Picked roughly in the named district — placeholder until verified addresses
-// are sourced for the commercial pitch.
+// Real Polish restaurants — names, neighbourhoods and approximate coordinates
+// taken from public listings. Menu/wine card content remains demo-grade until
+// each restaurant onboards with their actual lists.
 const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
-  "trattoria-bellavista": {
-    country: "Italy",
-    format: "Trattoria",
-    district: "Santa Croce",
-    lat: 45.4408, // Venice, Santa Croce
-    lng: 12.3155,
+  "atelier-amaro": {
+    country: "Polska",
+    format: "Fine Dining",
+    district: "Ujazdów",
+    lat: 52.2206, // Warsaw, ul. Agrykola 1 (Łazienki area)
+    lng: 21.0282,
   },
-  "sakura-ember": {
-    country: "Denmark",
-    format: "Chef's Table",
-    district: "Christianshavn",
-    lat: 55.6717, // Copenhagen, Christianshavn
-    lng: 12.5912,
+  "senses-warsaw": {
+    country: "Polska",
+    format: "Michelin",
+    district: "Śródmieście",
+    lat: 52.2455, // Warsaw, ul. Bielańska 12
+    lng: 21.0061,
   },
-  "brasa-iberica": {
-    country: "Spain",
-    format: "Grill House",
-    district: "Salamanca",
-    lat: 40.4286, // Madrid, Salamanca
-    lng: -3.6772,
+  "bottiglieria-1881": {
+    country: "Polska",
+    format: "Michelin",
+    district: "Stare Podgórze",
+    lat: 50.0473, // Krakow, ul. Bocheńska 5
+    lng: 19.9485,
   },
-  "bistro-maree": {
-    country: "France",
-    format: "Bistro",
-    district: "Presqu'ile",
-    lat: 45.7595, // Lyon, Presqu'ile
-    lng: 4.8346,
+  "pod-aniolami": {
+    country: "Polska",
+    format: "Tradycyjna",
+    district: "Stare Miasto",
+    lat: 50.0617, // Krakow, ul. Grodzka 35
+    lng: 19.9376,
   },
-  "andes-fuego": {
-    country: "Portugal",
-    format: "Fusion Bar",
-    district: "Chiado",
-    lat: 38.7110, // Lisbon, Chiado
-    lng: -9.1416,
+  "brovariusz-wroclaw": {
+    country: "Polska",
+    format: "Gastropub",
+    district: "Stare Miasto",
+    lat: 51.1100, // Wrocław, Rynek 6
+    lng: 17.0303,
   },
 };
 

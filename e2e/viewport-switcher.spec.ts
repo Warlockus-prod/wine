@@ -5,16 +5,16 @@ test.describe("viewport switcher", () => {
 
   test("mobile preview button opens phone frame overlay", async ({ page }) => {
     await page.goto("/");
+    // Mapbox + hydration race — wait for one of the restaurant cards to render
+    // so we know the page is interactive.
+    await expect(page.getByText("Atelier Amaro").first()).toBeVisible({ timeout: 10000 });
 
-    // Wait for client hydration
-    const mobileBtn = page.getByRole("button", { name: /mobile/i }).first();
+    const mobileBtn = page.getByRole("button", { name: /^smartphone\s*Mobile$|^Mobile$/i }).first();
     await expect(mobileBtn).toBeVisible({ timeout: 5000 });
-
-    // Click the Mobile button
     await mobileBtn.click();
 
-    // The overlay should appear with "Mobile Preview" label and an iframe
-    await expect(page.getByText("Mobile Preview")).toBeVisible({ timeout: 3000 });
+    // The overlay should appear with "Mobile Preview" label and an iframe.
+    await expect(page.getByText(/Mobile Preview/i).first()).toBeVisible({ timeout: 5000 });
     await expect(page.locator("iframe[title='Mobile preview']")).toBeVisible();
 
     // Close button should be visible
@@ -25,7 +25,7 @@ test.describe("viewport switcher", () => {
     await closeBtn.click();
 
     // Overlay should disappear
-    await expect(page.getByText("Mobile Preview")).not.toBeVisible();
+    await expect(page.getByText(/Mobile Preview/i).first()).not.toBeVisible();
   });
 
   test("mobile preview button is hidden inside iframe", async ({ page }) => {

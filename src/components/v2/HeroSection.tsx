@@ -23,7 +23,7 @@ export default function HeroSection() {
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
             href="/pairing"
-            className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-background-dark shadow-lg transition hover:bg-gray-200"
+            className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-[#1a0f11] shadow-lg transition hover:bg-gray-200"
           >
             Open Pairing Demo
           </Link>

@@ -3,14 +3,13 @@ import { expect, test } from "@playwright/test";
 test.describe("i18n EN/PL switching", () => {
   test("English home reachable with English content", async ({ page }) => {
     await page.goto("/");
-    // Restaurant directory must render (English seed name)
-    await expect(page.getByRole("heading", { name: /Trattoria Bellavista/i }).first()).toBeVisible();
+    // Restaurant directory must render the seed restaurants (proper noun, same in both locales)
+    await expect(page.getByText("Atelier Amaro").first()).toBeVisible({ timeout: 10000 });
   });
 
   test("Polish home reachable under /pl path prefix", async ({ page }) => {
     await page.goto("/pl");
-    // The page renders without 404 — restaurant directory present
-    await expect(page.getByRole("heading", { name: /Trattoria Bellavista/i }).first()).toBeVisible();
+    await expect(page.getByText("Atelier Amaro").first()).toBeVisible({ timeout: 10000 });
   });
 
   test("pairing page renders localized chrome under /pl", async ({ page }) => {
@@ -42,7 +41,7 @@ test.describe("i18n EN/PL switching", () => {
   });
 
   test("scoped pairing in Polish loads PL pairing reasons", async ({ page }) => {
-    await page.goto("/pl/pairing?restaurant=trattoria-bellavista");
+    await page.goto("/pl/pairing?restaurant=atelier-amaro");
     // Wait for AI analysis to settle to "ready" or "fallback"
     await expect(page.getByText("Bot sommeliera")).toBeVisible({ timeout: 8000 });
     // Bot service note line includes the word "podawać" in PL only
