@@ -119,7 +119,7 @@ export default function ImmersivePage() {
           className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/30 transition-transform duration-300 hover:scale-110"
         >
           <span className="material-icons text-white">smart_toy</span>
-          <span className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded bg-white px-3 py-1 text-xs font-bold text-[#1a0f11] opacity-0 transition-opacity group-hover:opacity-100">
+          <span className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded bg-white px-3 py-1 text-xs font-bold text-ink opacity-0 transition-opacity group-hover:opacity-100">
             Ask Sommelier AI
           </span>
         </Link>

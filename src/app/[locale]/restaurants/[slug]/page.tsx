@@ -80,7 +80,7 @@ export default async function RestaurantPage({
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
                   href={`/pairing?restaurant=${restaurant.slug}`}
-                  className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#1a0f11] transition hover:bg-gray-200"
+                  className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-gray-200"
                 >
                   {tx("openPairing")}
                 </Link>

@@ -198,7 +198,7 @@ export default function Home() {
                   <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
                     <Link
                       href={`/restaurants/${selectedRestaurant.slug}`}
-                      className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#1a0f11] transition hover:bg-gray-200 sm:px-4 sm:py-2 sm:text-sm"
+                      className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink transition hover:bg-gray-200 sm:px-4 sm:py-2 sm:text-sm"
                     >
                       {tx("openRestaurant")}
                     </Link>
@@ -302,7 +302,7 @@ export default function Home() {
                       <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/restaurants/${restaurant.slug}`}
-                          className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#1a0f11] transition hover:bg-gray-200"
+                          className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gray-200"
                         >
                           {tx("restaurantPageBtn")}
                         </Link>

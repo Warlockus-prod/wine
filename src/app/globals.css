@@ -20,6 +20,10 @@
   --color-surface-light: var(--color-surface-light);
   --color-accent-gold: var(--color-accent-gold);
   --color-surface-darker: var(--color-surface-darker);
+  /* Single-word alias used for `text-ink` on light/white CTAs. The
+     `text-background-dark` utility never gets emitted by Tailwind v4
+     (token name collides with `dark` modifier) — `text-ink` works. */
+  --color-ink: var(--color-background-dark);
 
   --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
   --font-serif: var(--font-playfair), "Playfair Display", serif;
