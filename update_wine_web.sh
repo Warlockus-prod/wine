@@ -39,7 +39,7 @@ if [[ -d /opt/repos/wine_web_wn/drizzle/migrations && -n "$(ls -A /opt/repos/win
     "${ENV_ARG[@]}" \
     --entrypoint node \
     wine_web_wn:latest \
-    scripts/db-seed.mjs
+    node_modules/tsx/dist/cli.mjs scripts/db-seed.mts
 fi
 
 docker run -d \
