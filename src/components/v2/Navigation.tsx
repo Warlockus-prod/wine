@@ -19,6 +19,7 @@ export default function Navigation() {
   const menuLinks = [
     { href: "/", label: tx("home") },
     { href: "/pairing", label: tx("pairing") },
+    { href: "/samouczek", label: tx("samouczek") },
     { href: "/admin", label: tx("admin") },
   ];
 
