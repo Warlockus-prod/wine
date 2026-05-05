@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { buildChatSystemPrompt } from "@/data/wine-compass-kb";
+import { logEvent } from "@/lib/server-events";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,10 @@ interface ChatRequest {
   messages?: ChatTurn[];
   /** Optional: user's current compass profile so the bot can reference it. */
   profile?: Record<string, number>;
+  /** Optional analytics passthroughs. */
+  anonymousId?: string;
+  sessionId?: string;
+  restaurantId?: string;
 }
 
 const MAX_TURNS = 12; // server-side cap
@@ -106,6 +111,32 @@ export async function POST(request: Request) {
     if (!reply) {
       return NextResponse.json({ error: "Bot nie zwrócił odpowiedzi." }, { status: 502 });
     }
+
+    // Log both sides for analytics — fire-and-forget, never blocks reply.
+    const lastUser = cleaned[cleaned.length - 1];
+    const isUuid = (v: string | undefined): v is string =>
+      !!v && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+    const ids = {
+      restaurantId: isUuid(body.restaurantId) ? body.restaurantId : null,
+      anonymousId: isUuid(body.anonymousId) ? body.anonymousId : null,
+      sessionId: body.sessionId ?? null,
+    };
+    void Promise.all([
+      logEvent({
+        type: "chat_message_user",
+        ...ids,
+        props: { chars: lastUser?.content.length ?? 0 },
+      }),
+      logEvent({
+        type: "chat_message_assistant",
+        ...ids,
+        props: {
+          chars: reply.length,
+          model,
+          tokens: completion.usage?.total_tokens ?? null,
+        },
+      }),
+    ]);
 
     return NextResponse.json({
       reply,

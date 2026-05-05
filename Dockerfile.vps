@@ -18,5 +18,14 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+# Drizzle migration assets + seed script — needed by `drizzle-kit migrate`
+# and `node scripts/db-seed.mjs` invoked from update_wine_web.sh before the
+# new app container takes over. Source TS files are copied so the seed
+# script can re-parse seed-restaurants.ts at deploy time.
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/src/db ./src/db
+COPY --from=builder /app/src/data ./src/data
+COPY --from=builder /app/scripts ./scripts
 EXPOSE 3000
 CMD ["npm", "run", "start", "--", "-H", "0.0.0.0", "-p", "3000"]
