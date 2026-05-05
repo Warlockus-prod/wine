@@ -9,13 +9,13 @@ import { Link } from "@/i18n/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 import { t } from "@/lib/localized";
-import { getCatalogRestaurant } from "@/lib/restaurant-directory";
 import {
   applyRestaurantPairingOverrides,
   buildPairingDatasetFromRestaurant,
   getRestaurantMatchForDishWine,
 } from "@/lib/restaurant-pairing-adapter";
 import { usePairingDataset } from "@/lib/pairing-store";
+import { useRestaurantCatalog } from "@/lib/restaurant-store";
 import type { Locale } from "@/i18n/routing";
 import type { PairingDish, PairingWine } from "@/types/pairing";
 
@@ -75,11 +75,12 @@ const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[], locale: 
 
 export default function PairingPage() {
   const { dataset } = usePairingDataset();
+  const { getRestaurantBySlug } = useRestaurantCatalog();
   const locale = useLocale() as Locale;
   const tx = useTranslations("pairing");
   const [restaurantContextSlug, setRestaurantContextSlug] = useState<string | null>(null);
   const restaurantContext = restaurantContextSlug
-    ? getCatalogRestaurant(restaurantContextSlug)
+    ? getRestaurantBySlug(restaurantContextSlug)
     : null;
   const activeDataset = useMemo(
     () => (restaurantContext ? buildPairingDatasetFromRestaurant(restaurantContext) : dataset),

@@ -7,14 +7,14 @@ Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 
 - Next.js 16 (App Router, **webpack** flag in `dev`/`build` — keep it)
 - React 19, TypeScript, Tailwind v4, Playwright
-- No backend. Data lives in `src/data/seed-restaurants.ts`; user edits persist in browser localStorage via `src/context/restaurants-context.tsx`.
+- No backend. Seed data lives in `src/data/seed-restaurants.ts` and `src/data/seed-pairing.ts`; user edits persist in browser localStorage via `src/lib/restaurant-store.ts` and `src/lib/pairing-store.ts`.
 
 ## Validation gate
 
 Before any commit/push that will be deployed:
 
 ```bash
-npm run check    # = lint + build + 26 e2e tests; all three must pass
+npm run check    # = lint + build + 31 e2e tests; all three must pass
 ```
 
 Individual:
@@ -31,10 +31,10 @@ E2E specs in `e2e/` — `smoke.spec.ts` is the load-bearing one and also runs as
 
 All routable pages live under `src/app/[locale]/`. Default English URL has no prefix; Polish gets `/pl/...`.
 
-- `/` (or `/pl`) — restaurant directory + Leaflet+OSM map + filters
+- `/` (or `/pl`) — restaurant directory + Mapbox map + filters
 - `/restaurants/[slug]` (or `/pl/restaurants/[slug]`) — per-venue menu + pairing UI (5 seeded venues, each with QR)
 - `/pairing?restaurant=<slug>` — pairing view scoped to a venue's menu and wine list. After ranking loads, the #1 wine is auto-selected and its "why it works" explanation renders in the bot chat panel.
-- `/admin` — content editor with EN | PL inputs side by side for every localized field; includes a Curated Pairings section that overrides algorithmic reasons. localStorage-backed; export/import JSON for portability.
+- `/admin` — content editor with global pairing sandbox and per-restaurant dishes/wines/pairings. localStorage-backed; export/import JSON for portability.
 
 ## i18n notes
 

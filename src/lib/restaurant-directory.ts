@@ -61,6 +61,14 @@ const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
   },
 };
 
+const fallbackMeta = (restaurant: Restaurant, index = 0): RestaurantMeta => ({
+  country: "Polska",
+  format: "Restaurant",
+  district: restaurant.city || "Centrum",
+  lat: 52.2297 + index * 0.01,
+  lng: 21.0122 + index * 0.01,
+});
+
 export const buildRestaurantUrl = (slug: string) =>
   new URL(`/restaurants/${slug}`, SITE_URL).toString();
 
@@ -70,8 +78,8 @@ export const buildPairingUrl = (slug: string) =>
 export const buildQrUrl = (url: string) =>
   `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=${encodeURIComponent(url)}`;
 
-export const catalogRestaurants: CatalogRestaurant[] = seedRestaurants.map((restaurant) => {
-  const meta = restaurantMetaBySlug[restaurant.slug];
+export const decorateRestaurant = (restaurant: Restaurant, index = 0): CatalogRestaurant => {
+  const meta = restaurantMetaBySlug[restaurant.slug] ?? fallbackMeta(restaurant, index);
   const restaurantUrl = buildRestaurantUrl(restaurant.slug);
 
   return {
@@ -81,7 +89,12 @@ export const catalogRestaurants: CatalogRestaurant[] = seedRestaurants.map((rest
     pairingUrl: buildPairingUrl(restaurant.slug),
     qrUrl: buildQrUrl(restaurantUrl),
   };
-});
+};
+
+export const decorateRestaurants = (restaurants: Restaurant[]): CatalogRestaurant[] =>
+  restaurants.map((restaurant, index) => decorateRestaurant(restaurant, index));
+
+export const catalogRestaurants: CatalogRestaurant[] = decorateRestaurants(seedRestaurants);
 
 export const getCatalogRestaurant = (slug: string) =>
   catalogRestaurants.find((restaurant) => restaurant.slug === slug) ?? null;

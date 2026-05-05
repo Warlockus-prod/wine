@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import RestaurantContentManager from "@/components/admin/RestaurantContentManager";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { trackEvent } from "@/lib/analytics";
@@ -241,7 +242,7 @@ export default function AdminPage() {
 
   const removeDish = (dishId: string) => {
     const label = dataset.dishes.find((dish) => dish.id === dishId)?.name ?? "dish";
-    if (!window.confirm(`Delete ${label}?`)) {
+    if (!window.confirm(`Delete ${t(label, locale)}?`)) {
       return;
     }
 
@@ -260,7 +261,7 @@ export default function AdminPage() {
 
   const removeWine = (wineId: string) => {
     const label = dataset.wines.find((wine) => wine.id === wineId)?.name ?? "wine";
-    if (!window.confirm(`Delete ${label}?`)) {
+    if (!window.confirm(`Delete ${t(label, locale)}?`)) {
       return;
     }
 
@@ -420,7 +421,9 @@ export default function AdminPage() {
       <Navigation />
 
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-20 sm:px-6 lg:px-8">
-        <section className="glass-panel rounded-2xl p-5 sm:p-6">
+        <RestaurantContentManager />
+
+        <section className="glass-panel mt-6 rounded-2xl p-5 sm:p-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="mb-2 inline-flex rounded-full border border-primary/35 bg-primary/15 px-3 py-1 text-xs font-semibold tracking-wider text-primary uppercase">

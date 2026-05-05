@@ -8,7 +8,7 @@ import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 import { t } from "@/lib/localized";
-import { catalogRestaurants } from "@/lib/restaurant-directory";
+import { useRestaurantCatalog } from "@/lib/restaurant-store";
 import type { Locale } from "@/i18n/routing";
 
 // Leaflet pulls `window` at module-eval, so it must be client-only.
@@ -26,17 +26,18 @@ type FilterValue = "All" | string;
 export default function Home() {
   const locale = useLocale() as Locale;
   const tx = useTranslations("home");
+  const { catalogRestaurants } = useRestaurantCatalog();
   const cuisineOptions = useMemo(
     () => ["All", ...new Set(catalogRestaurants.map((restaurant) => restaurant.cuisine))],
-    [],
+    [catalogRestaurants],
   );
   const cityOptions = useMemo(
     () => ["All", ...new Set(catalogRestaurants.map((restaurant) => restaurant.city))],
-    [],
+    [catalogRestaurants],
   );
   const formatOptions = useMemo(
     () => ["All", ...new Set(catalogRestaurants.map((restaurant) => restaurant.format))],
-    [],
+    [catalogRestaurants],
   );
 
   const [cuisineFilter, setCuisineFilter] = useState<FilterValue>("All");
@@ -53,7 +54,7 @@ export default function Home() {
 
         return cuisinePass && cityPass && formatPass;
       }),
-    [cityFilter, cuisineFilter, formatFilter],
+    [catalogRestaurants, cityFilter, cuisineFilter, formatFilter],
   );
 
   const effectiveSelectedSlug = filteredRestaurants.some((restaurant) => restaurant.slug === selectedSlug)
