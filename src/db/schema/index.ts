@@ -173,7 +173,7 @@ export const dishes = pgTable(
   },
   (t) => ({
     restIdx: index("dishes_restaurant_idx").on(t.restaurantId),
-    extIdx: index("dishes_external_idx").on(t.restaurantId, t.externalId),
+    extIdx: uniqueIndex("dishes_external_unique").on(t.restaurantId, t.externalId),
   }),
 );
 
@@ -209,7 +209,7 @@ export const wines = pgTable(
   },
   (t) => ({
     restIdx: index("wines_restaurant_idx").on(t.restaurantId),
-    extIdx: index("wines_external_idx").on(t.restaurantId, t.externalId),
+    extIdx: uniqueIndex("wines_external_unique").on(t.restaurantId, t.externalId),
   }),
 );
 

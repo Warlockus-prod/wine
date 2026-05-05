@@ -8,6 +8,13 @@
       "when": 1778022058406,
       "tag": "0000_initial_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778024290844,
+      "tag": "0001_unique_external_ids",
+      "breakpoints": true
     }
   ]
 }
