@@ -344,6 +344,7 @@ export default function PairingPage() {
   }, [activeDish, restaurantContext, wines, curatedPairings, locale]);
 
   const selectDish = (dishId: string, source: "cards" | "chips") => {
+    userPickedDishRef.current = true;
     setActiveDishId(dishId);
     setSelectedWineId(null);
     trackEvent("pairing_dish_selected", { dish_id: dishId, source });
@@ -383,6 +384,29 @@ export default function PairingPage() {
       setSelectedWineId(nextWineId);
     }
   }, [rankedMatches.best, selectedWineId, wines]);
+
+  // Mirror-image of the auto-select-best-wine effect above. When the guest
+  // picks a wine first (or before they have engaged with a dish), surface
+  // the dish that pairs best with that wine so the chat panel reads as
+  // "X (top dish for this wine) × Y (selected wine)" without forcing a
+  // second tap. activeDishHasBeenChosen tracks whether the user already
+  // pointed at a dish — we only re-pick when no explicit dish choice is in
+  // play, otherwise we'd fight their selection.
+  const userPickedDishRef = useRef(false);
+  useEffect(() => {
+    if (!selectedWine || dishRankings.size === 0 || userPickedDishRef.current) return;
+    let bestDishId: string | null = null;
+    let bestScore = -Infinity;
+    for (const [dishId, m] of dishRankings) {
+      if (m.score > bestScore) {
+        bestScore = m.score;
+        bestDishId = dishId;
+      }
+    }
+    if (bestDishId && bestDishId !== activeDishId) {
+      setActiveDishId(bestDishId);
+    }
+  }, [selectedWine, dishRankings, activeDishId]);
 
   if (!activeDish || wines.length === 0) {
     return (
