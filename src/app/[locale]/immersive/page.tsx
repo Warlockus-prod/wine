@@ -120,7 +120,7 @@ export default function ImmersivePage() {
         >
           <span className="material-icons text-white">smart_toy</span>
           <span className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded bg-white px-3 py-1 text-xs font-bold text-ink opacity-0 transition-opacity group-hover:opacity-100">
-            Ask Sommelier AI
+            Ask Vinovigator AI
           </span>
         </Link>
       </div>

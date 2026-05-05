@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("v2 admin + discover + restaurant flow", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: /sommelier/i }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /vinovigator|sommelier/i }).first()).toBeVisible();
   await expect(page.getByText(/on the map|na mapie/i)).toBeVisible();
   await expect(page.getByText(/Unique URLs|Unikalne URL/i)).toBeVisible();
 

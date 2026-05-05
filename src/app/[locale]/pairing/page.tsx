@@ -97,6 +97,12 @@ export default function PairingPage() {
   const [matchMap, setMatchMap] = useState<Map<string, MatchDetails>>(new Map());
   const [selectedWineId, setSelectedWineId] = useState<string | null>(null);
   const [aiStatus, setAiStatus] = useState<"loading" | "ready" | "fallback">("ready");
+  // Vinokompas-vocabulary explanation for the *currently active* dish×wine
+  // pair. Generated on demand from /api/pairing/explain. Cached per (dish,
+  // wine) so re-selecting doesn't re-spend tokens.
+  const [vinokompasExplanation, setVinokompasExplanation] = useState<string | null>(null);
+  const [vinokompasLoading, setVinokompasLoading] = useState(false);
+  const vinokompasCacheRef = useRef(new Map<string, string>());
   const firstClickTracked = useRef(false);
   const openTimestamp = useRef<number>(0);
   const wineListRef = useRef<HTMLDivElement | null>(null);
@@ -342,6 +348,60 @@ export default function PairingPage() {
       controller.abort();
     };
   }, [activeDish, restaurantContext, wines, curatedPairings, locale]);
+
+  // Fetch Vinokompas-vocabulary 2-sentence explanation whenever the user
+  // settles on a (dish, wine) pair. Cached per pair to avoid token spend
+  // on UI churn (sortedDishes re-flow, etc).
+  useEffect(() => {
+    if (!activeDish || !selectedWine) {
+      setVinokompasExplanation(null);
+      return;
+    }
+    const cacheKey = `${activeDish.id}|${selectedWine.id}|${locale}`;
+    const cached = vinokompasCacheRef.current.get(cacheKey);
+    if (cached) {
+      setVinokompasExplanation(cached);
+      return;
+    }
+    setVinokompasExplanation(null);
+    setVinokompasLoading(true);
+    const controller = new AbortController();
+    void (async () => {
+      try {
+        const res = await fetch("/api/pairing/explain", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dish: {
+              name: t(activeDish.name, locale),
+              description: t(activeDish.description, locale),
+            },
+            wine: {
+              name: t(selectedWine.name, locale),
+              description: t(selectedWine.description, locale),
+              grape: selectedWine.passport?.grape,
+              region: selectedWine.region,
+            },
+            locale,
+          }),
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = (await res.json()) as { explanation?: string };
+        if (data.explanation) {
+          vinokompasCacheRef.current.set(cacheKey, data.explanation);
+          setVinokompasExplanation(data.explanation);
+        }
+      } catch {
+        /* soft-fail: bubble doesn't render, regular reasons still shown */
+      } finally {
+        setVinokompasLoading(false);
+      }
+    })();
+    return () => {
+      controller.abort();
+    };
+  }, [activeDish, selectedWine, locale]);
 
   const selectDish = (dishId: string, source: "cards" | "chips") => {
     userPickedDishRef.current = true;
@@ -861,6 +921,21 @@ export default function PairingPage() {
                         : tx("botFallbackReason")}
                     </p>
                   </div>
+
+                  {(vinokompasLoading || vinokompasExplanation) ? (
+                    <div className="max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(197,160,89,0.32)] bg-[rgba(197,160,89,0.08)] px-4 py-3">
+                      <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
+                        Vinokompas
+                      </p>
+                      {vinokompasLoading && !vinokompasExplanation ? (
+                        <p className="animate-pulse text-sm leading-6 text-gray-300">
+                          {locale === "pl" ? "Tłumaczę słownikiem Vinokompasu…" : "Translating into Vinokompas vocabulary…"}
+                        </p>
+                      ) : (
+                        <p className="text-sm leading-6 text-gray-100">{vinokompasExplanation}</p>
+                      )}
+                    </div>
+                  ) : null}
 
                   <div className="max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
                     <p className="text-sm leading-6 text-gray-100">

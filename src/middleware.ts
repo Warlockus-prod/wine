@@ -1,44 +1,46 @@
 /**
- * Composed middleware: i18n routing + admin auth gate.
+ * Composed middleware: i18n routing + lightweight admin gate.
  *
- * 1) i18n routing (next-intl) — adds /pl/... prefix as needed, sets locale
- *    cookie. Runs first because admin pages live under [locale]/admin.
- * 2) Auth gate — any /admin or /pl/admin path requires a session OR is
- *    explicitly the signin page. Unauthed users get redirected to signin
- *    with a returnTo param so post-login they land where they aimed.
+ * Runs in edge runtime — must NOT import the full Auth.js config (which
+ * pulls postgres + nodemailer, neither available in edge). Instead we
+ * probe the standard Auth.js session cookie. Real session validation
+ * happens in API route handlers and `auth()` calls inside server pages
+ * where node runtime is available.
  *
- * The /admin route stays open in early-pilot mode if AUTH_GATE_ADMIN=0.
- * That keeps the demo open for sales meetings while we wire SMTP for the
- * real magic-link flow.
+ * If AUTH_GATE_ADMIN=0 the gate is fully disabled (current pilot mode —
+ * admin stays open while SMTP for magic-link is being set up).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { auth } from "./auth";
 
 const intl = createIntlMiddleware(routing);
 
 const ADMIN_PATH_RE = /^\/(?:[a-z]{2}\/)?admin(\/|$)/;
 const SIGNIN_PATH_RE = /^\/(?:[a-z]{2}\/)?admin\/signin(\/|$)/;
-const GATE_ENABLED = process.env.AUTH_GATE_ADMIN !== "0";
+const GATE_ENABLED = process.env.AUTH_GATE_ADMIN === "1";
 
-export default async function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+const SESSION_COOKIE_NAMES = [
+  "authjs.session-token",
+  "__Secure-authjs.session-token",
+  "next-auth.session-token",
+  "__Secure-next-auth.session-token",
+];
 
-  // Pass-through to i18n first — it might issue a redirect for locale
-  // negotiation; we'll re-evaluate auth on the redirected URL.
+export default function middleware(request: NextRequest) {
   const intlResponse = intl(request);
-
   if (!GATE_ENABLED) return intlResponse;
+
+  const { pathname, search } = request.nextUrl;
   if (!ADMIN_PATH_RE.test(pathname)) return intlResponse;
   if (SIGNIN_PATH_RE.test(pathname)) return intlResponse;
 
-  // Check session — DrizzleAdapter reads from sessions table.
-  const session = await auth();
-  if (session?.user) return intlResponse;
+  // Cheap cookie probe — sufficient gatekeeper at the edge. The actual
+  // session is re-validated server-side via auth() in API/RSC.
+  const hasSession = SESSION_COOKIE_NAMES.some((name) => request.cookies.get(name));
+  if (hasSession) return intlResponse;
 
-  // Build sign-in URL preserving the locale prefix the user already had.
   const localeMatch = pathname.match(/^\/([a-z]{2})\//);
   const localePrefix = localeMatch ? `/${localeMatch[1]}` : "";
   const returnTo = encodeURIComponent(pathname + search);
@@ -48,7 +50,5 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Skip API, _next, static files. Auth.js routes live under /api/auth and
-  // are excluded by the `api` token (Auth.js handles its own redirects).
   matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

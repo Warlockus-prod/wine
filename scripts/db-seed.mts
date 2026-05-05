@@ -74,7 +74,7 @@ function inferAbv(w: Wine) {
   return body === "full" ? 14.5 : body === "medium" ? 13.5 : 12.5;
 }
 
-let stats = { restaurants: 0, dishes: 0, wines: 0, pairings: 0, skippedDishes: 0, skippedWines: 0 };
+const stats = { restaurants: 0, dishes: 0, wines: 0, pairings: 0, skippedDishes: 0, skippedWines: 0 };
 
 console.log(`Loaded seed: ${seedRestaurants.length} restaurants`);
 

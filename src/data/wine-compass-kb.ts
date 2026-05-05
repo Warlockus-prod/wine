@@ -28,6 +28,9 @@ export type BaseTaste = "slodycz" | "cierpkosc" | "kwasowosc";
 export interface Tendencja {
   id: TendencjaId;
   name_pl: string;
+  /** Compact label for the compass dial — 1-2 words max, fits without
+   *  collision when 12 labels orbit a 320px circle. Falls back to name_pl. */
+  shortLabel_pl: string;
   associations_pl: string;
   examples_pl: string;
   found_in_pl: string; // "wina czerwone" | "wina białe" | etc
@@ -57,6 +60,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "swieze.cytrusy",
         name_pl: "Cytrusy",
+        shortLabel_pl: "Cytrusy",
         associations_pl: "cytryny, grejpfruty, pomarańcze, mandarynki",
         examples_pl: "Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
         found_in_pl: "wina białe i czerwone",
@@ -64,6 +68,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "swieze.zielone",
         name_pl: "Zielone warzywa i owoce",
+        shortLabel_pl: "Zielone",
         associations_pl: "melon, winogrona, seler, ogórek, karczoch, szparagi",
         examples_pl:
           "Te doznania często odnajdziemy w białych winach, warzywne tendencje spotykamy też często w winach czerwonych.",
@@ -83,6 +88,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "oleiste.maslo",
         name_pl: "Masłowość, tostowość, orzechy",
+        shortLabel_pl: "Masło · orzechy",
         associations_pl: "masło, orzechy, tosty, drożdże, ciasteczka maślane, pierniczki",
         examples_pl:
           "Różnego rodzaju produkty „tłuste”. Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
@@ -91,6 +97,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "oleiste.tropikalne",
         name_pl: "Owoce tropikalne",
+        shortLabel_pl: "Tropikalne",
         associations_pl: "mango, ananas, papaja, marakuja, banan, liczi",
         examples_pl:
           "Oleistość żywiczna, pełnia słodyczy. Te doznania często odnajdziemy w białych winach.",
@@ -110,6 +117,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "miekkie.dojrzale",
         name_pl: "Dojrzałe owoce",
+        shortLabel_pl: "Dojrzałe owoce",
         associations_pl:
           "w czerwonym: śliwki, wiśnie, maliny, jagody, truskawki, jeżyny, figi, porzeczka. W białym: jabłka, gruszki, morele, agrest",
         examples_pl: "Klasyczne owocowe nuty występujące w młodych, owocowych winach.",
@@ -118,6 +126,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "miekkie.konfitury",
         name_pl: "Konfitury",
+        shortLabel_pl: "Konfitury",
         associations_pl: "konfitury z jabłka, truskawki — owoce upieczone, usmażone, skarmelizowane",
         examples_pl:
           "Konfitury różnią się od dojrzałych owoców intensywnością. Tutaj jabłko czy truskawka są upieczone, usmażone, czy skarmelizowane.",
@@ -137,6 +146,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "tegie.cigaro",
         name_pl: "Czekolada, kawa, tytoń",
+        shortLabel_pl: "Czekolada · kawa",
         associations_pl: "czekolada, kawa, tytoń, słodkie cygaro",
         examples_pl:
           "Ciężka tendencja, która przywodzi na myśl „klub gentelmena”, „klub golfowy”, „sklep ze słodyczami” czy „sklep z cygarami”. Zwykle w winach czerwonych.",
@@ -145,6 +155,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "tegie.suszone",
         name_pl: "Suszone owoce",
+        shortLabel_pl: "Suszone owoce",
         associations_pl:
           "w czerwonych: wędzone śliwki, suszone śliwki, daktyle, żurawina. W białych: suszona morela, rodzynki, daktyle, jabłka, pomarańcze, banany, orientalne przyprawy",
         examples_pl: "Intensywne wrażenie. To trochę skojarzenie z wigilijnym suszem.",
@@ -164,6 +175,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "szorstkie.pizmo",
         name_pl: "Piżmo, skóra",
+        shortLabel_pl: "Piżmo · skóra",
         associations_pl: "skojarzenia zwierzęce — zapach mokrego psa, konia, stajni, skóry",
         examples_pl: "Tego rodzaju wrażenia spotykamy w czerwonych winach.",
         found_in_pl: "wina czerwone",
@@ -171,6 +183,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "szorstkie.dab",
         name_pl: "Dąb, dym, garbniki",
+        shortLabel_pl: "Dąb · dym",
         associations_pl:
           "drewno, nieheblowana deska, zapach ogniska, tytoń z papierosa, ściąganie na języku przy cierpkich owocach",
         examples_pl: "Szeroka rodzina wrażeń „szorstkich” i „cierpkich”.",
@@ -190,6 +203,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "ziemiste.mineraly",
         name_pl: "Minerały",
+        shortLabel_pl: "Minerały",
         associations_pl:
           "kamienie, rzeka, akweny wodne, woda mineralna — bąbelki na języku, „szczypanie”",
         examples_pl: "Pamiętacie jak pachnie morze? Ten zapach też.",
@@ -198,6 +212,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "ziemiste.sciolka",
         name_pl: "Ściółka leśna",
+        shortLabel_pl: "Ściółka leśna",
         associations_pl: "ściółka leśna, ścięta trawa, fiołki, lawenda",
         examples_pl:
           "Wrażenia kojarzone z lasem, glebą zwykle znajdujemy w winach czerwonych; trawę mamy w białych jak Sauvignon Blanc.",

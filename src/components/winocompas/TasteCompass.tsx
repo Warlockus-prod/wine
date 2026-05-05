@@ -190,8 +190,6 @@ export default function TasteCompass({
     [profile],
   );
 
-  const labelRadius = rOuter + 22;
-
   return (
     <div className="taste-compass-wrap" style={size ? { width: size, height: size + 40 } : undefined}>
       <svg
@@ -342,31 +340,74 @@ export default function TasteCompass({
           Vinokompas
         </text>
 
-        {/* Outer labels */}
+        {/* Outer labels — horizontal text, smart-anchored by quadrant.
+            Long labels split on `·` into two lines. The label sits on a
+            short radial tick line for premium chart-y feel. */}
         {showLabels &&
           spokes.map((s) => {
-            const x = cx + labelRadius * Math.sin(s.angle);
-            const y = cy - labelRadius * Math.cos(s.angle);
-            // Rotate text along the radius for outer arc readability
-            const deg = (s.angle * 180) / Math.PI;
-            const flip = deg > 90 || deg < -90;
+            const xUnit = Math.sin(s.angle);
+            const yUnit = -Math.cos(s.angle);
+            const tickStart = { x: cx + (rOuter + 4) * xUnit, y: cy + (rOuter + 4) * yUnit };
+            const tickEnd = { x: cx + (rOuter + 14) * xUnit, y: cy + (rOuter + 14) * yUnit };
+            const labelPos = {
+              x: cx + (rOuter + 22) * xUnit,
+              y: cy + (rOuter + 22) * yUnit,
+            };
+            // Anchor by horizontal position relative to centre.
+            // Right of axis → start; left → end; near axis → middle.
+            const anchorBand = Math.abs(xUnit);
+            const textAnchor = anchorBand < 0.3
+              ? "middle"
+              : xUnit > 0
+                ? "start"
+                : "end";
+            const baseline = yUnit < -0.3 ? "auto" : yUnit > 0.3 ? "hanging" : "middle";
+
+            const label = s.tendencja.shortLabel_pl ?? s.tendencja.name_pl;
+            const lines = label.includes("·") ? label.split("·").map((p) => p.trim()) : [label];
+            const lineHeight = 11;
+            const totalH = (lines.length - 1) * lineHeight;
+            const y0 = labelPos.y - (baseline === "middle" ? totalH / 2 : 0);
+
             return (
-              <text
-                key={`lbl-${s.tendencja.id}`}
-                x={x}
-                y={y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontFamily="var(--font-display)"
-                fontSize={9}
-                fontWeight={600}
-                fill="rgba(244,237,224,0.78)"
-                transform={`rotate(${flip ? deg + 180 : deg} ${x} ${y})`}
-                pointerEvents="none"
-                className="select-none"
-              >
-                {s.tendencja.name_pl}
-              </text>
+              <g key={`lbl-${s.tendencja.id}`} pointerEvents="none">
+                {/* radial tick */}
+                <line
+                  x1={tickStart.x}
+                  y1={tickStart.y}
+                  x2={tickEnd.x}
+                  y2={tickEnd.y}
+                  stroke={s.sector.color}
+                  strokeOpacity={0.55}
+                  strokeWidth={0.9}
+                />
+                <text
+                  x={labelPos.x}
+                  y={y0}
+                  textAnchor={textAnchor}
+                  dominantBaseline={baseline}
+                  fontFamily="var(--font-display)"
+                  fontSize={9.2}
+                  fontWeight={600}
+                  letterSpacing="0.04em"
+                  fill="rgba(244,237,224,0.86)"
+                  className="select-none"
+                >
+                  {lines.length === 1 ? (
+                    label
+                  ) : (
+                    lines.map((ln, i) => (
+                      <tspan
+                        key={i}
+                        x={labelPos.x}
+                        dy={i === 0 ? 0 : lineHeight}
+                      >
+                        {ln}
+                      </tspan>
+                    ))
+                  )}
+                </text>
+              </g>
             );
           })}
 

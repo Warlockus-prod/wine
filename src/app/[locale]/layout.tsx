@@ -20,9 +20,9 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Sommelier AI | Wine Pairing Platform",
+  title: "Vinovigator AI — Wine pairing for restaurants",
   description:
-    "Restaurant discovery catalog with Europe map, unique restaurant pages, QR entry points, and AI-assisted wine pairing.",
+    "Vinovigator AI: kompas smaku, mapa restauracji, QR przy stoliku, dwustronny matching dania i wina z uzasadnieniem językiem Vinokompasu.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/app-icon.svg", type: "image/svg+xml" }],
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Sommelier AI",
+    title: "Vinovigator AI",
   },
 };
 

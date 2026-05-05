@@ -6,12 +6,12 @@ type RouteCheck = {
 };
 
 const routes: RouteCheck[] = [
-  { path: "/", mustSee: /sommelier/i },
+  { path: "/", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/pairing", mustSee: /choose a dish/i },
   { path: "/admin", mustSee: /admin studio/i },
-  { path: "/immersive", mustSee: /sommelier/i },
-  { path: "/editorial", mustSee: /sommelier/i },
-  { path: "/pitch", mustSee: /sommelier/i },
+  { path: "/immersive", mustSee: /vinovigator|vinokompas|sommelier/i },
+  { path: "/editorial", mustSee: /vinovigator|vinokompas|sommelier/i },
+  { path: "/pitch", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/restaurants/atelier-amaro", mustSee: /wine list/i },
 ];
 

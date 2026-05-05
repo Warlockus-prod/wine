@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Sommelier AI",
-    short_name: "SommelierAI",
-    description: "Mobile-first restaurant and wine pairing experience",
+    name: "Vinovigator AI",
+    short_name: "Vinovigator",
+    description: "Vinokompas-driven wine pairing for restaurants — mobile-first, EN+PL.",
     start_url: "/",
     scope: "/",
     display: "standalone",

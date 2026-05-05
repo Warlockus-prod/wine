@@ -45,7 +45,7 @@ export default function Navigation() {
               <span className="material-icons text-sm">wine_bar</span>
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
-              Sommelier<span className="text-primary">AI</span>
+              Vinovigator<span className="text-primary"> AI</span>
             </span>
           </Link>
 
