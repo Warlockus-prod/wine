@@ -110,6 +110,10 @@ for (let rIdx = 0; rIdx < seedRestaurants.length; rIdx++) {
     const dishIdMap = new Map<string, string>();
     for (let i = 0; i < seed.dishes.length; i++) {
       const d = seed.dishes[i];
+      // Upsert: keeps the row's id stable but refreshes name+description
+      // so we can ship PL-translation updates without a manual reset.
+      // Skips price+sort_order on conflict — those can drift via admin
+      // edits and we don't want the seed to reset operator changes.
       const inserted = await tx`
         INSERT INTO dishes (
           restaurant_id, external_id, name, description, category, price, sort_order
@@ -122,16 +126,17 @@ for (let rIdx = 0; rIdx < seedRestaurants.length; rIdx++) {
           ${Number(d.price ?? 0)},
           ${i}
         )
-        ON CONFLICT DO NOTHING
-        RETURNING id
+        ON CONFLICT (restaurant_id, external_id) DO UPDATE
+          SET name = EXCLUDED.name,
+              description = EXCLUDED.description,
+              category = EXCLUDED.category,
+              updated_at = NOW()
+        RETURNING id, (xmax = 0) AS inserted
       `;
       if (inserted.length > 0) {
         dishIdMap.set(d.id, inserted[0].id as string);
-        stats.dishes++;
-      } else {
-        const existing = await tx`SELECT id FROM dishes WHERE restaurant_id = ${r.id} AND external_id = ${d.id}`;
-        if (existing.length > 0) dishIdMap.set(d.id, existing[0].id as string);
-        stats.skippedDishes++;
+        if (inserted[0].inserted) stats.dishes++;
+        else stats.skippedDishes++;
       }
     }
 
@@ -139,6 +144,8 @@ for (let rIdx = 0; rIdx < seedRestaurants.length; rIdx++) {
     for (let i = 0; i < seed.wines.length; i++) {
       const w = seed.wines[i];
       const yearNum = Number.parseInt(String(w.vintage ?? ""), 10);
+      // Same upsert pattern as dishes — refreshes notes/region/grape on
+      // existing wines so PL-translation updates ship through the seed.
       const inserted = await tx`
         INSERT INTO wines (
           restaurant_id, external_id, name, region, grape, style, vintage, year, price, notes,
@@ -160,16 +167,20 @@ for (let rIdx = 0; rIdx < seedRestaurants.length; rIdx++) {
           ${inferAbv(w)},
           ${i}
         )
-        ON CONFLICT DO NOTHING
-        RETURNING id
+        ON CONFLICT (restaurant_id, external_id) DO UPDATE
+          SET name = EXCLUDED.name,
+              region = EXCLUDED.region,
+              grape = EXCLUDED.grape,
+              style = EXCLUDED.style,
+              vintage = EXCLUDED.vintage,
+              notes = EXCLUDED.notes,
+              updated_at = NOW()
+        RETURNING id, (xmax = 0) AS inserted
       `;
       if (inserted.length > 0) {
         wineIdMap.set(w.id, inserted[0].id as string);
-        stats.wines++;
-      } else {
-        const existing = await tx`SELECT id FROM wines WHERE restaurant_id = ${r.id} AND external_id = ${w.id}`;
-        if (existing.length > 0) wineIdMap.set(w.id, existing[0].id as string);
-        stats.skippedWines++;
+        if (inserted[0].inserted) stats.wines++;
+        else stats.skippedWines++;
       }
     }
 

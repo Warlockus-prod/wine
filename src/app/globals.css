@@ -41,36 +41,59 @@
   --nav-border: rgba(255, 255, 255, 0.10);
 }
 
-/* ── Light theme overrides — parchment / cream editorial mode ─────────
-   Brand colors stay (wine red + gold) — only surfaces & inks invert.
-   Accessible contrast: ink #1a0f11 on paper #f4ede0 ≈ 14:1 (AAA). */
+/* ── Light theme overrides — refined editorial / wine-bar mode ────────
+   Inspiration: Mid-century menu cards, art-deco wine atlases, Hermès
+   in-store stationery. Cream paper, wine-ink type, gold accents that
+   feel printed (not screen-glowing). Brand colors keep their warmth.
+   AAA contrast on body text (≈14:1). */
 :root[data-theme="light"] {
-  --surface: #f4ede0;
-  --surface-elevated: #fbf7ee;
-  --surface-deep: #ece2cd;
-  --surface-input: #fbf7ee;
-  --surface-terminal: #1f1518;       /* terminal stays dark — looks sharper */
-  --ink: #1a0f11;
-  --ink-strong: #0c0506;
-  --ink-soft: #4a3438;
-  --ink-muted: #7c6b66;
-  --hairline: rgba(26, 15, 17, 0.10);
-  --hairline-strong: rgba(26, 15, 17, 0.20);
-  --paper-tint: rgba(26, 15, 17, 0.025);
-  --paper-tint-strong: rgba(26, 15, 17, 0.045);
-  --paper-glow: rgba(197, 160, 89, 0.12);
-  --gold-hairline: rgba(168, 110, 30, 0.34);
-  --gold-hairline-soft: rgba(168, 110, 30, 0.22);
-  --row-tint-odd: rgba(26, 15, 17, 0.010);
-  --row-tint-even: rgba(26, 15, 17, 0.022);
-  --row-tint-hover: rgba(197, 160, 89, 0.10);
-  --shadow-card: 0 8px 22px rgba(80, 40, 20, 0.10);
+  /* Paper-stack — three closely-related cream tones for layering */
+  --surface: #f6efde;            /* page bg — warm ivory */
+  --surface-elevated: #fdfaf2;   /* cards — almost white */
+  --surface-deep: #ebe1c8;       /* hero, ribbon, parchment — manila */
+  --surface-input: #fbf6e8;      /* forms — slightly warmer than card */
+  --surface-terminal: #1d1316;   /* terminal stays dark on purpose */
+
+  /* Type — wine-ink scale */
+  --ink: #2a1418;
+  --ink-strong: #150a0c;
+  --ink-soft: #523a3f;
+  --ink-muted: #8a7a76;
+
+  /* Lines — warm taupe instead of cold grey */
+  --hairline: rgba(40, 24, 18, 0.08);
+  --hairline-strong: rgba(40, 24, 18, 0.16);
+
+  /* Paper layering tones — gentler than dark-mode opacities */
+  --paper-tint: rgba(120, 80, 30, 0.025);
+  --paper-tint-strong: rgba(120, 80, 30, 0.05);
+  --paper-glow: rgba(197, 160, 89, 0.18);
+
+  /* Gold appears slightly darker on cream so it reads — pure #c5a059
+     looks too washed out on light bg. Use printed-foil bronze. */
+  --gold-hairline: rgba(155, 105, 22, 0.42);
+  --gold-hairline-soft: rgba(155, 105, 22, 0.28);
+
+  /* Alternating-row striping — subtle wine wash */
+  --row-tint-odd: rgba(120, 30, 20, 0.012);
+  --row-tint-even: rgba(120, 30, 20, 0.030);
+  --row-tint-hover: rgba(197, 160, 89, 0.16);
+
+  /* Soft, warm shadow (NOT cold blue-grey) */
+  --shadow-card:
+    0 1px 2px rgba(80, 40, 20, 0.04),
+    0 8px 24px rgba(80, 40, 20, 0.08);
+
+  /* Page background — cream with delicate gold/wine wash */
   --bg-radials:
-    radial-gradient(circle at 12% 8%, rgba(209, 21, 52, 0.10), transparent 38%),
-    radial-gradient(circle at 90% 10%, rgba(197, 160, 89, 0.18), transparent 32%),
-    linear-gradient(180deg, #f4ede0 0%, #efe6d3 100%);
-  --nav-bg: rgba(244, 237, 224, 0.86);
-  --nav-border: rgba(26, 15, 17, 0.10);
+    radial-gradient(circle at 12% 8%, rgba(209, 21, 52, 0.06), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(197, 160, 89, 0.14), transparent 35%),
+    radial-gradient(circle at 50% 100%, rgba(155, 105, 22, 0.05), transparent 50%),
+    linear-gradient(180deg, #f6efde 0%, #f0e7ce 100%);
+
+  /* Nav bar — frosted cream, warm hairline */
+  --nav-bg: rgba(246, 239, 222, 0.88);
+  --nav-border: rgba(40, 24, 18, 0.08);
 }
 
 @theme inline {
@@ -231,6 +254,66 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 
 /* Theme toggle's own rotation: keep crisp, no color transition flicker */
 .theme-toggle { transition: transform 220ms ease, background-color 220ms ease, border-color 220ms ease; }
+
+/* ── Light-theme: buttons / chips / accents polish ────────────────────
+   Targets the "dark utility" patterns that look like leftover dark UI on
+   cream paper: solid black-on-white pills, dark gradient buttons, etc. */
+:root[data-theme="light"] {
+  /* Primary button class used in restaurant/pairing pages */
+}
+/* `bg-primary text-white` pattern — wine red CTA on cream. Soften the
+   shadow so it doesn't look like a printed sticker. */
+:root[data-theme="light"] .bg-primary,
+:root[data-theme="light"] [class*="bg-primary"]:not([class*="hover:bg-primary"]) {
+  box-shadow: 0 4px 14px rgba(138, 10, 34, 0.18);
+}
+/* Solid dark "rounded-full bg-white text-ink" CTAs (used on home cards)
+   — flip to wine-on-cream so they don't punch holes in the layout. */
+:root[data-theme="light"] .bg-white {
+  background-color: var(--surface-elevated) !important;
+  color: var(--ink-strong) !important;
+  border: 1px solid var(--gold-hairline) !important;
+}
+/* Pills marked as active language use bg-primary; keep, but soften inset */
+:root[data-theme="light"] .text-ink {
+  color: var(--ink-strong) !important;
+}
+/* Dark gradient surfaces (sky-with-radial bg used on hero sections in
+   /samouczek and /pitch) — replace dark gradient with light gradient. */
+:root[data-theme="light"] [class*="bg-[radial-gradient"] {
+  background-image: none !important;
+  background-color: var(--surface-deep) !important;
+}
+/* "bg-black/N" surfaces in cards on home — they were thinking white-on-dark
+   semi-transparent. On light bg the same opacity reads as a dirty smudge.
+   Lift to slightly darker than card surface. */
+:root[data-theme="light"] .bg-black\/15,
+:root[data-theme="light"] .bg-black\/16,
+:root[data-theme="light"] .bg-black\/12,
+:root[data-theme="light"] .bg-black\/18,
+:root[data-theme="light"] .bg-black\/22,
+:root[data-theme="light"] .bg-black\/30 {
+  background-color: rgba(40, 24, 18, 0.04) !important;
+}
+/* Red-rosé chips (badges) — keep wine accent but lighter base */
+:root[data-theme="light"] [class*="bg-rose-"] {
+  background-color: rgba(209, 21, 52, 0.12) !important;
+  color: #8a0a22 !important;
+}
+:root[data-theme="light"] [class*="border-rose-"] {
+  border-color: rgba(209, 21, 52, 0.28) !important;
+}
+/* Material icons on cream — make them ink, not bright white */
+:root[data-theme="light"] .material-icons,
+:root[data-theme="light"] .material-symbols-outlined {
+  color: inherit !important;
+}
+/* Restaurant page hero often uses .bg-black/22 + cream type — cream is
+   already remapped. Add slight warm wash to QR aside backdrop. */
+:root[data-theme="light"] .glass-panel {
+  background: rgba(253, 250, 242, 0.85) !important;
+  border-color: var(--gold-hairline) !important;
+}
 
 * {
   box-sizing: border-box;
@@ -523,6 +606,24 @@ body {
   outline: 2px solid var(--color-accent-gold);
   outline-offset: 3px;
 }
+/* Light-mode primary CTA — printed deep-wine on cream, gold foil border.
+   The dark-mode glow shadow becomes a soft warm shadow (no glowing
+   "screen-saver" feel on light backgrounds). */
+:root[data-theme="light"] .pitch-cta-primary {
+  background: linear-gradient(180deg, #b81230 0%, #8a0a22 100%);
+  color: #fbf3e3;
+  border: 1px solid rgba(155, 105, 22, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255, 230, 200, 0.22) inset,
+    0 6px 20px rgba(138, 10, 34, 0.20),
+    0 1px 2px rgba(40, 10, 12, 0.10);
+}
+:root[data-theme="light"] .pitch-cta-primary:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 230, 200, 0.28) inset,
+    0 10px 28px rgba(138, 10, 34, 0.28),
+    0 1px 2px rgba(40, 10, 12, 0.10);
+}
 
 .pitch-cta-ghost {
   display: inline-flex;
@@ -545,6 +646,17 @@ body {
 .pitch-cta-ghost:focus-visible {
   outline: 2px solid var(--color-accent-gold);
   outline-offset: 3px;
+}
+/* Light-mode ghost — gold foil that darkens to bronze on hover */
+:root[data-theme="light"] .pitch-cta-ghost {
+  border-color: rgba(155, 105, 22, 0.45);
+  color: var(--ink-strong);
+  background: rgba(253, 250, 242, 0.55);
+}
+:root[data-theme="light"] .pitch-cta-ghost:hover {
+  border-color: rgba(155, 105, 22, 0.85);
+  color: rgba(155, 105, 22, 1);
+  background: rgba(197, 160, 89, 0.10);
 }
 
 @keyframes pitch-fade-up {

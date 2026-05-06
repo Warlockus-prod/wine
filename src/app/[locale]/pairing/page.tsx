@@ -3,9 +3,17 @@
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
+
+// Page-aware sommelier chat — opens by default on /pairing so the user
+// can converse about whatever dish/wine they're inspecting. The
+// pageContext prop tells the bot what's on screen.
+const FloatingTasteChat = dynamic(() => import("@/components/winocompas/FloatingTasteChat"), {
+  ssr: false,
+});
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 import { t, localizeDecant } from "@/lib/localized";
@@ -277,6 +285,10 @@ export default function PairingPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            // Locale flows to the API so algorithmic reasons come back
+            // already translated. Curated reasons are picked per locale
+            // on the client side (see `t(c.reason, locale)` below).
+            locale,
             dish: {
               id: activeDish.id,
               name: t(activeDish.name, "en"),
@@ -932,7 +944,34 @@ export default function PairingPage() {
                           {locale === "pl" ? "Tłumaczę słownikiem Vinokompasu…" : "Translating into Vinokompas vocabulary…"}
                         </p>
                       ) : (
-                        <p className="text-sm leading-6 text-gray-100">{vinokompasExplanation}</p>
+                        <>
+                          <p className="text-sm leading-6 text-gray-100">{vinokompasExplanation}</p>
+                          {/* "Talk to AI sommelier" — fires wn:open-chat with
+                              a prefill that asks the bot to elaborate on this
+                              specific dish×wine. The chat panel opens (or
+                              activates if collapsed) and auto-sends. */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (typeof window === "undefined") return;
+                              const dish = t(activeDish.name, locale);
+                              const wine = t(selectedWine.name, locale);
+                              const prefill =
+                                locale === "pl"
+                                  ? `Opowiedz mi więcej o połączeniu „${dish}" z „${wine}". Co warto zauważyć w pierwszym łyku?`
+                                  : `Tell me more about pairing "${dish}" with "${wine}". What should I notice in the first sip?`;
+                              window.dispatchEvent(
+                                new CustomEvent("wn:open-chat", { detail: { prefill } }),
+                              );
+                            }}
+                            className="mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
+                          >
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                              <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
+                            </svg>
+                            {locale === "pl" ? "Porozmawiaj z AI sommelierem" : "Talk to AI sommelier"}
+                          </button>
+                        </>
                       )}
                     </div>
                   ) : null}
@@ -1001,6 +1040,24 @@ export default function PairingPage() {
       </main>
 
       <MobileTabBar />
+
+      {/* Page-aware sommelier chat — opens by default on /pairing. The
+          pageContext string is rebuilt every render so the bot always
+          knows the currently focused dish + wine + restaurant. Stored
+          conversation key is shared with the rest of the app so the
+          history follows the user. */}
+      <FloatingTasteChat
+        defaultOpen
+        pageContext={[
+          restaurantContext
+            ? `Restauracja: ${t(restaurantContext.name, locale)} (${restaurantContext.city}, ${restaurantContext.country}).`
+            : null,
+          activeDish ? `Wybrane danie: ${t(activeDish.name, locale)}.` : null,
+          selectedWine ? `Sugerowane wino: ${t(selectedWine.name, locale)} (${selectedWine.region}).` : null,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      />
     </div>
   );
 }

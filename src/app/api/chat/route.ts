@@ -11,6 +11,10 @@ interface ChatRequest {
   messages?: ChatTurn[];
   /** Optional: user's current compass profile so the bot can reference it. */
   profile?: Record<string, number>;
+  /** Optional: a short page-context hint (current dish + wine, restaurant
+   *  slug, etc.) injected as a system note so the bot's reply is grounded
+   *  in what the user is looking at right now. */
+  pageContext?: string;
   /** Optional analytics passthroughs. */
   anonymousId?: string;
   sessionId?: string;
@@ -75,6 +79,10 @@ export async function POST(request: Request) {
   }
 
   const profileNote = profileToSummary(body.profile);
+  const pageNote =
+    typeof body.pageContext === "string" && body.pageContext.trim().length > 0
+      ? `Aktualnie użytkownik ogląda: ${body.pageContext.trim().slice(0, 600)}`
+      : null;
 
   let openai: OpenAI;
   try {
@@ -103,6 +111,7 @@ export async function POST(request: Request) {
       messages: [
         { role: "system", content: buildChatSystemPrompt() },
         ...(profileNote ? [{ role: "system" as const, content: profileNote }] : []),
+        ...(pageNote ? [{ role: "system" as const, content: pageNote }] : []),
         ...cleaned,
       ],
     });

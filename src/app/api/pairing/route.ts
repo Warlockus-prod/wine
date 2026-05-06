@@ -1,5 +1,42 @@
 import { NextResponse } from "next/server";
 
+type Locale = "pl" | "en";
+
+// All reason strings translated. Key = stable English source line; value =
+// PL translation. The scorer still works with English keys internally —
+// we resolve to the active locale once at the end of the request.
+const PL: Record<string, string> = {
+  "High acidity refreshes the palate and balances richer textures.":
+    "Wysoka kwasowość odświeża podniebienie i równoważy bogatsze tekstury.",
+  "High tannin or full body can overpower delicate flavors.":
+    "Wysoka taniczność lub pełne ciało mogą zdominować delikatne smaki.",
+  "Acidity and minerality support seafood freshness and salinity.":
+    "Kwasowość i mineralność podkreślają świeżość owoców morza i ich słoność.",
+  "Tannin structure pairs well with the protein and fat in red meat.":
+    "Struktura taninowa doskonale współgra z białkiem i tłuszczem czerwonego mięsa.",
+  "A light-bodied wine can feel too thin for a rich meat dish.":
+    "Wino o lekkim ciele może wydać się zbyt delikatne przy treściwym daniu mięsnym.",
+  "Higher alcohol can amplify perceived heat in spicy dishes.":
+    "Wyższy alkohol może wzmocnić odczuwaną ostrość w pikantnych daniach.",
+  "Light to medium body with softer tannin handles spice more gracefully.":
+    "Wino o lekkim lub średnim ciele i miększej taninie lepiej radzi sobie z ostrością.",
+  "Wine acidity aligns with the acid profile of tomato-based sauces.":
+    "Kwasowość wina współgra z profilem kwasowym sosów pomidorowych.",
+  "Sparkling texture cleanses the palate after fried textures.":
+    "Tekstura wina musującego oczyszcza podniebienie po smażonych potrawach.",
+  "Classic regional white-wine-and-seafood pairing profile.":
+    "Klasyczne regionalne łączenie białego wina z owocami morza.",
+  "Pinot Noir complements duck and mushroom notes without overpowering them.":
+    "Pinot Noir uzupełnia nuty kaczki i grzybów, nie dominując ich.",
+  "Overall body, acidity, and aromatic profile are broadly compatible.":
+    "Ogólne ciało, kwasowość i profil aromatyczny są w pełni zgodne.",
+  "Overall wine structure is compatible with the selected dish.":
+    "Ogólna struktura wina pasuje do wybranego dania.",
+};
+
+const localize = (text: string, locale: Locale): string =>
+  locale === "pl" ? PL[text] ?? text : text;
+
 type DishInput = {
   id?: string;
   name?: string;
@@ -198,11 +235,18 @@ export async function POST(request: Request) {
       dish?: DishInput;
       wines?: WineInput[];
       curated?: CuratedInput[];
+      locale?: Locale;
     };
 
     if (!body?.dish || !Array.isArray(body.wines) || body.wines.length === 0) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
+
+    // Locale resolution priority: explicit body.locale → URL ?locale param.
+    // Default keeps EN to avoid silently breaking older clients.
+    const url = new URL(request.url);
+    const fromQuery = url.searchParams.get("locale") as Locale | null;
+    const locale: Locale = body.locale ?? (fromQuery === "pl" ? "pl" : "en");
 
     const dish = body.dish;
     const dishId = dish.id ?? "";
@@ -231,10 +275,12 @@ export async function POST(request: Request) {
           return {
             ...result,
             score: clamp(Math.max(result.score, 88), 25, 99),
+            // Curated reasons are author-written, no translation map.
             reason: curatedReason,
           };
         }
-        return result;
+        // Translate the algorithmic reason once, at the boundary.
+        return { ...result, reason: localize(result.reason, locale) };
       })
       .sort((a, b) => b.score - a.score);
 

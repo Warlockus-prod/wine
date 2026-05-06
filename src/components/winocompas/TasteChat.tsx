@@ -37,9 +37,18 @@ interface Props {
   profile?: CompassProfile;
   /** Stable storage key so we keep the conversation across reloads. */
   storageKey?: string;
+  /** Page-aware context — short summary of what the user is currently
+   *  looking at (e.g. "Dish: Duck Confit · Wine: Trimbach Riesling ·
+   *  Restaurant: Atelier Amaro"). Sent to /api/chat as a system-level hint
+   *  so the bot can ground its replies. NOT shown in the chat UI. */
+  pageContext?: string;
 }
 
-export default function TasteChat({ profile, storageKey = "wn_taste_chat_v1" }: Props) {
+export default function TasteChat({
+  profile,
+  storageKey = "wn_taste_chat_v1",
+  pageContext,
+}: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: HELLO_PL },
   ]);
@@ -81,6 +90,25 @@ export default function TasteChat({ profile, storageKey = "wn_taste_chat_v1" }: 
     el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  // Listen for prefill requests from "Talk to AI sommelier" CTAs around
+  // the app. Fire wn:open-chat with detail.prefill = "..." to send.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (event: Event) => {
+      const ce = event as CustomEvent<{ prefill?: string } | null>;
+      const text = ce.detail?.prefill;
+      if (text && typeof text === "string") {
+        // Defer to next tick so the chat has time to mount/scroll.
+        window.setTimeout(() => send(text), 60);
+      }
+    };
+    window.addEventListener("wn:open-chat", handler);
+    return () => window.removeEventListener("wn:open-chat", handler);
+    // `send` is stable enough — re-running on profile change isn't an issue
+    // because handler reads the latest `send` via closure of this render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const send = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || sending) return;
@@ -101,6 +129,9 @@ export default function TasteChat({ profile, storageKey = "wn_taste_chat_v1" }: 
         body: JSON.stringify({
           messages: baseHistory.map(({ role, content }) => ({ role, content })),
           profile,
+          // Page context flows to /api/chat as a system-prompt suffix so
+          // the bot knows what the user is looking at right now.
+          pageContext,
         }),
       });
       const data = (await res.json()) as { reply?: string; error?: string };

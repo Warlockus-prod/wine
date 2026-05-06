@@ -145,7 +145,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)]">
+        {/* Map gets a full-width row at the top so the user can actually see
+            restaurant placement across Europe. The catalogue list lives in
+            its own section below — the previous side-by-side cramming hid
+            most map markers behind the catalog column. */}
+        <section className="mt-6">
           <article className="rounded-[34px] border border-white/10 bg-black/15 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)]">
             <div className="mb-5 flex items-end justify-between gap-3">
               <div>
@@ -159,7 +163,7 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="relative h-[420px] overflow-hidden rounded-[30px] border border-white/10 bg-[#130a0b] sm:h-[480px] xl:aspect-[4/3] xl:h-auto">
+            <div className="relative h-[520px] overflow-hidden rounded-[30px] border border-white/10 bg-[#130a0b] sm:h-[620px] lg:h-[700px]">
               <RestaurantMap
                 restaurants={filteredRestaurants}
                 selectedSlug={effectiveSelectedSlug}
@@ -214,7 +218,10 @@ export default function Home() {
               ) : null}
             </div>
           </article>
+        </section>
 
+        {/* Catalogue list moved to its own section below the map */}
+        <section className="mt-6">
           <article className="rounded-[34px] border border-white/10 bg-black/15 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)]">
             <div className="mb-5 flex items-end justify-between gap-3">
               <div>
@@ -228,7 +235,7 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="hide-scrollbar flex max-h-[820px] flex-col gap-4 overflow-y-auto pr-1">
+            <div className="grid gap-4 lg:grid-cols-2">
               {filteredRestaurants.map((restaurant) => {
                 const selected = restaurant.slug === effectiveSelectedSlug;
 

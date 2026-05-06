@@ -33,6 +33,8 @@ interface Props {
    *  Used by /samouczek's "Wyłącz czat" toggle so users who don't want a
    *  guide are not nagged. */
   disabled?: boolean;
+  /** Page-aware hint passed through to <TasteChat> (and the API). */
+  pageContext?: string;
 }
 
 const STATE_KEY = "wn_floating_chat_open_v1";
@@ -42,6 +44,7 @@ export default function FloatingTasteChat({
   storageKey,
   defaultOpen = false,
   disabled = false,
+  pageContext,
 }: Props) {
   // Lazy state init reads localStorage exactly once on mount — no render
   // thrash, no setState-in-effect lint, no SSR mismatch (this whole
@@ -133,7 +136,7 @@ export default function FloatingTasteChat({
               </svg>
             </button>
             <div className="flex flex-1">
-              <TasteChat profile={profile} storageKey={storageKey} />
+              <TasteChat profile={profile} storageKey={storageKey} pageContext={pageContext} />
             </div>
           </div>
         </div>

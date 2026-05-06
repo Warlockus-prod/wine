@@ -17,11 +17,12 @@ export default function Navigation() {
   const locale = useLocale() as Locale;
   const tx = useTranslations("nav");
 
+  // Public-facing menu: Admin / Panel are intentionally removed — operator
+  // entrance lives in the right-side action button instead.
   const menuLinks = [
     { href: "/", label: tx("home") },
     { href: "/pairing", label: tx("pairing") },
     { href: "/samouczek", label: tx("samouczek") },
-    { href: "/admin", label: tx("admin") },
   ];
 
   const switchLocale = (next: Locale) => {
@@ -105,18 +106,15 @@ export default function Navigation() {
                 <span>Mobile</span>
               </button>
             ) : null}
+            {/* Operator entrance — leads to /admin (Panel). Renamed from
+                "Sign In" + the previous Admin link merged into one button. */}
             <Link
-              className="hidden rounded-lg border border-white/20 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/16 md:inline-flex"
               href="/admin"
+              className="hidden items-center gap-2 rounded-lg border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-sm font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20 md:inline-flex"
             >
-              {tx("admin")}
+              <span className="material-icons text-base">person</span>
+              Panel
             </Link>
-            <button
-              type="button"
-              className="hidden rounded-lg border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/14 md:inline-flex"
-            >
-              Sign In
-            </button>
             <button
               type="button"
               aria-label="Open menu"
