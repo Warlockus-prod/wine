@@ -3,12 +3,14 @@ import { expect, test, devices, type TestOptions } from "@playwright/test";
 type RouteCheck = {
   path: string;
   mustSee: RegExp;
+  /** When set, look for a heading instead of any text (avoids matching hidden <option> values). */
+  matchAs?: "heading" | "text";
 };
 
 const routes: RouteCheck[] = [
   { path: "/", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/pairing", mustSee: /choose a dish/i },
-  { path: "/admin", mustSee: /admin studio/i },
+  { path: "/admin", mustSee: /sommelier|atelier/i, matchAs: "heading" },
   { path: "/immersive", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/editorial", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/pitch", mustSee: /vinovigator|vinokompas|sommelier/i },
@@ -37,7 +39,11 @@ for (const profile of profiles) {
     for (const route of routes) {
       test(`route ${route.path} has no horizontal overflow`, async ({ page }) => {
         await page.goto(route.path);
-        await expect(page.getByText(route.mustSee).first()).toBeVisible();
+        const sentinel =
+          route.matchAs === "heading"
+            ? page.getByRole("heading", { name: route.mustSee }).first()
+            : page.getByText(route.mustSee).first();
+        await expect(sentinel).toBeVisible();
 
         const metrics = await page.evaluate(() => {
           const doc = document.documentElement;

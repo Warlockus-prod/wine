@@ -9,7 +9,7 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
 
   await page.goto("/admin");
   await expect(page).toHaveURL(/\/admin$/);
-  await expect(page.getByText("V2 Admin Studio")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /atelier/i }).first()).toBeVisible();
 
   const dishName = `Smoke Dish ${Date.now()}`;
   // The new-dish form uses the single-language input; admin's edit grid splits
@@ -19,7 +19,7 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
     "https://images.unsplash.com/photo-1544025162-d76694265947?w=1200",
   );
   await page.locator('textarea[placeholder="Dish description"]').first().fill("Automated dish for smoke test");
-  await page.getByRole("button", { name: "Add Dish" }).click();
+  await page.getByRole("button", { name: /add dish/i }).click();
 
   await page.goto("/pairing");
   await expect(page.getByRole("button", { name: dishName }).first()).toBeVisible();

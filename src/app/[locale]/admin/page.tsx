@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RestaurantContentManager from "@/components/admin/RestaurantContentManager";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
@@ -54,6 +54,97 @@ const bodyOptions: WineBody[] = ["light", "medium", "full"];
 const acidityOptions: WineAcidity[] = ["low", "medium", "high"];
 const tanninOptions: WineTannin[] = ["none", "soft", "medium", "high"];
 
+const ROMAN = [
+  "",
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII",
+  "IX",
+  "X",
+  "XI",
+  "XII",
+  "XIII",
+  "XIV",
+  "XV",
+  "XVI",
+  "XVII",
+  "XVIII",
+  "XIX",
+  "XX",
+];
+const toRoman = (n: number): string => {
+  if (n <= 20) return ROMAN[n] ?? String(n);
+  // simple fallback for larger lists
+  const map: Array<[number, string]> = [
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ];
+  let out = "";
+  let v = n;
+  for (const [val, sym] of map) {
+    while (v >= val) {
+      out += sym;
+      v -= val;
+    }
+  }
+  return out;
+};
+
+function SavedPill({ text }: { text: string }) {
+  return (
+    <span className="saved-pill" role="status" aria-live="polite">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden>
+        <path
+          d="M3 9.4L7.2 13.6L15 5.5"
+          stroke="#b6e8c2"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      {text}
+    </span>
+  );
+}
+
+function TendrilCorner({ side = "right" }: { side?: "left" | "right" }) {
+  const flip = side === "left" ? " scale(-1, 1)" : "";
+  return (
+    <svg
+      className="tendril-corner"
+      width="120"
+      height="120"
+      viewBox="0 0 120 120"
+      style={{
+        top: 12,
+        [side]: 12,
+        transform: `rotate(0deg)${flip}`,
+      } as React.CSSProperties}
+      aria-hidden
+    >
+      <g fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round">
+        <path d="M10 60 C 30 30, 60 30, 80 50 S 110 80, 100 110" />
+        <path d="M40 38 C 35 30, 28 28, 22 32" />
+        <path d="M65 36 C 65 28, 70 22, 78 22" />
+        <path d="M88 56 C 95 52, 102 54, 106 60" />
+        <ellipse cx="22" cy="32" rx="3.5" ry="1.4" transform="rotate(-30 22 32)" />
+        <ellipse cx="78" cy="22" rx="3.5" ry="1.4" transform="rotate(35 78 22)" />
+        <ellipse cx="106" cy="60" rx="3.5" ry="1.4" transform="rotate(70 106 60)" />
+      </g>
+    </svg>
+  );
+}
+
 export default function AdminPage() {
   const { dataset, setDataset, resetDataset, exportDataset, importDataset } = usePairingDataset();
   const locale = useLocale() as Locale;
@@ -94,7 +185,21 @@ export default function AdminPage() {
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
   const [importText, setImportText] = useState("");
   const [statusText, setStatusText] = useState("");
+  const [statusKey, setStatusKey] = useState(0);
   const [mobileTab, setMobileTab] = useState<"dishes" | "wines">("dishes");
+
+  // Auto-clear status pill after 3.5s — keeps the chrome feeling alive instead
+  // of static. The keyed re-mount restarts the checkmark draw on every change.
+  useEffect(() => {
+    if (!statusText) return;
+    const timer = window.setTimeout(() => setStatusText(""), 3500);
+    return () => window.clearTimeout(timer);
+  }, [statusText, statusKey]);
+
+  const setStatus = (text: string) => {
+    setStatusText(text);
+    setStatusKey((k) => k + 1);
+  };
 
   const effectiveDishId =
     apiDishId && dataset.dishes.some((dish) => dish.id === apiDishId)
@@ -127,7 +232,7 @@ export default function AdminPage() {
 
   const addDish = () => {
     if (!dishForm.name.trim() || !dishForm.description.trim() || !dishForm.image.trim()) {
-      setStatusText("Fill dish name, description and image URL.");
+      setStatus("Fill dish name, description and image URL.");
       return;
     }
 
@@ -157,12 +262,12 @@ export default function AdminPage() {
       tags: "Main, Signature",
     });
     setApiDishId(created.id);
-    setStatusText("Dish added.");
+    setStatus("Dish added.");
   };
 
   const addWine = () => {
     if (!wineForm.name.trim() || !wineForm.region.trim() || !wineForm.image.trim()) {
-      setStatusText("Fill wine name, region and image URL.");
+      setStatus("Fill wine name, region and image URL.");
       return;
     }
 
@@ -216,7 +321,7 @@ export default function AdminPage() {
       decant: "No decant.",
     });
     setApiSelectedWineIds((current) => [...current, created.id]);
-    setStatusText("Wine added.");
+    setStatus("Wine added.");
   };
 
   const updateDish = (dishId: string, patch: Partial<PairingDish>) => {
@@ -257,7 +362,7 @@ export default function AdminPage() {
       { dish_id: dishId },
     );
 
-    setStatusText("Dish removed.");
+    setStatus("Dish removed.");
   };
 
   const removeWine = (wineId: string) => {
@@ -277,7 +382,7 @@ export default function AdminPage() {
     );
 
     setApiSelectedWineIds((current) => current.filter((id) => id !== wineId));
-    setStatusText("Wine removed.");
+    setStatus("Wine removed.");
   };
 
   const effectivePairingDishId =
@@ -377,7 +482,7 @@ export default function AdminPage() {
 
       setApiResponse(payload);
       setApiStatus("ready");
-      setStatusText("API pairing completed.");
+      setStatus("API pairing completed.");
     } catch {
       setApiStatus("error");
       setApiResponse({ error: "API error. Check payload and try again." });
@@ -398,12 +503,12 @@ export default function AdminPage() {
   const importJson = () => {
     const ok = importDataset(importText);
     if (!ok) {
-      setStatusText("Import failed: invalid JSON format.");
+      setStatus("Import failed: invalid JSON format.");
       return;
     }
 
     setImportText("");
-    setStatusText("Dataset imported.");
+    setStatus("Dataset imported.");
     trackEvent("v2_admin_import_json", { chars: importText.length });
   };
 
@@ -413,7 +518,7 @@ export default function AdminPage() {
     }
 
     resetDataset();
-    setStatusText("Dataset reset to defaults.");
+    setStatus("Dataset reset to defaults.");
     trackEvent("v2_admin_reset_dataset", {});
   };
 
@@ -424,158 +529,220 @@ export default function AdminPage() {
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-20 sm:px-6 lg:px-8">
         <RestaurantContentManager />
 
-        <section className="glass-panel mt-6 rounded-2xl p-5 sm:p-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="mb-2 inline-flex rounded-full border border-primary/35 bg-primary/15 px-3 py-1 text-xs font-semibold tracking-wider text-primary uppercase">
-                New Style Admin
+        {/* ── Editorial header ────────────────────────────────────────── */}
+        <section
+          className="editorial-frame pitch-grain relative mt-6 overflow-hidden rounded-2xl border border-[rgba(197,160,89,0.18)] bg-[#150a0c]/85 p-6 sm:p-8"
+        >
+          <TendrilCorner side="right" />
+
+          <div className="relative z-10 flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <p className="pitch-eyebrow">Sandbox · Library</p>
+              <h1 className="pitch-display mt-3 text-4xl text-white sm:text-5xl">
+                Sommelier&rsquo;s <em className="italic text-[var(--color-accent-gold)]">Atelier</em>
+              </h1>
+              <div className="pitch-rule pitch-rule--short mt-4" />
+              <p className="mt-4 max-w-xl font-serif text-base italic leading-relaxed text-[#e6dccd]">
+                Globalna pracownia łączeń — dodawaj dania i wina, kuruj rekomendacje,
+                testuj odpowiedzi modelu API. Edycja konkretnej restauracji w bazie produkcyjnej:
               </p>
-              <h1 className="text-3xl font-bold text-white sm:text-4xl">V2 Admin Studio</h1>
-              <p className="mt-2 text-sm text-gray-300">
-                Sandbox biblioteki łączeń API. Dla edycji konkretnej restauracji w bazie produkcyjnej —
-                <Link
-                  href="/admin/restaurants"
-                  className="ml-1 font-semibold text-[var(--color-accent-gold)] underline-offset-2 hover:underline"
-                >
-                  per-restaurant editor &rarr;
-                </Link>
-              </p>
+              <Link
+                href="/admin/restaurants"
+                className="pitch-cta-ghost mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold tracking-wider uppercase"
+              >
+                Per-restaurant editor &rarr;
+              </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
-              <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2">
-                <p className="text-lg font-semibold text-white">{dataset.dishes.length}</p>
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Dishes</p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/70 px-4 py-3">
+                <p className="font-serif text-2xl italic text-[var(--color-accent-gold)]">
+                  {dataset.dishes.length}
+                </p>
+                <p className="mt-1 text-[10px] tracking-[0.2em] text-gray-400 uppercase">Dishes</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2">
-                <p className="text-lg font-semibold text-white">{dataset.wines.length}</p>
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Wines</p>
+              <div className="rounded-xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/70 px-4 py-3">
+                <p className="font-serif text-2xl italic text-[var(--color-accent-gold)]">
+                  {dataset.wines.length}
+                </p>
+                <p className="mt-1 text-[10px] tracking-[0.2em] text-gray-400 uppercase">Wines</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 col-span-2 sm:col-span-1">
-                <p className="text-lg font-semibold text-white">/api/pairing</p>
-                <p className="text-[10px] tracking-wider text-gray-400 uppercase">Endpoint</p>
+              <div className="rounded-xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/70 px-4 py-3">
+                <p className="font-serif text-2xl italic text-[var(--color-accent-gold)]">
+                  {dataset.pairings.length}
+                </p>
+                <p className="mt-1 text-[10px] tracking-[0.2em] text-gray-400 uppercase">Pairings</p>
               </div>
             </div>
           </div>
 
-          {statusText ? (
-            <p className="mt-4 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2 text-sm text-primary">
-              {statusText}
-            </p>
-          ) : null}
-
-          <div className="mt-4 flex flex-wrap gap-2">
+          {/* Toolbar — cream pill row */}
+          <div className="relative z-10 mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={exportJson}
-              className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold"
+              className="rounded-full border border-[rgba(197,160,89,0.35)] bg-[#1a0f12] px-4 py-2 text-xs font-semibold tracking-wider text-[#f4ede0] uppercase transition hover:bg-[#1f1316]"
             >
               Export JSON
             </button>
             <button
               type="button"
               onClick={importJson}
-              className="rounded-lg border border-primary/40 bg-primary/15 px-3 py-2 text-xs font-semibold text-primary"
+              className="rounded-full border border-[rgba(197,160,89,0.55)] bg-[var(--color-accent-gold)]/15 px-4 py-2 text-xs font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/25"
             >
               Import JSON
             </button>
             <button
               type="button"
               onClick={resetAll}
-              className="rounded-lg border border-rose-500/30 bg-rose-900/20 px-3 py-2 text-xs font-semibold text-rose-300"
+              className="rounded-full border border-rose-500/30 bg-rose-900/20 px-4 py-2 text-xs font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
             >
               Reset to Seed
             </button>
+
+            {statusText ? (
+              <span key={statusKey} className="ml-auto">
+                <SavedPill text={statusText} />
+              </span>
+            ) : null}
           </div>
 
           <textarea
-            className="mt-3 min-h-28 w-full rounded-xl border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
+            className="field-refined relative z-10 mt-4 min-h-28 w-full"
             placeholder='Paste JSON like { "dishes": [...], "wines": [...] }'
             value={importText}
             onChange={(event) => setImportText(event.target.value)}
           />
         </section>
 
-        <div className="sticky top-20 z-30 mt-6 flex gap-2 border-b border-white/10 bg-background-dark pb-3 xl:hidden">
+        {/* ── Mobile notebook tabs ────────────────────────────────────── */}
+        <div className="notebook-tabs sticky top-20 z-30 mt-6 flex gap-0 bg-background-dark pb-3 xl:hidden">
           <button
             type="button"
             onClick={() => setMobileTab("dishes")}
-            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition ${
-              mobileTab === "dishes"
-                ? "bg-primary text-white"
-                : "border border-white/10 bg-surface-dark text-gray-300"
-            }`}
+            className={`notebook-tab flex-1 ${mobileTab === "dishes" ? "notebook-tab--active" : ""}`}
           >
             Dishes ({dataset.dishes.length})
           </button>
           <button
             type="button"
             onClick={() => setMobileTab("wines")}
-            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition ${
-              mobileTab === "wines"
-                ? "bg-primary text-white"
-                : "border border-white/10 bg-surface-dark text-gray-300"
-            }`}
+            className={`notebook-tab flex-1 ${mobileTab === "wines" ? "notebook-tab--active" : ""}`}
           >
             Wines ({dataset.wines.length})
           </button>
         </div>
 
+        {/* ── Twin panels: Dishes | Wines ─────────────────────────────── */}
         <section className="mt-4 grid grid-cols-1 gap-6 xl:mt-6 xl:grid-cols-2">
-          <article className={`min-w-0 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5 ${mobileTab !== "dishes" ? "hidden xl:block" : ""}`}>
-            <h2 className="text-xl font-semibold text-white">Dishes</h2>
-            <p className="mt-1 text-xs text-gray-400">Add menu items used by pairing AI.</p>
-
-            <div className="mt-4 grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3">
-              <input
-                className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Dish name"
-                value={dishForm.name}
-                onChange={(event) => setDishForm({ ...dishForm, name: event.target.value })}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  type="number"
-                  min={1}
-                  placeholder="Price"
-                  value={dishForm.price}
-                  onChange={(event) => setDishForm({ ...dishForm, price: event.target.value })}
-                />
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  placeholder="Tags (comma separated)"
-                  value={dishForm.tags}
-                  onChange={(event) => setDishForm({ ...dishForm, tags: event.target.value })}
-                />
+          {/* ───────── Dishes panel ───────── */}
+          <article
+            className={`surface-parchment editorial-frame relative min-w-0 rounded-2xl p-5 sm:p-6 ${
+              mobileTab !== "dishes" ? "hidden xl:block" : ""
+            }`}
+          >
+            <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.18)] pb-3">
+              <div>
+                <p className="pitch-eyebrow">Tasting Log · I</p>
+                <h2 className="pitch-display mt-1 text-2xl text-white">Dishes</h2>
               </div>
-              <input
-                className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Image URL"
-                value={dishForm.image}
-                onChange={(event) => setDishForm({ ...dishForm, image: event.target.value })}
-              />
-              <textarea
-                className="min-h-16 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Dish description"
-                value={dishForm.description}
-                onChange={(event) => setDishForm({ ...dishForm, description: event.target.value })}
-              />
-              <button
-                type="button"
-                onClick={addDish}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
-              >
-                Add Dish
-              </button>
+              <p className="font-serif text-xs italic text-[#c5a059]/80">
+                {dataset.dishes.length} entries
+              </p>
+            </header>
+
+            {/* New entry */}
+            <div className="rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0f12]/55 p-4">
+              <p className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)] uppercase">
+                ❦ New entry
+              </p>
+              <div className="mt-3 grid gap-3">
+                <div>
+                  <label className="field-label">Name</label>
+                  <input
+                    className="field-refined w-full"
+                    placeholder="Dish name"
+                    value={dishForm.name}
+                    onChange={(event) => setDishForm({ ...dishForm, name: event.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="field-label">Price</label>
+                    <input
+                      className="field-refined w-full"
+                      type="number"
+                      min={1}
+                      placeholder="Price"
+                      value={dishForm.price}
+                      onChange={(event) => setDishForm({ ...dishForm, price: event.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="field-label">Tags</label>
+                    <input
+                      className="field-refined w-full"
+                      placeholder="Tags (comma separated)"
+                      value={dishForm.tags}
+                      onChange={(event) => setDishForm({ ...dishForm, tags: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="field-label">Image URL</label>
+                  <input
+                    className="field-refined w-full"
+                    placeholder="Image URL"
+                    value={dishForm.image}
+                    onChange={(event) => setDishForm({ ...dishForm, image: event.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="field-label">Description</label>
+                  <textarea
+                    className="field-refined min-h-16 w-full"
+                    placeholder="Dish description"
+                    value={dishForm.description}
+                    onChange={(event) => setDishForm({ ...dishForm, description: event.target.value })}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={addDish}
+                  className="pitch-cta-primary mt-1 inline-flex items-center justify-center rounded-full px-5 py-2.5 text-xs font-semibold tracking-wider uppercase"
+                >
+                  + Add Dish
+                </button>
+              </div>
             </div>
 
-            <div className="mt-4 space-y-3 max-h-[560px] overflow-auto pr-1">
-              {dataset.dishes.map((dish) => (
-                <div key={dish.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+            {/* Existing entries */}
+            <div className="mt-5 space-y-4 max-h-[640px] overflow-auto pr-1">
+              {dataset.dishes.map((dish, idx) => (
+                <div
+                  key={dish.id}
+                  className="rounded-xl border border-[rgba(197,160,89,0.14)] bg-[#1a0f12]/40 p-4 transition hover:border-[rgba(197,160,89,0.30)]"
+                >
+                  <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.12)] pb-2">
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-serif text-sm italic text-[var(--color-accent-gold)]">
+                        {toRoman(idx + 1)}.
+                      </span>
+                      <span className="font-serif text-base italic text-[#f4ede0]">
+                        {t(dish.name, locale) || "Untitled"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeDish(dish.id)}
+                      className="rounded-full border border-rose-500/30 bg-rose-900/15 px-3 py-1 text-[10px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
+                    >
+                      Delete
+                    </button>
+                  </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       placeholder="EN name"
                       value={dish.name.en}
                       onChange={(event) =>
@@ -583,7 +750,7 @@ export default function AdminPage() {
                       }
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       placeholder="PL nazwa"
                       value={dish.name.pl}
                       onChange={(event) =>
@@ -593,7 +760,7 @@ export default function AdminPage() {
                   </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       type="number"
                       min={1}
                       value={dish.price}
@@ -602,19 +769,19 @@ export default function AdminPage() {
                       }
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={toTagInput(dish.tags)}
                       onChange={(event) => updateDish(dish.id, { tags: parseTags(event.target.value) })}
                     />
                   </div>
                   <input
-                    className="mb-2 w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                    className="field-refined mb-2 w-full"
                     value={dish.image}
                     onChange={(event) => updateDish(dish.id, { image: event.target.value })}
                   />
                   <div className="mb-1 grid gap-2 sm:grid-cols-2">
                     <textarea
-                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined min-h-14 w-full min-w-0"
                       placeholder="EN description"
                       value={dish.description.en}
                       onChange={(event) =>
@@ -624,7 +791,7 @@ export default function AdminPage() {
                       }
                     />
                     <textarea
-                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined min-h-14 w-full min-w-0"
                       placeholder="PL opis"
                       value={dish.description.pl}
                       onChange={(event) =>
@@ -634,176 +801,255 @@ export default function AdminPage() {
                       }
                     />
                   </div>
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => removeDish(dish.id)}
-                      className="rounded-lg border border-rose-500/30 bg-rose-900/20 px-3 py-1.5 text-xs font-semibold text-rose-300"
-                    >
-                      Delete
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
           </article>
 
-          <article className={`min-w-0 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5 ${mobileTab !== "wines" ? "hidden xl:block" : ""}`}>
-            <h2 className="text-xl font-semibold text-white">Wines</h2>
-            <p className="mt-1 text-xs text-gray-400">Manage cellar options for AI scoring.</p>
+          {/* ───────── Wines panel ───────── */}
+          <article
+            className={`surface-parchment editorial-frame relative min-w-0 rounded-2xl p-5 sm:p-6 ${
+              mobileTab !== "wines" ? "hidden xl:block" : ""
+            }`}
+          >
+            <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.18)] pb-3">
+              <div>
+                <p className="pitch-eyebrow">Cellar Log · II</p>
+                <h2 className="pitch-display mt-1 text-2xl text-white">Wines</h2>
+              </div>
+              <p className="font-serif text-xs italic text-[#c5a059]/80">
+                {dataset.wines.length} entries
+              </p>
+            </header>
 
-            <div className="mt-4 grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3">
-              <input
-                className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Wine name"
-                value={wineForm.name}
-                onChange={(event) => setWineForm({ ...wineForm, name: event.target.value })}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  placeholder="Region"
-                  value={wineForm.region}
-                  onChange={(event) => setWineForm({ ...wineForm, region: event.target.value })}
-                />
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  type="number"
-                  min={1900}
-                  max={2100}
-                  placeholder="Year"
-                  value={wineForm.year}
-                  onChange={(event) => setWineForm({ ...wineForm, year: event.target.value })}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  type="number"
-                  min={1}
-                  placeholder="Price"
-                  value={wineForm.price}
-                  onChange={(event) => setWineForm({ ...wineForm, price: event.target.value })}
-                />
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  type="number"
-                  min={1}
-                  max={5}
-                  step={0.1}
-                  placeholder="Rating"
-                  value={wineForm.rating}
-                  onChange={(event) => setWineForm({ ...wineForm, rating: event.target.value })}
-                />
-              </div>
-              <input
-                className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Image URL"
-                value={wineForm.image}
-                onChange={(event) => setWineForm({ ...wineForm, image: event.target.value })}
-              />
-              <input
-                className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Tags (comma separated)"
-                value={wineForm.tags}
-                onChange={(event) => setWineForm({ ...wineForm, tags: event.target.value })}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  placeholder="Grape"
-                  value={wineForm.grape}
-                  onChange={(event) => setWineForm({ ...wineForm, grape: event.target.value })}
-                />
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  type="number"
-                  step={0.1}
-                  min={5}
-                  max={20}
-                  placeholder="ABV %"
-                  value={wineForm.abv}
-                  onChange={(event) => setWineForm({ ...wineForm, abv: event.target.value })}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <select
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  value={wineForm.body}
-                  onChange={(event) =>
-                    setWineForm({ ...wineForm, body: event.target.value as WineBody })
-                  }
+            {/* New entry */}
+            <div className="rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0f12]/55 p-4">
+              <p className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)] uppercase">
+                ❦ New entry
+              </p>
+              <div className="mt-3 grid gap-3">
+                <div>
+                  <label className="field-label">Name</label>
+                  <input
+                    className="field-refined w-full"
+                    placeholder="Wine name"
+                    value={wineForm.name}
+                    onChange={(event) => setWineForm({ ...wineForm, name: event.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="field-label">Region</label>
+                    <input
+                      className="field-refined w-full"
+                      placeholder="Region"
+                      value={wineForm.region}
+                      onChange={(event) => setWineForm({ ...wineForm, region: event.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="field-label">Year</label>
+                    <input
+                      className="field-refined w-full"
+                      type="number"
+                      min={1900}
+                      max={2100}
+                      placeholder="Year"
+                      value={wineForm.year}
+                      onChange={(event) => setWineForm({ ...wineForm, year: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="field-label">Price</label>
+                    <input
+                      className="field-refined w-full"
+                      type="number"
+                      min={1}
+                      placeholder="Price"
+                      value={wineForm.price}
+                      onChange={(event) => setWineForm({ ...wineForm, price: event.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="field-label">Rating</label>
+                    <input
+                      className="field-refined w-full"
+                      type="number"
+                      min={1}
+                      max={5}
+                      step={0.1}
+                      placeholder="Rating"
+                      value={wineForm.rating}
+                      onChange={(event) => setWineForm({ ...wineForm, rating: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="field-label">Image URL</label>
+                  <input
+                    className="field-refined w-full"
+                    placeholder="Image URL"
+                    value={wineForm.image}
+                    onChange={(event) => setWineForm({ ...wineForm, image: event.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="field-label">Tags</label>
+                  <input
+                    className="field-refined w-full"
+                    placeholder="Tags (comma separated)"
+                    value={wineForm.tags}
+                    onChange={(event) => setWineForm({ ...wineForm, tags: event.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="field-label">Grape</label>
+                    <input
+                      className="field-refined w-full"
+                      placeholder="Grape"
+                      value={wineForm.grape}
+                      onChange={(event) => setWineForm({ ...wineForm, grape: event.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="field-label">ABV %</label>
+                    <input
+                      className="field-refined w-full"
+                      type="number"
+                      step={0.1}
+                      min={5}
+                      max={20}
+                      placeholder="ABV %"
+                      value={wineForm.abv}
+                      onChange={(event) => setWineForm({ ...wineForm, abv: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="field-label">Body</label>
+                    <select
+                      className="field-refined w-full"
+                      value={wineForm.body}
+                      onChange={(event) =>
+                        setWineForm({ ...wineForm, body: event.target.value as WineBody })
+                      }
+                    >
+                      {bodyOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="field-label">Acidity</label>
+                    <select
+                      className="field-refined w-full"
+                      value={wineForm.acidity}
+                      onChange={(event) =>
+                        setWineForm({ ...wineForm, acidity: event.target.value as WineAcidity })
+                      }
+                    >
+                      {acidityOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="field-label">Tannin</label>
+                    <select
+                      className="field-refined w-full"
+                      value={wineForm.tannin}
+                      onChange={(event) =>
+                        setWineForm({ ...wineForm, tannin: event.target.value as WineTannin })
+                      }
+                    >
+                      {tanninOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="field-label">Serving °C</label>
+                    <input
+                      className="field-refined w-full"
+                      placeholder="Serving temp C (e.g. 8-10)"
+                      value={wineForm.servingTempC}
+                      onChange={(event) =>
+                        setWineForm({ ...wineForm, servingTempC: event.target.value })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="field-label">Decant</label>
+                    <input
+                      className="field-refined w-full"
+                      placeholder="Decant notes"
+                      value={wineForm.decant}
+                      onChange={(event) => setWineForm({ ...wineForm, decant: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="field-label">Description</label>
+                  <textarea
+                    className="field-refined min-h-16 w-full"
+                    placeholder="Wine description"
+                    value={wineForm.description}
+                    onChange={(event) => setWineForm({ ...wineForm, description: event.target.value })}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={addWine}
+                  className="pitch-cta-primary mt-1 inline-flex items-center justify-center rounded-full px-5 py-2.5 text-xs font-semibold tracking-wider uppercase"
                 >
-                  {bodyOptions.map((option) => (
-                    <option key={option} value={option}>
-                      Body: {option}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  value={wineForm.acidity}
-                  onChange={(event) =>
-                    setWineForm({ ...wineForm, acidity: event.target.value as WineAcidity })
-                  }
-                >
-                  {acidityOptions.map((option) => (
-                    <option key={option} value={option}>
-                      Acidity: {option}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  value={wineForm.tannin}
-                  onChange={(event) =>
-                    setWineForm({ ...wineForm, tannin: event.target.value as WineTannin })
-                  }
-                >
-                  {tanninOptions.map((option) => (
-                    <option key={option} value={option}>
-                      Tannin: {option}
-                    </option>
-                  ))}
-                </select>
+                  + Add Wine
+                </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  placeholder="Serving temp C (e.g. 8-10)"
-                  value={wineForm.servingTempC}
-                  onChange={(event) =>
-                    setWineForm({ ...wineForm, servingTempC: event.target.value })
-                  }
-                />
-                <input
-                  className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                  placeholder="Decant notes"
-                  value={wineForm.decant}
-                  onChange={(event) => setWineForm({ ...wineForm, decant: event.target.value })}
-                />
-              </div>
-              <textarea
-                className="min-h-16 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Wine description"
-                value={wineForm.description}
-                onChange={(event) => setWineForm({ ...wineForm, description: event.target.value })}
-              />
-              <button
-                type="button"
-                onClick={addWine}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
-              >
-                Add Wine
-              </button>
             </div>
 
-            <div className="mt-4 space-y-3 max-h-[560px] overflow-auto pr-1">
-              {dataset.wines.map((wine) => (
-                <div key={wine.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+            {/* Existing entries */}
+            <div className="mt-5 space-y-4 max-h-[640px] overflow-auto pr-1">
+              {dataset.wines.map((wine, idx) => (
+                <div
+                  key={wine.id}
+                  className="rounded-xl border border-[rgba(197,160,89,0.14)] bg-[#1a0f12]/40 p-4 transition hover:border-[rgba(197,160,89,0.30)]"
+                >
+                  <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.12)] pb-2">
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-serif text-sm italic text-[var(--color-accent-gold)]">
+                        {toRoman(idx + 1)}.
+                      </span>
+                      <span className="font-serif text-base italic text-[#f4ede0]">
+                        {t(wine.name, locale) || "Untitled"}
+                      </span>
+                      <span className="font-serif text-[10px] italic tracking-wider text-[#c5a059]/70 uppercase">
+                        {wine.region} · {wine.year}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeWine(wine.id)}
+                      className="rounded-full border border-rose-500/30 bg-rose-900/15 px-3 py-1 text-[10px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
+                    >
+                      Delete
+                    </button>
+                  </div>
+
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       placeholder="EN name"
                       value={wine.name.en}
                       onChange={(event) =>
@@ -811,7 +1057,7 @@ export default function AdminPage() {
                       }
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       placeholder="PL nazwa"
                       value={wine.name.pl}
                       onChange={(event) =>
@@ -821,12 +1067,12 @@ export default function AdminPage() {
                   </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.region}
                       onChange={(event) => updateWine(wine.id, { region: event.target.value })}
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       type="number"
                       min={1900}
                       max={2100}
@@ -836,14 +1082,14 @@ export default function AdminPage() {
                   </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       type="number"
                       min={1}
                       value={wine.price}
                       onChange={(event) => updateWine(wine.id, { price: Math.max(1, Number(event.target.value) || 1) })}
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       type="number"
                       min={1}
                       max={5}
@@ -855,18 +1101,18 @@ export default function AdminPage() {
                     />
                   </div>
                   <input
-                    className="mb-2 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                    className="field-refined mb-2 w-full min-w-0"
                     value={wine.image}
                     onChange={(event) => updateWine(wine.id, { image: event.target.value })}
                   />
                   <input
-                    className="mb-2 w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                    className="field-refined mb-2 w-full"
                     value={toTagInput(wine.tags)}
                     onChange={(event) => updateWine(wine.id, { tags: parseTags(event.target.value) })}
                   />
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.passport.grape}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -875,7 +1121,7 @@ export default function AdminPage() {
                       }
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       type="number"
                       min={5}
                       max={20}
@@ -893,7 +1139,7 @@ export default function AdminPage() {
                   </div>
                   <div className="mb-2 grid grid-cols-3 gap-2">
                     <select
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.passport.body}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -908,7 +1154,7 @@ export default function AdminPage() {
                       ))}
                     </select>
                     <select
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.passport.acidity}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -923,7 +1169,7 @@ export default function AdminPage() {
                       ))}
                     </select>
                     <select
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.passport.tannin}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -940,7 +1186,7 @@ export default function AdminPage() {
                   </div>
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.passport.servingTempC}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -952,7 +1198,7 @@ export default function AdminPage() {
                       }
                     />
                     <input
-                      className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined w-full"
                       value={wine.passport.decant}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -963,7 +1209,7 @@ export default function AdminPage() {
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
                     <textarea
-                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined min-h-14 w-full min-w-0"
                       placeholder="EN description"
                       value={wine.description.en}
                       onChange={(event) =>
@@ -973,7 +1219,7 @@ export default function AdminPage() {
                       }
                     />
                     <textarea
-                      className="min-h-14 w-full min-w-0 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                      className="field-refined min-h-14 w-full min-w-0"
                       placeholder="PL opis"
                       value={wine.description.pl}
                       onChange={(event) =>
@@ -983,41 +1229,134 @@ export default function AdminPage() {
                       }
                     />
                   </div>
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => removeWine(wine.id)}
-                      className="rounded-lg border border-rose-500/30 bg-rose-900/20 px-3 py-1.5 text-xs font-semibold text-rose-300"
-                    >
-                      Delete
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
           </article>
         </section>
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        {/* ── Sommelier Notes (Curated Pairings) ──────────────────────── */}
+        <section className="surface-parchment editorial-frame relative mt-6 overflow-hidden rounded-2xl p-5 sm:p-7">
+          <TendrilCorner side="left" />
+          <header className="relative z-10 mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(197,160,89,0.18)] pb-3">
             <div>
-              <h2 className="text-xl font-semibold text-white">API Playground</h2>
-              <p className="mt-1 text-xs text-gray-400">Run `/api/pairing` with custom payload from current dataset.</p>
+              <p className="pitch-eyebrow">Sommelier&rsquo;s Notes · III</p>
+              <h2 className="pitch-display mt-1 text-3xl text-white">{tx("curatedPairings.title")}</h2>
+              <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]/85">
+                {tx("curatedPairings.subtitle")}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="field-label">Dish</span>
+              <select
+                className="field-refined min-w-[14rem]"
+                value={effectivePairingDishId}
+                onChange={(event) => setPairingDishId(event.target.value)}
+              >
+                {dataset.dishes.map((dish) => (
+                  <option key={dish.id} value={dish.id}>
+                    {t(dish.name, locale)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </header>
+
+          {dataset.dishes.length === 0 ? (
+            <p className="rounded-xl border border-[rgba(197,160,89,0.18)] bg-[#1a0f12]/55 p-3 text-sm italic text-[#e6dccd]">
+              {tx("curatedPairings.noDishes")}
+            </p>
+          ) : (
+            <div className="relative z-10 grid gap-3 md:grid-cols-2">
+              {dataset.wines.map((wine) => {
+                const curated = pairingsByWineId.get(wine.id);
+                const selected = Boolean(curated);
+                return (
+                  <div
+                    key={wine.id}
+                    className={`rounded-xl border p-3 transition ${
+                      selected
+                        ? "border-[rgba(197,160,89,0.55)] bg-[var(--color-accent-gold)]/10"
+                        : "border-[rgba(197,160,89,0.16)] bg-[#1a0f12]/40 hover:border-[rgba(197,160,89,0.30)]"
+                    }`}
+                  >
+                    <label className="flex cursor-pointer items-center gap-3 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => togglePairing(wine.id)}
+                        className="h-4 w-4 cursor-pointer accent-[var(--color-accent-gold)]"
+                      />
+                      <span
+                        className={`font-serif italic ${
+                          selected ? "text-[#f4ede0]" : "text-[#e6dccd]/85"
+                        }`}
+                      >
+                        {t(wine.name, locale)}
+                      </span>
+                      <span className="ml-auto font-serif text-[10px] italic tracking-[0.18em] text-[#c5a059]/70 uppercase">
+                        {wine.region}
+                      </span>
+                    </label>
+                    {selected && curated ? (
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <textarea
+                          className="field-refined min-h-20 w-full"
+                          placeholder={tx("curatedPairings.reasonEnPlaceholder")}
+                          value={curated.reason.en}
+                          onChange={(event) =>
+                            updatePairingReason(wine.id, "en", event.target.value)
+                          }
+                        />
+                        <textarea
+                          className="field-refined min-h-20 w-full"
+                          placeholder={tx("curatedPairings.reasonPlPlaceholder")}
+                          value={curated.reason.pl}
+                          onChange={(event) =>
+                            updatePairingReason(wine.id, "pl", event.target.value)
+                          }
+                        />
+                      </div>
+                    ) : (
+                      <p className="mt-2 font-serif text-xs italic text-[#c5a059]/60">
+                        {tx("curatedPairings.notCurated")}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* ── API Playground (terminal-styled, de-emphasized) ─────────── */}
+        <section className="mt-8 rounded-2xl border border-[rgba(197,160,89,0.14)] bg-[#0a0506] p-5 sm:p-6">
+          <header className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(197,160,89,0.14)] pb-3">
+            <div>
+              <p className="pitch-eyebrow">Workshop · IV</p>
+              <h2 className="font-mono text-base text-[var(--color-accent-gold)]">
+                <span className="text-gray-500">$</span> /api/pairing
+              </h2>
+              <p className="mt-1 font-mono text-[11px] text-gray-500">
+                Run live pairing API with current dataset payload.
+              </p>
             </div>
             <button
               type="button"
               onClick={runApiPairing}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
+              className="rounded-md border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-4 py-2 font-mono text-xs font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20"
             >
-              {apiStatus === "loading" ? "Running..." : "Run /api/pairing"}
+              {apiStatus === "loading" ? "▸ running…" : "▸ execute"}
             </button>
-          </div>
+          </header>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)]">
-            <article className="min-w-0 rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="mb-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">Dish</p>
+            <article className="terminal-block min-w-0">
+              <p className="font-mono text-[10px] tracking-wider text-gray-500 uppercase">
+                <span className="prompt">›</span> dish
+              </p>
               <select
-                className="w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
+                className="mt-2 w-full rounded border border-[rgba(197,160,89,0.18)] bg-[#0d0809] px-3 py-2 font-mono text-xs text-[#d4cabc]"
                 value={effectiveDishId}
                 onChange={(event) => setApiDishId(event.target.value)}
               >
@@ -1029,13 +1368,18 @@ export default function AdminPage() {
               </select>
             </article>
 
-            <article className="min-w-0 rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="mb-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">Wines</p>
-              <div className="max-h-44 space-y-2 overflow-auto pr-1">
+            <article className="terminal-block min-w-0">
+              <p className="font-mono text-[10px] tracking-wider text-gray-500 uppercase">
+                <span className="prompt">›</span> wines[ ]
+              </p>
+              <div className="mt-2 max-h-44 space-y-1.5 overflow-auto pr-1">
                 {dataset.wines.map((wine) => {
                   const checked = effectiveWineIds.includes(wine.id);
                   return (
-                    <label key={wine.id} className="flex cursor-pointer items-center gap-2 text-sm text-gray-200">
+                    <label
+                      key={wine.id}
+                      className="flex cursor-pointer items-center gap-2 font-mono text-xs text-[#d4cabc]"
+                    >
                       <input
                         type="checkbox"
                         checked={checked}
@@ -1046,6 +1390,7 @@ export default function AdminPage() {
                               : [...current, wine.id],
                           );
                         }}
+                        className="accent-[var(--color-accent-gold)]"
                       />
                       <span>{t(wine.name, locale)}</span>
                     </label>
@@ -1054,30 +1399,40 @@ export default function AdminPage() {
               </div>
             </article>
 
-            <article className="min-w-0 rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="mb-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">Result</p>
-              {apiResponse?.matches?.length ? (
-                <div className="space-y-2">
-                  {apiResponse.matches.map((item) => {
+            <article className="terminal-block min-w-0">
+              <p className="font-mono text-[10px] tracking-wider text-gray-500 uppercase">
+                <span className="prompt">›</span> response
+              </p>
+              <div className="mt-2 space-y-2">
+                {apiResponse?.matches?.length ? (
+                  apiResponse.matches.map((item) => {
                     const wineMatch = dataset.wines.find((wine) => wine.id === item.wineId);
                     const wineName = wineMatch ? t(wineMatch.name, locale) : item.wineId;
                     return (
-                      <div key={item.wineId} className="rounded-lg border border-primary/20 bg-primary/10 p-2">
-                        <p className="text-sm font-semibold text-white">{wineName} • {item.score}%</p>
-                        <p className="text-xs text-gray-300">{item.reason}</p>
+                      <div
+                        key={item.wineId}
+                        className="rounded border border-[var(--color-accent-gold)]/25 bg-[var(--color-accent-gold)]/5 p-2"
+                      >
+                        <p className="font-mono text-xs text-[#f4ede0]">
+                          <span className="num">{item.score}%</span>{" "}
+                          <span className="str">{wineName}</span>
+                        </p>
+                        <p className="mt-1 font-mono text-[11px] text-gray-400">{item.reason}</p>
                       </div>
                     );
-                  })}
-                </div>
-              ) : apiResponse?.error ? (
-                <p className="rounded-lg border border-rose-500/30 bg-rose-900/20 p-2 text-sm text-rose-300">
-                  {apiResponse.error}
-                </p>
-              ) : (
-                <p className="text-sm text-gray-400">Run API to see pairing response.</p>
-              )}
+                  })
+                ) : apiResponse?.error ? (
+                  <p className="rounded border border-rose-500/30 bg-rose-900/10 p-2 font-mono text-xs text-rose-300">
+                    ✗ {apiResponse.error}
+                  </p>
+                ) : (
+                  <p className="font-mono text-xs text-gray-500">
+                    {apiStatus === "loading" ? "// awaiting response…" : "// idle"}
+                  </p>
+                )}
+              </div>
 
-              <pre className="mt-3 max-h-40 w-full max-w-full overflow-auto whitespace-pre-wrap break-all rounded-lg border border-white/10 bg-[#140c0f] p-2 text-xs text-gray-300">
+              <pre className="mt-3 max-h-40 w-full max-w-full overflow-auto whitespace-pre-wrap break-all rounded border border-[rgba(197,160,89,0.10)] bg-[#0d0809] p-2 font-mono text-[10px] text-gray-500">
                 {JSON.stringify(
                   {
                     dish: selectedDish,
@@ -1090,83 +1445,6 @@ export default function AdminPage() {
               </pre>
             </article>
           </div>
-        </section>
-
-        <section className="mt-6 rounded-2xl border border-white/10 bg-surface-dark/80 p-4 sm:p-5">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-white">{tx("curatedPairings.title")}</h2>
-              <p className="mt-1 text-xs text-gray-400">{tx("curatedPairings.subtitle")}</p>
-            </div>
-            <select
-              className="rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
-              value={effectivePairingDishId}
-              onChange={(event) => setPairingDishId(event.target.value)}
-            >
-              {dataset.dishes.map((dish) => (
-                <option key={dish.id} value={dish.id}>
-                  {t(dish.name, locale)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {dataset.dishes.length === 0 ? (
-            <p className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-gray-400">
-              {tx("curatedPairings.noDishes")}
-            </p>
-          ) : (
-            <div className="grid gap-3 md:grid-cols-2">
-              {dataset.wines.map((wine) => {
-                const curated = pairingsByWineId.get(wine.id);
-                const selected = Boolean(curated);
-                return (
-                  <div
-                    key={wine.id}
-                    className={`rounded-xl border p-3 ${
-                      selected
-                        ? "border-primary/45 bg-primary/12"
-                        : "border-white/10 bg-black/20"
-                    }`}
-                  >
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-white">
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => togglePairing(wine.id)}
-                      />
-                      <span>{t(wine.name, locale)}</span>
-                      <span className="ml-auto text-[10px] tracking-wider text-gray-400 uppercase">
-                        {wine.region}
-                      </span>
-                    </label>
-                    {selected && curated ? (
-                      <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                        <textarea
-                          className="min-h-20 w-full rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
-                          placeholder={tx("curatedPairings.reasonEnPlaceholder")}
-                          value={curated.reason.en}
-                          onChange={(event) =>
-                            updatePairingReason(wine.id, "en", event.target.value)
-                          }
-                        />
-                        <textarea
-                          className="min-h-20 w-full rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
-                          placeholder={tx("curatedPairings.reasonPlPlaceholder")}
-                          value={curated.reason.pl}
-                          onChange={(event) =>
-                            updatePairingReason(wine.id, "pl", event.target.value)
-                          }
-                        />
-                      </div>
-                    ) : (
-                      <p className="mt-2 text-xs text-gray-500">{tx("curatedPairings.notCurated")}</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </section>
       </main>
 
