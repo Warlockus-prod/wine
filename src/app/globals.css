@@ -175,6 +175,60 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 :root[data-theme="light"] .material-icons,
 :root[data-theme="light"] .material-symbols-outlined { color: inherit; }
 
+/* ── Hardcoded dark hex colors used in /admin and /pitch ─────────────
+   Many cards and panels were authored before semantic vars existed and
+   inline arbitrary Tailwind colors like bg-[#1a0f12]/40 . Rather than
+   touch every JSX site, we re-tint these in light mode here. The hex
+   selectors are escaped so Tailwind v4's generated class names match. */
+
+/* Deep-wine surfaces → parchment surface */
+:root[data-theme="light"] [class*="bg-[#150a0c]"],
+:root[data-theme="light"] [class*="bg-[#1a0f12]"],
+:root[data-theme="light"] [class*="bg-[#190f12]"],
+:root[data-theme="light"] [class*="bg-[#170d0f]"],
+:root[data-theme="light"] [class*="bg-[#170d10]"],
+:root[data-theme="light"] [class*="bg-[#1a0e10]"],
+:root[data-theme="light"] [class*="bg-[#140a0c]"],
+:root[data-theme="light"] [class*="bg-[#1c1014]"],
+:root[data-theme="light"] [class*="bg-[#1d1113]"],
+:root[data-theme="light"] [class*="bg-[#1d1114]"],
+:root[data-theme="light"] [class*="bg-[#1f1316]"],
+:root[data-theme="light"] [class*="bg-[#0f0709]"],
+:root[data-theme="light"] [class*="bg-[#100608]"],
+:root[data-theme="light"] [class*="bg-[#100709]"] {
+  background-color: var(--surface-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Deep-wine hover variants */
+:root[data-theme="light"] [class*="hover:bg-[#1c1014]"]:hover,
+:root[data-theme="light"] [class*="hover:bg-[#1f1316]"]:hover {
+  background-color: var(--surface-deep) !important;
+}
+
+/* Cream inks-on-dark → wine ink-on-cream */
+:root[data-theme="light"] [class*="text-[#f4ede0]"],
+:root[data-theme="light"] [class*="text-[#e6dccd]"],
+:root[data-theme="light"] [class*="text-[#e6d3c0]"],
+:root[data-theme="light"] [class*="text-[#cbc1b1]"],
+:root[data-theme="light"] [class*="text-[#d4cabc]"] {
+  color: var(--ink) !important;
+}
+/* Pink-cream tag color (rose-on-dark) — restate as wine red on light */
+:root[data-theme="light"] [class*="text-[#f4c1c8]"] {
+  color: var(--color-primary-dark) !important;
+}
+
+/* Terminal block keeps its own dark surface even in light mode — DON'T
+   override children that live INSIDE .terminal-block */
+:root[data-theme="light"] .terminal-block [class*="bg-[#0d0809]"],
+:root[data-theme="light"] .terminal-block [class*="bg-[#0a0506]"],
+:root[data-theme="light"] .terminal-block [class*="text-[#d4cabc]"] {
+  background-color: revert !important;
+  color: revert !important;
+}
+
+
 /* Theme toggle's own rotation: keep crisp, no color transition flicker */
 .theme-toggle { transition: transform 220ms ease, background-color 220ms ease, border-color 220ms ease; }
 
@@ -326,6 +380,12 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.77, 0 0 0 0 0.62, 0 0 0 0 0.34, 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   background-size: 160px 160px;
 }
+/* In light mode the overlay-blend grain reads dirty — switch to multiply
+   so the cream paper gets a subtle texture, not a haze. */
+:root[data-theme="light"] .pitch-grain::before {
+  mix-blend-mode: multiply;
+  opacity: 0.08;
+}
 
 .pitch-eyebrow {
   font-family: var(--font-serif);
@@ -469,8 +529,8 @@ body {
   align-items: center;
   gap: 0.6rem;
   padding: 0.95rem 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #f4ede0;
+  border: 1px solid var(--hairline-strong);
+  color: var(--ink);
   font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: 0.08em;
