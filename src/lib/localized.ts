@@ -59,3 +59,43 @@ export const isLocalizedString = (value: unknown): value is LocalizedString =>
       typeof (value as Record<string, unknown>).en === "string" &&
       typeof (value as Record<string, unknown>).pl === "string",
   );
+
+/**
+ * Server-stored "decant" strings on wines are plain English strings (legacy
+ * shape — pre-i18n). Until we promote them to LocalizedString in DB, this
+ * shim translates the small set of common patterns so PL UI doesn't leak EN.
+ *
+ * Patterns: "No decant. Open X minutes before service.", "Decant N minutes
+ * before service.", "Optional N-minute decant.", "Serve chilled in ...".
+ */
+export const localizeDecant = (text: string | undefined | null, locale: Locale): string => {
+  if (!text) return "";
+  if (locale !== "pl") return text;
+
+  let s = text;
+  // Order matters — most specific first.
+  s = s.replace(
+    /No decant\.\s*Serve chilled in white[- ]wine stem\.?/i,
+    "Bez dekantowania. Podawaj schłodzone w kieliszku do białego wina.",
+  );
+  s = s.replace(
+    /No decant\.\s*Serve fresh from the cellar\.?/i,
+    "Bez dekantowania. Podawaj prosto z piwnicy.",
+  );
+  s = s.replace(
+    /No decant\.\s*Open (\d+) minutes? before service\.?/i,
+    "Bez dekantowania. Otwórz $1 minut przed podaniem.",
+  );
+  s = s.replace(
+    /No decant\.\s*Open just before service\.?/i,
+    "Bez dekantowania. Otwórz tuż przed podaniem.",
+  );
+  s = s.replace(
+    /Decant (\d+) minutes? before service\.?/i,
+    "Dekantuj $1 minut przed podaniem.",
+  );
+  s = s.replace(/Decant (\d+) minutes?\.?/i, "Dekantuj $1 minut.");
+  s = s.replace(/Optional (\d+)[- ]minute decant\.?/i, "Opcjonalne dekantowanie $1 minut.");
+  s = s.replace(/^No decant\.?$/i, "Bez dekantowania.");
+  return s;
+};

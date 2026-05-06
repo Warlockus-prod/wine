@@ -6,7 +6,6 @@ import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 import {
-  COMPASS_SECTORS,
   BASE_TASTES,
   METHOD_STEPS,
   FAQ_ITEMS,
@@ -22,9 +21,12 @@ const TasteCompass = dynamic(() => import("@/components/winocompas/TasteCompass"
   ),
 });
 
-const TasteChat = dynamic(() => import("@/components/winocompas/TasteChat"), {
+const CompassExplorer = dynamic(() => import("@/components/winocompas/CompassExplorer"), {
   ssr: false,
-  loading: () => <div className="h-[420px] animate-pulse rounded-2xl bg-white/5" />,
+});
+
+const FloatingTasteChat = dynamic(() => import("@/components/winocompas/FloatingTasteChat"), {
+  ssr: false,
 });
 
 export default function SamouczekPage() {
@@ -118,7 +120,32 @@ export default function SamouczekPage() {
             </div>
 
             <div id="chat" className="scroll-mt-24">
-              <TasteChat profile={profile} />
+              {/* Inline mini-explainer + invite to use the floating bot. */}
+              <div className="rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#150a0c] p-5">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-bold tracking-[0.22em] text-primary uppercase">
+                      Przewodnik Vinokompasu
+                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-[#cbc1b1]">
+                      Bot jest stale dostępny — kliknij okrągłą ikonę w prawym dolnym rogu ekranu w każdej chwili (działa nawet podczas przewijania).
+                    </p>
+                    <p className="mt-3 font-serif text-sm italic text-[var(--color-accent-gold)]">
+                      Zapytaj np.: &bdquo;Co to cierpkość?&rdquo;, &bdquo;Jakie wino dla kogoś kto lubi tytoń?&rdquo;, &bdquo;Co znaczy moja kombinacja?&rdquo;
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Three-level explorer — wrażenia → tendencje → skojarzenia */}
+              <div className="mt-6">
+                <CompassExplorer />
+              </div>
             </div>
           </div>
 
@@ -177,62 +204,14 @@ export default function SamouczekPage() {
 
         <Ornament />
 
-        {/* ───────── 6 WRAŻEŃ — DETAILED CHAPTERS ───────── */}
-        <section aria-labelledby="wrazenia-title" className="scroll-mt-24">
-          <header className="mb-10 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">III.</span>
-            <div>
-              <h2 id="wrazenia-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
-                Sześć wrażeń
-              </h2>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#cbc1b1]">
-                Każde wino można opisać używając kilku z nich. Każde wrażenie ma 2 tendencje — to cała filozofia.
-              </p>
-            </div>
-          </header>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {COMPASS_SECTORS.map((sector) => (
-              <article
-                key={sector.id}
-                className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#150a0c] p-5 transition-colors hover:border-white/24"
-                style={{
-                  background: `radial-gradient(circle at 100% 0%, ${sector.color}26, transparent 60%), #150a0c`,
-                }}
-              >
-                <span
-                  className="absolute right-4 top-4 inline-block h-3 w-3 rounded-full"
-                  style={{ background: sector.color }}
-                  aria-hidden
-                />
-                <p className="pitch-roman text-[0.72rem]">{sector.noun_pl}</p>
-                <h3 className="pitch-display mt-2 text-2xl text-white">{sector.name_pl}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-[#cbc1b1]">{sector.short_pl}</p>
-
-                <div className="mt-4 space-y-3 border-t border-white/8 pt-4">
-                  {sector.tendencje.map((t, ti) => (
-                    <div key={t.id}>
-                      <p className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{ color: sector.color }}>
-                        {ti + 1}) {t.name_pl}
-                      </p>
-                      <p className="mt-1 text-xs leading-relaxed text-[#cbc1b1]">
-                        {t.associations_pl}
-                      </p>
-                      <p className="mt-1 text-[11px] italic text-gray-500">{t.found_in_pl}</p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <Ornament />
+        {/* III. has been replaced by the inline <CompassExplorer> attached
+            to the compass interactive — saves a visit-and-scroll round-trip
+            and removes a redundant wall of static cards. */}
 
         {/* ───────── FAQ ───────── */}
         <section aria-labelledby="faq-title" className="scroll-mt-24">
           <header className="mb-10 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">IV.</span>
+            <span className="pitch-roman">III.</span>
             <div>
               <h2 id="faq-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
                 Pytania i odpowiedzi
@@ -311,6 +290,11 @@ export default function SamouczekPage() {
       </main>
 
       <MobileTabBar />
+
+      {/* Floating persistent chat — visible across page scroll. Default
+          open=false so first scroll isn't blocked; saved state restored
+          via localStorage on next visit. */}
+      <FloatingTasteChat profile={profile} />
     </div>
   );
 }

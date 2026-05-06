@@ -40,9 +40,14 @@ export default function Navigation() {
     <>
       <nav className="glass-nav fixed top-0 z-50 w-full border-b border-white/10">
         <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
-              <span className="material-icons text-sm">wine_bar</span>
+          <Link
+            href="/"
+            className="-ml-2 flex h-12 items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-white/5"
+            onClick={() => setMobileOpen(false)}
+            aria-label="Vinovigator AI — strona główna"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded bg-primary text-white">
+              <span className="material-icons text-base">wine_bar</span>
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
               Vinovigator<span className="text-primary"> AI</span>

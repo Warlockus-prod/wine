@@ -8,7 +8,7 @@ import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
-import { t } from "@/lib/localized";
+import { t, localizeDecant } from "@/lib/localized";
 import {
   applyRestaurantPairingOverrides,
   buildPairingDatasetFromRestaurant,
@@ -494,7 +494,7 @@ export default function PairingPage() {
     <div className="mobile-safe-bottom flex min-h-screen flex-col overflow-hidden bg-background-dark text-gray-200 selection:bg-primary selection:text-white">
       <Navigation />
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-24 pb-8 sm:px-6 lg:px-8">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-x-hidden px-4 pt-24 pb-8 sm:px-6 lg:px-8">
         <header className="mb-6 rounded-[28px] border border-white/10 bg-black/15 px-4 py-5 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-sm sm:px-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -541,8 +541,8 @@ export default function PairingPage() {
           </div>
         </header>
 
-        <div className="grid flex-1 gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <section className="rounded-[30px] border border-white/10 bg-black/15 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5">
+        <div className="grid min-w-0 flex-1 gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <section className="min-w-0 rounded-[30px] border border-white/10 bg-black/15 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5">
             <div className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
                 <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
@@ -638,7 +638,7 @@ export default function PairingPage() {
 
           <section
             ref={wineListRef}
-            className="rounded-[30px] border border-white/10 bg-[#120a0ccc] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5"
+            className="min-w-0 rounded-[30px] border border-white/10 bg-[#120a0ccc] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5"
           >
             <div className="mb-4 border-b border-white/8 pb-4">
               <div className="flex flex-wrap items-end justify-between gap-3">
@@ -941,7 +941,7 @@ export default function PairingPage() {
                     <p className="text-sm leading-6 text-gray-100">
                       {tx("botServiceNote", {
                         temp: selectedWine.passport.servingTempC,
-                        decant: selectedWine.passport.decant,
+                        decant: localizeDecant(selectedWine.passport.decant, locale),
                       })}
                     </p>
                   </div>
@@ -992,7 +992,7 @@ export default function PairingPage() {
 
                 <div className="mt-3 rounded-xl border border-white/10 bg-black/25 p-3">
                   <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.decant")}</p>
-                  <p className="mt-1 text-sm text-gray-100">{selectedWine.passport.decant}</p>
+                  <p className="mt-1 text-sm text-gray-100">{localizeDecant(selectedWine.passport.decant, locale)}</p>
                 </div>
               </article>
             </div>
