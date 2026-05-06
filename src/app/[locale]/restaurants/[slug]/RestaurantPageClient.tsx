@@ -247,6 +247,19 @@ export default function RestaurantPageClient({
         </section>
       </main>
 
+      {/* Sticky mobile-only CTA — guest's primary action is "Otwórz Pairing".
+          Hidden on lg+ where the inline buttons are already a one-thumb reach. */}
+      <Link
+        href={`/pairing?restaurant=${restaurant.slug}`}
+        className="fixed right-4 bottom-20 z-40 inline-flex h-12 items-center gap-2 rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark px-5 text-sm font-bold text-white shadow-[0_18px_36px_rgba(209,21,52,0.45)] transition-transform hover:scale-[1.02] active:scale-95 lg:hidden"
+        aria-label={tx("openPairing")}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 2L7 11h10l-5-9zM3 13l4 9 5-9 5 9 4-9H3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+        </svg>
+        {tx("openPairing")}
+      </Link>
+
       <MobileTabBar />
     </div>
   );

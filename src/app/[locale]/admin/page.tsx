@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import RestaurantContentManager from "@/components/admin/RestaurantContentManager";
@@ -431,7 +432,13 @@ export default function AdminPage() {
               </p>
               <h1 className="text-3xl font-bold text-white sm:text-4xl">V2 Admin Studio</h1>
               <p className="mt-2 text-sm text-gray-300">
-                Manage pairing API data: add/edit dishes and wines, then run live API checks.
+                Sandbox biblioteki łączeń API. Dla edycji konkretnej restauracji w bazie produkcyjnej —
+                <Link
+                  href="/admin/restaurants"
+                  className="ml-1 font-semibold text-[var(--color-accent-gold)] underline-offset-2 hover:underline"
+                >
+                  per-restaurant editor &rarr;
+                </Link>
               </p>
             </div>
 
