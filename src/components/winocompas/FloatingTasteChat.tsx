@@ -20,7 +20,7 @@
  * yank the panel away from a user mid-conversation.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TasteChat from "./TasteChat";
 import type { CompassProfile } from "./TasteCompass";
 
@@ -68,6 +68,23 @@ export default function FloatingTasteChat({
       return v;
     });
   };
+
+  // Listen for global "open chat" requests fired from <InteractiveCompass>
+  // ("Zapytaj przewodnika" CTA). Skipped while disabled. MUST sit before
+  // any early returns to satisfy the rules-of-hooks ordering.
+  useEffect(() => {
+    if (disabled || typeof window === "undefined") return;
+    const onOpen = () => {
+      try {
+        window.localStorage.setItem(STATE_KEY, "1");
+      } catch {
+        /* ignore */
+      }
+      setOpen(true);
+    };
+    window.addEventListener("wn:open-chat", onOpen);
+    return () => window.removeEventListener("wn:open-chat", onOpen);
+  }, [disabled]);
 
   if (!hydrated) {
     // SSR placeholder — render nothing to avoid layout shift on hydration.

@@ -30,12 +30,23 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { Link } from "@/i18n/navigation";
 import { COMPASS_SECTORS, BASE_TASTES } from "@/data/wine-compass-kb";
 import type {
   CompassProfile,
   Intensity as IntensityLevel,
 } from "./TasteCompass";
+
+// Heavy SVG dial — only mount when the user toggles "Kompas" mode.
+const InteractiveCompass = dynamic(() => import("./InteractiveCompass"), {
+  ssr: false,
+  loading: () => (
+    <div className="aspect-square w-full max-w-[440px] animate-pulse rounded-full bg-white/5" />
+  ),
+});
+
+type ViewMode = "cards" | "compass";
 
 type Stage = 1 | 2 | 3;
 
@@ -635,6 +646,48 @@ function DrynessArrow({ score, label }: { score: number; label: string }) {
   );
 }
 
+// ─── view-mode toggle (Karty | Kompas) ───────────────────────────────────
+function ViewToggle({
+  value,
+  onChange,
+}: {
+  value: ViewMode;
+  onChange: (next: ViewMode) => void;
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Tryb widoku"
+      className="inline-flex items-center gap-1 rounded-full border border-[rgba(197,160,89,0.30)] bg-[#1a0f12]/70 p-1"
+    >
+      {(
+        [
+          { v: "cards", label: "Karty" },
+          { v: "compass", label: "Kompas" },
+        ] as const
+      ).map((opt) => {
+        const active = opt.v === value;
+        return (
+          <button
+            key={opt.v}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onChange(opt.v)}
+            className={`rounded-full px-3 py-1 text-[10px] font-bold tracking-wider uppercase transition ${
+              active
+                ? "bg-[var(--color-accent-gold)] text-[#150a0c]"
+                : "text-[#e6dccd]/75 hover:text-[#f4ede0]"
+            }`}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── stage 2: WRAŻENIA ───────────────────────────────────────────────────
 function Stage2({
   profile,
@@ -643,18 +696,28 @@ function Stage2({
   profile: CompassProfile;
   onProfileChange: (next: CompassProfile) => void;
 }) {
+  const [view, setView] = useState<ViewMode>("cards");
+
   return (
     <div>
-      <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Wrażenia</p>
-        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
-          Sześć wrażeń
-        </h2>
-        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Kliknij intensywność dla każdego wrażenia. To poziom „smak na języku” — nie martw się detalami, kierunek wystarczy.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Wrażenia</p>
+          <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+            Sześć wrażeń
+          </h2>
+          <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
+            Kliknij intensywność dla każdego wrażenia. Możesz przełączyć na pełny Vinokompas i zobaczyć opis każdej tendencji.
+          </p>
+        </div>
+        <ViewToggle value={view} onChange={setView} />
       </header>
 
+      {view === "compass" ? (
+        <div className="mt-6">
+          <InteractiveCompass profile={profile} onProfileChange={onProfileChange} />
+        </div>
+      ) : (
       <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {COMPASS_SECTORS.map((s) => {
           const v = sectorAverage(profile, s.id);
@@ -697,6 +760,7 @@ function Stage2({
           );
         })}
       </ul>
+      )}
     </div>
   );
 }
@@ -709,18 +773,31 @@ function Stage3({
   profile: CompassProfile;
   onProfileChange: (next: CompassProfile) => void;
 }) {
+  // Stage 3 defaults to the compass — that IS the canonical view of all 12
+  // tendencje and matches the original Vinokompas pedagogy. Cards still
+  // available for users who prefer them.
+  const [view, setView] = useState<ViewMode>("compass");
+
   return (
     <div>
-      <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap III · Tendencje</p>
-        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
-          Dwanaście tendencji
-        </h2>
-        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Tryb dla zaawansowanych — każde wrażenie ma dwie tendencje. Tutaj precyzyjnie wskazujesz, czego szukasz w winie.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="pitch-eyebrow pitch-eyebrow--start">Etap III · Tendencje</p>
+          <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+            Dwanaście tendencji
+          </h2>
+          <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
+            Tryb dla zaawansowanych — każde wrażenie ma dwie tendencje. Włącz auto-przewodnika, aby przeszedł przez każdą z 12 po kolei.
+          </p>
+        </div>
+        <ViewToggle value={view} onChange={setView} />
       </header>
 
+      {view === "compass" ? (
+        <div className="mt-6">
+          <InteractiveCompass profile={profile} onProfileChange={onProfileChange} />
+        </div>
+      ) : (
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         {COMPASS_SECTORS.map((s) => (
           <div
@@ -771,6 +848,7 @@ function Stage3({
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

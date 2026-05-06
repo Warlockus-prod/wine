@@ -96,6 +96,14 @@ interface Props {
   showLabels?: boolean;
   /** Diameter override; defaults to 100% of container. */
   size?: number;
+  /** Bubble hover changes to the parent (for side info-panels / tours). */
+  onHoverChange?: (tendencjaId: string | null) => void;
+  /** Force a tendencja to look "hovered" — overrides internal hover. Used
+   *  by <InteractiveCompass> to pulse a spoke during the auto-tour. */
+  externalHighlightId?: string | null;
+  /** Hide the bottom legend (tag chips) — useful when wrapper provides its
+   *  own info side-panel. */
+  hideLegend?: boolean;
 }
 
 export default function TasteCompass({
@@ -104,6 +112,9 @@ export default function TasteCompass({
   onChange,
   showLabels = true,
   size,
+  onHoverChange,
+  externalHighlightId,
+  hideLegend = false,
 }: Props) {
   const isControlled = profileProp !== undefined;
   const [internal, setInternal] = useState<CompassProfile>(() => defaultProfile ?? {});
@@ -148,6 +159,19 @@ export default function TasteCompass({
 
   const [hovered, setHovered] = useState<string | null>(null);
   const focusedRef = useRef<string | null>(null);
+
+  // Effective highlight: prefer the parent-controlled externalHighlightId
+  // (used for guided tour) over the internal mouse-driven hover.
+  const effectiveHover = externalHighlightId ?? hovered;
+
+  // Bubble internal hover changes upward so a side-panel can react.
+  const reportHover = useCallback(
+    (id: string | null) => {
+      setHovered(id);
+      onHoverChange?.(id);
+    },
+    [onHoverChange],
+  );
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<SVGElement>, spoke: SpokeMeta) => {
@@ -284,21 +308,48 @@ export default function TasteCompass({
           return <g key={`fillg-${s.tendencja.id}`}>{slices}</g>;
         })}
 
-        {/* Hover preview ring */}
-        {hovered &&
+        {/* Hover preview ring (also drives guided-tour highlight via
+            externalHighlightId — see effectiveHover) */}
+        {effectiveHover &&
           (() => {
-            const s = spokes.find((sp) => sp.tendencja.id === hovered);
+            const s = spokes.find((sp) => sp.tendencja.id === effectiveHover);
             if (!s) return null;
             const r1 = rInner + ringStep * s.intensity;
             const r2 = rInner + ringStep * (s.intensity + 1);
-            if (s.intensity >= MAX_INTENSITY) return null;
+            // For tour highlight on a fully-empty spoke we still want to
+            // show SOMETHING. Draw the next ring (or the full first ring
+            // if intensity is 0) at higher opacity.
+            if (s.intensity >= MAX_INTENSITY) {
+              // Outline the full filled spoke with a soft glow ring.
+              return (
+                <path
+                  d={annularPath(cx, cy, rInner, rOuter, s.start + 0.005, s.end - 0.005)}
+                  fill="none"
+                  stroke={s.sector.color}
+                  strokeOpacity={0.85}
+                  strokeWidth={1.4}
+                  pointerEvents="none"
+                />
+              );
+            }
+            const isTourHighlight =
+              externalHighlightId === s.tendencja.id;
             return (
               <path
                 d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
                 fill={s.sector.color}
-                fillOpacity={0.18}
+                fillOpacity={isTourHighlight ? 0.32 : 0.18}
                 pointerEvents="none"
-              />
+              >
+                {isTourHighlight ? (
+                  <animate
+                    attributeName="fill-opacity"
+                    values="0.18;0.45;0.18"
+                    dur="2s"
+                    repeatCount="indefinite"
+                  />
+                ) : null}
+              </path>
             );
           })()}
 
@@ -319,8 +370,10 @@ export default function TasteCompass({
               aria-valuenow={fit}
               aria-valuetext={`${fit} z ${MAX_INTENSITY}`}
               onClick={() => cycleIntensity(s.tendencja.id)}
-              onMouseEnter={() => setHovered(s.tendencja.id)}
-              onMouseLeave={() => setHovered((h) => (h === s.tendencja.id ? null : h))}
+              onMouseEnter={() => reportHover(s.tendencja.id)}
+              onMouseLeave={() =>
+                reportHover(hovered === s.tendencja.id ? null : hovered)
+              }
               onKeyDown={(e) => handleKey(e, s)}
               style={{ cursor: "pointer", outline: "none" }}
               className="taste-compass-touch"
@@ -442,8 +495,9 @@ export default function TasteCompass({
         })}
       </svg>
 
-      {/* Live legend — shows what's currently selected */}
-      <CompassLegend profile={profile} onClear={() => setProfile({})} />
+      {/* Live legend — shows what's currently selected.
+          Hidden when the wrapper provides its own info side-panel. */}
+      {hideLegend ? null : <CompassLegend profile={profile} onClear={() => setProfile({})} />}
     </div>
   );
 }
