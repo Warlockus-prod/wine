@@ -117,29 +117,54 @@ export default function FloatingTasteChat({
         </button>
       ) : null}
 
-      {/* Expanded panel — viewport-pinned */}
+      {/* Expanded panel — viewport-pinned. Mobile: half-screen so the page
+          underneath stays visible (≈55vh, capped). Desktop: 380×~700 docked
+          bottom-right. The drag-handle pill at the top is decorative — taps
+          the chat title hides the panel for parity with the X button. */}
       {open ? (
-        <div
-          className="fixed inset-x-3 bottom-3 z-40 flex max-h-[calc(100dvh-6rem)] flex-col sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[380px]"
-          role="dialog"
-          aria-label="Przewodnik Vinokompasu"
-        >
-          <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
-            <button
-              type="button"
-              onClick={() => toggle(false)}
-              aria-label="Schowaj przewodnika"
-              className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/55 text-gray-200 backdrop-blur transition hover:border-white/40 hover:text-white"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </button>
-            <div className="flex flex-1">
-              <TasteChat profile={profile} storageKey={storageKey} pageContext={pageContext} />
+        <>
+          {/* Mobile-only soft backdrop — not a hard scrim, just enough wash
+              so users see the chat is overlay rather than the page. */}
+          <button
+            type="button"
+            aria-label="Zamknij przewodnika"
+            onClick={() => toggle(false)}
+            className="fixed inset-0 z-30 bg-gradient-to-t from-black/45 via-black/20 to-transparent sm:hidden"
+            style={{ pointerEvents: "auto" }}
+          />
+          <div
+            className="fixed inset-x-2 bottom-2 z-40 flex max-h-[58dvh] flex-col sm:inset-x-auto sm:right-5 sm:bottom-5 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
+            role="dialog"
+            aria-label="Przewodnik Vinokompasu"
+          >
+            <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
+              {/* Drag-handle pill at the top edge — purely visual cue that
+                  this is a sheet you can dismiss. Taps the panel header to
+                  toggle (mobile only). */}
+              <button
+                type="button"
+                onClick={() => toggle(false)}
+                aria-label="Zwiń przewodnika"
+                className="absolute top-1.5 left-1/2 z-20 -translate-x-1/2 sm:hidden"
+              >
+                <span className="block h-1.5 w-12 rounded-full bg-white/35 transition hover:bg-white/55" />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggle(false)}
+                aria-label="Schowaj przewodnika"
+                className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/55 text-gray-200 backdrop-blur transition hover:border-white/40 hover:text-white"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+              <div className="flex flex-1">
+                <TasteChat profile={profile} storageKey={storageKey} pageContext={pageContext} />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       ) : null}
     </>
   );

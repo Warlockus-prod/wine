@@ -21,7 +21,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { COMPASS_SECTORS } from "@/data/wine-compass-kb";
+import { BASE_TASTES, COMPASS_SECTORS } from "@/data/wine-compass-kb";
 import type { CompassProfile } from "./TasteCompass";
 
 const TasteCompass = dynamic(() => import("./TasteCompass"), { ssr: false });
@@ -176,6 +176,15 @@ export default function InteractiveCompass({
             ? "Przewodnik prowadzi przez 12 tendencji"
             : "Najedź lub kliknij, aby ustawić intensywność"}
         </p>
+
+        {/* Selected-profile bar — animated chips appear as the user clicks
+            spokes. Replaces TasteCompass's default legend (we hideLegend
+            because this is more on-brand and uses sektor colour swatches). */}
+        <SelectedProfileBar
+          profile={profile}
+          onClear={() => onProfileChange({})}
+          onPickHover={setHovered}
+        />
       </div>
 
       {/* ── Side info panel ─────────────────────────────────────────── */}
@@ -339,6 +348,116 @@ function IdleCard({ onStartTour }: { onStartTour: () => void }) {
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+// ─── selected profile bar ────────────────────────────────────────────────
+// Sits under the compass; surfaces the user's accumulated picks as a chip
+// row. Mirrors what TasteCompass's old `<CompassLegend>` did but uses
+// editorial typography and includes base smaki (slodycz/cierpkosc/
+// kwasowosc) when set. Hovering a chip rebroadcasts hover to the compass
+// via the parent (so the spoke pulses).
+function SelectedProfileBar({
+  profile,
+  onClear,
+  onPickHover,
+}: {
+  profile: CompassProfile;
+  onClear: () => void;
+  onPickHover: (id: string | null) => void;
+}) {
+  const tendencjaPicks = COMPASS_SECTORS.flatMap((s) =>
+    s.tendencje
+      .map((t) => ({
+        id: t.id,
+        label: t.shortLabel_pl ?? t.name_pl,
+        color: s.color,
+        intensity: (profile[t.id] ?? 0) as number,
+      }))
+      .filter((p) => p.intensity > 0),
+  ).sort((a, b) => b.intensity - a.intensity);
+
+  const basePicks = BASE_TASTES.map((b) => ({
+    id: `base.${b.id}`,
+    label: b.name_pl,
+    intensity: (profile[`base.${b.id}`] ?? 0) as number,
+  })).filter((p) => p.intensity > 0);
+
+  const total = tendencjaPicks.length + basePicks.length;
+
+  if (total === 0) {
+    return (
+      <p className="mt-5 text-center font-serif text-xs italic text-[var(--color-accent-gold)] opacity-75">
+        Twój profil pojawi się tutaj — wskaż intensywność dotykiem koła.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-5 w-full max-w-[440px] rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#1a0f12]/55 p-3">
+      <div className="mb-2 flex items-baseline justify-between gap-2 px-1">
+        <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
+          Twój profil · {total}
+        </p>
+        <button
+          type="button"
+          onClick={onClear}
+          className="rounded-full border border-rose-500/30 bg-rose-900/20 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/35"
+        >
+          Wyzeruj
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        {tendencjaPicks.map((p) => (
+          <span
+            key={p.id}
+            onMouseEnter={() => onPickHover(p.id)}
+            onMouseLeave={() => onPickHover(null)}
+            className="profile-chip inline-flex items-center gap-1.5 rounded-full border bg-[#1a0e10]/70 px-2.5 py-1 text-[11px] text-[#f4ede0] transition hover:scale-105"
+            style={{ borderColor: `${p.color}66` }}
+          >
+            <span
+              aria-hidden
+              className="inline-block h-2 w-2 rounded-full"
+              style={{ background: p.color, boxShadow: `0 0 6px ${p.color}88` }}
+            />
+            <span className="font-serif italic">{p.label}</span>
+            <span className="ml-0.5 inline-flex gap-0.5" aria-hidden>
+              {[0, 1, 2, 3].map((i) => (
+                <span
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: i < p.intensity ? p.color : "rgba(197,160,89,0.18)" }}
+                />
+              ))}
+            </span>
+          </span>
+        ))}
+
+        {basePicks.length > 0 ? (
+          <span className="mx-1 h-3 w-px bg-[var(--color-accent-gold)]/35" aria-hidden />
+        ) : null}
+
+        {basePicks.map((p) => (
+          <span
+            key={p.id}
+            className="profile-chip inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-2.5 py-1 text-[11px] text-[var(--color-accent-gold)]"
+          >
+            <span className="font-serif italic">{p.label}</span>
+            <span className="ml-0.5 inline-flex gap-0.5" aria-hidden>
+              {[0, 1, 2, 3].map((i) => (
+                <span
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: i < p.intensity ? "var(--color-accent-gold)" : "rgba(197,160,89,0.20)" }}
+                />
+              ))}
+            </span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
