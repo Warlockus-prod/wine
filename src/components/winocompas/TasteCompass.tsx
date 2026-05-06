@@ -135,8 +135,11 @@ export default function TasteCompass({
     [profile, setIntensity],
   );
 
-  // Geometry
-  const VIEW = 400;
+  // Geometry — viewBox 440 gives 20px breathing room on each side so the
+  // outermost labels (text-anchor=start at the east point) never clip out
+  // of the parent container at 390px viewport. Compass disc itself stays
+  // visually unchanged — only the SVG canvas is wider.
+  const VIEW = 440;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;

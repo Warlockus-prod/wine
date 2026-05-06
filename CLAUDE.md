@@ -39,20 +39,29 @@ All routable pages live under `src/app/[locale]/`. English at root, Polish at `/
 
 - `/` (or `/pl`) — restaurant directory + Leaflet+OSM map + filters; hero has prominent **Samouczek smaku** gold CTA
 - `/restaurants/[slug]` — per-venue menu + QR (DB-backed via `/api/restaurants/[slug]`)
-- `/pairing?restaurant=<slug>` — bidirectional matching workspace: pick dish → wines re-rank, pick wine → menu re-ranks. Top-3 highlights, auto-select #1 of the other side. Chat panel has 4 bubbles: compare → curated/algo reason → **Vinokompas-vocab 2-sentence explanation** (gold-bordered, AI-generated via `/api/pairing/explain`) → service note.
-- `/samouczek` — interactive Vinokompas tutorial: SVG compass (6 sectors × 2 tendencje × 5 intensity rings, ARIA-correct), 3 base-smaki sliders, AI chat with KB-grounded system prompt.
+- `/pairing?restaurant=<slug>` — bidirectional matching workspace: pick dish → wines re-rank, pick wine → menu re-ranks. Top-3 highlights, auto-select #1 of the other side. Chat panel has 4 bubbles: compare → curated/algo reason → **Vinokompas-vocab 2-sentence explanation** (gold-bordered, AI-generated via `/api/pairing/explain`) → service note. Decant strings localized at render time (`localizeDecant`).
+- `/samouczek` — interactive Vinokompas tutorial: SVG compass (6 sectors × 2 tendencje × 5 intensity rings, ARIA-correct), 3 base-smaki sliders, **3-level CompassExplorer** (sektor → tendencja → skojarzenia) with progressive reveal, **FloatingTasteChat** docked bottom-right (persists across scroll, expand/collapse remembered in localStorage).
 - `/pitch` — editorial sales-pitch landing for restaurant owners.
-- `/admin` — content editor (UI still localStorage; DB serves all reads via API). Auth gate OFF via `AUTH_GATE_ADMIN=0`.
+- `/admin` — content editor (UI still localStorage; DB serves all reads via API; write API surface ready). Auth gate OFF via `AUTH_GATE_ADMIN=0`.
 - `/admin/signin` — magic-link login flow (waits on SMTP env vars to flip the gate).
 
 ## API routes
 - `GET /api/restaurants` + `/api/restaurants/[slug]` — DB-resolved with seed fallback (`src/lib/db-restaurants.ts`)
+- `GET/POST /api/restaurants/[slug]/dishes` + `PUT/DELETE /api/restaurants/[slug]/dishes/[id]` — write surface, zod-validated, ACL-gated
+- `GET/POST /api/restaurants/[slug]/wines` + `PUT/DELETE /api/restaurants/[slug]/wines/[id]` — same shape
+- `GET/POST/DELETE /api/restaurants/[slug]/pairings` — POST is upsert keyed on (restaurant, dish, wine); DELETE via `?dishId=&wineId=`
 - `POST /api/pairing` — algorithmic scoring (~14 rules)
 - `POST /api/pairing/explain` — Vinokompas 2-sentence reasoning (OpenAI)
 - `POST /api/chat` — Vinokompas guide bot (OpenAI, KB system prompt, gpt-5.x → `max_completion_tokens`)
 - `GET/POST /api/profiles` — guest taste-compass profile by anonymous_id
 - `POST /api/events` — analytics ingest (single or batch ≤50)
 - `/api/auth/[...nextauth]` — Auth.js handlers
+
+All write routes go through `src/lib/api-acl.ts`:
+ - `requireAuth()` returns the active user (or a synthetic `pilot` user when `AUTH_GATE_ADMIN=0`)
+ - `requireRestaurantMember(user, slug)` resolves the restaurant + checks `restaurant_members` (bypassed in pilot mode)
+ - `apiHandler(fn)` converts thrown `ApiError` into JSON+status uniformly
+Every write emits an `admin_*` event into the analytics table with the actor id.
 
 ## i18n notes
 
@@ -95,8 +104,9 @@ App binds `172.17.0.1:4300` only — public access is via the shared `nginx_serv
 
 ## Posture & caveats
 
-- **Production-grade backend now in place** — Postgres 16 + Drizzle migrations + Auth.js scaffold + analytics events. Use it; don't roll back to localStorage-only thinking.
-- **Admin UI still writes to localStorage** even though reads come from DB. Write API + admin refactor + multi-tenant ACL are open work items — see project memory `next steps`.
+- **Production-grade backend now in place** — Postgres 16 + Drizzle migrations + Auth.js scaffold + analytics events + complete write API (POST/PUT/DELETE for dishes/wines/pairings, all zod-validated, all ACL-gated). Use it; don't roll back to localStorage-only thinking.
+- **Admin UI still writes to localStorage** even though reads come from DB and the write API is fully ready. Refactoring the admin page to use `fetch('/api/restaurants/<slug>/dishes', {method: 'POST', body: ...})` instead of `setDataset` is the natural next pass — backend is waiting.
+- **Bootstrap your admin user** before flipping the auth gate: `ADMIN_EMAIL=ty@firma.pl npx tsx scripts/db-bootstrap-admin.mts` (run on VPS via docker exec). Then provision SMTP env (EMAIL_SERVER_*) and set `AUTH_GATE_ADMIN=1`. Without this two-step, flipping the gate is a lockout.
 - **Auth gate is currently OFF** (`AUTH_GATE_ADMIN=0`). Magic-link infra is wired and ready; flip to `1` AFTER provisioning SMTP env vars (EMAIL_SERVER_HOST/PORT/USER/PASSWORD/FROM). Until then `/admin/signin` does work but emits the magic link to `docker logs` instead of email.
 - **Seed wine photos and prices are placeholder-grade.** Source-back each label before any commercial pitch.
 - **PL seed translations are LLM first-pass.** Polish-speaking sommelier must vet wine vocabulary before commercial pitch.

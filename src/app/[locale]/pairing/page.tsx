@@ -533,7 +533,7 @@ export default function PairingPage() {
               <button
                 type="button"
                 onClick={scrollToWineList}
-                className="rounded-full border border-primary/40 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary uppercase lg:hidden"
+                className="inline-flex h-9 items-center rounded-full border border-primary/40 px-3.5 text-[11px] font-semibold tracking-wide text-primary uppercase lg:hidden"
               >
                 {tx("jumpToWines")}
               </button>
