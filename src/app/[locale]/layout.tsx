@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { PwaRegister } from "@/components/pwa-register";
+import { ThemeProvider } from "@/components/v2/ThemeProvider";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -59,7 +60,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} className="dark">
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -76,10 +77,12 @@ export default async function LocaleLayout({
       <body
         className={`${plusJakartaSans.variable} ${playfairDisplay.variable} antialiased`}
       >
-        <NextIntlClientProvider>
-          <PwaRegister />
-          {children}
-        </NextIntlClientProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider>
+            <PwaRegister />
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

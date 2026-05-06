@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import ThemeToggle from "./ThemeToggle";
 
 const PHONE_WIDTH = 390;
 const PHONE_HEIGHT = 844;
@@ -72,6 +73,9 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Theme switcher */}
+            <ThemeToggle className="hidden md:inline-flex" />
+
             {/* Language switcher */}
             <div className="hidden items-center gap-1 rounded-lg border border-white/15 bg-white/5 p-1 md:flex">
               {routing.locales.map((option) => (
@@ -131,7 +135,11 @@ export default function Navigation() {
           <aside
             role="dialog"
             aria-label="Mobile navigation"
-            className="absolute top-20 right-3 left-3 rounded-2xl border border-white/10 bg-[#1d1114] p-4 shadow-2xl"
+            className="absolute top-20 right-3 left-3 rounded-2xl border p-4 shadow-2xl"
+            style={{
+              background: "var(--surface-elevated)",
+              borderColor: "var(--hairline-strong)",
+            }}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="grid gap-2">
@@ -154,6 +162,26 @@ export default function Navigation() {
                   </Link>
                 );
               })}
+              <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+                <ThemeToggle withLabel />
+                <div className="flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 p-1">
+                  {routing.locales.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => switchLocale(option as Locale)}
+                      className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
+                        option === locale
+                          ? "bg-primary text-white"
+                          : "text-gray-300 hover:text-white"
+                      }`}
+                      aria-label={tx(option === "en" ? "english" : "polish")}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </aside>
         </div>

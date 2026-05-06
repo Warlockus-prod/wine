@@ -9,6 +9,68 @@
   --color-surface-light: #ffffff;
   --color-accent-gold: #c5a059;
   --color-surface-darker: #130a0b;
+
+  /* ── Semantic theme tokens (dark = default) ──────────────────────────
+     These are the "switchable" vars; flip by adding [data-theme="light"]
+     to <html>. Atoms that read from these auto-respond to theme. */
+  --surface: #1a0f11;             /* page bg base */
+  --surface-elevated: #2a1619;    /* cards, panels */
+  --surface-deep: #150a0c;        /* hero, ribbon body, parchment base */
+  --surface-input: #1a0e10;       /* form fields */
+  --surface-terminal: #0a0506;    /* API playground */
+  --ink: #f4ede0;                 /* primary text on dark */
+  --ink-strong: #ffffff;          /* bright headings on dark */
+  --ink-soft: #d6cdc0;            /* secondary text */
+  --ink-muted: #9c9080;           /* gray-400 equivalent */
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.16);
+  --paper-tint: rgba(244, 237, 224, 0.045);
+  --paper-tint-strong: rgba(244, 237, 224, 0.06);
+  --paper-glow: rgba(197, 160, 89, 0.08);
+  --gold-hairline: rgba(197, 160, 89, 0.22);
+  --gold-hairline-soft: rgba(197, 160, 89, 0.18);
+  --row-tint-odd: rgba(255, 255, 255, 0.012);
+  --row-tint-even: rgba(255, 255, 255, 0.022);
+  --row-tint-hover: rgba(197, 160, 89, 0.05);
+  --shadow-card: 0 12px 28px rgba(0, 0, 0, 0.42);
+  --bg-radials:
+    radial-gradient(circle at 12% 8%, rgba(209, 21, 52, 0.22), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(197, 160, 89, 0.16), transparent 28%),
+    linear-gradient(180deg, #1a0f11 0%, #130a0b 100%);
+  --nav-bg: rgba(24, 12, 14, 0.86);
+  --nav-border: rgba(255, 255, 255, 0.10);
+}
+
+/* ── Light theme overrides — parchment / cream editorial mode ─────────
+   Brand colors stay (wine red + gold) — only surfaces & inks invert.
+   Accessible contrast: ink #1a0f11 on paper #f4ede0 ≈ 14:1 (AAA). */
+:root[data-theme="light"] {
+  --surface: #f4ede0;
+  --surface-elevated: #fbf7ee;
+  --surface-deep: #ece2cd;
+  --surface-input: #fbf7ee;
+  --surface-terminal: #1f1518;       /* terminal stays dark — looks sharper */
+  --ink: #1a0f11;
+  --ink-strong: #0c0506;
+  --ink-soft: #4a3438;
+  --ink-muted: #7c6b66;
+  --hairline: rgba(26, 15, 17, 0.10);
+  --hairline-strong: rgba(26, 15, 17, 0.20);
+  --paper-tint: rgba(26, 15, 17, 0.025);
+  --paper-tint-strong: rgba(26, 15, 17, 0.045);
+  --paper-glow: rgba(197, 160, 89, 0.12);
+  --gold-hairline: rgba(168, 110, 30, 0.34);
+  --gold-hairline-soft: rgba(168, 110, 30, 0.22);
+  --row-tint-odd: rgba(26, 15, 17, 0.010);
+  --row-tint-even: rgba(26, 15, 17, 0.022);
+  --row-tint-hover: rgba(197, 160, 89, 0.10);
+  --shadow-card: 0 8px 22px rgba(80, 40, 20, 0.10);
+  --bg-radials:
+    radial-gradient(circle at 12% 8%, rgba(209, 21, 52, 0.10), transparent 38%),
+    radial-gradient(circle at 90% 10%, rgba(197, 160, 89, 0.18), transparent 32%),
+    linear-gradient(180deg, #f4ede0 0%, #efe6d3 100%);
+  --nav-bg: rgba(244, 237, 224, 0.86);
+  --nav-border: rgba(26, 15, 17, 0.10);
 }
 
 @theme inline {
@@ -25,9 +87,96 @@
      (token name collides with `dark` modifier) — `text-ink` works. */
   --color-ink: var(--color-background-dark);
 
+  /* Semantic Tailwind tokens — usable as `bg-surface`, `text-ink-soft`, etc.
+     They read the data-theme-aware vars above, so utilities auto-switch. */
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-deep: var(--surface-deep);
+  --color-paper: var(--surface);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+
   --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
   --font-serif: var(--font-playfair), "Playfair Display", serif;
 }
+
+/* Smooth theme transition — only fade colors/borders, not transforms */
+:root,
+:root * {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  :root * { transition: none; }
+}
+/* Don't bog down inputs the user is typing into */
+input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms ease; }
+
+/* ── Light-mode compatibility shims ───────────────────────────────────
+   Existing components use Tailwind utilities like `text-white`,
+   `text-gray-300`, `bg-background-dark`. Rather than touch every JSX
+   file, we re-color these in light mode via narrowly scoped overrides.
+   Premium chrome (`pitch-display`, `pitch-eyebrow`) keeps gold/red
+   accents and works on both surfaces. */
+:root[data-theme="light"] {
+  /* Body text/icons that were white-on-dark become ink-on-cream */
+}
+:root[data-theme="light"] body { color: var(--ink); }
+:root[data-theme="light"] .text-white,
+:root[data-theme="light"] [class*="text-white"]:not([class*="hover:text-white"]) {
+  color: var(--ink-strong) !important;
+}
+:root[data-theme="light"] .text-gray-100,
+:root[data-theme="light"] .text-gray-200 { color: var(--ink) !important; }
+:root[data-theme="light"] .text-gray-300,
+:root[data-theme="light"] .text-gray-400 { color: var(--ink-soft) !important; }
+:root[data-theme="light"] .text-gray-500 { color: var(--ink-muted) !important; }
+
+/* Surfaces */
+:root[data-theme="light"] .bg-background-dark { background-color: var(--surface) !important; }
+:root[data-theme="light"] .bg-surface-dark,
+:root[data-theme="light"] [class*="bg-surface-dark"] { background-color: var(--surface-elevated) !important; }
+:root[data-theme="light"] .bg-black\/20,
+:root[data-theme="light"] .bg-black\/22,
+:root[data-theme="light"] .bg-black\/55,
+:root[data-theme="light"] .bg-black\/85 { background-color: rgba(26, 15, 17, 0.06) !important; }
+
+/* Borders that were white-on-dark */
+:root[data-theme="light"] .border-white\/5,
+:root[data-theme="light"] .border-white\/8,
+:root[data-theme="light"] .border-white\/10,
+:root[data-theme="light"] .border-white\/12,
+:root[data-theme="light"] .border-white\/15,
+:root[data-theme="light"] .border-white\/20 { border-color: var(--hairline-strong) !important; }
+
+/* Glass panels white tints — turn ink-tinted */
+:root[data-theme="light"] .bg-white\/4,
+:root[data-theme="light"] .bg-white\/5,
+:root[data-theme="light"] .bg-white\/6,
+:root[data-theme="light"] .bg-white\/8,
+:root[data-theme="light"] .bg-white\/10,
+:root[data-theme="light"] .bg-white\/12 { background-color: rgba(26, 15, 17, 0.04) !important; }
+
+/* Inputs that hard-coded the dark surface */
+:root[data-theme="light"] input.bg-\[\#1a0f12\],
+:root[data-theme="light"] textarea.bg-\[\#1a0f12\],
+:root[data-theme="light"] select.bg-\[\#1a0f12\],
+:root[data-theme="light"] input.bg-\[\#190f12\],
+:root[data-theme="light"] textarea.bg-\[\#190f12\] {
+  background-color: var(--surface-input) !important;
+  color: var(--ink) !important;
+  border-color: var(--hairline-strong) !important;
+}
+
+/* Material Icons base color */
+:root[data-theme="light"] .material-icons,
+:root[data-theme="light"] .material-symbols-outlined { color: inherit; }
+
+/* Theme toggle's own rotation: keep crisp, no color transition flicker */
+.theme-toggle { transition: transform 220ms ease, background-color 220ms ease, border-color 220ms ease; }
 
 * {
   box-sizing: border-box;
@@ -46,11 +195,9 @@ html {
 
 body {
   font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
-  color: #f4f2f1;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(209, 21, 52, 0.22), transparent 35%),
-    radial-gradient(circle at 90% 10%, rgba(197, 160, 89, 0.16), transparent 28%),
-    linear-gradient(180deg, #1a0f11 0%, #130a0b 100%);
+  color: var(--ink);
+  background: var(--bg-radials);
+  background-attachment: fixed;
 }
 
 /* Wrap base resets in @layer base so Tailwind utilities (text-ink, text-primary,
@@ -82,16 +229,17 @@ body {
 
 @layer utilities {
   .glass-nav {
-    background: rgba(24, 12, 14, 0.86);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
 
   .glass-panel {
-    background: rgba(43, 24, 27, 0.72);
+    background: color-mix(in srgb, var(--surface-elevated) 78%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(209, 21, 52, 0.16);
+    border: 1px solid var(--gold-hairline-soft);
   }
 
   .text-gradient {
@@ -454,17 +602,20 @@ body {
 }
 
 /* Parchment surface — used on admin tasting log + restaurant menu rows.
-   Layered: subtle cream tint + paper grain (inherited from .pitch-grain). */
+   Layered: subtle cream tint + paper grain (inherited from .pitch-grain).
+   Reads from semantic vars so it adapts to light/dark theme. */
 .surface-parchment {
   background:
-    linear-gradient(180deg, rgba(244, 237, 224, 0.045), rgba(244, 237, 224, 0.02)),
-    radial-gradient(circle at 0% 0%, rgba(197, 160, 89, 0.08), transparent 40%),
-    #150a0c;
+    linear-gradient(180deg, var(--paper-tint), color-mix(in srgb, var(--paper-tint) 50%, transparent)),
+    radial-gradient(circle at 0% 0%, var(--paper-glow), transparent 40%),
+    var(--surface-deep);
+  color: var(--ink);
 }
 .surface-parchment-strong {
   background:
-    linear-gradient(180deg, rgba(244, 237, 224, 0.06), rgba(244, 237, 224, 0.03)),
-    #170d10;
+    linear-gradient(180deg, var(--paper-tint-strong), var(--paper-tint)),
+    var(--surface-deep);
+  color: var(--ink);
 }
 
 /* Hairline rule with two diamond ornaments */
@@ -493,14 +644,14 @@ body {
 .menu-row {
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--hairline);
   transition:
     background-color 320ms ease,
     transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.menu-row:nth-child(odd)  { background: rgba(255, 255, 255, 0.012); }
-.menu-row:nth-child(even) { background: rgba(255, 255, 255, 0.022); }
-.menu-row:hover { background: rgba(197, 160, 89, 0.05); }
+.menu-row:nth-child(odd)  { background: var(--row-tint-odd); }
+.menu-row:nth-child(even) { background: var(--row-tint-even); }
+.menu-row:hover { background: var(--row-tint-hover); }
 .menu-row:last-child { border-bottom: none; }
 
 .menu-row::after {
@@ -534,11 +685,12 @@ body {
 .ribbon-card {
   position: relative;
   background:
-    linear-gradient(180deg, rgba(244, 237, 224, 0.05), rgba(244, 237, 224, 0.02)),
-    #170d0f;
-  border: 1px solid rgba(197, 160, 89, 0.22);
+    linear-gradient(180deg, var(--paper-tint), color-mix(in srgb, var(--paper-tint) 50%, transparent)),
+    var(--surface-deep);
+  border: 1px solid var(--gold-hairline);
   padding: 1.2rem 1.4rem 1.4rem;
   border-radius: 14px;
+  color: var(--ink);
 }
 .ribbon-card::before {
   /* The "ribbon": gold notch top-left to evoke a bookmark */
@@ -578,7 +730,7 @@ body {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 0.92rem;
-  color: rgba(244, 237, 224, 0.65);
+  color: color-mix(in srgb, var(--ink) 65%, transparent);
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: color 200ms ease;
@@ -587,11 +739,11 @@ body {
   border-radius: 9px 9px 0 0;
   background: transparent;
 }
-.notebook-tab:hover { color: #f4ede0; }
+.notebook-tab:hover { color: var(--ink); }
 .notebook-tab--active {
   color: var(--color-accent-gold);
-  border-color: rgba(197, 160, 89, 0.32);
-  background: linear-gradient(180deg, rgba(197, 160, 89, 0.1), transparent);
+  border-color: var(--gold-hairline);
+  background: linear-gradient(180deg, var(--paper-glow), transparent);
 }
 .notebook-tab--active::after {
   content: "";
@@ -605,16 +757,19 @@ body {
 
 /* Refined input with gold focus ring — used in admin sandbox forms */
 .field-refined {
-  background: #1a0e10;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #f4ede0;
+  background: var(--surface-input);
+  border: 1px solid var(--hairline-strong);
+  color: var(--ink);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   font-size: 0.875rem;
-  transition: border-color 220ms ease, box-shadow 220ms ease;
+  transition: border-color 220ms ease, box-shadow 220ms ease, background-color 220ms ease, color 220ms ease;
   width: 100%;
 }
-.field-refined::placeholder { color: rgba(244, 237, 224, 0.35); font-style: italic; }
+.field-refined::placeholder {
+  color: color-mix(in srgb, var(--ink) 35%, transparent);
+  font-style: italic;
+}
 .field-refined:focus {
   outline: none;
   border-color: var(--color-accent-gold);
@@ -626,7 +781,7 @@ body {
   font-style: italic;
   font-size: 0.78rem;
   letter-spacing: 0.06em;
-  color: rgba(197, 160, 89, 0.85);
+  color: color-mix(in srgb, var(--color-accent-gold) 88%, var(--ink));
   margin-bottom: 0.35rem;
   display: block;
 }
@@ -661,10 +816,10 @@ body {
   animation: check-draw 0.6s 0.05s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-/* Terminal-y API playground */
+/* Terminal-y API playground — stays dark in both themes; reads better */
 .terminal-block {
-  background: #0a0506;
-  border: 1px solid rgba(197, 160, 89, 0.18);
+  background: var(--surface-terminal);
+  border: 1px solid var(--gold-hairline-soft);
   border-radius: 10px;
   padding: 1rem 1.1rem;
   font-family: ui-monospace, SFMono-Regular, "Menlo", monospace;
@@ -673,10 +828,15 @@ body {
   line-height: 1.55;
   overflow-x: auto;
 }
+.terminal-block,
+.terminal-block * { color: #d4cabc; }
 .terminal-block .prompt { color: var(--color-accent-gold); user-select: none; }
 .terminal-block .key    { color: #f4c1c8; }
 .terminal-block .str    { color: #b6e8c2; }
 .terminal-block .num    { color: #f4c84a; }
+.terminal-block select,
+.terminal-block input,
+.terminal-block pre { color: #d4cabc; background-color: #0d0809; border-color: rgba(197, 160, 89, 0.18); }
 
 /* Tendril decoration — inline SVG-ready container */
 .tendril-corner {
@@ -694,7 +854,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(197, 160, 89, 0.16);
+  border: 1px solid var(--gold-hairline-soft);
   border-radius: inherit;
   pointer-events: none;
 }
