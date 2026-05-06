@@ -29,6 +29,10 @@ interface Props {
   storageKey?: string;
   /** Default expanded state on first visit. */
   defaultOpen?: boolean;
+  /** When true, hide the floating launcher AND collapse any open panel.
+   *  Used by /samouczek's "Wyłącz czat" toggle so users who don't want a
+   *  guide are not nagged. */
+  disabled?: boolean;
 }
 
 const STATE_KEY = "wn_floating_chat_open_v1";
@@ -37,6 +41,7 @@ export default function FloatingTasteChat({
   profile,
   storageKey,
   defaultOpen = false,
+  disabled = false,
 }: Props) {
   // Lazy state init reads localStorage exactly once on mount — no render
   // thrash, no setState-in-effect lint, no SSR mismatch (this whole
@@ -68,6 +73,9 @@ export default function FloatingTasteChat({
     // SSR placeholder — render nothing to avoid layout shift on hydration.
     return null;
   }
+
+  // Disabled mode — hide everything. Don't even leave the launcher dot.
+  if (disabled) return null;
 
   return (
     <>
