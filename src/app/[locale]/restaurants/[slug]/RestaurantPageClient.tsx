@@ -240,10 +240,12 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
 
             <ul className="first-cap divide-y divide-white/5">
               {restaurant.dishes.map((dish) => {
-                const photo = getDishImage(
-                  { category: dish.category, name: t(dish.name, lng) },
-                  240,
-                );
+                const photo =
+                  dish.image ??
+                  getDishImage(
+                    { id: dish.id, category: dish.category, name: t(dish.name, lng) },
+                    240,
+                  );
                 const dishName = t(dish.name, lng);
                 const isActive = activeDishId === dish.id;
                 return (

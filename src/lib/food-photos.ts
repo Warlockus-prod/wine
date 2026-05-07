@@ -1,18 +1,19 @@
 /**
  * food-photos.ts — category-keyed Unsplash CDN URLs for dish + wine images.
  *
- * Why this exists: the seed catalogue (~50 dishes, ~40 wines) carries no
- * `image` field, so the app would otherwise render SVG placeholders only.
- * This module returns a stable, hand-picked Unsplash photo URL based on
- * the dish category (or wine style/grape) so the catalogue feels real
- * without bloating seed data with 100 individual URLs.
+ * Resolution order for getDishImage:
+ *   1. dish.image (explicit URL on the seed entry) — highest priority,
+ *      handled by the call site, not here.
+ *   2. DISH_IMAGE_MAP[dish.id] from src/data/dish-images.ts — populated
+ *      by scripts/gen-dish-images.mts after running DALL·E 3 generation.
+ *      This is what gives EVERY dish a unique generated photo.
+ *   3. Category-keyed Unsplash URL (this file's regex rules) — fallback.
+ *   4. DISH_FALLBACK — generic plated dish.
  *
- * URLs use Unsplash's CDN params (?w=...&q=80&auto=format) which compress
- * the image server-side. Photos are public-domain or Unsplash-licensed.
- *
- * If a dish/wine ever ships its own `image`, that wins — the helpers here
- * are a fallback path used by the rendering layer.
+ * Same shape for wines.
  */
+
+import { DISH_IMAGE_MAP } from "@/data/dish-images";
 
 const norm = (s?: string) => (s ?? "").toLowerCase().trim();
 
@@ -75,13 +76,16 @@ const buildUnsplashUrl = (id: string, w = 600) =>
   `https://images.unsplash.com/${id}?w=${w}&q=80&auto=format`;
 
 /**
- * Pick a dish image based on dish category + name. Returns a stable Unsplash
- * URL. The same input always returns the same URL — no randomness.
+ * Pick a dish image. Lookup order:
+ *   1. opts.id → DISH_IMAGE_MAP (the AI-generated photo, if present)
+ *   2. category/name regex rules → curated Unsplash CDN URL
+ *   3. DISH_FALLBACK (generic plated dish)
  */
 export function getDishImage(
-  opts: { category?: string; name?: string },
+  opts: { id?: string; category?: string; name?: string },
   size = 600,
 ): string {
+  if (opts.id && DISH_IMAGE_MAP[opts.id]) return DISH_IMAGE_MAP[opts.id];
   const haystack = `${norm(opts.category)} ${norm(opts.name)}`;
   for (const r of DISH_RULES) if (r.match.test(haystack)) return buildUnsplashUrl(r.src, size);
   return buildUnsplashUrl(DISH_FALLBACK, size);
@@ -99,9 +103,11 @@ const WINE_RULES: Rule[] = [
 const WINE_FALLBACK = "photo-1553361371-9b22f78e8b1d"; // generic red bottle
 
 export function getWineImage(
-  opts: { style?: string; grape?: string; name?: string; region?: string },
+  opts: { id?: string; style?: string; grape?: string; name?: string; region?: string },
   size = 600,
 ): string {
+  // (No AI-generated wine map yet — wines lean on Wikimedia for canonical
+  // bottle photos handled in restaurant-pairing-adapter.ts.)
   const haystack = `${norm(opts.style)} ${norm(opts.grape)} ${norm(opts.name)} ${norm(opts.region)}`;
   for (const r of WINE_RULES) if (r.match.test(haystack)) return buildUnsplashUrl(r.src, size);
   return buildUnsplashUrl(WINE_FALLBACK, size);

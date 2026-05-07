@@ -208,7 +208,7 @@ export const buildPairingDatasetFromRestaurant = (restaurant: Restaurant): Pairi
     description: dish.description,
     // Category-aware Unsplash photo — Italian dishes get pasta/pizza shots,
     // Japanese get sushi/ramen, etc. (vs. previous 4-shot indexed pool).
-    image: photoForDish({ category: dish.category, name: t(dish.name, "en") }),
+    image: dish.image ?? photoForDish({ id: dish.id, category: dish.category, name: t(dish.name, "en") }),
     tags: [dish.category, restaurant.cuisine].filter(Boolean),
   })),
   pairings: restaurant.dishes.flatMap<CuratedPairing>((dish) =>

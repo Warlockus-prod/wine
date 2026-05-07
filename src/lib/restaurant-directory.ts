@@ -73,16 +73,16 @@ const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
     coverImage:
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80&auto=format",
   },
-  // slug "brovariusz-wroclaw" repurposed for Disfrutar (Barcelona).
+  // slug "brovariusz-wroclaw" repurposed for Maido (Lima) — Peruvian Nikkei.
   "brovariusz-wroclaw": {
-    country: "España",
-    format: "Modern Spanish · 2⭐ Michelin",
-    district: "Eixample",
-    city: "Barcelona",
-    lat: 41.3851,
-    lng: 2.1734,
+    country: "Perú",
+    format: "Peruvian Nikkei · World #1",
+    district: "Miraflores",
+    city: "Lima",
+    lat: -12.1196,
+    lng: -77.0366,
     coverImage:
-      "https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200&q=80&auto=format",
+      "https://images.unsplash.com/photo-1611141647740-8fffc6e29cf2?w=1200&q=80&auto=format",
   },
 };
 

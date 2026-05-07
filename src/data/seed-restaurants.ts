@@ -1,4 +1,6 @@
-import { Restaurant } from "@/types/restaurant";
+// Use relative path so tsx (used by scripts/) can resolve without
+// tsconfig-paths plugin. Next.js webpack handles either form.
+import type { Restaurant } from "../types/restaurant";
 
 export const seedRestaurants: Restaurant[] = [
   {
@@ -84,174 +86,178 @@ export const seedRestaurants: Restaurant[] = [
         notes: { en: "Pear, lemon zest, and saline minerality.", pl: "Gruszka, skórka cytryny i słona mineralność." },
       },
     ],
+    // Atelier Amaro · Polish Modern menu — fermentation, foraging, game.
+    // Wojciech Modest Amaro signatures: dialogue with Polish forest, lake
+    // and pasture, executed at Michelin precision. Replaces the old
+    // mistakenly-Italian content that was in seed since v1.
     dishes: [
       {
         id: "r1-d1",
-        name: { en: "Pizza Margherita", pl: "Pizza Margherita" },
-        category: "Pizza",
-        description: { en: "San Marzano tomato, fior di latte, basil, and olive oil.", pl: "Pomidor San Marzano, fior di latte, bazylia i oliwa z oliwek." },
-        price: 18,
+        name: { en: "Porcini in Black Garlic", pl: "Borowik w czarnym czosnku" },
+        category: "Starter",
+        description: { en: "Foraged porcini mushrooms cured in black garlic, served on a smoked yogurt cloud with rye crumb.", pl: "Leśny borowik peklowany w czarnym czosnku, podany na chmurze wędzonego jogurtu z grzanką żytnią." },
+        price: 28,
         pairings: [
           {
-            wineId: "r1-w2",
-            reason: { en: "Sangiovese acidity mirrors tomato and refreshes melted cheese.", pl: "Kwasowość Sangiovese odpowiada pomidorowi i odświeża stopiony ser." },
+            wineId: "r1-w8",
+            reason: { en: "Pinot Grigio's saline minerality lifts the umami of the cured mushroom.", pl: "Słona mineralność Pinot Grigio podkreśla umami peklowanego grzyba." },
           },
           {
-            wineId: "r1-w5",
-            reason: { en: "Sparkling bubbles cut richness and keep basil flavors bright.", pl: "Bąbelki musującego wina rozcinają tłustość i utrzymują świeży aromat bazylii." },
+            wineId: "r1-w3",
+            reason: { en: "Cortese's white-flower nose contrasts the black-garlic depth.", pl: "Nuta białego kwiatu w Cortese kontrastuje z głębią czarnego czosnku." },
           },
         ],
       },
       {
         id: "r1-d2",
-        name: { en: "Cacio e Pepe", pl: "Cacio e Pepe" },
-        category: "Pasta",
-        description: { en: "Handmade tonnarelli with pecorino romano and black pepper.", pl: "Ręcznie robione tonnarelli z pecorino romano i czarnym pieprzem." },
-        price: 21,
+        name: { en: "Venison Tartare", pl: "Tatar z dziczyzny" },
+        category: "Starter",
+        description: { en: "Hand-cut wild deer fillet with juniper, smoked egg yolk, pickled rowan and horseradish snow.", pl: "Ręcznie krojona polędwica jelenia z jałowcem, wędzonym żółtkiem, marynowaną jarzębiną i śniegiem chrzanowym." },
+        price: 36,
         pairings: [
           {
-            wineId: "r1-w3",
-            reason: { en: "Mineral white wine balances salty pecorino and pepper heat.", pl: "Mineralne białe wino równoważy słone pecorino i ostrość pieprzu." },
+            wineId: "r1-w2",
+            reason: { en: "Sangiovese cherry and herbs echo the juniper and rowan notes.", pl: "Wiśnia i zioła Sangiovese odpowiadają nutom jałowca i jarzębiny." },
           },
           {
-            wineId: "r1-w8",
-            reason: { en: "Pinot Grigio keeps the dish airy and highlights pepper aroma.", pl: "Pinot Grigio utrzymuje danie lekkim i podkreśla aromat pieprzu." },
+            wineId: "r1-w1",
+            reason: { en: "Tignanello's polished tannins frame the raw venison without overpowering it.", pl: "Wypolerowane taniny Tignanello obramowują surową dziczyznę nie przytłaczając jej." },
           },
         ],
       },
       {
         id: "r1-d3",
-        name: { en: "Tagliatelle al Ragu", pl: "Tagliatelle al ragù" },
-        category: "Pasta",
-        description: { en: "Slow-cooked beef and pork ragu with egg tagliatelle.", pl: "Wolno duszony ragù z wołowiny i wieprzowiny z makaronem tagliatelle z jajkami." },
-        price: 25,
+        name: { en: "Sour Rye Soup", pl: "Żurek z chrzanem" },
+        category: "Soup",
+        description: { en: "Five-day fermented rye sour, smoked white sausage, soft-cooked quail egg and fresh horseradish.", pl: "Pięciodniowy zakwas żytni, wędzona biała kiełbasa, jajko przepiórcze na miękko i świeży chrzan." },
+        price: 24,
         pairings: [
           {
-            wineId: "r1-w1",
-            reason: { en: "Structured tannins match ragu depth and savory meat notes.", pl: "Strukturalne taniny pasują do głębi ragù i wytrawnych mięsnych nut." },
+            wineId: "r1-w5",
+            reason: { en: "Trento brut bubbles cut the richness of fermented sour and smoked sausage.", pl: "Bąbelki Trento brut przecinają sytość zakwasu i wędzonej kiełbasy." },
           },
           {
-            wineId: "r1-w2",
-            reason: { en: "Chianti herbs and cherry pair naturally with tomato-based sauce.", pl: "Zioła i wiśnia w Chianti naturalnie łączą się z sosem na bazie pomidorów." },
+            wineId: "r1-w8",
+            reason: { en: "Pinot Grigio's crispness mirrors the żurek's bright acidity.", pl: "Świeżość Pinot Grigio współgra z jasną kwasowością żurku." },
           },
         ],
       },
       {
         id: "r1-d4",
-        name: { en: "Osso Buco alla Milanese", pl: "Osso Buco po mediolańsku" },
-        category: "Main",
-        description: { en: "Braised veal shank, saffron jus, and gremolata.", pl: "Duszona pręga cielęca, sos szafranowy i gremolata." },
-        price: 34,
+        name: { en: "Pierogi with Lake Pike", pl: "Pierogi ze szczupakiem" },
+        category: "Pasta",
+        description: { en: "Hand-folded dumplings with Mazurian pike, dill butter and a buttermilk-cucumber espuma.", pl: "Ręcznie składane pierogi z mazurskim szczupakiem, masło koperkowe i espuma z maślanki i ogórka." },
+        price: 32,
         pairings: [
           {
-            wineId: "r1-w7",
-            reason: { en: "Brunello structure stands up to gelatin-rich braised veal.", pl: "Struktura Brunello dorównuje bogatej w żelatynę duszonej cielęcinie." },
+            wineId: "r1-w3",
+            reason: { en: "Gavi's mineral citrus echoes the buttermilk-cucumber freshness.", pl: "Mineralne cytrusy Gavi odpowiadają świeżości maślanki i ogórka." },
           },
           {
-            wineId: "r1-w1",
-            reason: { en: "Tignanello adds spice and depth to saffron and bone marrow.", pl: "Tignanello dodaje korzenności i głębi szafranowi oraz szpikowi." },
+            wineId: "r1-w4",
+            reason: { en: "Sicilian Chardonnay's richness wraps the lake pike and dill butter.", pl: "Treściwość sycylijskiego Chardonnay otacza szczupaka i masło koperkowe." },
           },
         ],
       },
       {
         id: "r1-d5",
-        name: { en: "Risotto alla Milanese", pl: "Risotto po mediolańsku" },
-        category: "Rice",
-        description: { en: "Carnaroli rice with saffron, butter, and parmigiano.", pl: "Ryż carnaroli z szafranem, masłem i parmigiano." },
-        price: 24,
+        name: { en: "Juniper-Cured Trout", pl: "Pstrąg w jałowcu" },
+        category: "Seafood",
+        description: { en: "Three-day juniper cure on alpine trout, pine-needle oil, fennel ash and beetroot leather.", pl: "Trzydniowe peklowanie pstrąga alpejskiego w jałowcu, olej z igliwia, popiół koprowy i skóra z buraka." },
+        price: 38,
         pairings: [
           {
-            wineId: "r1-w4",
-            reason: { en: "Creamy Chardonnay texture echoes risotto body and saffron notes.", pl: "Kremowa tekstura Chardonnay odpowiada treściwości risotto i nutom szafranu." },
+            wineId: "r1-w8",
+            reason: { en: "Pear and saline notes bring out the alpine clarity of the trout.", pl: "Gruszka i nuty słone wydobywają górską klarowność pstrąga." },
           },
           {
-            wineId: "r1-w5",
-            reason: { en: "Brut freshness cleans palate between buttery spoonfuls.", pl: "Świeżość brutu oczyszcza podniebienie między maślanymi łyżkami." },
+            wineId: "r1-w3",
+            reason: { en: "Gavi's chalky finish balances the fennel ash and pine oil.", pl: "Kredowe wykończenie Gavi równoważy popiół koprowy i olej iglasty." },
           },
         ],
       },
       {
         id: "r1-d6",
-        name: { en: "Branzino al Forno", pl: "Pieczony labraks" },
-        category: "Seafood",
-        description: { en: "Oven-roasted sea bass, lemon, capers, and herbs.", pl: "Pieczony labraks z piekarnika, cytryna, kapary i zioła." },
-        price: 31,
+        name: { en: "Duck with Roasted Beetroot", pl: "Kaczka z pieczonym burakiem" },
+        category: "Main",
+        description: { en: "Hay-smoked Mazovian duck breast, glazed beetroot, blackcurrant jus and pearl barley risotto.", pl: "Mazowiecka pierś kaczki wędzona na sianie, glazurowany burak, sos z czarnej porzeczki i risotto z kaszy pęczak." },
+        price: 56,
         pairings: [
           {
-            wineId: "r1-w3",
-            reason: { en: "Citrus and minerality amplify delicate sea bass flavors.", pl: "Cytrusy i mineralność wzmacniają delikatne nuty labraksa." },
+            wineId: "r1-w7",
+            reason: { en: "Brunello's leather and dried herb notes carry the smoked duck and beet.", pl: "Skórzane i ziołowe nuty Brunello niosą wędzoną kaczkę i buraka." },
           },
           {
-            wineId: "r1-w8",
-            reason: { en: "Light body keeps fish and herbs in focus.", pl: "Lekka treściwość trzyma rybę i zioła w centrum uwagi." },
+            wineId: "r1-w1",
+            reason: { en: "Tignanello's depth matches the blackcurrant jus and pearl barley.", pl: "Głębia Tignanello dorównuje sosowi z czarnej porzeczki i kaszy pęczak." },
           },
         ],
       },
       {
         id: "r1-d7",
-        name: { en: "Vitello Tonnato", pl: "Vitello Tonnato" },
-        category: "Starter",
-        description: { en: "Cold sliced veal with creamy tuna-caper sauce.", pl: "Zimna plasterkowana cielęcina z kremowym sosem tuńczykowo-kaparowym." },
-        price: 22,
+        name: { en: "Roe Deer with Lingonberry", pl: "Sarna w sosie z borówek" },
+        category: "Game",
+        description: { en: "Sous-vide roe deer loin, forest lingonberry sauce, smoked celeriac purée, juniper bread.", pl: "Polędwica sarny sous-vide, sos z leśnych borówek, puree z wędzonego selera i chleb na jałowcu." },
+        price: 64,
         pairings: [
           {
-            wineId: "r1-w3",
-            reason: { en: "High acidity sharpens the rich tuna emulsion.", pl: "Wysoka kwasowość wyostrza bogatą emulsję tuńczykową." },
+            wineId: "r1-w1",
+            reason: { en: "Tignanello's tobacco and cedar wrap the gamey loin and lingonberry sweetness.", pl: "Tytoń i cedr Tignanello otaczają dziczyznę i słodycz borówki." },
           },
           {
-            wineId: "r1-w5",
-            reason: { en: "Fine mousse lightens the texture of chilled veal.", pl: "Drobny mus rozjaśnia teksturę zimnej cielęciny." },
+            wineId: "r1-w7",
+            reason: { en: "Brunello's tannins frame the smoked celeriac without crushing the deer.", pl: "Taniny Brunello obramowują wędzony seler nie miażdżąc sarny." },
           },
         ],
       },
       {
         id: "r1-d8",
-        name: { en: "Melanzane alla Parmigiana", pl: "Bakłażan alla Parmigiana" },
-        category: "Vegetarian",
-        description: { en: "Layered eggplant, tomato sauce, mozzarella, and basil.", pl: "Warstwowy bakłażan, sos pomidorowy, mozzarella i bazylia." },
-        price: 20,
+        name: { en: "Lamb with Buckwheat", pl: "Jagnięcina z kaszą gryczaną" },
+        category: "Main",
+        description: { en: "Slow-roasted Podhale lamb shoulder, toasted buckwheat, fermented cabbage and goat cheese foam.", pl: "Wolno pieczony bark jagnięcia podhalańskiego, prażona gryka, kiszona kapusta i pianka z koziego sera." },
+        price: 52,
         pairings: [
           {
             wineId: "r1-w2",
-            reason: { en: "Acid-driven red supports tomato while keeping eggplant balanced.", pl: "Kwasowe czerwone wspiera pomidor, zachowując równowagę bakłażana." },
+            reason: { en: "Chianti Rufina's bright cherry cuts through the slow-roasted lamb fat.", pl: "Jasna wiśnia Chianti Rufina przecina tłuszcz wolno pieczonej jagnięciny." },
           },
           {
             wineId: "r1-w7",
-            reason: { en: "Earthy Brunello complements roasted eggplant depth.", pl: "Ziemiste Brunello uzupełnia głębię pieczonego bakłażana." },
+            reason: { en: "Brunello's structure stands up to the fermented cabbage and goat cheese.", pl: "Struktura Brunello dorównuje kiszonej kapuście i koziemu serowi." },
           },
         ],
       },
       {
         id: "r1-d9",
-        name: { en: "Burrata e Pomodori", pl: "Burrata z pomidorami" },
-        category: "Starter",
-        description: { en: "Creamy burrata, heirloom tomatoes, basil, and aged balsamic.", pl: "Kremowa burrata, pomidory dziedziczne, bazylia i dojrzewający balsamico." },
-        price: 19,
+        name: { en: "Forest Cheesecake", pl: "Sernik leśny" },
+        category: "Dessert",
+        description: { en: "Curd cheesecake on a juniper-crumb base, pine sorbet, candied rowan and meadow honey.", pl: "Sernik z twarogu na spodzie z jałowca, sorbet z igliwia, kandyzowana jarzębina i miód z łąki." },
+        price: 22,
         pairings: [
           {
-            wineId: "r1-w8",
-            reason: { en: "Crisp pear and citrus cut through burrata creaminess.", pl: "Świeża gruszka i cytrusy przecinają kremowość burraty." },
+            wineId: "r1-w6",
+            reason: { en: "Ben Rye's apricot, saffron and honey echo the meadow-honey glaze.", pl: "Morela, szafran i miód Ben Rye odpowiadają glazurze z miodu łąkowego." },
           },
           {
             wineId: "r1-w5",
-            reason: { en: "Bubbles and acidity refresh after each rich bite.", pl: "Bąbelki i kwasowość odświeżają po każdym treściwym kęsie." },
+            reason: { en: "A dry brut keeps the curd cheesecake from feeling heavy.", pl: "Wytrawny brut nie pozwala sernikowi zaciężyć." },
           },
         ],
       },
       {
         id: "r1-d10",
-        name: { en: "Tiramisu", pl: "Tiramisu" },
+        name: { en: "Pear & Ricotta Cream", pl: "Krem z gruszki i ricotty" },
         category: "Dessert",
-        description: { en: "Mascarpone cream, espresso-soaked savoiardi, and cocoa.", pl: "Krem mascarpone, savoiardi nasączone espresso i kakao." },
-        price: 14,
+        description: { en: "Slow-poached pear in elderflower syrup, smoked ricotta cream, walnut praline and oat tuile.", pl: "Wolno gotowana gruszka w syropie z czarnego bzu, krem z wędzonej ricotty, praliny z orzechów włoskich i tuile owsiane." },
+        price: 20,
         pairings: [
           {
             wineId: "r1-w6",
-            reason: { en: "Sweet apricot and honey tones complement cocoa and coffee.", pl: "Słodkie nuty moreli i miodu uzupełniają kakao i kawę." },
+            reason: { en: "Donnafugata Ben Rye's candied orange harmonises with the elderflower pear.", pl: "Kandyzowana pomarańcza Ben Rye harmonizuje z gruszką na czarnym bzie." },
           },
           {
-            wineId: "r1-w5",
-            reason: { en: "A dry sparkling contrast keeps dessert from feeling heavy.", pl: "Wytrawny musujący kontrast nie pozwala deserowi sprawiać wrażenia ciężkiego." },
+            wineId: "r1-w8",
+            reason: { en: "Pinot Grigio's pear note doubles the dish's central fruit.", pl: "Gruszkowa nuta Pinot Grigio podwaja owocowy rdzeń deseru." },
           },
         ],
       },
@@ -1039,15 +1045,16 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r5",
-    // Rebranded to Disfrutar (Barcelona) — modern Spanish, ranked top 5
-    // World's 50 Best. Existing menu (Polish gastropub) gets a Spanish
-    // rewrite (gildas, jamón ibérico, paella, postres) in the next pass.
+    // Rebranded to Maido (Lima) — world #1 in 50 Best 2025, Peruvian-
+    // Japanese (Nikkei) cuisine. Existing menu (ceviche, tiradito,
+    // lomo saltado, anticuchos, picarones) is already Peruvian/Nikkei
+    // and matches perfectly — no dish rewrite needed.
     slug: "brovariusz-wroclaw",
-    name: { en: "Disfrutar", pl: "Disfrutar" },
-    cuisine: "Spanish Modern",
-    city: "Barcelona",
+    name: { en: "Maido", pl: "Maido" },
+    cuisine: "Peruvian Nikkei",
+    city: "Lima",
     description:
-      { en: "Avant-garde Spanish from the elBulli alumni at Carrer Villarroel — playful technique with serrano ham, gilda, paella, jamón ibérico and Catalan wines from Penedès to Priorat.", pl: "Awangardowa kuchnia hiszpańska od absolwentów elBulli przy Carrer Villarroel — finezja techniki z szynką serrano, gildą, paellą, jamón ibérico i katalońskimi winami od Penedès po Priorat." },
+      { en: "World #1 Peruvian-Japanese (Nikkei) tasting house at Calle San Martín — Mitsuharu Tsumura's dialogue between Lima's coast and Osaka's tradition: Pacific seafood, ají amarillo, ponzu and Andean tubers.", pl: "Światowy numer 1 — peruwiańsko-japońska (Nikkei) restauracja degustacyjna przy Calle San Martín — dialog Mitsuharu Tsumury między wybrzeżem Limy a tradycją Osaki: owoce morza Pacyfiku, ají amarillo, ponzu i andyjskie bulwy." },
     coverGradient: "from-[#5a2a1a] via-[#d96a3a] to-[#f4d68a]",
     wines: [
       {

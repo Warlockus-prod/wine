@@ -220,7 +220,10 @@ export default function RestaurantPairingPanel({
 
   const dishImg =
     activeDish.image ??
-    getDishImage({ category: activeDish.category, name: t(activeDish.name, lng) }, 600);
+    getDishImage(
+      { id: activeDish.id, category: activeDish.category, name: t(activeDish.name, lng) },
+      600,
+    );
 
   return (
     <PanelShell mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}>
