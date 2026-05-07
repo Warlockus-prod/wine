@@ -582,15 +582,15 @@ export default function PairingPage() {
                     key={dish.id}
                     type="button"
                     onClick={() => selectDish(dish.id, "cards")}
-                    className={`group flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${
+                    className={`group flex w-full items-start gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all duration-300 ${
                       isActive
-                        ? "active-dish-glow border-primary bg-gradient-to-r from-primary/18 to-white/5"
-                        : "border-white/8 bg-black/18 opacity-65 hover:border-white/16 hover:opacity-100"
+                        ? "active-dish-glow scale-[1.02] border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(209,21,52,0.20),0_18px_42px_rgba(209,21,52,0.32)]"
+                        : "border-white/8 bg-black/18 opacity-60 hover:border-white/22 hover:opacity-100"
                     }`}
                   >
                     <span
-                      className={`mt-5 h-2.5 w-2.5 shrink-0 rounded-full transition ${
-                        isActive ? "bg-primary shadow-[0_0_12px_rgba(209,21,52,0.7)]" : "bg-white/20"
+                      className={`mt-5 h-3 w-3 shrink-0 rounded-full transition ${
+                        isActive ? "bg-primary shadow-[0_0_18px_rgba(209,21,52,0.85)]" : "bg-white/20"
                       }`}
                     />
 
@@ -736,7 +736,7 @@ export default function PairingPage() {
 
                 const toneClass =
                   isSelected
-                    ? "border-white/40 bg-gradient-to-r from-white/10 to-primary/10 shadow-[0_0_0_1px_rgba(255,255,255,0.18),0_16px_32px_rgba(0,0,0,0.18)] opacity-100"
+                    ? "scale-[1.02] border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/14 to-[var(--color-accent-gold)]/12 shadow-[0_0_0_3px_rgba(197,160,89,0.32),0_24px_48px_rgba(209,21,52,0.30)] opacity-100"
                     : topRank === 1
                       ? "border-amber-200/65 bg-amber-300/10 opacity-100"
                       : topRank === 2

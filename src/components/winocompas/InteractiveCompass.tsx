@@ -79,10 +79,18 @@ const findFocus = (id: string | null): FocusRecord | null => {
   return null;
 };
 
+// Tour pacing presets — labeled so the UI control reads naturally.
+const TOUR_SPEEDS = [
+  { id: "slow", ms: 5000, label: "Wolno" },
+  { id: "normal", ms: 3200, label: "Normalnie" },
+  { id: "fast", ms: 1800, label: "Szybko" },
+] as const;
+type TourSpeedId = (typeof TOUR_SPEEDS)[number]["id"];
+
 export default function InteractiveCompass({
   profile,
   onProfileChange,
-  tourMs = 2800,
+  tourMs,
   level = 3,
   autoStartTour = false,
 }: Props) {
@@ -92,7 +100,12 @@ export default function InteractiveCompass({
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [tourOn, setTourOn] = useState(autoStartTour);
   const [tourIdx, setTourIdx] = useState(0);
+  const [tourSpeed, setTourSpeed] = useState<TourSpeedId>("normal");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Effective interval: explicit prop wins, otherwise pick from preset.
+  const intervalMs =
+    tourMs ?? TOUR_SPEEDS.find((s) => s.id === tourSpeed)?.ms ?? 3200;
 
   // Tour cycles through level-specific id set (3 base / 6 sektor / 12 spoke).
   const tourIds = useMemo(() => tourIdsForLevel(level), [level]);
@@ -120,11 +133,11 @@ export default function InteractiveCompass({
     }
     intervalRef.current = setInterval(() => {
       setTourIdx((i) => (i + 1) % tourIds.length);
-    }, tourMs);
+    }, intervalMs);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [tourOn, tourMs, tourIds.length]);
+  }, [tourOn, intervalMs, tourIds.length]);
 
   const tourId = tourOn ? tourIds[tourIdx] : null;
   // Priority: tour > hover > pinned. Tour wraps the others while playing;
@@ -236,7 +249,14 @@ export default function InteractiveCompass({
               </button>
               <button
                 type="button"
-                onClick={() => setTourOn(false)}
+                onClick={() => {
+                  // Pin the spoke the tour was just on so the info panel
+                  // keeps showing it after pause (otherwise focusedId
+                  // collapses to null and the panel reverts to the idle
+                  // state — confusing UX).
+                  if (tourId) setPinnedId(tourId);
+                  setTourOn(false);
+                }}
                 className="inline-flex items-center gap-2 rounded-full border border-rose-500/35 bg-rose-900/20 px-4 py-2 text-xs font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
               >
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
@@ -261,6 +281,28 @@ export default function InteractiveCompass({
               >
                 {tourIdx + 1} / {tourIds.length}
               </span>
+              {/* Speed picker — sits inline with tour controls. */}
+              <div className="ml-2 flex items-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#1a0f12]/55 p-0.5" role="radiogroup" aria-label="Tempo przewodnika">
+                {TOUR_SPEEDS.map((s) => {
+                  const active = s.id === tourSpeed;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setTourSpeed(s.id)}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase transition ${
+                        active
+                          ? "bg-[var(--color-accent-gold)] text-[#150a0c]"
+                          : "text-[#e6dccd]/70 hover:text-[#f4ede0]"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
             </>
           )}
         </div>
