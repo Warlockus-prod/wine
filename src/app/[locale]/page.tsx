@@ -154,7 +154,15 @@ export default function Home() {
                 <select
                   value={filter.value}
                   onChange={(event) => filter.onChange(event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-[#130b0df2] px-4 py-3 text-sm text-white"
+                  // Theme-aware: var(--surface-elevated) flips to white on
+                  // light theme, var(--ink) keeps text readable. Drops the
+                  // hardcoded #130b0df2 dark surface that punched a hole.
+                  className="rounded-2xl border px-4 py-3 text-sm"
+                  style={{
+                    background: "var(--surface-elevated)",
+                    borderColor: "var(--gold-hairline-soft)",
+                    color: "var(--ink)",
+                  }}
                 >
                   {filter.options.map((option) => (
                     <option key={option} value={option}>

@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import mapboxgl from "mapbox-gl";
 import { useLocale } from "next-intl";
+import { useTheme } from "next-themes";
 import { useEffect, useMemo, useRef } from "react";
 import { t } from "@/lib/localized";
 import type { Locale } from "@/i18n/routing";
@@ -21,8 +22,17 @@ type Props = {
   onSelect: (slug: string) => void;
 };
 
+// Mapbox style URLs — official Mapbox-hosted styles. light-v11 is a clean
+// white-canvas map suited to the cream UI; dark-v11 is the night-mode
+// satellite-style we use in dark theme. Switching style at runtime via
+// map.setStyle() preserves markers and viewport.
+const STYLE_DARK = "mapbox://styles/mapbox/dark-v11";
+const STYLE_LIGHT = "mapbox://styles/mapbox/light-v11";
+
 export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: Props) {
   const locale = useLocale() as Locale;
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === "light";
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
@@ -59,7 +69,9 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
     try {
       map = new mapboxgl.Map({
         container: containerRef.current,
-        style: "mapbox://styles/mapbox/dark-v11",
+        // Initial style picked from the *current* theme; the effect
+        // below swaps it on subsequent theme toggles via setStyle().
+        style: isLight ? STYLE_LIGHT : STYLE_DARK,
         center,
         zoom: 4,
         attributionControl: false,
@@ -86,6 +98,16 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Theme swap — call map.setStyle() when the user toggles dark/light.
+  // Mapbox preserves source data + custom layers across setStyle but
+  // markers are external DOM elements, so they re-attach themselves
+  // automatically on the new style. No need to recreate them.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.setStyle(isLight ? STYLE_LIGHT : STYLE_DARK);
+  }, [isLight]);
 
   // Sync markers with restaurants list.
   useEffect(() => {
