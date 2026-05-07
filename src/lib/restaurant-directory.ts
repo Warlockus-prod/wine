@@ -40,43 +40,49 @@ const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
     coverImage:
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80&auto=format",
   },
+  // slug "senses-warsaw" repurposed for Sukiyabashi Jiro (Tokyo, Japanese).
   "senses-warsaw": {
-    country: "France",
-    format: "Tasting Menu · Michelin",
-    district: "1er Arrondissement",
-    city: "Paris",
-    lat: 48.8566, // Paris (was Warsaw — moved per cuisine: Tasting Menu fits Paris)
-    lng: 2.3522,
+    country: "Japan",
+    format: "Sushi-ya · 3⭐ Michelin",
+    district: "Ginza",
+    city: "Tokyo",
+    lat: 35.6717,
+    lng: 139.7639,
     coverImage:
-      "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=1200&q=80&auto=format",
+      "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1200&q=80&auto=format",
   },
+  // slug "bottiglieria-1881" repurposed for Osteria Francescana (Modena).
   "bottiglieria-1881": {
     country: "Italia",
-    format: "Italian · Michelin",
-    district: "Trastevere",
-    city: "Roma",
-    lat: 41.9028, // Roma (was Krakow — Italian cuisine fits Rome)
-    lng: 12.4964,
+    format: "Avant-garde · 3⭐ Michelin",
+    district: "Centro Storico",
+    city: "Modena",
+    lat: 44.6471,
+    lng: 10.9252,
+    coverImage:
+      "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=1200&q=80&auto=format",
+  },
+  // slug "pod-aniolami" repurposed for Lasserre (Paris).
+  "pod-aniolami": {
+    country: "France",
+    format: "Haute cuisine · 2⭐ Michelin",
+    district: "Champs-Élysées",
+    city: "Paris",
+    lat: 48.8665,
+    lng: 2.3083,
     coverImage:
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80&auto=format",
   },
-  "pod-aniolami": {
-    country: "Polska",
-    format: "Tradycyjna",
-    district: "Stare Miasto",
-    lat: 50.0617, // Krakow, ul. Grodzka 35
-    lng: 19.9376,
-    coverImage:
-      "https://images.unsplash.com/photo-1559847844-5315695dadae?w=1200&q=80&auto=format",
-  },
+  // slug "brovariusz-wroclaw" repurposed for Disfrutar (Barcelona).
   "brovariusz-wroclaw": {
-    country: "Polska",
-    format: "Gastropub",
-    district: "Stare Miasto",
-    lat: 51.1100, // Wrocław, Rynek 6
-    lng: 17.0303,
+    country: "España",
+    format: "Modern Spanish · 2⭐ Michelin",
+    district: "Eixample",
+    city: "Barcelona",
+    lat: 41.3851,
+    lng: 2.1734,
     coverImage:
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80&auto=format",
+      "https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200&q=80&auto=format",
   },
 };
 

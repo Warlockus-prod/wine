@@ -13,10 +13,12 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
+import { useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import DishMonogramSVG from "@/components/v2/DishMonogramSVG";
 import WineBottleSVG from "@/components/v2/WineBottleSVG";
+import RestaurantPairingPanel from "@/components/v2/RestaurantPairingPanel";
 import { Link } from "@/i18n/navigation";
 import { t } from "@/lib/localized";
 import { getDishImage, getWineImage } from "@/lib/food-photos";
@@ -28,6 +30,12 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
   const lng = useLocale() as Locale;
   const { getRestaurantBySlug } = useRestaurantCatalog();
   const restaurant = getRestaurantBySlug(slug);
+  // Pairing panel is integrated; track which dish the user clicked from
+  // the menu list. Default to the first dish so the panel has data on
+  // first paint instead of an empty state.
+  const [activeDishId, setActiveDishId] = useState<string | null>(
+    restaurant?.dishes[0]?.id ?? null,
+  );
 
   if (!restaurant) {
     return (
@@ -69,7 +77,10 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
     <div className="pitch-grain min-h-screen bg-background-dark text-gray-100">
       <Navigation />
 
-      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-24 pb-16 sm:px-6 sm:pt-28 lg:px-8">
+      {/* lg:pr-[400px] reserves room for the always-visible pairing panel
+          docked to the right edge. mobile-safe-bottom + extra pb space
+          on mobile so the bottom-sheet doesn't hide the last menu rows. */}
+      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-24 pb-32 sm:px-6 sm:pt-28 lg:px-8 lg:pr-[400px] lg:pb-16">
         {/* ─────────── HERO ─────────── */}
         <section
           className={`editorial-frame relative overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br p-5 shadow-[0_28px_100px_rgba(0,0,0,0.32)] sm:rounded-[36px] sm:p-10 lg:p-14 ${restaurant.coverGradient}`}
@@ -234,10 +245,25 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
                   240,
                 );
                 const dishName = t(dish.name, lng);
+                const isActive = activeDishId === dish.id;
                 return (
                   <li
                     key={dish.id}
-                    className="menu-row group flex items-start gap-3 py-5 pl-3 pr-3 sm:gap-5 sm:pl-4 sm:pr-5"
+                    onClick={() => setActiveDishId(dish.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setActiveDishId(dish.id);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isActive}
+                    className={`menu-row group flex cursor-pointer items-start gap-3 py-5 pl-3 pr-3 transition sm:gap-5 sm:pl-4 sm:pr-5 ${
+                      isActive
+                        ? "bg-[var(--color-accent-gold)]/8 ring-1 ring-[var(--gold-hairline)] ring-inset"
+                        : ""
+                    }`}
                   >
                     {/* Real Unsplash photo + monogram fallback if it 404s.
                         72×72 (mobile) → 96×96 (desktop). */}
@@ -271,16 +297,19 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
                       <p className="menu-row__desc mt-2 text-sm leading-6 text-gray-300/95 sm:leading-7">
                         {t(dish.description, lng)}
                       </p>
-                      {/* Per-dish CTA — links straight into the scoped pairing
-                          view with this dish pre-selected. Replaces the
-                          implicit "scroll up and find Otwórz pairing" path. */}
-                      <Link
-                        href={`/pairing?restaurant=${restaurant.slug}&dish=${dish.id}`}
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/22"
-                      >
-                        <span aria-hidden>🍷</span>
-                        {tx("pickWineForDish")}
-                      </Link>
+                      {/* Active-state hint: pairing panel on the right (or
+                          mobile bottom-sheet) is already showing top-3 wines
+                          for this dish — no per-row CTA needed anymore. */}
+                      {isActive ? (
+                        <p className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
+                          <span aria-hidden>→</span>
+                          {tx("activeDishHint")}
+                        </p>
+                      ) : (
+                        <p className="mt-2 inline-flex items-center gap-1.5 text-[10px] tracking-[0.18em] text-[var(--ink-muted)] uppercase opacity-70 group-hover:opacity-100">
+                          {tx("tapToPair")}
+                        </p>
+                      )}
                     </div>
                   </li>
                 );
@@ -390,28 +419,16 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
         </section>
       </main>
 
-      {/* Desktop floating "ask the sommelier" link — top-right, after main nav */}
-      <Link
-        href={`/pairing?restaurant=${restaurant.slug}`}
-        className="fixed top-24 right-5 z-30 hidden items-center gap-2 rounded-full border border-[rgba(197,160,89,0.45)] bg-[#170d0fcc] px-3.5 py-2 font-serif text-xs italic text-[var(--color-accent-gold)] shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur transition hover:border-[var(--color-accent-gold)] hover:text-white lg:inline-flex"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
-        </svg>
-        {tx("openPairingView")}
-      </Link>
-
-      {/* Sticky mobile-only CTA — kept from previous polish, restyled */}
-      <Link
-        href={`/pairing?restaurant=${restaurant.slug}`}
-        className="fixed right-4 bottom-20 z-40 inline-flex h-12 items-center gap-2 rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark px-5 text-sm font-bold text-white shadow-[0_18px_36px_rgba(209,21,52,0.45)] transition-transform hover:scale-[1.02] active:scale-95 lg:hidden"
-        aria-label={tx("openPairing")}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M12 2L7 11h10l-5-9zM3 13l4 9 5-9 5 9 4-9H3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-        </svg>
-        {tx("openPairing")}
-      </Link>
+      {/* Integrated pairing panel — desktop docked right, mobile bottom-sheet.
+          Replaces the previous floating "ask sommelier" link and the sticky
+          mobile CTA: both pointed to /pairing as a separate page. Now the
+          pairing UX lives inline. The standalone /pairing route still works
+          for those who land there directly (e.g. via QR-coded link). */}
+      <RestaurantPairingPanel
+        restaurant={restaurant}
+        activeDishId={activeDishId}
+        onActiveDishChange={setActiveDishId}
+      />
 
       <MobileTabBar />
     </div>

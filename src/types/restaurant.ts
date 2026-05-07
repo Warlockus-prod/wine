@@ -8,6 +8,9 @@ export type Wine = {
   style: string;
   vintage?: string;
   notes: LocalizedString;
+  /** Optional hero photo URL (Wikimedia, Unsplash, or generated/local).
+   *  When absent, lib/food-photos.ts returns a category-keyed fallback. */
+  image?: string;
 };
 
 export type DishPairing = {
@@ -22,6 +25,10 @@ export type Dish = {
   description: LocalizedString;
   price: number;
   pairings: DishPairing[];
+  /** Optional hero photo URL (typically generated and saved under
+   *  public/dishes/<slug>/<id>.jpg). When absent, lib/food-photos.ts
+   *  returns a category-keyed Unsplash fallback. */
+  image?: string;
 };
 
 export type Restaurant = {
