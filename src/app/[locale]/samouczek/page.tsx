@@ -30,15 +30,16 @@ export default function SamouczekPage() {
   const [chatDisabled, setChatDisabled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  // Hydrate persisted state once on mount.
+  // Hydrate persisted state in useEffect (NOT lazy useState) so SSR and
+  // first-client-render produce identical HTML — hydration-mismatch-free.
+  // The lint rule `react-hooks/set-state-in-effect` flags this; it's a
+  // false positive for the "external-store hydration" case (per React 19
+  // docs, equivalent to a network fetch) — keeping the disable.
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY);
       const disabled = window.localStorage.getItem(CHAT_DISABLED_KEY);
-      // Hydrate persisted state. We accept the lint complaint here because
-      // localStorage is not accessible during render — the only safe place
-      // to read it is post-mount in an effect.
       if (raw) {
         const parsed = JSON.parse(raw) as CompassProfile;
         if (parsed && typeof parsed === "object") {

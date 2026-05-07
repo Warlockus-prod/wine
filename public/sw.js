@@ -1,6 +1,21 @@
-const CACHE_NAME = "wine-shell-v3";
+// v4 — current Vinovigator routes (no more legacy /v1/ paths). Bumping
+// CACHE_NAME on every SW change forces all clients to drop the old shell
+// in the activate handler below. Restaurant slug pages are cached
+// network-first by the navigation handler; menu/wine photos under
+// /dishes/* and /wines/* are cached cache-first so once a guest scans
+// the QR at a table, the menu keeps working even if Wi-Fi drops.
+const CACHE_NAME = "wine-shell-v4";
 const OFFLINE_URL = "/offline";
-const SHELL_ROUTES = ["/", "/pairing", "/immersive", "/editorial", "/v1", "/v1/admin", OFFLINE_URL];
+const SHELL_ROUTES = [
+  "/",
+  "/pl",
+  "/pairing",
+  "/pl/pairing",
+  "/samouczek",
+  "/pl/samouczek",
+  "/admin",
+  OFFLINE_URL,
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

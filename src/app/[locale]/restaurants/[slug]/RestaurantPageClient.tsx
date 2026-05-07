@@ -333,15 +333,18 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
 
             <ul className="divide-y divide-white/5">
               {restaurant.wines.map((wine) => {
-                const photo = getWineImage(
-                  {
-                    style: wine.style,
-                    grape: wine.grape,
-                    name: t(wine.name, lng),
-                    region: wine.region,
-                  },
-                  240,
-                );
+                const photo =
+                  wine.image ??
+                  getWineImage(
+                    {
+                      id: wine.id,
+                      style: wine.style,
+                      grape: wine.grape,
+                      name: t(wine.name, lng),
+                      region: wine.region,
+                    },
+                    240,
+                  );
                 const wineName = t(wine.name, lng);
                 return (
                   <li

@@ -14,6 +14,7 @@
  */
 
 import { DISH_IMAGE_MAP } from "@/data/dish-images";
+import { WINE_IMAGE_MAP } from "@/data/wine-images";
 
 const norm = (s?: string) => (s ?? "").toLowerCase().trim();
 
@@ -106,8 +107,7 @@ export function getWineImage(
   opts: { id?: string; style?: string; grape?: string; name?: string; region?: string },
   size = 600,
 ): string {
-  // (No AI-generated wine map yet — wines lean on Wikimedia for canonical
-  // bottle photos handled in restaurant-pairing-adapter.ts.)
+  if (opts.id && WINE_IMAGE_MAP[opts.id]) return WINE_IMAGE_MAP[opts.id];
   const haystack = `${norm(opts.style)} ${norm(opts.grape)} ${norm(opts.name)} ${norm(opts.region)}`;
   for (const r of WINE_RULES) if (r.match.test(haystack)) return buildUnsplashUrl(r.src, size);
   return buildUnsplashUrl(WINE_FALLBACK, size);

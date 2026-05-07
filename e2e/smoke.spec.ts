@@ -26,7 +26,13 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
 
   await page.goto("/restaurants/atelier-amaro");
   await expect(page).toHaveURL(/\/restaurants\/atelier-amaro/);
-  await expect(page.getByText(/direct access qr/i)).toBeVisible();
+  // Restaurant data hydrates client-side (useRestaurantCatalog SWR) — give
+  // the heading a chance to mount before asserting on the QR aside.
+  await expect(page.getByRole("heading", { name: /atelier amaro/i }).first()).toBeVisible({ timeout: 10000 });
+  // QR aside text varies by negotiated locale (EN: "Direct access QR",
+  // PL: "QR — bezpośredni dostęp"). Either is fine — we just want to
+  // confirm the QR aside rendered.
+  await expect(page.getByText(/direct access qr|bezpośredni dostęp/i)).toBeVisible();
   // Integrated pairing panel — footer CTA replaces the old "Open pairing" link.
   await expect(
     page.getByRole("link", { name: /open pairing view|otwórz widok łączenia/i }).first(),
@@ -34,10 +40,11 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
 
   await page.goto("/pairing?restaurant=atelier-amaro");
   await expect(page).toHaveURL(/\/pairing\?restaurant=atelier-amaro/);
-  await expect(page.getByText(/context: atelier amaro/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /porcini in black garlic/i }).first()).toBeVisible();
+  // Context label varies by locale ("Context: …" / "Kontekst: …").
+  await expect(page.getByText(/(?:context|kontekst): atelier amaro/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: /marchesi antinori tignanello/i }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: /porcini in black garlic/i }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible();
 });
 
 test("restaurant admin edits flow into restaurant page and scoped pairing", async ({ page }) => {

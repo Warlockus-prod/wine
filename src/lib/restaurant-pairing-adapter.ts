@@ -22,6 +22,7 @@ export type RestaurantMatchDetails = {
 // canonical bottles where the brand-specific photo reads better than a
 // generic Unsplash shot.
 import { getDishImage as photoForDish, getWineImage as photoForWine } from "./food-photos";
+import { WINE_IMAGE_MAP } from "@/data/wine-images";
 
 const wineImages = {
   riesling: "https://upload.wikimedia.org/wikipedia/commons/9/91/2009_Trimbach_Riesling_%288130797570%29.jpg",
@@ -88,7 +89,9 @@ const wineEnText = (wine: Wine) =>
   `${t(wine.name, "en")} ${wine.grape} ${wine.style} ${t(wine.notes, "en")}`.toLowerCase();
 
 const getWineImage = (wine: Wine) => {
-  // Wikimedia overrides for canonical bottles where the brand-specific
+  // 1) AI-generated bottle photo per wine id (gen-wine-images.mts)
+  if (WINE_IMAGE_MAP[wine.id]) return WINE_IMAGE_MAP[wine.id];
+  // 2) Wikimedia overrides for canonical bottles where the brand-specific
   // photo is recognisable (worth more than a generic red on the rail).
   const text = `${t(wine.name, "en")} ${wine.grape} ${wine.style}`.toLowerCase();
   if (text.includes("riesling")) return wineImages.riesling;
