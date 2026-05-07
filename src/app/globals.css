@@ -315,6 +315,29 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
   border-color: var(--gold-hairline) !important;
 }
 
+/* Restaurant page hero cover — `coverGradient` strings hard-bake dark wine
+   tones (`from-[#3b2424] via-[#7f3434] to-[#d6a15c]`). On cream paper they
+   read as black bricks. Soften the entire hero in light-mode by lifting
+   the brightness. The text inside uses `text-white` which our shim already
+   maps to ink-strong, so legibility holds. */
+:root[data-theme="light"] section[class*="bg-gradient-to-br"][class*="from-["] {
+  background-image: linear-gradient(
+    140deg,
+    rgba(140, 60, 20, 0.20),
+    rgba(197, 160, 89, 0.30),
+    rgba(220, 175, 95, 0.25)
+  ) !important;
+  background-color: var(--surface-deep) !important;
+}
+/* Pairing CTA widget — same idea, lifted bg in light mode */
+:root[data-theme="light"] a[class*="bg-gradient-to-br"][class*="from-[#1a0e10]"] {
+  background-image: linear-gradient(
+    140deg,
+    var(--surface-deep),
+    var(--surface-elevated)
+  ) !important;
+}
+
 * {
   box-sizing: border-box;
 }
