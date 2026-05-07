@@ -22,7 +22,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { BASE_TASTES, COMPASS_SECTORS } from "@/data/wine-compass-kb";
-import type { CompassProfile } from "./TasteCompass";
+import type { CompassLevel, CompassProfile } from "./TasteCompass";
 
 const TasteCompass = dynamic(() => import("./TasteCompass"), { ssr: false });
 
@@ -31,19 +31,49 @@ interface Props {
   onProfileChange: (next: CompassProfile) => void;
   /** Tour rotation interval in ms; defaults to 2800 (≈3s/spoke). */
   tourMs?: number;
+  /** Progressive-disclosure level — flows into TasteCompass and selects
+   *  which IDs the auto-tour cycles through. */
+  level?: CompassLevel;
+  /** Auto-start the tour when the component mounts. Used so each stage
+   *  greets the user with a presentation instead of a static disc. */
+  autoStartTour?: boolean;
 }
 
-// All 12 spoke ids in the order TasteCompass arranges them (clockwise from
-// 12 o'clock). Used by the auto-tour to step through.
+// Tour ID sets per level — what auto-tour cycles through.
 const ALL_TENDENCJE_IDS = COMPASS_SECTORS.flatMap((s) =>
   s.tendencje.map((t) => t.id),
 );
+const SEKTOR_IDS = COMPASS_SECTORS.map((s) => s.id);
+const BASE_TOUR_IDS = ["base.cierpkosc", "base.slodycz", "base.kwasowosc"];
 
-const findSpoke = (tendencjaId: string | null) => {
-  if (!tendencjaId) return null;
+const tourIdsForLevel = (level: CompassLevel): string[] => {
+  if (level === 1) return BASE_TOUR_IDS;
+  if (level === 2) return SEKTOR_IDS;
+  return ALL_TENDENCJE_IDS;
+};
+
+// Resolve a focus id (tendencja, sektor, or base.<id>) into a normalized
+// shape the side panel can render. Returns null when the id is unknown.
+type FocusRecord =
+  | { kind: "tendencja"; sector: (typeof COMPASS_SECTORS)[number]; tendencja: (typeof COMPASS_SECTORS)[number]["tendencje"][number] }
+  | { kind: "sektor"; sector: (typeof COMPASS_SECTORS)[number] }
+  | { kind: "base"; baseId: string; name: string; description: string };
+
+const findFocus = (id: string | null): FocusRecord | null => {
+  if (!id) return null;
+  // base.<id>?
+  if (id.startsWith("base.")) {
+    const baseId = id.slice(5);
+    const b = BASE_TASTES.find((t) => t.id === baseId);
+    return b ? { kind: "base", baseId, name: b.name_pl, description: b.description_pl } : null;
+  }
+  // sektor id?
+  const sektor = COMPASS_SECTORS.find((s) => s.id === id);
+  if (sektor) return { kind: "sektor", sector: sektor };
+  // tendencja id?
   for (const s of COMPASS_SECTORS) {
     for (const t of s.tendencje) {
-      if (t.id === tendencjaId) return { sector: s, tendencja: t };
+      if (t.id === id) return { kind: "tendencja", sector: s, tendencja: t };
     }
   }
   return null;
@@ -53,15 +83,31 @@ export default function InteractiveCompass({
   profile,
   onProfileChange,
   tourMs = 2800,
+  level = 3,
+  autoStartTour = false,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   // Pinned id stays selected after the user clicks (or hovers chip in the
-  // selected-profile bar). Persists until they pick a different one. This
-  // fixes the UX bug where info evaporated as soon as the cursor left.
+  // selected-profile bar). Persists until they pick a different one.
   const [pinnedId, setPinnedId] = useState<string | null>(null);
-  const [tourOn, setTourOn] = useState(false);
+  const [tourOn, setTourOn] = useState(autoStartTour);
   const [tourIdx, setTourIdx] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Tour cycles through level-specific id set (3 base / 6 sektor / 12 spoke).
+  const tourIds = useMemo(() => tourIdsForLevel(level), [level]);
+
+  // Reset tour position when level changes — otherwise an idx of 11 from
+  // a level-3 run would crash level-1's 3-item set. Auto-start the tour
+  // for stages that ask for it. Lint-disable required: localStorage- and
+  // prop-driven sync state is the only safe place to set it.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTourIdx(0);
+    if (autoStartTour) {
+      setTourOn(true);
+    }
+  }, [level, autoStartTour]);
 
   // Tour ticks
   useEffect(() => {
@@ -73,52 +119,73 @@ export default function InteractiveCompass({
       return;
     }
     intervalRef.current = setInterval(() => {
-      setTourIdx((i) => (i + 1) % ALL_TENDENCJE_IDS.length);
+      setTourIdx((i) => (i + 1) % tourIds.length);
     }, tourMs);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [tourOn, tourMs]);
+  }, [tourOn, tourMs, tourIds.length]);
 
-  const tourId = tourOn ? ALL_TENDENCJE_IDS[tourIdx] : null;
-  // Priority: tour > pinned (last clicked) > current hover. Tour wraps the
-  // others while playing; outside of tour, the pinned selection is the
-  // baseline and hover provides the live preview.
+  const tourId = tourOn ? tourIds[tourIdx] : null;
+  // Priority: tour > hover > pinned. Tour wraps the others while playing;
+  // outside of tour the pinned selection is baseline and hover provides
+  // the live preview.
   const focusedId = tourId ?? hovered ?? pinnedId;
-  const focused = useMemo(() => findSpoke(focusedId), [focusedId]);
+  const focused = useMemo(() => findFocus(focusedId), [focusedId]);
 
-  // Pin the spoke whenever the user changes its profile value (i.e. clicks
-  // it). Listening on profile diff keeps this decoupled from TasteCompass
-  // internals — we don't need a separate click callback.
+  // Pin whenever profile changes (i.e. user clicked a spoke / sektor / base).
+  // Listens to ALL profile keys, including base.* and the per-tendencja ids,
+  // so a click at any level pins the corresponding interactive target.
   const prevProfileRef = useRef(profile);
   useEffect(() => {
     const prev = prevProfileRef.current;
     prevProfileRef.current = profile;
-    for (const id of ALL_TENDENCJE_IDS) {
-      if ((profile[id] ?? 0) !== (prev[id] ?? 0)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPinnedId(id);
-        break;
+    // Find first changed key — pick the level-appropriate display id.
+    const allKeys = new Set([...Object.keys(profile), ...Object.keys(prev)]);
+    for (const k of allKeys) {
+      if ((profile[k] ?? 0) === (prev[k] ?? 0)) continue;
+      let displayId: string;
+      if (k.startsWith("base.")) {
+        displayId = k;
+      } else if (level === 2) {
+        // Tendencja change at L2 — find its sektor and pin that.
+        const s = COMPASS_SECTORS.find((sec) => sec.tendencje.some((t) => t.id === k));
+        displayId = s?.id ?? k;
+      } else {
+        displayId = k;
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPinnedId(displayId);
+      break;
     }
-  }, [profile]);
+  }, [profile, level]);
 
-  const stepTour = useCallback((dir: 1 | -1) => {
-    setTourIdx((i) => {
-      const n = ALL_TENDENCJE_IDS.length;
-      return (i + dir + n) % n;
-    });
-  }, []);
+  const stepTour = useCallback(
+    (dir: 1 | -1) => {
+      setTourIdx((i) => {
+        const n = tourIds.length;
+        return (i + dir + n) % n;
+      });
+    },
+    [tourIds.length],
+  );
 
   const onAskGuide = useCallback(() => {
     if (typeof window === "undefined") return;
-    const detail = focused
-      ? {
-          sektor: focused.sector.name_pl,
-          tendencja: focused.tendencja.name_pl,
-        }
-      : null;
-    window.dispatchEvent(new CustomEvent("wn:open-chat", { detail }));
+    if (!focused) return;
+    const label =
+      focused.kind === "tendencja"
+        ? `${focused.sector.name_pl} · ${focused.tendencja.name_pl}`
+        : focused.kind === "sektor"
+          ? focused.sector.name_pl
+          : focused.name;
+    window.dispatchEvent(
+      new CustomEvent("wn:open-chat", {
+        detail: {
+          prefill: `Opowiedz mi więcej o wrażeniu „${label}" — czego szukać w winie?`,
+        },
+      }),
+    );
   }, [focused]);
 
   return (
@@ -129,6 +196,7 @@ export default function InteractiveCompass({
           <TasteCompass
             profile={profile}
             onChange={onProfileChange}
+            level={level}
             // Tour wins; pinned (last-clicked) wins over nothing — both are
             // bridged through this single prop so the spoke pulses as long
             // as that selection is "current".
@@ -191,7 +259,7 @@ export default function InteractiveCompass({
                 className="ml-1 font-mono text-[11px] tracking-wider text-[#c5a059]/70"
                 aria-live="polite"
               >
-                {tourIdx + 1} / {ALL_TENDENCJE_IDS.length}
+                {tourIdx + 1} / {tourIds.length}
               </span>
             </>
           )}
@@ -199,7 +267,9 @@ export default function InteractiveCompass({
 
         <p className="mt-3 text-center text-[11px] tracking-wider text-[#c5a059]/55 uppercase">
           {tourOn
-            ? "Przewodnik prowadzi przez 12 tendencji"
+            ? `Przewodnik prowadzi przez ${tourIds.length} ${
+                level === 1 ? "smaki bazowe" : level === 2 ? "wrażeń" : "tendencji"
+              }`
             : "Najedź lub kliknij, aby ustawić intensywność"}
         </p>
 
@@ -216,32 +286,35 @@ export default function InteractiveCompass({
       {/* ── Side info panel ─────────────────────────────────────────── */}
       <aside
         className="rounded-2xl border border-[rgba(197,160,89,0.22)] p-5 transition"
-        style={{
-          background: focused
-            ? `linear-gradient(180deg, ${focused.sector.color}1f, transparent 70%), #150a0c`
-            : "#150a0c",
-          borderColor: focused
-            ? `${focused.sector.color}44`
-            : "rgba(197,160,89,0.22)",
-        }}
+        style={(() => {
+          const accent =
+            focused?.kind === "tendencja" || focused?.kind === "sektor"
+              ? focused.sector.color
+              : "#c5a059";
+          return {
+            background: focused
+              ? `linear-gradient(180deg, ${accent}1f, transparent 70%), #150a0c`
+              : "#150a0c",
+            borderColor: focused ? `${accent}44` : "rgba(197,160,89,0.22)",
+          };
+        })()}
         aria-live="polite"
       >
         {focused ? (
           <FocusedCard
-            sectorName={focused.sector.name_pl}
-            sectorColor={focused.sector.color}
-            sectorShort={focused.sector.short_pl}
-            sectorLong={focused.sector.long_pl}
-            tendencjaName={focused.tendencja.name_pl}
-            tendencjaAssociations={focused.tendencja.associations_pl}
-            tendencjaExamples={focused.tendencja.examples_pl}
-            foundIn={focused.tendencja.found_in_pl}
-            intensityValue={(profile[focused.tendencja.id] ?? 0) as number}
+            focused={focused}
+            profile={profile}
             isTour={tourOn}
             onAskGuide={onAskGuide}
           />
         ) : (
-          <IdleCard onStartTour={() => { setTourOn(true); setTourIdx(0); }} />
+          <IdleCard
+            level={level}
+            onStartTour={() => {
+              setTourOn(true);
+              setTourIdx(0);
+            }}
+          />
         )}
       </aside>
     </div>
@@ -249,77 +322,138 @@ export default function InteractiveCompass({
 }
 
 function FocusedCard({
-  sectorName,
-  sectorColor,
-  sectorShort,
-  sectorLong,
-  tendencjaName,
-  tendencjaAssociations,
-  tendencjaExamples,
-  foundIn,
-  intensityValue,
+  focused,
+  profile,
   isTour,
   onAskGuide,
 }: {
-  sectorName: string;
-  sectorColor: string;
-  sectorShort: string;
-  sectorLong: string;
-  tendencjaName: string;
-  tendencjaAssociations: string;
-  tendencjaExamples: string;
-  foundIn: string;
-  intensityValue: number;
+  focused: FocusRecord;
+  profile: CompassProfile;
   isTour: boolean;
   onAskGuide: () => void;
 }) {
+  // Branch the visible content per focus kind so the same panel reads
+  // sensibly at level 1 (base smaki), level 2 (sektor), or level 3 (full).
+  const accent =
+    focused.kind === "tendencja" || focused.kind === "sektor"
+      ? focused.sector.color
+      : "#c5a059";
+
+  // Title + subtitle vary per kind
+  const eyebrow =
+    focused.kind === "base"
+      ? "Smak bazowy"
+      : focused.kind === "sektor"
+        ? "Wrażenie"
+        : "Tendencja";
+  const title =
+    focused.kind === "base"
+      ? focused.name
+      : focused.kind === "sektor"
+        ? focused.sector.name_pl
+        : focused.sector.name_pl;
+  const subtitle =
+    focused.kind === "tendencja" ? ` · ${focused.tendencja.name_pl}` : "";
+
+  // Intensity per focus kind (used in the value pill upper-right)
+  const intensity =
+    focused.kind === "base"
+      ? ((profile[`base.${focused.baseId}`] ?? 0) as number)
+      : focused.kind === "sektor"
+        ? // sektor avg of its two tendencje
+          Math.round(
+            (((profile[focused.sector.tendencje[0].id] ?? 0) as number) +
+              ((profile[focused.sector.tendencje[1].id] ?? 0) as number)) /
+              2,
+          )
+        : ((profile[focused.tendencja.id] ?? 0) as number);
+
   return (
     <div>
       <div className="flex items-baseline gap-3">
         <span
           className="inline-block h-3 w-3 rounded-full"
           style={{
-            background: sectorColor,
-            boxShadow: `0 0 0 2px #150a0c, 0 0 0 4px ${sectorColor}55`,
+            background: accent,
+            boxShadow: `0 0 0 2px #150a0c, 0 0 0 4px ${accent}55`,
           }}
           aria-hidden
         />
-        <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: sectorColor }}>
-          {isTour ? "Przewodnik mówi…" : "Aktualnie"}
+        <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: accent }}>
+          {isTour ? "Przewodnik mówi…" : eyebrow}
         </p>
         <span className="ml-auto font-mono text-[10px] tracking-wider text-[#c5a059]/70">
-          {intensityValue}/4
+          {intensity}/4
         </span>
       </div>
 
       <h3 className="pitch-display mt-2 text-2xl text-white">
-        {sectorName}
-        <em className="font-serif text-base italic text-[#e6dccd]/85"> · {tendencjaName}</em>
+        {title}
+        {subtitle ? (
+          <em className="font-serif text-base italic text-[#e6dccd]/85">{subtitle}</em>
+        ) : null}
       </h3>
 
-      <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{sectorShort}</p>
-
-      <dl className="mt-4 space-y-2.5 text-[13px] leading-relaxed">
-        <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
-          <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Skojarzenia</dt>
-          <dd className="text-[#e6dccd]/90">{tendencjaAssociations}</dd>
-        </div>
-        <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
-          <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Przykład</dt>
-          <dd className="font-serif italic text-[#e6dccd]/85">{tendencjaExamples}</dd>
-        </div>
-        <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
-          <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Spotkasz w</dt>
-          <dd className="text-[#cbc1b1]">{foundIn}</dd>
-        </div>
-      </dl>
-
-      <details className="mt-4 group">
-        <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4ede0]">
-          ❦ Pełny opis sektora
-        </summary>
-        <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">{sectorLong}</p>
-      </details>
+      {/* Body — three paragraphs per kind */}
+      {focused.kind === "base" ? (
+        <>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{focused.description}</p>
+          <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
+            Trzy smaki bazowe — cierpkość, słodycz, kwasowość — to
+            podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym
+            wyraźniej dominują w twoim ulubionym profilu.
+          </p>
+        </>
+      ) : focused.kind === "sektor" ? (
+        <>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{focused.sector.short_pl}</p>
+          <dl className="mt-4 space-y-2 text-[12px] leading-relaxed">
+            {focused.sector.tendencje.map((t) => (
+              <div
+                key={t.id}
+                className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-3 border-b border-[rgba(197,160,89,0.15)] pb-2 last:border-0"
+              >
+                <dt className="font-serif text-[12px] italic text-[var(--color-accent-gold)]">
+                  {t.name_pl}
+                </dt>
+                <dd className="text-[#cbc1b1]">{t.associations_pl}</dd>
+              </div>
+            ))}
+          </dl>
+          <details className="mt-4 group">
+            <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4ede0]">
+              ❦ Pełny opis sektora
+            </summary>
+            <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
+              {focused.sector.long_pl}
+            </p>
+          </details>
+        </>
+      ) : (
+        <>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{focused.sector.short_pl}</p>
+          <dl className="mt-4 space-y-2.5 text-[13px] leading-relaxed">
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Skojarzenia</dt>
+              <dd className="text-[#e6dccd]/90">{focused.tendencja.associations_pl}</dd>
+            </div>
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Przykład</dt>
+              <dd className="font-serif italic text-[#e6dccd]/85">{focused.tendencja.examples_pl}</dd>
+            </div>
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Spotkasz w</dt>
+              <dd className="text-[#cbc1b1]">{focused.tendencja.found_in_pl}</dd>
+            </div>
+          </dl>
+          <details className="mt-4 group">
+            <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4ede0]">
+              ❦ Pełny opis sektora
+            </summary>
+            <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">{focused.sector.long_pl}</p>
+          </details>
+        </>
+      )}
 
       <div className="mt-5 flex flex-wrap gap-2">
         <button
@@ -337,16 +471,22 @@ function FocusedCard({
   );
 }
 
-function IdleCard({ onStartTour }: { onStartTour: () => void }) {
+function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: () => void }) {
+  const what =
+    level === 1
+      ? { count: 3, plural: "trzy smaki bazowe" }
+      : level === 2
+        ? { count: 6, plural: "sześć wrażeń" }
+        : { count: 12, plural: "dwanaście tendencji" };
   return (
     <div>
       <p className="pitch-eyebrow pitch-eyebrow--start">Vinokompas</p>
       <h3 className="pitch-display mt-3 text-2xl text-white">
-        Najedź na sektor lub<br />uruchom przewodnika
+        Najedź na koło lub<br />uruchom przewodnika
       </h3>
       <p className="mt-3 text-sm leading-relaxed text-[#e6dccd]">
-        Tarcza Vinokompasu pokaże opis każdego wrażenia. Możesz też pozwolić, by
-        przewodnik przeszedł przez wszystkie 12 tendencji automatycznie — wystarczy nacisnąć przycisk poniżej.
+        Tarcza Vinokompasu pokaże opis każdego elementu. Możesz też pozwolić,
+        by przewodnik przeszedł przez {what.plural} automatycznie — wystarczy nacisnąć przycisk poniżej.
       </p>
       <button
         type="button"

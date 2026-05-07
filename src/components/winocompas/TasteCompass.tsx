@@ -20,9 +20,29 @@ import { COMPASS_SECTORS, type CompassSector, type Tendencja } from "@/data/wine
 
 export type Intensity = 0 | 1 | 2 | 3 | 4;
 export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-4
+/**
+ * Compass progressive-disclosure level.
+ *  1 — only 3 base smaki axes (cierpkość / słodycz / kwasowość)
+ *  2 — adds 6 sektor wedges (świeżość · oleistość · miękkość · tęgość ·
+ *      szorstkość · ziemistość) clickable as a whole
+ *  3 — full 12-tendencja interactive compass (default; backwards-compat)
+ *
+ * Each level adds a layer of click targets and labels. The underlying
+ * profile model stays the same — sektor clicks fan their value to both
+ * tendencje under that sektor; base clicks set base.<id>.
+ */
+export type CompassLevel = 1 | 2 | 3;
 
 const MAX_INTENSITY = 4;
 const RING_COUNT = MAX_INTENSITY + 1; // 0..4 = 5 rings
+
+// 3 base smaki anchored at 120° intervals starting from 12 o'clock.
+// Order matches BASE_TASTES so we can iterate either side.
+const BASE_AXES = [
+  { id: "cierpkosc", label: "CIERPKOŚĆ", angle: -Math.PI / 2 },                 // top
+  { id: "slodycz",   label: "SŁODYCZ",   angle: -Math.PI / 2 + (2 * Math.PI) / 3 }, // lower-right
+  { id: "kwasowosc", label: "KWASOWOŚĆ", angle: -Math.PI / 2 + (4 * Math.PI) / 3 }, // lower-left
+] as const;
 
 interface SpokeMeta {
   sector: CompassSector;
@@ -96,15 +116,30 @@ interface Props {
   showLabels?: boolean;
   /** Diameter override; defaults to 100% of container. */
   size?: number;
-  /** Bubble hover changes to the parent (for side info-panels / tours). */
-  onHoverChange?: (tendencjaId: string | null) => void;
-  /** Force a tendencja to look "hovered" — overrides internal hover. Used
-   *  by <InteractiveCompass> to pulse a spoke during the auto-tour. */
+  /** Bubble hover changes to the parent (for side info-panels / tours).
+   *  Bubbled IDs may be tendencja id, sektor id, or `base.<smak>` id
+   *  depending on the active level. */
+  onHoverChange?: (focusId: string | null) => void;
+  /** Force a focus highlight from the parent — overrides internal hover.
+   *  Used by <InteractiveCompass> for the guided auto-tour. Accepts a
+   *  tendencja id, sektor id, or `base.<smak>` id. */
   externalHighlightId?: string | null;
   /** Hide the bottom legend (tag chips) — useful when wrapper provides its
    *  own info side-panel. */
   hideLegend?: boolean;
+  /** Progressive-disclosure level (1=base only, 2=+sektor, 3=+tendencje).
+   *  Defaults to 3 to keep all existing call-sites unchanged. */
+  level?: CompassLevel;
 }
+
+// Sektor avg helper — fans the same value to both tendencje under a sektor.
+const sektorAvg = (profile: CompassProfile, sektorId: string): number => {
+  const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
+  if (!s) return 0;
+  const a = (profile[s.tendencje[0].id] ?? 0) as number;
+  const b = (profile[s.tendencje[1].id] ?? 0) as number;
+  return Math.round((a + b) / 2);
+};
 
 export default function TasteCompass({
   profile: profileProp,
@@ -115,6 +150,7 @@ export default function TasteCompass({
   onHoverChange,
   externalHighlightId,
   hideLegend = false,
+  level = 3,
 }: Props) {
   const isControlled = profileProp !== undefined;
   const [internal, setInternal] = useState<CompassProfile>(() => defaultProfile ?? {});
@@ -142,6 +178,36 @@ export default function TasteCompass({
       const cur = (profile[id] ?? 0) as Intensity;
       const next = (cur + 1) % RING_COUNT;
       setIntensity(id, next as Intensity);
+    },
+    [profile, setIntensity],
+  );
+
+  // Level-2 click: cycle the average for the sektor and fan it to BOTH
+  // tendencje under it (so downstream consumers see a coherent profile
+  // even when the user never opens level 3).
+  const cycleSektor = useCallback(
+    (sektorId: string) => {
+      const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
+      if (!s) return;
+      const cur = sektorAvg(profile, sektorId);
+      const next = ((cur + 1) % RING_COUNT) as Intensity;
+      setProfile({
+        ...profile,
+        [s.tendencje[0].id]: next,
+        [s.tendencje[1].id]: next,
+      });
+    },
+    [profile, setProfile],
+  );
+
+  // Level-1 click: cycle a base smak. Same 0..4 ring scale, stored under
+  // `base.<id>` so it doesn't collide with tendencja keys.
+  const cycleBase = useCallback(
+    (baseId: string) => {
+      const key = `base.${baseId}`;
+      const cur = (profile[key] ?? 0) as Intensity;
+      const next = ((cur + 1) % RING_COUNT) as Intensity;
+      setIntensity(key, next);
     },
     [profile, setIntensity],
   );
@@ -272,13 +338,15 @@ export default function TasteCompass({
           />
         ))}
 
-        {/* Spokes — radial dividers between tendencje */}
+        {/* Spokes — radial dividers between tendencje. Faded out at level 1
+            (when only base axes matter) so the disc reads simpler. */}
         {SPOKES.map((s) => {
           const x = cx + rOuter * Math.sin(s.angle - s.half);
           const y = cy - rOuter * Math.cos(s.angle - s.half);
           return (
             <line
               key={`spoke-${s.tendencja.id}`}
+              opacity={level >= 2 ? 1 : 0.18}
               x1={cx}
               y1={cy}
               x2={x}
@@ -289,72 +357,198 @@ export default function TasteCompass({
           );
         })}
 
-        {/* Filled intensity per tendencja */}
-        {spokes.map((s) => {
-          const slices: React.ReactNode[] = [];
-          for (let i = 0; i < s.intensity; i++) {
-            const r1 = rInner + ringStep * i;
-            const r2 = rInner + ringStep * (i + 1);
-            slices.push(
-              <path
-                key={`fill-${s.tendencja.id}-${i}`}
-                d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
-                fill={s.sector.color}
-                fillOpacity={0.45 + (i / RING_COUNT) * 0.55}
-                pointerEvents="none"
-              />,
-            );
-          }
-          return <g key={`fillg-${s.tendencja.id}`}>{slices}</g>;
-        })}
+        {/* Filled intensity — at level 3 we draw per-tendencja (12 wedges);
+            at level 2 we paint the average across BOTH tendencje of each
+            sektor as a single wide wedge so the L2 view stays clean. */}
+        {level >= 3
+          ? spokes.map((s) => {
+              const slices: React.ReactNode[] = [];
+              for (let i = 0; i < s.intensity; i++) {
+                const r1 = rInner + ringStep * i;
+                const r2 = rInner + ringStep * (i + 1);
+                slices.push(
+                  <path
+                    key={`fill-${s.tendencja.id}-${i}`}
+                    d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
+                    fill={s.sector.color}
+                    fillOpacity={0.45 + (i / RING_COUNT) * 0.55}
+                    pointerEvents="none"
+                  />,
+                );
+              }
+              return <g key={`fillg-${s.tendencja.id}`}>{slices}</g>;
+            })
+          : level === 2
+            ? COMPASS_SECTORS.map((sector, sIdx) => {
+                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+                const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+                const start = angleCenter - arc / 2 + 0.01;
+                const end = angleCenter + arc / 2 - 0.01;
+                const intensity = sektorAvg(profile, sector.id);
+                if (intensity <= 0) return null;
+                const slices: React.ReactNode[] = [];
+                for (let i = 0; i < intensity; i++) {
+                  const r1 = rInner + ringStep * i;
+                  const r2 = rInner + ringStep * (i + 1);
+                  slices.push(
+                    <path
+                      key={`l2fill-${sector.id}-${i}`}
+                      d={annularPath(cx, cy, r1, r2, start, end)}
+                      fill={sector.color}
+                      fillOpacity={0.40 + (i / RING_COUNT) * 0.55}
+                      pointerEvents="none"
+                    />,
+                  );
+                }
+                return <g key={`l2fillg-${sector.id}`}>{slices}</g>;
+              })
+            : null}
 
-        {/* Hover preview ring (also drives guided-tour highlight via
-            externalHighlightId — see effectiveHover) */}
+        {/* Hover / tour highlight — handles three target kinds:
+            1) tendencja id  → highlight that spoke (current behaviour)
+            2) sektor id     → highlight whole sektor wedge (level 2)
+            3) base.<id>     → glow on the matching base axis (level 1) */}
         {effectiveHover &&
           (() => {
+            const isTour = externalHighlightId === effectiveHover;
+            // 1) tendencja
             const s = spokes.find((sp) => sp.tendencja.id === effectiveHover);
-            if (!s) return null;
-            const r1 = rInner + ringStep * s.intensity;
-            const r2 = rInner + ringStep * (s.intensity + 1);
-            // For tour highlight on a fully-empty spoke we still want to
-            // show SOMETHING. Draw the next ring (or the full first ring
-            // if intensity is 0) at higher opacity.
-            if (s.intensity >= MAX_INTENSITY) {
-              // Outline the full filled spoke with a soft glow ring.
+            if (s && level >= 3) {
+              const r1 = rInner + ringStep * s.intensity;
+              const r2 = rInner + ringStep * (s.intensity + 1);
+              if (s.intensity >= MAX_INTENSITY) {
+                return (
+                  <path
+                    d={annularPath(cx, cy, rInner, rOuter, s.start + 0.005, s.end - 0.005)}
+                    fill="none"
+                    stroke={s.sector.color}
+                    strokeOpacity={0.85}
+                    strokeWidth={1.4}
+                    pointerEvents="none"
+                  />
+                );
+              }
               return (
                 <path
-                  d={annularPath(cx, cy, rInner, rOuter, s.start + 0.005, s.end - 0.005)}
-                  fill="none"
-                  stroke={s.sector.color}
+                  d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
+                  fill={s.sector.color}
+                  fillOpacity={isTour ? 0.32 : 0.18}
+                  pointerEvents="none"
+                >
+                  {isTour ? (
+                    <animate attributeName="fill-opacity" values="0.18;0.45;0.18" dur="2s" repeatCount="indefinite" />
+                  ) : null}
+                </path>
+              );
+            }
+            // 2) sektor (level 2)
+            const sektor = COMPASS_SECTORS.find((x) => x.id === effectiveHover);
+            if (sektor) {
+              const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+              const sIdx = COMPASS_SECTORS.indexOf(sektor);
+              const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+              return (
+                <path
+                  d={annularPath(cx, cy, rInner, rOuter, angleCenter - arc / 2 + 0.01, angleCenter + arc / 2 - 0.01)}
+                  fill={sektor.color}
+                  fillOpacity={isTour ? 0.18 : 0.10}
+                  stroke={sektor.color}
                   strokeOpacity={0.85}
                   strokeWidth={1.4}
                   pointerEvents="none"
-                />
+                >
+                  {isTour ? (
+                    <animate attributeName="fill-opacity" values="0.10;0.28;0.10" dur="2s" repeatCount="indefinite" />
+                  ) : null}
+                </path>
               );
             }
-            const isTourHighlight =
-              externalHighlightId === s.tendencja.id;
-            return (
-              <path
-                d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
-                fill={s.sector.color}
-                fillOpacity={isTourHighlight ? 0.32 : 0.18}
-                pointerEvents="none"
-              >
-                {isTourHighlight ? (
-                  <animate
-                    attributeName="fill-opacity"
-                    values="0.18;0.45;0.18"
-                    dur="2s"
-                    repeatCount="indefinite"
-                  />
-                ) : null}
-              </path>
-            );
+            // 3) base.<id> (level 1) — glow disc behind the matching beam
+            if (effectiveHover.startsWith("base.")) {
+              const baseId = effectiveHover.slice(5);
+              const axis = BASE_AXES.find((a) => a.id === baseId);
+              if (!axis) return null;
+              const x = cx + (rOuter + 4) * Math.sin(axis.angle);
+              const y = cy - (rOuter + 4) * Math.cos(axis.angle);
+              return (
+                <circle cx={x} cy={y} r={20} fill="var(--color-accent-gold)" fillOpacity={isTour ? 0.30 : 0.18} pointerEvents="none">
+                  {isTour ? (
+                    <animate attributeName="fill-opacity" values="0.18;0.42;0.18" dur="2s" repeatCount="indefinite" />
+                  ) : null}
+                </circle>
+              );
+            }
+            return null;
           })()}
 
-        {/* Touch / click target — full spoke wedge */}
-        {spokes.map((s) => {
+        {/* Level-2 click overlay — one wedge per sektor (cycles avg) */}
+        {level === 2 &&
+          COMPASS_SECTORS.map((sector, sIdx) => {
+            const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+            const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+            const start = angleCenter - arc / 2;
+            const end = angleCenter + arc / 2;
+            const value = sektorAvg(profile, sector.id);
+            return (
+              <path
+                key={`l2touch-${sector.id}`}
+                d={annularPath(cx, cy, rInner, rOuter, start, end)}
+                fill="transparent"
+                stroke="transparent"
+                tabIndex={0}
+                role="slider"
+                aria-label={sector.name_pl}
+                aria-valuemin={0}
+                aria-valuemax={MAX_INTENSITY}
+                aria-valuenow={value}
+                aria-valuetext={`${value} z ${MAX_INTENSITY}`}
+                onClick={() => cycleSektor(sector.id)}
+                onMouseEnter={() => reportHover(sector.id)}
+                onMouseLeave={() =>
+                  reportHover(hovered === sector.id ? null : hovered)
+                }
+                style={{ cursor: "pointer", outline: "none" }}
+                className="taste-compass-touch"
+              />
+            );
+          })}
+
+        {/* Level-1 click overlay — 3 broad wedges, each ~120° wide,
+            centred on the corresponding base axis. Big touch areas so
+            mobile users can tap easily. */}
+        {level === 1 &&
+          BASE_AXES.map((axis) => {
+            const arc = (Math.PI * 2) / BASE_AXES.length;
+            const start = axis.angle - arc / 2;
+            const end = axis.angle + arc / 2;
+            const id = `base.${axis.id}`;
+            const value = (profile[id] ?? 0) as number;
+            return (
+              <path
+                key={`l1touch-${axis.id}`}
+                d={annularPath(cx, cy, rInner, rOuter, start, end)}
+                fill="transparent"
+                stroke="transparent"
+                tabIndex={0}
+                role="slider"
+                aria-label={axis.label}
+                aria-valuemin={0}
+                aria-valuemax={MAX_INTENSITY}
+                aria-valuenow={value}
+                aria-valuetext={`${value} z ${MAX_INTENSITY}`}
+                onClick={() => cycleBase(axis.id)}
+                onMouseEnter={() => reportHover(id)}
+                onMouseLeave={() =>
+                  reportHover(hovered === id ? null : hovered)
+                }
+                style={{ cursor: "pointer", outline: "none" }}
+                className="taste-compass-touch"
+              />
+            );
+          })}
+
+        {/* Touch / click target — full spoke wedge (level 3 only) */}
+        {level >= 3 && spokes.map((s) => {
           const fit = s.intensity;
           return (
             <path
@@ -398,8 +592,10 @@ export default function TasteCompass({
 
         {/* Outer labels — horizontal text, smart-anchored by quadrant.
             Long labels split on `·` into two lines. The label sits on a
-            short radial tick line for premium chart-y feel. */}
-        {showLabels &&
+            short radial tick line for premium chart-y feel.
+            Only rendered at level 3 (12 tendencje view) — at lower levels
+            this would clutter the disc. */}
+        {showLabels && level >= 3 &&
           spokes.map((s) => {
             const xUnit = Math.sin(s.angle);
             const yUnit = -Math.cos(s.angle);
@@ -467,8 +663,10 @@ export default function TasteCompass({
             );
           })}
 
-        {/* Sector noun labels — one per sector, larger, between the 2 tendencje */}
-        {COMPASS_SECTORS.map((sector, sIdx) => {
+        {/* Sector noun labels — one per sector, larger, between the 2 tendencje.
+            Faded at level 1 (compass shows only base axes there) and given
+            a stronger weight at level 2 (where sektor IS the unit of work). */}
+        {level >= 2 && COMPASS_SECTORS.map((sector, sIdx) => {
           const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
           const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
           const r = (rOuter + rInner) / 2 - 4;
@@ -483,14 +681,96 @@ export default function TasteCompass({
               dominantBaseline="middle"
               fontFamily="var(--font-serif)"
               fontStyle="italic"
-              fontSize={11}
-              fontWeight={500}
-              fill="rgba(255,255,255,0.55)"
+              fontSize={level === 2 ? 13 : 11}
+              fontWeight={level === 2 ? 600 : 500}
+              fill={level === 2 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.55)"}
               pointerEvents="none"
               className="select-none"
             >
               {sector.name_pl}
             </text>
+          );
+        })}
+
+        {/* Base-smak axis overlay — 3 gold beams + labels at the perimeter.
+            Always rendered so the user keeps the reference even at level
+            2/3, but visually loud only at level 1 (where it's the only
+            interaction). Beam length = base intensity × ringStep (0..rOuter). */}
+        {BASE_AXES.map((axis) => {
+          const baseId = `base.${axis.id}`;
+          const value = (profile[baseId] ?? 0) as number;
+          const xUnit = Math.sin(axis.angle);
+          const yUnit = -Math.cos(axis.angle);
+          const beamLen = rInner + ringStep * value;
+          const beamX = cx + beamLen * xUnit;
+          const beamY = cy + beamLen * yUnit;
+          const labelX = cx + (rOuter + 30) * xUnit;
+          const labelY = cy + (rOuter + 30) * yUnit;
+          const dimWhenIrrelevant = level >= 2 ? 0.4 : 1;
+          return (
+            <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
+              {/* Faint axis line ALWAYS shown to anchor the geometry */}
+              <line
+                x1={cx}
+                y1={cy}
+                x2={cx + (rOuter - 4) * xUnit}
+                y2={cy + (rOuter - 4) * yUnit}
+                stroke="rgba(197, 160, 89, 0.30)"
+                strokeWidth={0.8}
+                strokeDasharray="2 3"
+              />
+              {/* Filled beam — proportional to value */}
+              {value > 0 ? (
+                <line
+                  x1={cx}
+                  y1={cy}
+                  x2={beamX}
+                  y2={beamY}
+                  stroke="var(--color-accent-gold)"
+                  strokeWidth={3.5}
+                  strokeLinecap="round"
+                  opacity={0.85}
+                />
+              ) : null}
+              {/* Tip dot at axis end (always visible — the click hint) */}
+              <circle
+                cx={cx + rOuter * xUnit}
+                cy={cy + rOuter * yUnit}
+                r={4}
+                fill="var(--color-accent-gold)"
+                opacity={value > 0 ? 1 : 0.55}
+              />
+              {/* Label */}
+              <text
+                x={labelX}
+                y={labelY}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontFamily="var(--font-display)"
+                fontSize={level === 1 ? 13 : 10.5}
+                fontWeight={700}
+                letterSpacing="0.18em"
+                fill="var(--color-accent-gold)"
+                className="select-none"
+              >
+                {axis.label}
+              </text>
+              {/* Value pill at axis end (level 1 only — too noisy at higher levels) */}
+              {level === 1 ? (
+                <text
+                  x={cx + (rOuter + 14) * xUnit}
+                  y={cy + (rOuter + 14) * yUnit}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontFamily="ui-monospace, SFMono-Regular, monospace"
+                  fontSize={10}
+                  fill="rgba(244, 237, 224, 0.75)"
+                  className="select-none"
+                >
+                  {value}/{MAX_INTENSITY}
+                </text>
+              ) : null}
+            </g>
           );
         })}
       </svg>
