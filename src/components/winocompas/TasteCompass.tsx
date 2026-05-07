@@ -292,9 +292,11 @@ export default function TasteCompass({
         aria-label="Tarcza Vinokompasu — zaznacz intensywność każdej tendencji"
       >
         <defs>
+          {/* BG gradient reads from semantic tokens — flips dark↔white per
+              theme without re-rendering. */}
           <radialGradient id={`${baseId}-bg`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#1a0e10" />
-            <stop offset="100%" stopColor="#0c0506" />
+            <stop offset="0%" stopColor="var(--surface-elevated)" />
+            <stop offset="100%" stopColor="var(--surface-deep)" />
           </radialGradient>
           {COMPASS_SECTORS.map((s) => (
             <radialGradient key={s.id} id={`${baseId}-grad-${s.id}`} cx="50%" cy="50%" r="60%">
@@ -319,13 +321,13 @@ export default function TasteCompass({
               d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
               fill={sector.color}
               fillOpacity={0.06}
-              stroke="rgba(255,255,255,0.04)"
+              stroke="var(--hairline)"
               strokeWidth={0.5}
             />
           );
         })}
 
-        {/* Concentric ring lines */}
+        {/* Concentric ring lines — theme-aware via hairline var */}
         {Array.from({ length: RING_COUNT + 1 }).map((_, i) => (
           <circle
             key={`ring-${i}`}
@@ -333,7 +335,7 @@ export default function TasteCompass({
             cy={cy}
             r={rInner + ringStep * i}
             fill="none"
-            stroke="rgba(255,255,255,0.05)"
+            stroke="var(--hairline)"
             strokeWidth={0.6}
           />
         ))}
@@ -351,7 +353,7 @@ export default function TasteCompass({
               y1={cy}
               x2={x}
               y2={y}
-              stroke="rgba(255,255,255,0.08)"
+              stroke="var(--hairline-strong)"
               strokeWidth={0.5}
             />
           );
@@ -575,8 +577,8 @@ export default function TasteCompass({
           );
         })}
 
-        {/* Center hub + 6-pointed compass star */}
-        <circle cx={cx} cy={cy} r={rInner} fill="#0e0608" stroke="rgba(197,160,89,0.45)" strokeWidth={0.7} />
+        {/* Center hub + 6-pointed compass star — fill flips per theme */}
+        <circle cx={cx} cy={cy} r={rInner} fill="var(--surface-deep)" stroke="var(--gold-hairline)" strokeWidth={0.7} />
         <text
           x={cx}
           y={cy + 4}
@@ -584,7 +586,8 @@ export default function TasteCompass({
           fontFamily="var(--font-serif)"
           fontStyle="italic"
           fontSize={12}
-          fill="rgba(197,160,89,0.85)"
+          fill="var(--color-accent-gold)"
+          opacity={0.9}
           pointerEvents="none"
         >
           Vinokompas
@@ -642,7 +645,8 @@ export default function TasteCompass({
                   fontSize={9.2}
                   fontWeight={600}
                   letterSpacing="0.04em"
-                  fill="rgba(244,237,224,0.86)"
+                  fill="var(--ink)"
+                  opacity={0.9}
                   className="select-none"
                 >
                   {lines.length === 1 ? (
@@ -683,7 +687,8 @@ export default function TasteCompass({
               fontStyle="italic"
               fontSize={level === 2 ? 13 : 11}
               fontWeight={level === 2 ? 600 : 500}
-              fill={level === 2 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.55)"}
+              fill="var(--ink)"
+              opacity={level === 2 ? 0.95 : 0.65}
               pointerEvents="none"
               className="select-none"
             >
@@ -764,7 +769,8 @@ export default function TasteCompass({
                   dominantBaseline="middle"
                   fontFamily="ui-monospace, SFMono-Regular, monospace"
                   fontSize={10}
-                  fill="rgba(244, 237, 224, 0.75)"
+                  fill="var(--ink)"
+                  opacity={0.75}
                   className="select-none"
                 >
                   {value}/{MAX_INTENSITY}

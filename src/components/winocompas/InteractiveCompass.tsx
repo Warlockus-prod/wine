@@ -285,17 +285,27 @@ export default function InteractiveCompass({
 
       {/* ── Side info panel ─────────────────────────────────────────── */}
       <aside
-        className="rounded-2xl border border-[rgba(197,160,89,0.22)] p-5 transition"
+        className="rounded-2xl border p-5 transition"
         style={(() => {
           const accent =
             focused?.kind === "tendencja" || focused?.kind === "sektor"
               ? focused.sector.color
-              : "#c5a059";
+              : "var(--color-accent-gold)";
+          // Use the semantic surface vars so the panel flips dark/cream
+          // with the page. The accent overlay (sektor color at 0x1f) reads
+          // on both backgrounds; border tint stays themed.
           return {
             background: focused
-              ? `linear-gradient(180deg, ${accent}1f, transparent 70%), #150a0c`
-              : "#150a0c",
-            borderColor: focused ? `${accent}44` : "rgba(197,160,89,0.22)",
+              ? `linear-gradient(180deg, ${
+                  focused.kind === "base" ? "rgba(197,160,89,0.12)" : accent + "1f"
+                }, transparent 70%), var(--surface-elevated)`
+              : "var(--surface-elevated)",
+            borderColor:
+              focused?.kind === "tendencja" || focused?.kind === "sektor"
+                ? `${focused.sector.color}55`
+                : "var(--gold-hairline)",
+            color: "var(--ink)",
+            boxShadow: "var(--shadow-card)",
           };
         })()}
         aria-live="polite"

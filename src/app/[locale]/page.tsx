@@ -300,7 +300,14 @@ export default function Home() {
                         </p>
                       </button>
 
-                      <div className="grid shrink-0 gap-2 rounded-[22px] border border-white/10 bg-[#130b0df0] p-3 text-center">
+                      <div
+                        className="grid shrink-0 gap-2 rounded-[22px] border p-3 text-center"
+                        style={{
+                          background: "var(--surface-deep)",
+                          borderColor: "var(--gold-hairline-soft)",
+                          color: "var(--ink-soft)",
+                        }}
+                      >
                         <Image
                           src={restaurant.qrUrl}
                           alt={`QR code for ${t(restaurant.name, locale)}`}
