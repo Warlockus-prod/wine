@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
@@ -65,6 +65,28 @@ export default function Home() {
     filteredRestaurants.find((restaurant) => restaurant.slug === effectiveSelectedSlug) ??
     filteredRestaurants[0] ??
     null;
+
+  // Refs to each catalog card so we can scroll the selected one into view
+  // when the user picks from the map. Keyed by slug; map cleared on
+  // unmount via callback ref returning undefined.
+  const cardRefs = useRef<Map<string, HTMLElement>>(new Map());
+  // Track whether the latest selection came from a USER action (map click,
+  // catalog click) vs initial mount — only auto-scroll on user actions to
+  // avoid jumping the page on first paint.
+  const userPickedRef = useRef(false);
+  const handlePick = (slug: string) => {
+    userPickedRef.current = true;
+    setSelectedSlug(slug);
+  };
+
+  useEffect(() => {
+    if (!userPickedRef.current) return;
+    if (!effectiveSelectedSlug) return;
+    const el = cardRefs.current.get(effectiveSelectedSlug);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    userPickedRef.current = false;
+  }, [effectiveSelectedSlug]);
 
   return (
     <div className="min-h-screen bg-background-dark text-gray-100">
@@ -167,7 +189,7 @@ export default function Home() {
               <RestaurantMap
                 restaurants={filteredRestaurants}
                 selectedSlug={effectiveSelectedSlug}
-                onSelect={setSelectedSlug}
+                onSelect={handlePick}
               />
 
               <div className="pointer-events-none absolute top-3 left-3 z-[400] rounded-full border border-white/10 bg-black/55 px-2.5 py-0.5 text-[10px] font-semibold tracking-[0.22em] text-gray-200 uppercase backdrop-blur sm:top-4 sm:left-4 sm:px-3 sm:py-1 sm:text-[11px]">
@@ -242,16 +264,24 @@ export default function Home() {
                 return (
                   <article
                     key={restaurant.slug}
-                    className={`rounded-[28px] border p-4 transition ${
+                    ref={(el) => {
+                      if (el) cardRefs.current.set(restaurant.slug, el);
+                      else cardRefs.current.delete(restaurant.slug);
+                    }}
+                    // scroll-margin-top so smooth-scroll lands below the
+                    // sticky nav (h-20 = 5rem); without it the card hides
+                    // under the navbar.
+                    style={{ scrollMarginTop: "6.5rem" }}
+                    className={`relative rounded-[28px] border p-4 transition ${
                       selected
-                        ? "border-primary/35 bg-primary/8 shadow-[0_0_0_1px_rgba(209,21,52,0.2)]"
-                        : "border-white/8 bg-black/12"
+                        ? "border-primary/55 bg-primary/12 shadow-[0_0_0_2px_rgba(209,21,52,0.35),0_18px_40px_rgba(209,21,52,0.18)]"
+                        : "border-white/8 bg-black/12 hover:border-white/20"
                     }`}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <button
                         type="button"
-                        onClick={() => setSelectedSlug(restaurant.slug)}
+                        onClick={() => handlePick(restaurant.slug)}
                         className="min-w-0 flex-1 text-left"
                       >
                         <div className="flex flex-wrap items-center gap-2">

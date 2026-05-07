@@ -119,14 +119,19 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
       el.className = "wn-marker";
       el.setAttribute("aria-label", t(r.name, locale));
       el.dataset.selected = r.slug === selectedSlug ? "true" : "false";
-      el.innerHTML = '<span class="wn-marker__dot"></span>';
+      // Each marker now carries a visible name pill so the map reads as
+      // "places with names", not "anonymous dots". Label sits to the right
+      // of the dot with a hairline tail; pulses gold when selected.
+      el.innerHTML =
+        '<span class="wn-marker__dot"></span>' +
+        `<span class="wn-marker__label">${escapeHtml(t(r.name, locale))}</span>`;
       el.addEventListener("click", (event) => {
         event.stopPropagation();
         onSelectRef.current(r.slug);
         map.flyTo({ center: [r.lng, r.lat], zoom: Math.max(map.getZoom(), 6), duration: 700 });
       });
 
-      const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+      const marker = new mapboxgl.Marker({ element: el, anchor: "left" })
         .setLngLat([r.lng, r.lat])
         .setPopup(
           new mapboxgl.Popup({ offset: 18, closeButton: false, className: "wn-popup" }).setHTML(
@@ -156,13 +161,27 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
     map.fitBounds(bounds, { padding: 60, maxZoom: 10, duration: 600 });
   }, [restaurants]);
 
-  // Fly-to selected restaurant.
+  // Fly-to selected restaurant + auto-open its popup. Closes any other
+  // open popup so the map always reflects the active selection visually.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !selectedSlug) return;
     const r = restaurants.find((x) => x.slug === selectedSlug);
     if (!r) return;
+
     map.flyTo({ center: [r.lng, r.lat], zoom: Math.max(map.getZoom(), 8), duration: 700 });
+
+    // Close every popup that isn't the selected one, then open the active
+    // one (idempotent — togglePopup would close an already-open popup).
+    for (const [slug, marker] of markersRef.current.entries()) {
+      const p = marker.getPopup();
+      if (!p) continue;
+      if (slug === selectedSlug) {
+        if (!p.isOpen()) marker.togglePopup();
+      } else if (p.isOpen()) {
+        marker.togglePopup();
+      }
+    }
   }, [selectedSlug, restaurants]);
 
   return (

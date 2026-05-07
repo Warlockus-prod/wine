@@ -1069,7 +1069,8 @@ body {
   }
 }
 
-/* Mapbox GL — restaurant marker and popup styling. Dark theme matching brand. */
+/* Mapbox GL — restaurant marker (named pill) + popup. Anchored "left" so
+   the dot sits on the map coordinate and the label trails to the right. */
 .wn-marker {
   appearance: none;
   background: transparent;
@@ -1078,36 +1079,91 @@ body {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
+  gap: 8px;
+  font: inherit;
+  text-align: left;
+  /* Width grows with label; height is the dot's hit area. */
   height: 28px;
+  transform-origin: left center;
+  transition: transform 180ms ease;
 }
 .wn-marker__dot {
   display: block;
+  flex: 0 0 auto;
   width: 14px;
   height: 14px;
   border-radius: 9999px;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  background: #2a1416;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  background: #d11534;
+  box-shadow:
+    0 0 0 4px rgba(209, 21, 52, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.45);
   transition:
     background 180ms ease,
     box-shadow 180ms ease,
     transform 180ms ease;
 }
+.wn-marker__label {
+  display: inline-block;
+  padding: 3px 9px 4px;
+  border-radius: 9999px;
+  background: rgba(20, 11, 13, 0.92);
+  border: 1px solid rgba(197, 160, 89, 0.40);
+  color: #f4ede0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.40);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+  pointer-events: none; /* whole button is the click target */
+}
+.wn-marker:hover .wn-marker__dot,
 .wn-marker[data-selected="true"] .wn-marker__dot {
   background: #d11534;
-  border-color: #ffffff;
-  box-shadow: 0 0 0 8px rgba(209, 21, 52, 0.32);
-  transform: scale(1.2);
+  box-shadow:
+    0 0 0 8px rgba(209, 21, 52, 0.32),
+    0 1px 4px rgba(0, 0, 0, 0.45);
+  transform: scale(1.15);
 }
-.wn-marker:hover .wn-marker__dot {
-  background: #d11534;
+.wn-marker:hover .wn-marker__label {
+  background: #2a1216;
+  border-color: rgba(197, 160, 89, 0.85);
+  color: #fff;
+}
+.wn-marker[data-selected="true"] {
+  z-index: 10;
+}
+.wn-marker[data-selected="true"] .wn-marker__label {
+  background: linear-gradient(180deg, #d11534, #a00f28);
+  border-color: rgba(255, 230, 200, 0.65);
+  color: #fff;
+  font-weight: 700;
+  box-shadow:
+    0 4px 18px rgba(209, 21, 52, 0.40),
+    0 0 0 1px rgba(197, 160, 89, 0.35);
 }
 .wn-marker:focus-visible {
   outline: 2px solid #c5a059;
   outline-offset: 4px;
   border-radius: 9999px;
+}
+/* Light-theme override — labels read on cream paper, not against it */
+:root[data-theme="light"] .wn-marker__label {
+  background: rgba(253, 250, 242, 0.95);
+  border-color: rgba(155, 105, 22, 0.45);
+  color: var(--ink-strong);
+}
+:root[data-theme="light"] .wn-marker:hover .wn-marker__label {
+  background: #fff;
+  border-color: rgba(155, 105, 22, 0.85);
 }
 
 .mapboxgl-popup.wn-popup .mapboxgl-popup-content {
