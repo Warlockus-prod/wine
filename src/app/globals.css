@@ -337,6 +337,22 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
   ) !important;
 }
 
+/* Format pills on the catalogue cards — restaurant.coverGradient ships
+   dark hex stops (`from-[#5f2f23] via-[#a04d2b] to-[#e1a65b]`) which on
+   cream paper read as heavy dark blocks. In light mode lift them with an
+   inner translucent layer so the brand color stays visible but not
+   overwhelming. Selector targets the small format-pill at the top-left
+   of each catalogue card (rounded-full + bg-gradient-to-r combo). */
+:root[data-theme="light"] span[class*="rounded-full"][class*="bg-gradient-to-r"][class*="from-["],
+:root[data-theme="light"] div[class*="rounded-full"][class*="bg-gradient-to-r"][class*="from-["] {
+  background-blend-mode: lighten;
+  background-color: rgba(255, 255, 255, 0.55);
+  filter: saturate(0.92) brightness(1.05);
+  box-shadow:
+    0 0 0 1px rgba(155, 105, 22, 0.20),
+    0 4px 10px rgba(80, 40, 20, 0.10);
+}
+
 * {
   box-sizing: border-box;
 }

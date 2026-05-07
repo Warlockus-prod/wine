@@ -7,7 +7,12 @@ import { decorateRestaurants } from "@/lib/restaurant-directory";
 import type { CatalogRestaurant } from "@/lib/restaurant-directory";
 import type { Dish, DishPairing, Restaurant, Wine } from "@/types/restaurant";
 
-const STORAGE_KEY = "web_wn_restaurant_catalog_v1";
+// v2 — bumped after the 5-cuisine rebrand (Senses→Sukiyabashi Jiro,
+// Bottiglieria→Osteria Francescana, Pod Aniołami→Lasserre, Brovariusz→
+// Maido). Old v1 data orphans in localStorage but next visit reads fresh
+// seed with the new brand names. Bump again whenever the seed shape
+// changes or restaurants are renamed.
+const STORAGE_KEY = "web_wn_restaurant_catalog_v2";
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 

@@ -197,41 +197,58 @@ export default function Home() {
               </div>
 
               {selectedRestaurant ? (
-                <div className="absolute right-2 bottom-2 left-2 z-[400] rounded-[20px] border border-white/10 bg-[#160d0ff0] p-3 shadow-2xl backdrop-blur-md sm:right-3 sm:bottom-3 sm:left-3 sm:rounded-[26px] sm:p-4">
+                // Selected-restaurant overlay sits on the always-dark Mapbox
+                // satellite layer. Inline styles bypass the light-theme
+                // text-white shim so the card stays readable in both themes.
+                <div
+                  className="absolute right-2 bottom-2 left-2 z-[400] rounded-[20px] border p-3 shadow-2xl backdrop-blur-md sm:right-3 sm:bottom-3 sm:left-3 sm:rounded-[26px] sm:p-4"
+                  style={{
+                    background: "rgba(22, 13, 15, 0.94)",
+                    borderColor: "rgba(255, 255, 255, 0.10)",
+                    color: "rgba(255, 255, 255, 0.92)",
+                  }}
+                >
                   <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-semibold tracking-[0.22em] text-primary uppercase sm:text-[11px] sm:tracking-[0.24em]">
+                      <p className="text-[10px] font-semibold tracking-[0.22em] uppercase sm:text-[11px] sm:tracking-[0.24em]" style={{ color: "#f4c1c8" }}>
                         {tx("selectedRestaurant")}
                       </p>
-                      <h3 className="mt-0.5 text-lg font-bold text-white sm:mt-1 sm:text-2xl">
+                      <h3 className="mt-0.5 text-lg font-bold sm:mt-1 sm:text-2xl" style={{ color: "#ffffff" }}>
                         {t(selectedRestaurant.name, locale)}
                       </h3>
-                      <p className="mt-0.5 text-[11px] text-gray-400 sm:text-sm">
+                      <p className="mt-0.5 text-[11px] sm:text-sm" style={{ color: "rgba(244, 237, 224, 0.75)" }}>
                         {selectedRestaurant.city}, {selectedRestaurant.country} •{" "}
                         {selectedRestaurant.format}
                       </p>
                     </div>
                     <div
-                      className={`shrink-0 rounded-xl bg-gradient-to-r px-2.5 py-1 text-[11px] font-semibold text-white sm:rounded-2xl sm:px-4 sm:py-2 sm:text-sm ${selectedRestaurant.coverGradient}`}
+                      className={`shrink-0 rounded-xl bg-gradient-to-r px-2.5 py-1 text-[11px] font-semibold sm:rounded-2xl sm:px-4 sm:py-2 sm:text-sm ${selectedRestaurant.coverGradient}`}
+                      style={{ color: "#ffffff" }}
                     >
                       {selectedRestaurant.cuisine}
                     </div>
                   </div>
 
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-300 sm:mt-3 sm:line-clamp-none sm:text-sm sm:leading-6">
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 sm:mt-3 sm:line-clamp-none sm:text-sm sm:leading-6" style={{ color: "rgba(244, 237, 224, 0.85)" }}>
                     {t(selectedRestaurant.description, locale)}
                   </p>
 
                   <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
                     <Link
                       href={`/restaurants/${selectedRestaurant.slug}`}
-                      className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink transition hover:bg-gray-200 sm:px-4 sm:py-2 sm:text-sm"
+                      className="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm"
+                      style={{ background: "#ffffff", color: "#1a0f11" }}
                     >
                       {tx("openRestaurant")}
                     </Link>
                     <Link
                       href={`/pairing?restaurant=${selectedRestaurant.slug}`}
-                      className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/18 sm:px-4 sm:py-2 sm:text-sm"
+                      className="rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm"
+                      style={{
+                        borderColor: "rgba(209, 21, 52, 0.45)",
+                        background: "rgba(209, 21, 52, 0.15)",
+                        color: "#ff6680",
+                      }}
                     >
                       {tx("openPairing")}
                     </Link>
