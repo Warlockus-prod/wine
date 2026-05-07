@@ -316,6 +316,10 @@ export const EVENT_TYPES = [
   "admin_pairing_create",
   "admin_pairing_update",
   "admin_pairing_delete",
+  // Rate-limit hits — fire when /api/chat blocks a request because the
+  // per-anonymous-id 4h bucket is full. Lets us spot abusive callers
+  // without keeping per-request logs.
+  "chat_rate_limited",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 

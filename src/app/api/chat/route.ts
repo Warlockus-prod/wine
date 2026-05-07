@@ -25,6 +25,47 @@ const MAX_TURNS = 12; // server-side cap
 const MAX_USER_CHARS = 2000;
 const MAX_RESPONSE_TOKENS = 350;
 
+// ─── Per-anonymousId rate limit (4-hour rolling window) ───────────────
+// In-memory only — fine for a single-container deploy. If we ever scale
+// horizontally, swap for Redis or postgres. Limit prevents one guest
+// from burning OpenAI tokens by spamming the chat. Defaults are
+// intentionally generous: ~1 message every 8 minutes on average.
+const RATE_WINDOW_MS = 4 * 60 * 60 * 1000; // 4h
+const RATE_MAX_PER_WINDOW = 30;            // 30 messages / 4h per anon id
+type RateBuckets = Map<string, number[]>;
+// Module-scope so it survives across requests within a single instance.
+const rateBuckets: RateBuckets =
+  ((globalThis as unknown) as { __wn_chatBuckets?: RateBuckets }).__wn_chatBuckets ??
+  new Map();
+((globalThis as unknown) as { __wn_chatBuckets?: RateBuckets }).__wn_chatBuckets = rateBuckets;
+
+const checkRate = (key: string): { ok: true } | { ok: false; retryAfter: number; usage: number } => {
+  const now = Date.now();
+  const previous = rateBuckets.get(key) ?? [];
+  const recent = previous.filter((ts) => now - ts < RATE_WINDOW_MS);
+  if (recent.length >= RATE_MAX_PER_WINDOW) {
+    const oldest = recent[0];
+    const retryAfter = Math.max(1, Math.ceil((RATE_WINDOW_MS - (now - oldest)) / 1000));
+    rateBuckets.set(key, recent); // keep pruned
+    return { ok: false, retryAfter, usage: recent.length };
+  }
+  recent.push(now);
+  rateBuckets.set(key, recent);
+  return { ok: true };
+};
+
+// Anonymous-id key with a fallback so missing-id requests still get
+// rate-limited as a single shared bucket (worst case all such requests
+// share the limit, which is the right pessimism).
+const rateKeyFromBody = (body: ChatRequest, request: Request): string => {
+  const raw = body.anonymousId?.trim();
+  if (raw && /^[A-Za-z0-9_.\-]{6,128}$/.test(raw)) return `id:${raw}`;
+  // Fallback: client IP from common proxy headers (we sit behind nginx).
+  const fwd = request.headers.get("x-forwarded-for");
+  const ip = fwd?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "anon";
+  return `ip:${ip}`;
+};
+
 let openaiSingleton: OpenAI | null = null;
 const getOpenAI = () => {
   if (openaiSingleton) return openaiSingleton;
@@ -76,6 +117,29 @@ export async function POST(request: Request) {
 
   if (cleaned.length === 0) {
     return NextResponse.json({ error: "no valid messages" }, { status: 400 });
+  }
+
+  // 4h rolling-window rate limit per anonymous id (or IP fallback).
+  // Returns 429 with a friendly PL message + Retry-After header. Logs
+  // the throttle event so we can spot abusive patterns later.
+  const rateKey = rateKeyFromBody(body, request);
+  const rate = checkRate(rateKey);
+  if (!rate.ok) {
+    const minutes = Math.ceil(rate.retryAfter / 60);
+    void logEvent({
+      type: "chat_rate_limited",
+      props: { key: rateKey, usage: rate.usage, retryAfterSec: rate.retryAfter },
+    });
+    return NextResponse.json(
+      {
+        error:
+          minutes >= 60
+            ? `Limit pytań na sesję wyczerpany. Wróć za około ${Math.ceil(minutes / 60)} godz. — przewodnik dostępny ${RATE_MAX_PER_WINDOW} razy na 4 godziny.`
+            : `Trochę za szybko. Wróć za ~${minutes} min — limit ${RATE_MAX_PER_WINDOW} pytań / 4 godz.`,
+        retryAfter: rate.retryAfter,
+      },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfter) } },
+    );
   }
 
   const profileNote = profileToSummary(body.profile);

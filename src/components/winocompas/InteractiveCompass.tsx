@@ -55,6 +55,10 @@ export default function InteractiveCompass({
   tourMs = 2800,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
+  // Pinned id stays selected after the user clicks (or hovers chip in the
+  // selected-profile bar). Persists until they pick a different one. This
+  // fixes the UX bug where info evaporated as soon as the cursor left.
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [tourOn, setTourOn] = useState(false);
   const [tourIdx, setTourIdx] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -77,8 +81,27 @@ export default function InteractiveCompass({
   }, [tourOn, tourMs]);
 
   const tourId = tourOn ? ALL_TENDENCJE_IDS[tourIdx] : null;
-  const focusedId = tourId ?? hovered;
+  // Priority: tour > pinned (last clicked) > current hover. Tour wraps the
+  // others while playing; outside of tour, the pinned selection is the
+  // baseline and hover provides the live preview.
+  const focusedId = tourId ?? hovered ?? pinnedId;
   const focused = useMemo(() => findSpoke(focusedId), [focusedId]);
+
+  // Pin the spoke whenever the user changes its profile value (i.e. clicks
+  // it). Listening on profile diff keeps this decoupled from TasteCompass
+  // internals — we don't need a separate click callback.
+  const prevProfileRef = useRef(profile);
+  useEffect(() => {
+    const prev = prevProfileRef.current;
+    prevProfileRef.current = profile;
+    for (const id of ALL_TENDENCJE_IDS) {
+      if ((profile[id] ?? 0) !== (prev[id] ?? 0)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPinnedId(id);
+        break;
+      }
+    }
+  }, [profile]);
 
   const stepTour = useCallback((dir: 1 | -1) => {
     setTourIdx((i) => {
@@ -106,7 +129,10 @@ export default function InteractiveCompass({
           <TasteCompass
             profile={profile}
             onChange={onProfileChange}
-            externalHighlightId={tourId}
+            // Tour wins; pinned (last-clicked) wins over nothing — both are
+            // bridged through this single prop so the spoke pulses as long
+            // as that selection is "current".
+            externalHighlightId={tourId ?? pinnedId}
             onHoverChange={setHovered}
             hideLegend
           />
