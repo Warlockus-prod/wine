@@ -29,6 +29,13 @@ const nextConfig: NextConfig = {
         hostname: "api.qrserver.com",
         pathname: "/**",
       },
+      // Unsplash CDN — used by lib/food-photos.ts as the dish/wine
+      // photo fallback when seed data has no `image` field.
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
 };

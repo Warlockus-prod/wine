@@ -16,12 +16,12 @@ export type RestaurantMatchDetails = {
   reason: string;
 };
 
-const dishImagePool = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBhlI46dafXSZ08utjSWbYOYBXZcyqovonosZ2MUis2T4FrSvjy7_Er5VMFJGAyjeWp6cx4bAhd_fI7SJMDIIwahIUPZlC02XtIhiDwCHmPSxPugT4iWUD67WMW99bbqs2xkNY5bYvdOaPa6jOirgJHjo9wV0NTJewH4our6G4GtxHwO9VnE0K3h93WLpEAD80eTfNnFdE31B3kcA4ndUFvOistF3Se_VuL9iOVmF5AN-mDj830CgfHP0aDivk8iqNlJQeBWp8M6L0",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCPhT2eBSA_1VVLpnQm9-cravzJ5Gc6FyawGxH5Takx28R2xtCFpag0eczWbZHEqE3gyaMGP0cvt9nLzATLU6A-7LS1erp38xnUTU91m3FZDe-dnxX88rni9PsT8essOHKPlgzsFX52buk-L2YJNIFb8moz3A5MaFooxURC6ri2hJ1J6sH5vfOLDCW3aU_dz9FOz9D9602DKJ_AY9GA3Z1eoG8bqbSgyRnKXiyjYHZzuIfZUVUIkLabvoLkmxtJ_IzNH_obOFeSUSQ",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBE3Sa94YOEcabLhKzWAZ1hVizzQofzK2Z4E5bDpnb40C_Y7kjftpAIvfPRUvuRTv9i2R4yl2Jyas9yYjBSdg-TB95Y5sHjwlgXp0C5qu1WuvXdmBwrewbREclI2Qm3t1GSI7I2tRy0h0-uJWU7AE8RcD4OIZSj_MCLqex08-Yw5sMlLAY610w_NvRLCYyHK30eYl_t2qEEz-6QioSMB_5z-9TrP1ivcg5AOiYglAF-KcAtKAuyc_s8SkJBIcMDsOL9hhwBpVrU47c",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuAaiwxSmTLYTg2ZH3EFQxN-shWqR6ZLwQpI0z5SMPyJTaXY2mMiVVpwoVF-pqkdZU3upPy3La9j4mQfCanZGieFBcp6xyeSrSY82SN97CSDaaShFsNj7aA9cHnJxWOdNjYl13uEmlgRGlUWJTDIeFbl6lwNJQP547qRRdN-Zk43iFIZUevpZz0PNN2dQKNOgJxv0hPw1NuOXYzxB8zVyfrewxB1XetEi7on87zLHr9jOrkiMkRF0WT6CPcSqn2iO4DTpH263EN9O6A",
-];
+// Image pools used to live here as 4-deep arrays applied by index — most
+// dishes ended up sharing the same generic snail/duck shot. Now category-
+// keyed via lib/food-photos. Old wineImages map kept as overrides for
+// canonical bottles where the brand-specific photo reads better than a
+// generic Unsplash shot.
+import { getDishImage as photoForDish, getWineImage as photoForWine } from "./food-photos";
 
 const wineImages = {
   riesling: "https://upload.wikimedia.org/wikipedia/commons/9/91/2009_Trimbach_Riesling_%288130797570%29.jpg",
@@ -88,22 +88,26 @@ const wineEnText = (wine: Wine) =>
   `${t(wine.name, "en")} ${wine.grape} ${wine.style} ${t(wine.notes, "en")}`.toLowerCase();
 
 const getWineImage = (wine: Wine) => {
+  // Wikimedia overrides for canonical bottles where the brand-specific
+  // photo is recognisable (worth more than a generic red on the rail).
   const text = `${t(wine.name, "en")} ${wine.grape} ${wine.style}`.toLowerCase();
-
-  if (text.includes("riesling")) {
-    return wineImages.riesling;
-  }
+  if (text.includes("riesling")) return wineImages.riesling;
   if (text.includes("chablis") || text.includes("chardonnay") || text.includes("albarino") || text.includes("sancerre")) {
     return wineImages.chardonnay;
   }
-  if (text.includes("sangiovese") || text.includes("chianti") || text.includes("brunello")) {
-    return wineImages.sangiovese;
-  }
+  if (text.includes("sangiovese") || text.includes("chianti") || text.includes("brunello")) return wineImages.sangiovese;
   if (text.includes("sparkling") || text.includes("champagne") || text.includes("brut") || text.includes("cava")) {
     return wineImages.sparkling;
   }
-
-  return wineImages.red;
+  // Everything else falls through to the category-aware Unsplash helper —
+  // returns a wine-style-appropriate bottle (red/white/rosé/dessert) instead
+  // of the previous catch-all PenfoldsGrange shot.
+  return photoForWine({
+    style: wine.style,
+    grape: wine.grape,
+    name: t(wine.name, "en"),
+    region: wine.region,
+  });
 };
 
 const inferBody = (wine: Wine): WineBody => {
@@ -197,12 +201,14 @@ const getWineTags = (wine: Wine) => {
 };
 
 export const buildPairingDatasetFromRestaurant = (restaurant: Restaurant): PairingDataset => ({
-  dishes: restaurant.dishes.map<PairingDish>((dish, index) => ({
+  dishes: restaurant.dishes.map<PairingDish>((dish) => ({
     id: dish.id,
     name: dish.name,
     price: dish.price,
     description: dish.description,
-    image: dishImagePool[index % dishImagePool.length],
+    // Category-aware Unsplash photo — Italian dishes get pasta/pizza shots,
+    // Japanese get sushi/ramen, etc. (vs. previous 4-shot indexed pool).
+    image: photoForDish({ category: dish.category, name: t(dish.name, "en") }),
     tags: [dish.category, restaurant.cuisine].filter(Boolean),
   })),
   pairings: restaurant.dishes.flatMap<CuratedPairing>((dish) =>
