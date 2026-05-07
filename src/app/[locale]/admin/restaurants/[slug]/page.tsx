@@ -197,12 +197,12 @@ function DishesTab({
       <article className="rounded-2xl border border-white/10 bg-[#150a0c] p-5">
         <h2 className="text-lg font-semibold text-white">Nowe danie</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <input className={inputCls} placeholder="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input className={inputCls} placeholder="Nazwa (PL)" value={form.namePl} onChange={(e) => setForm({ ...form, namePl: e.target.value })} />
-          <textarea className={`${inputCls} sm:col-span-2 min-h-[60px]`} placeholder="Description (EN)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          <textarea className={`${inputCls} sm:col-span-2 min-h-[60px]`} placeholder="Opis (PL)" value={form.descriptionPl} onChange={(e) => setForm({ ...form, descriptionPl: e.target.value })} />
-          <input className={inputCls} placeholder="Kategoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-          <input className={inputCls} type="number" placeholder="Cena" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+          <input className={inputCls} placeholder="Name (EN)" aria-label="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input className={inputCls} placeholder="Nazwa (PL)" aria-label="Nazwa (PL)" value={form.namePl} onChange={(e) => setForm({ ...form, namePl: e.target.value })} />
+          <textarea className={`${inputCls} sm:col-span-2 min-h-[60px]`} placeholder="Description (EN)" aria-label="Description (EN)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <textarea className={`${inputCls} sm:col-span-2 min-h-[60px]`} placeholder="Opis (PL)" aria-label="Opis (PL)" value={form.descriptionPl} onChange={(e) => setForm({ ...form, descriptionPl: e.target.value })} />
+          <input className={inputCls} placeholder="Kategoria" aria-label="Kategoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+          <input className={inputCls} type="number" placeholder="Cena" aria-label="Cena" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
         </div>
         <button type="button" onClick={submit} disabled={creating} className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60">
           {creating ? "Tworzę…" : "+ Dodaj danie"}
@@ -280,8 +280,8 @@ function DishRow({
       {open ? (
         <div className="space-y-3 border-t border-white/8 p-4">
           <div className="grid gap-2 sm:grid-cols-2">
-            <input className={inputCls} placeholder="Name (EN)" value={draft.name.en} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, en: e.target.value } })} />
-            <input className={inputCls} placeholder="Nazwa (PL)" value={draft.name.pl} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, pl: e.target.value } })} />
+            <input className={inputCls} placeholder="Name (EN)" aria-label="Name (EN)" value={draft.name.en} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, en: e.target.value } })} />
+            <input className={inputCls} placeholder="Nazwa (PL)" aria-label="Nazwa (PL)" value={draft.name.pl} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, pl: e.target.value } })} />
             <textarea className={`${inputCls} sm:col-span-2 min-h-[60px]`} value={draft.description.en} onChange={(e) => setDraft({ ...draft, description: { ...draft.description, en: e.target.value } })} />
             <textarea className={`${inputCls} sm:col-span-2 min-h-[60px]`} value={draft.description.pl} onChange={(e) => setDraft({ ...draft, description: { ...draft.description, pl: e.target.value } })} />
             <input className={inputCls} value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} />
@@ -357,15 +357,15 @@ function WinesTab({
       <article className="rounded-2xl border border-white/10 bg-[#150a0c] p-5">
         <h2 className="text-lg font-semibold text-white">Nowe wino</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <input className={inputCls} placeholder="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <input className={inputCls} placeholder="Nazwa (PL)" value={form.namePl} onChange={(e) => setForm({ ...form, namePl: e.target.value })} />
-          <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} placeholder="Notes (EN)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-          <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} placeholder="Nuty (PL)" value={form.notesPl} onChange={(e) => setForm({ ...form, notesPl: e.target.value })} />
-          <input className={inputCls} placeholder="Region" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} />
-          <input className={inputCls} placeholder="Szczep" value={form.grape} onChange={(e) => setForm({ ...form, grape: e.target.value })} />
-          <input className={inputCls} placeholder="Styl (Red/White/Sparkling)" value={form.style} onChange={(e) => setForm({ ...form, style: e.target.value })} />
-          <input className={inputCls} placeholder="Rocznik" value={form.vintage} onChange={(e) => setForm({ ...form, vintage: e.target.value })} />
-          <input className={inputCls} type="number" placeholder="Cena" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+          <input className={inputCls} placeholder="Name (EN)" aria-label="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input className={inputCls} placeholder="Nazwa (PL)" aria-label="Nazwa (PL)" value={form.namePl} onChange={(e) => setForm({ ...form, namePl: e.target.value })} />
+          <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} placeholder="Notes (EN)" aria-label="Notes (EN)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+          <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} placeholder="Nuty (PL)" aria-label="Nuty (PL)" value={form.notesPl} onChange={(e) => setForm({ ...form, notesPl: e.target.value })} />
+          <input className={inputCls} placeholder="Region" aria-label="Region" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} />
+          <input className={inputCls} placeholder="Szczep" aria-label="Szczep" value={form.grape} onChange={(e) => setForm({ ...form, grape: e.target.value })} />
+          <input className={inputCls} placeholder="Styl (Red/White/Sparkling)" aria-label="Styl (Red/White/Sparkling)" value={form.style} onChange={(e) => setForm({ ...form, style: e.target.value })} />
+          <input className={inputCls} placeholder="Rocznik" aria-label="Rocznik" value={form.vintage} onChange={(e) => setForm({ ...form, vintage: e.target.value })} />
+          <input className={inputCls} type="number" placeholder="Cena" aria-label="Cena" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
         </div>
         <button type="button" onClick={submit} disabled={creating} className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60">
           {creating ? "Tworzę…" : "+ Dodaj wino"}
@@ -442,10 +442,10 @@ function WineRow({
       {open ? (
         <div className="space-y-3 border-t border-white/8 p-4">
           <div className="grid gap-2 sm:grid-cols-2">
-            <input className={inputCls} value={draft.name.en} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, en: e.target.value } })} placeholder="Name (EN)" />
-            <input className={inputCls} value={draft.name.pl} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, pl: e.target.value } })} placeholder="Nazwa (PL)" />
-            <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} value={draft.notes.en} onChange={(e) => setDraft({ ...draft, notes: { ...draft.notes, en: e.target.value } })} placeholder="Notes (EN)" />
-            <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} value={draft.notes.pl} onChange={(e) => setDraft({ ...draft, notes: { ...draft.notes, pl: e.target.value } })} placeholder="Nuty (PL)" />
+            <input className={inputCls} value={draft.name.en} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, en: e.target.value } })} placeholder="Name (EN)" aria-label="Name (EN)" />
+            <input className={inputCls} value={draft.name.pl} onChange={(e) => setDraft({ ...draft, name: { ...draft.name, pl: e.target.value } })} placeholder="Nazwa (PL)" aria-label="Nazwa (PL)" />
+            <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} value={draft.notes.en} onChange={(e) => setDraft({ ...draft, notes: { ...draft.notes, en: e.target.value } })} placeholder="Notes (EN)" aria-label="Notes (EN)" />
+            <textarea className={`${inputCls} sm:col-span-2 min-h-[50px]`} value={draft.notes.pl} onChange={(e) => setDraft({ ...draft, notes: { ...draft.notes, pl: e.target.value } })} placeholder="Nuty (PL)" aria-label="Nuty (PL)" />
             <input className={inputCls} value={draft.region} onChange={(e) => setDraft({ ...draft, region: e.target.value })} />
             <input className={inputCls} value={draft.grape} onChange={(e) => setDraft({ ...draft, grape: e.target.value })} />
             <input className={inputCls} value={draft.style} onChange={(e) => setDraft({ ...draft, style: e.target.value })} />
@@ -579,13 +579,13 @@ function PairingsTab({
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <textarea
                     className={`${inputCls} min-h-[60px]`}
-                    placeholder="Reason (EN)"
+                    placeholder="Reason (EN)" aria-label="Reason (EN)"
                     defaultValue={reason.en}
                     onBlur={(e) => updateReason(w.id, "en", e.target.value)}
                   />
                   <textarea
                     className={`${inputCls} min-h-[60px]`}
-                    placeholder="Uzasadnienie (PL)"
+                    placeholder="Uzasadnienie (PL)" aria-label="Uzasadnienie (PL)"
                     defaultValue={reason.pl}
                     onBlur={(e) => updateReason(w.id, "pl", e.target.value)}
                   />

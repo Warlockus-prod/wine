@@ -226,7 +226,49 @@ export default function RestaurantPairingPanel({
     );
 
   return (
-    <PanelShell mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}>
+    <PanelShell
+      mobileOpen={mobileOpen}
+      setMobileOpen={setMobileOpen}
+      peek={
+        <>
+          <span
+            aria-hidden
+            className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg"
+          >
+            <Image
+              src={dishImg}
+              alt=""
+              fill
+              sizes="36px"
+              unoptimized
+              className="object-cover"
+            />
+          </span>
+          <span className="min-w-0 flex-1 text-left">
+            <span className="block truncate text-[10px] font-bold tracking-[0.18em] uppercase" style={{ color: "var(--color-accent-gold)" }}>
+              {tx("pairingWidgetEyebrow")}
+            </span>
+            <span className="block truncate font-serif text-sm italic" style={{ color: "var(--ink)" }}>
+              {t(activeDish.name, lng)}
+            </span>
+          </span>
+          {rankedTop3[0] ? (
+            <span
+              className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold"
+              style={{
+                background: "color-mix(in srgb, var(--color-primary) 18%, transparent)",
+                color: "var(--color-primary)",
+              }}
+            >
+              {rankedTop3[0].score}%
+            </span>
+          ) : null}
+          <svg width="14" height="9" viewBox="0 0 16 9" fill="none" aria-hidden style={{ color: "var(--color-accent-gold)" }}>
+            <path d="M1 4.5L8 1l7 3.5M1 8l7-3.5L15 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </>
+      }
+    >
       {/* Active dish header */}
       <div className="border-b border-[var(--gold-hairline-soft)] p-4">
         <div className="flex items-start gap-3">
@@ -247,11 +289,36 @@ export default function RestaurantPairingPanel({
         </div>
       </div>
 
-      {/* Top 3 wines */}
+      {/* Top 3 wines — skeleton placeholders while /api/pairing resolves
+          so the panel doesn't pulse a single label and look broken. */}
       <div className="flex-1 overflow-y-auto p-4">
         <p className="mb-3 text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "var(--ink-muted)" }}>
           {loading ? tx("matchingWines") : tx("topThreeWines")}
         </p>
+        {loading && rankedTop3.length === 0 ? (
+          <ol className="space-y-3" aria-busy="true">
+            {[0, 1, 2].map((i) => (
+              <li
+                key={i}
+                className="rounded-xl border p-3"
+                style={{
+                  background: "var(--surface-elevated)",
+                  borderColor: "var(--hairline-strong)",
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="h-7 w-7 shrink-0 rounded-full" style={{ background: "var(--hairline-strong)", animation: "pulse 1.6s ease-in-out infinite" }} />
+                  <span className="h-14 w-10 shrink-0 rounded-lg" style={{ background: "var(--hairline-strong)", animation: "pulse 1.6s ease-in-out infinite" }} />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <span className="block h-3 w-3/4 rounded" style={{ background: "var(--hairline-strong)", animation: "pulse 1.6s ease-in-out infinite" }} />
+                    <span className="block h-2.5 w-1/2 rounded" style={{ background: "var(--hairline)", animation: "pulse 1.6s ease-in-out infinite" }} />
+                    <span className="block h-2.5 w-full rounded" style={{ background: "var(--hairline)", animation: "pulse 1.6s ease-in-out infinite" }} />
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : null}
         <ol className="space-y-3">
           {rankedTop3.map((m, i) => {
             const wineImg =
@@ -355,10 +422,14 @@ function PanelShell({
   children,
   mobileOpen,
   setMobileOpen,
+  peek,
 }: {
   children: React.ReactNode;
   mobileOpen: boolean;
   setMobileOpen: (v: boolean) => void;
+  /** Tiny preview row shown in the collapsed mobile state — typically
+   *  active dish thumb + #1 wine score. Click expands the sheet. */
+  peek?: React.ReactNode;
 }) {
   return (
     <>
@@ -375,7 +446,10 @@ function PanelShell({
         {children}
       </aside>
 
-      {/* Mobile: bottom sheet (peek + expand). Anchored above MobileTabBar. */}
+      {/* Mobile: bottom sheet (peek + expand). Anchored above MobileTabBar.
+          When collapsed, shows a preview row (active dish photo + name + #1
+          wine score) so the user knows the panel has content without
+          having to expand it first. */}
       <div className="fixed inset-x-0 bottom-16 z-30 lg:hidden">
         <button
           type="button"
@@ -388,13 +462,32 @@ function PanelShell({
             style={{ background: "var(--hairline-strong)" }}
           />
         </button>
+        {!mobileOpen && peek ? (
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Otwórz panel łączenia"
+            className="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 overflow-hidden rounded-t-2xl border border-b-0 px-4 py-3 shadow-2xl"
+            style={{
+              background: "var(--surface-elevated)",
+              borderColor: "var(--gold-hairline)",
+              color: "var(--ink)",
+            }}
+          >
+            {peek}
+          </button>
+        ) : null}
         <div
           className="mx-2 flex flex-col overflow-hidden rounded-t-2xl border border-b-0 shadow-2xl transition-[max-height] duration-300"
           style={{
             background: "var(--surface-elevated)",
             borderColor: "var(--gold-hairline)",
             color: "var(--ink)",
-            maxHeight: mobileOpen ? "70dvh" : "3.5rem",
+            // When `peek` content is visible (collapsed state), this main
+            // sheet has 0 height so the peek replaces the old empty bar.
+            // When open, sheet expands to 70dvh as before.
+            maxHeight: mobileOpen ? "70dvh" : peek ? "0" : "3.5rem",
+            borderWidth: mobileOpen ? "1px" : peek ? "0" : "1px",
           }}
         >
           {children}

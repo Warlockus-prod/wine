@@ -282,7 +282,7 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredRestaurants.map((restaurant) => {
                 const selected = restaurant.slug === effectiveSelectedSlug;
 

@@ -11,9 +11,12 @@
  *   npx tsx scripts/export-pl-translations.mts > review/pl-review.csv
  */
 
-import { seedRestaurants } from "../src/data/seed-restaurants";
-import { seedPairingDataset } from "../src/data/seed-pairing";
-import { COMPASS_SECTORS, BASE_TASTES, FAQ_ITEMS } from "../src/data/wine-compass-kb";
+// @ts-expect-error — Node 23 strip-types requires explicit .ts; tsconfig forbids
+import { seedRestaurants } from "../src/data/seed-restaurants.ts";
+// @ts-expect-error — same as above
+import { seedPairingDataset } from "../src/data/seed-pairing.ts";
+// @ts-expect-error — same as above
+import { COMPASS_SECTORS, BASE_TASTES, FAQ_ITEMS } from "../src/data/wine-compass-kb.ts";
 
 interface Row {
   id: string;

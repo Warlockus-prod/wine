@@ -661,7 +661,7 @@ export default function AdminPage() {
                   <label className="field-label">Name</label>
                   <input
                     className="field-refined w-full"
-                    placeholder="Dish name"
+                    placeholder="Dish name" aria-label="Dish name"
                     value={dishForm.name}
                     onChange={(event) => setDishForm({ ...dishForm, name: event.target.value })}
                   />
@@ -673,7 +673,7 @@ export default function AdminPage() {
                       className="field-refined w-full"
                       type="number"
                       min={1}
-                      placeholder="Price"
+                      placeholder="Price" aria-label="Price"
                       value={dishForm.price}
                       onChange={(event) => setDishForm({ ...dishForm, price: event.target.value })}
                     />
@@ -682,7 +682,7 @@ export default function AdminPage() {
                     <label className="field-label">Tags</label>
                     <input
                       className="field-refined w-full"
-                      placeholder="Tags (comma separated)"
+                      placeholder="Tags (comma separated)" aria-label="Tags (comma separated)"
                       value={dishForm.tags}
                       onChange={(event) => setDishForm({ ...dishForm, tags: event.target.value })}
                     />
@@ -692,7 +692,7 @@ export default function AdminPage() {
                   <label className="field-label">Image URL</label>
                   <input
                     className="field-refined w-full"
-                    placeholder="Image URL"
+                    placeholder="Image URL" aria-label="Image URL"
                     value={dishForm.image}
                     onChange={(event) => setDishForm({ ...dishForm, image: event.target.value })}
                   />
@@ -701,7 +701,7 @@ export default function AdminPage() {
                   <label className="field-label">Description</label>
                   <textarea
                     className="field-refined min-h-16 w-full"
-                    placeholder="Dish description"
+                    placeholder="Dish description" aria-label="Dish description"
                     value={dishForm.description}
                     onChange={(event) => setDishForm({ ...dishForm, description: event.target.value })}
                   />
@@ -743,7 +743,7 @@ export default function AdminPage() {
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="field-refined w-full"
-                      placeholder="EN name"
+                      placeholder="EN name" aria-label="EN name"
                       value={dish.name.en}
                       onChange={(event) =>
                         updateDish(dish.id, { name: setLocalized(dish.name, "en", event.target.value) })
@@ -751,7 +751,7 @@ export default function AdminPage() {
                     />
                     <input
                       className="field-refined w-full"
-                      placeholder="PL nazwa"
+                      placeholder="PL nazwa" aria-label="PL nazwa"
                       value={dish.name.pl}
                       onChange={(event) =>
                         updateDish(dish.id, { name: setLocalized(dish.name, "pl", event.target.value) })
@@ -782,7 +782,7 @@ export default function AdminPage() {
                   <div className="mb-1 grid gap-2 sm:grid-cols-2">
                     <textarea
                       className="field-refined min-h-14 w-full min-w-0"
-                      placeholder="EN description"
+                      placeholder="EN description" aria-label="EN description"
                       value={dish.description.en}
                       onChange={(event) =>
                         updateDish(dish.id, {
@@ -792,7 +792,7 @@ export default function AdminPage() {
                     />
                     <textarea
                       className="field-refined min-h-14 w-full min-w-0"
-                      placeholder="PL opis"
+                      placeholder="PL opis" aria-label="PL opis"
                       value={dish.description.pl}
                       onChange={(event) =>
                         updateDish(dish.id, {
@@ -832,7 +832,7 @@ export default function AdminPage() {
                   <label className="field-label">Name</label>
                   <input
                     className="field-refined w-full"
-                    placeholder="Wine name"
+                    placeholder="Wine name" aria-label="Wine name"
                     value={wineForm.name}
                     onChange={(event) => setWineForm({ ...wineForm, name: event.target.value })}
                   />
@@ -842,7 +842,7 @@ export default function AdminPage() {
                     <label className="field-label">Region</label>
                     <input
                       className="field-refined w-full"
-                      placeholder="Region"
+                      placeholder="Region" aria-label="Region"
                       value={wineForm.region}
                       onChange={(event) => setWineForm({ ...wineForm, region: event.target.value })}
                     />
@@ -854,7 +854,7 @@ export default function AdminPage() {
                       type="number"
                       min={1900}
                       max={2100}
-                      placeholder="Year"
+                      placeholder="Year" aria-label="Year"
                       value={wineForm.year}
                       onChange={(event) => setWineForm({ ...wineForm, year: event.target.value })}
                     />
@@ -867,7 +867,7 @@ export default function AdminPage() {
                       className="field-refined w-full"
                       type="number"
                       min={1}
-                      placeholder="Price"
+                      placeholder="Price" aria-label="Price"
                       value={wineForm.price}
                       onChange={(event) => setWineForm({ ...wineForm, price: event.target.value })}
                     />
@@ -880,7 +880,7 @@ export default function AdminPage() {
                       min={1}
                       max={5}
                       step={0.1}
-                      placeholder="Rating"
+                      placeholder="Rating" aria-label="Rating"
                       value={wineForm.rating}
                       onChange={(event) => setWineForm({ ...wineForm, rating: event.target.value })}
                     />
@@ -890,7 +890,7 @@ export default function AdminPage() {
                   <label className="field-label">Image URL</label>
                   <input
                     className="field-refined w-full"
-                    placeholder="Image URL"
+                    placeholder="Image URL" aria-label="Image URL"
                     value={wineForm.image}
                     onChange={(event) => setWineForm({ ...wineForm, image: event.target.value })}
                   />
@@ -899,7 +899,7 @@ export default function AdminPage() {
                   <label className="field-label">Tags</label>
                   <input
                     className="field-refined w-full"
-                    placeholder="Tags (comma separated)"
+                    placeholder="Tags (comma separated)" aria-label="Tags (comma separated)"
                     value={wineForm.tags}
                     onChange={(event) => setWineForm({ ...wineForm, tags: event.target.value })}
                   />
@@ -909,7 +909,7 @@ export default function AdminPage() {
                     <label className="field-label">Grape</label>
                     <input
                       className="field-refined w-full"
-                      placeholder="Grape"
+                      placeholder="Grape" aria-label="Grape"
                       value={wineForm.grape}
                       onChange={(event) => setWineForm({ ...wineForm, grape: event.target.value })}
                     />
@@ -922,7 +922,7 @@ export default function AdminPage() {
                       step={0.1}
                       min={5}
                       max={20}
-                      placeholder="ABV %"
+                      placeholder="ABV %" aria-label="ABV %"
                       value={wineForm.abv}
                       onChange={(event) => setWineForm({ ...wineForm, abv: event.target.value })}
                     />
@@ -983,7 +983,7 @@ export default function AdminPage() {
                     <label className="field-label">Serving °C</label>
                     <input
                       className="field-refined w-full"
-                      placeholder="Serving temp C (e.g. 8-10)"
+                      placeholder="Serving temp C (e.g. 8-10)" aria-label="Serving temp C (e.g. 8-10)"
                       value={wineForm.servingTempC}
                       onChange={(event) =>
                         setWineForm({ ...wineForm, servingTempC: event.target.value })
@@ -994,7 +994,7 @@ export default function AdminPage() {
                     <label className="field-label">Decant</label>
                     <input
                       className="field-refined w-full"
-                      placeholder="Decant notes"
+                      placeholder="Decant notes" aria-label="Decant notes"
                       value={wineForm.decant}
                       onChange={(event) => setWineForm({ ...wineForm, decant: event.target.value })}
                     />
@@ -1004,7 +1004,7 @@ export default function AdminPage() {
                   <label className="field-label">Description</label>
                   <textarea
                     className="field-refined min-h-16 w-full"
-                    placeholder="Wine description"
+                    placeholder="Wine description" aria-label="Wine description"
                     value={wineForm.description}
                     onChange={(event) => setWineForm({ ...wineForm, description: event.target.value })}
                   />
@@ -1050,7 +1050,7 @@ export default function AdminPage() {
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="field-refined w-full"
-                      placeholder="EN name"
+                      placeholder="EN name" aria-label="EN name"
                       value={wine.name.en}
                       onChange={(event) =>
                         updateWine(wine.id, { name: setLocalized(wine.name, "en", event.target.value) })
@@ -1058,7 +1058,7 @@ export default function AdminPage() {
                     />
                     <input
                       className="field-refined w-full"
-                      placeholder="PL nazwa"
+                      placeholder="PL nazwa" aria-label="PL nazwa"
                       value={wine.name.pl}
                       onChange={(event) =>
                         updateWine(wine.id, { name: setLocalized(wine.name, "pl", event.target.value) })
@@ -1210,7 +1210,7 @@ export default function AdminPage() {
                   <div className="grid gap-2 sm:grid-cols-2">
                     <textarea
                       className="field-refined min-h-14 w-full min-w-0"
-                      placeholder="EN description"
+                      placeholder="EN description" aria-label="EN description"
                       value={wine.description.en}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -1220,7 +1220,7 @@ export default function AdminPage() {
                     />
                     <textarea
                       className="field-refined min-h-14 w-full min-w-0"
-                      placeholder="PL opis"
+                      placeholder="PL opis" aria-label="PL opis"
                       value={wine.description.pl}
                       onChange={(event) =>
                         updateWine(wine.id, {

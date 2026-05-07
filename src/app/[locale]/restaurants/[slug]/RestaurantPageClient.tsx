@@ -134,7 +134,10 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
                 </Link>
               </div>
 
-              {/* Stat strip */}
+              {/* Stat strip — sits over the dark cover gradient in BOTH
+                  themes, so we keep explicit white text + dark backdrop
+                  via inline styles (escapes the light-mode text-white shim
+                  that would otherwise turn this ink-on-black). */}
               <div className="mt-7 grid grid-cols-3 gap-2 sm:mt-9 sm:gap-3">
                 {[
                   { label: tx("district"), value: restaurant.district },
@@ -143,12 +146,16 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
                 ].map((s) => (
                   <div
                     key={s.label}
-                    className="rounded-[18px] border border-white/12 bg-black/22 p-3 backdrop-blur-sm sm:rounded-[24px] sm:p-4"
+                    className="rounded-[18px] border p-3 backdrop-blur-sm sm:rounded-[24px] sm:p-4"
+                    style={{
+                      background: "rgba(20, 11, 13, 0.42)",
+                      borderColor: "rgba(255, 255, 255, 0.18)",
+                    }}
                   >
-                    <p className="text-[10px] tracking-[0.18em] text-white/70 uppercase sm:text-[11px] sm:tracking-[0.2em]">
+                    <p className="text-[10px] tracking-[0.18em] uppercase sm:text-[11px] sm:tracking-[0.2em]" style={{ color: "rgba(255, 255, 255, 0.78)" }}>
                       {s.label}
                     </p>
-                    <p className="mt-1 font-serif text-base italic text-white sm:text-xl">
+                    <p className="mt-1 font-serif text-base italic sm:text-xl" style={{ color: "#ffffff" }}>
                       {s.value}
                     </p>
                   </div>
@@ -277,6 +284,7 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
                         sizes="(min-width: 640px) 96px, 72px"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         unoptimized
+                        loading="lazy"
                       />
                       {/* Gold-foil corner monogram overlay — anchors the brand
                           look on top of the photo without obscuring it. */}
@@ -361,6 +369,7 @@ export default function RestaurantPageClient({ slug }: { slug: string }) {
                         sizes="(min-width: 640px) 76px, 60px"
                         className="object-cover transition-transform duration-500 group-hover:-translate-y-0.5"
                         unoptimized
+                        loading="lazy"
                       />
                       <div className="absolute right-1 bottom-1 h-7 w-3 sm:h-9 sm:w-4">
                         <WineBottleSVG

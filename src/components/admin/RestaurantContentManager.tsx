@@ -369,14 +369,14 @@ export default function RestaurantContentManager() {
           <div className="mt-4 grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3">
             <input
               className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-              placeholder="Restaurant dish name"
+              placeholder="Restaurant dish name" aria-label="Restaurant dish name"
               value={dishForm.name}
               onChange={(event) => setDishForm({ ...dishForm, name: event.target.value })}
             />
             <div className="grid grid-cols-2 gap-2">
               <input
                 className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Category"
+                placeholder="Category" aria-label="Category"
                 value={dishForm.category}
                 onChange={(event) => setDishForm({ ...dishForm, category: event.target.value })}
               />
@@ -384,14 +384,14 @@ export default function RestaurantContentManager() {
                 className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
                 type="number"
                 min={1}
-                placeholder="Price"
+                placeholder="Price" aria-label="Price"
                 value={dishForm.price}
                 onChange={(event) => setDishForm({ ...dishForm, price: event.target.value })}
               />
             </div>
             <textarea
               className="min-h-16 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-              placeholder="Restaurant dish description"
+              placeholder="Restaurant dish description" aria-label="Restaurant dish description"
               value={dishForm.description}
               onChange={(event) => setDishForm({ ...dishForm, description: event.target.value })}
             />
@@ -410,7 +410,7 @@ export default function RestaurantContentManager() {
                 <div className="mb-2 grid grid-cols-2 gap-2">
                   <input
                     className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="EN name"
+                    placeholder="EN name" aria-label="EN name"
                     value={dish.name.en}
                     onChange={(event) =>
                       updateDish(dish.id, { name: setLocalized(dish.name, "en", event.target.value) })
@@ -418,7 +418,7 @@ export default function RestaurantContentManager() {
                   />
                   <input
                     className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="PL name"
+                    placeholder="PL name" aria-label="PL name"
                     value={dish.name.pl}
                     onChange={(event) =>
                       updateDish(dish.id, { name: setLocalized(dish.name, "pl", event.target.value) })
@@ -442,7 +442,7 @@ export default function RestaurantContentManager() {
                 <div className="grid gap-2 sm:grid-cols-2">
                   <textarea
                     className="min-h-16 w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="EN description"
+                    placeholder="EN description" aria-label="EN description"
                     value={dish.description.en}
                     onChange={(event) =>
                       updateDish(dish.id, {
@@ -452,7 +452,7 @@ export default function RestaurantContentManager() {
                   />
                   <textarea
                     className="min-h-16 w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="PL description"
+                    placeholder="PL description" aria-label="PL description"
                     value={dish.description.pl}
                     onChange={(event) =>
                       updateDish(dish.id, {
@@ -482,20 +482,20 @@ export default function RestaurantContentManager() {
           <div className="mt-4 grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3">
             <input
               className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-              placeholder="Restaurant wine name"
+              placeholder="Restaurant wine name" aria-label="Restaurant wine name"
               value={wineForm.name}
               onChange={(event) => setWineForm({ ...wineForm, name: event.target.value })}
             />
             <div className="grid grid-cols-2 gap-2">
               <input
                 className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Region"
+                placeholder="Region" aria-label="Region"
                 value={wineForm.region}
                 onChange={(event) => setWineForm({ ...wineForm, region: event.target.value })}
               />
               <input
                 className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Vintage"
+                placeholder="Vintage" aria-label="Vintage"
                 value={wineForm.vintage}
                 onChange={(event) => setWineForm({ ...wineForm, vintage: event.target.value })}
               />
@@ -503,20 +503,20 @@ export default function RestaurantContentManager() {
             <div className="grid grid-cols-2 gap-2">
               <input
                 className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Grape"
+                placeholder="Grape" aria-label="Grape"
                 value={wineForm.grape}
                 onChange={(event) => setWineForm({ ...wineForm, grape: event.target.value })}
               />
               <input
                 className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                placeholder="Style"
+                placeholder="Style" aria-label="Style"
                 value={wineForm.style}
                 onChange={(event) => setWineForm({ ...wineForm, style: event.target.value })}
               />
             </div>
             <textarea
               className="min-h-16 rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-              placeholder="Restaurant wine notes"
+              placeholder="Restaurant wine notes" aria-label="Restaurant wine notes"
               value={wineForm.notes}
               onChange={(event) => setWineForm({ ...wineForm, notes: event.target.value })}
             />
@@ -535,7 +535,7 @@ export default function RestaurantContentManager() {
                 <div className="mb-2 grid grid-cols-2 gap-2">
                   <input
                     className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="EN name"
+                    placeholder="EN name" aria-label="EN name"
                     value={wine.name.en}
                     onChange={(event) =>
                       updateWine(wine.id, { name: setLocalized(wine.name, "en", event.target.value) })
@@ -543,7 +543,7 @@ export default function RestaurantContentManager() {
                   />
                   <input
                     className="rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="PL name"
+                    placeholder="PL name" aria-label="PL name"
                     value={wine.name.pl}
                     onChange={(event) =>
                       updateWine(wine.id, { name: setLocalized(wine.name, "pl", event.target.value) })
@@ -577,7 +577,7 @@ export default function RestaurantContentManager() {
                 <div className="grid gap-2 sm:grid-cols-2">
                   <textarea
                     className="min-h-16 w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="EN notes"
+                    placeholder="EN notes" aria-label="EN notes"
                     value={wine.notes.en}
                     onChange={(event) =>
                       updateWine(wine.id, { notes: setLocalized(wine.notes, "en", event.target.value) })
@@ -585,7 +585,7 @@ export default function RestaurantContentManager() {
                   />
                   <textarea
                     className="min-h-16 w-full rounded-lg border border-white/10 bg-[#1a0f12] px-3 py-2 text-sm"
-                    placeholder="PL notes"
+                    placeholder="PL notes" aria-label="PL notes"
                     value={wine.notes.pl}
                     onChange={(event) =>
                       updateWine(wine.id, { notes: setLocalized(wine.notes, "pl", event.target.value) })
@@ -652,13 +652,13 @@ export default function RestaurantContentManager() {
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     <textarea
                       className="min-h-20 w-full rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
-                      placeholder="EN reason"
+                      placeholder="EN reason" aria-label="EN reason"
                       value={curated.reason.en}
                       onChange={(event) => updatePairingReason(wine.id, "en", event.target.value)}
                     />
                     <textarea
                       className="min-h-20 w-full rounded-lg border border-white/15 bg-[#190f12] px-3 py-2 text-sm text-gray-100"
-                      placeholder="PL reason"
+                      placeholder="PL reason" aria-label="PL reason"
                       value={curated.reason.pl}
                       onChange={(event) => updatePairingReason(wine.id, "pl", event.target.value)}
                     />
