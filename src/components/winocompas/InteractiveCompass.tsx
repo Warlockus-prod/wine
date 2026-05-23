@@ -37,6 +37,11 @@ interface Props {
   /** Auto-start the tour when the component mounts. Used so each stage
    *  greets the user with a presentation instead of a static disc. */
   autoStartTour?: boolean;
+  /** Optional content rendered in the LEFT column directly under the
+   *  compass + profile bar — on the SAME card. Stage 1 uses this for the
+   *  dryness arrow so it sits next to the compass and updates live as the
+   *  user adjusts the base tastes. */
+  belowCompass?: React.ReactNode;
 }
 
 // Tour ID sets per level — what auto-tour cycles through.
@@ -93,6 +98,7 @@ export default function InteractiveCompass({
   tourMs,
   level = 3,
   autoStartTour = false,
+  belowCompass,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   // Pinned id stays selected after the user clicks (or hovers chip in the
@@ -323,6 +329,10 @@ export default function InteractiveCompass({
           onClear={() => onProfileChange({})}
           onPickHover={setHovered}
         />
+
+        {/* Stage-specific slot under the compass (e.g. the live dryness
+            arrow on stage 1) — same card, always visible. */}
+        {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
       </div>
 
       {/* ── Side info panel ─────────────────────────────────────────── */}

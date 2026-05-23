@@ -485,6 +485,11 @@ function Stage1({
           onProfileChange={onProfileChange}
           level={1}
           autoStartTour
+          // Dryness arrow lives on the SAME card as the compass (client
+          // request: skala wytrawności widoczna jednocześnie z Vinokompasem
+          // i widać jak się zmienia). It re-renders live on every base-taste
+          // change because `dr` is recomputed each render in the parent.
+          belowCompass={<DrynessArrow score={dr.score} label={dr.label} />}
         />
       </div>
 
@@ -508,9 +513,6 @@ function Stage1({
           ))}
         </div>
       </details>
-
-      {/* Dryness arrow indicator */}
-      <DrynessArrow score={dr.score} label={dr.label} />
     </div>
   );
 }
