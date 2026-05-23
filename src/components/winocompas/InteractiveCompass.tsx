@@ -432,6 +432,60 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
   );
 }
 
+/**
+ * SelectionComment — the guide's live reaction to how strongly the user
+ * marked the focused element. 0 = a nudge to click; 1-4 = an interpretation
+ * of that intensity. Gives the panel a "the przewodnik is watching what I
+ * do" feel instead of static description text.
+ */
+const INTENSITY_COMMENTS: Record<number, string> = {
+  0: "Jeszcze nie zaznaczone — kliknij koło, aby ustawić siłę (0–4).",
+  1: "Ledwo wyczuwalne — subtelny akcent w tle.",
+  2: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
+  3: "Mocne — jeden z głównych charakterów Twojego wina.",
+  4: "Dominujące — definiuje styl, którego szukasz.",
+};
+
+function SelectionComment({
+  intensity,
+  accent,
+  label,
+}: {
+  intensity: number;
+  accent: string;
+  label: string;
+}) {
+  const v = Math.max(0, Math.min(4, Math.round(intensity)));
+  const comment = INTENSITY_COMMENTS[v];
+  return (
+    <div
+      className="mt-3 flex items-start gap-2.5 rounded-xl border px-3 py-2.5"
+      style={{
+        borderColor: v > 0 ? `${accent}55` : "var(--gold-hairline-soft)",
+        background: v > 0 ? `${accent}14` : "var(--surface-deep)",
+      }}
+      aria-live="polite"
+    >
+      {/* 4-dot intensity readout */}
+      <span className="mt-0.5 inline-flex shrink-0 gap-0.5" aria-hidden>
+        {[0, 1, 2, 3].map((i) => (
+          <span
+            key={i}
+            className="h-2 w-2 rounded-full"
+            style={{ background: i < v ? accent : "var(--hairline-strong)" }}
+          />
+        ))}
+      </span>
+      <p className="text-[12px] leading-snug" style={{ color: "var(--ink)" }}>
+        <strong className="font-semibold" style={{ color: v > 0 ? accent : "var(--ink-soft)" }}>
+          {label} · {v}/4.
+        </strong>{" "}
+        {comment}
+      </p>
+    </div>
+  );
+}
+
 function FocusedCard({
   focused,
   profile,
@@ -504,6 +558,12 @@ function FocusedCard({
           <em className="font-serif text-base italic text-[#e6dccd]/85">{subtitle}</em>
         ) : null}
       </h3>
+
+      {/* Live commentary on the user's selection — the guide reacts to the
+          intensity they set (client: "czy ten przewodnik nie powinien
+          komentować tego co zaznaczyłam?"). Updates instantly on every
+          click because `intensity` is read from the profile each render. */}
+      <SelectionComment intensity={intensity} accent={accent} label={title} />
 
       {/* Body — three paragraphs per kind. The primary description types
           out like a typewriter while the auto-tour is running (client:

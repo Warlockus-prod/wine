@@ -36,12 +36,16 @@ export type CompassLevel = 1 | 2 | 3;
 const MAX_INTENSITY = 4;
 const RING_COUNT = MAX_INTENSITY + 1; // 0..4 = 5 rings
 
-// 3 base smaki anchored at 120° intervals starting from 12 o'clock.
-// Order matches BASE_TASTES so we can iterate either side.
+// 3 base smaki at 120° intervals. The compass uses a north-zero,
+// clockwise convention (x = cx + r·sin θ, y = cy − r·cos θ), so θ=0 is
+// the top. Matches the canonical Vinokompas layout:
+//   CIERPKOŚĆ top · SŁODYCZ lower-right (4 o'clock) · KWASOWOŚĆ lower-left.
+// (Previously these used -π/2 offsets from a math-convention which put
+//  CIERPKOŚĆ on the left and clipped its label — fixed.)
 const BASE_AXES = [
-  { id: "cierpkosc", label: "CIERPKOŚĆ", angle: -Math.PI / 2 },                 // top
-  { id: "slodycz",   label: "SŁODYCZ",   angle: -Math.PI / 2 + (2 * Math.PI) / 3 }, // lower-right
-  { id: "kwasowosc", label: "KWASOWOŚĆ", angle: -Math.PI / 2 + (4 * Math.PI) / 3 }, // lower-left
+  { id: "cierpkosc", label: "CIERPKOŚĆ", angle: 0 },                    // top
+  { id: "slodycz",   label: "SŁODYCZ",   angle: (2 * Math.PI) / 3 },   // lower-right (4 o'clock)
+  { id: "kwasowosc", label: "KWASOWOŚĆ", angle: (4 * Math.PI) / 3 },   // lower-left (8 o'clock)
 ] as const;
 
 interface SpokeMeta {
