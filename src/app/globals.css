@@ -54,35 +54,35 @@
   --surface-input: #fbfbf9;      /* forms — almost white */
   --surface-terminal: #1d1316;   /* terminal stays dark on purpose */
 
-  /* Type — wine-ink scale */
+  /* Type — wine-ink scale. ink-muted darkened for legibility on white. */
   --ink: #1a0f11;
   --ink-strong: #0a0506;
   --ink-soft: #4a3438;
-  --ink-muted: #8a7a76;
+  --ink-muted: #6f5d57;
 
-  /* Lines — warm taupe whispers (lighter, more print-like) */
-  --hairline: rgba(40, 24, 18, 0.06);
-  --hairline-strong: rgba(40, 24, 18, 0.14);
+  /* Lines — clearly visible on white so cards have crisp edges (the
+     previous 0.06/0.14 made everything look muddy / borderless). */
+  --hairline: rgba(40, 24, 18, 0.12);
+  --hairline-strong: rgba(40, 24, 18, 0.24);
 
-  /* Paper layering tones — kept very light so white stays white */
-  --paper-tint: rgba(120, 80, 30, 0.018);
-  --paper-tint-strong: rgba(120, 80, 30, 0.035);
-  --paper-glow: rgba(197, 160, 89, 0.10);
+  /* Paper layering tones — slightly stronger for surface differentiation */
+  --paper-tint: rgba(120, 80, 30, 0.03);
+  --paper-tint-strong: rgba(120, 80, 30, 0.06);
+  --paper-glow: rgba(197, 160, 89, 0.14);
 
-  /* Gold appears as printed-foil bronze on white — pure #c5a059 reads
-     too pale; this darker bronze keeps the brand luxurious. */
-  --gold-hairline: rgba(155, 105, 22, 0.42);
-  --gold-hairline-soft: rgba(155, 105, 22, 0.24);
+  /* Gold — printed-foil bronze, a touch stronger so it reads on white. */
+  --gold-hairline: rgba(155, 105, 22, 0.55);
+  --gold-hairline-soft: rgba(155, 105, 22, 0.34);
 
-  /* Alternating-row striping — barely-there wine wash */
-  --row-tint-odd: rgba(120, 30, 20, 0.008);
-  --row-tint-even: rgba(120, 30, 20, 0.020);
-  --row-tint-hover: rgba(197, 160, 89, 0.12);
+  /* Alternating-row striping — gentle but visible wine wash */
+  --row-tint-odd: rgba(120, 30, 20, 0.015);
+  --row-tint-even: rgba(120, 30, 20, 0.038);
+  --row-tint-hover: rgba(197, 160, 89, 0.16);
 
-  /* Soft, warm shadow — sharper, more product-page than mid-century */
+  /* Crisper card shadow for clear elevation on white */
   --shadow-card:
-    0 1px 2px rgba(40, 20, 12, 0.04),
-    0 8px 28px rgba(40, 20, 12, 0.07);
+    0 1px 2px rgba(40, 20, 12, 0.06),
+    0 10px 30px rgba(40, 20, 12, 0.10);
 
   /* Page background — clean white with the faintest wine/gold wash */
   --bg-radials:
