@@ -689,7 +689,7 @@ export default function PairingPage() {
                     type="button"
                     onClick={() => entry.item && selectWine(entry.item.wine.id, "top-3")}
                     disabled={!entry.item}
-                    className={`rounded-2xl border px-3 py-3 text-left transition ${
+                    className={`min-w-0 overflow-hidden rounded-2xl border px-3 py-3 text-left transition ${
                       entry.item
                         ? `${entry.tone} ${
                             selectedWineId === entry.item.wine.id
@@ -707,7 +707,7 @@ export default function PairingPage() {
                         <p className="mt-1 line-clamp-1 text-sm font-semibold text-white">
                           {t(entry.item.wine.name, locale)}
                         </p>
-                        <p className="text-xs text-gray-300">
+                        <p className="truncate text-xs text-gray-300">
                           {tx("matchPercent", { score: entry.item.match.score })} • ${entry.item.wine.price}
                         </p>
                       </>

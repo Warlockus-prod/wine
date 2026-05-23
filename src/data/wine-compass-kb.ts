@@ -284,7 +284,7 @@ export const METHOD_STEPS: MethodStep[] = [
     id: "kompas",
     title_pl: "Ułóż na kompasie",
     body_pl:
-      "Każde z 6 wrażeń (świeże, oleiste, miękkie, tęgie, szorstkie, ziemiste) ma 2 tendencje. Zaznacz na kompasie intensywność każdej tendencji (od 0 do 4). To jest twój profil smaku tego wina.",
+      "Każde z 6 wrażeń (świeże, oleiste, miękkie, tęgie, szorstkie, ziemiste) ma 2 tendencje. Zaznacz na kompasie intensywność każdej tendencji (od 0 do 5). To jest twój profil smaku tego wina.",
   },
   {
     id: "porownaj",

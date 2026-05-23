@@ -439,11 +439,12 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
  * do" feel instead of static description text.
  */
 const INTENSITY_COMMENTS: Record<number, string> = {
-  0: "Jeszcze nie zaznaczone — kliknij koło, aby ustawić siłę (0–4).",
+  0: "Jeszcze nie zaznaczone — kliknij koło, aby ustawić siłę (0–5).",
   1: "Ledwo wyczuwalne — subtelny akcent w tle.",
-  2: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
-  3: "Mocne — jeden z głównych charakterów Twojego wina.",
-  4: "Dominujące — definiuje styl, którego szukasz.",
+  2: "Delikatne — lekko zaznaczone.",
+  3: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
+  4: "Mocne — jeden z głównych charakterów Twojego wina.",
+  5: "Dominujące — definiuje styl, którego szukasz.",
 };
 
 function SelectionComment({
@@ -455,7 +456,7 @@ function SelectionComment({
   accent: string;
   label: string;
 }) {
-  const v = Math.max(0, Math.min(4, Math.round(intensity)));
+  const v = Math.max(0, Math.min(5, Math.round(intensity)));
   const comment = INTENSITY_COMMENTS[v];
   return (
     <div
@@ -466,9 +467,9 @@ function SelectionComment({
       }}
       aria-live="polite"
     >
-      {/* 4-dot intensity readout */}
+      {/* 5-dot intensity readout */}
       <span className="mt-0.5 inline-flex shrink-0 gap-0.5" aria-hidden>
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2, 3, 4].map((i) => (
           <span
             key={i}
             className="h-2 w-2 rounded-full"
@@ -478,7 +479,7 @@ function SelectionComment({
       </span>
       <p className="text-[12px] leading-snug" style={{ color: "var(--ink)" }}>
         <strong className="font-semibold" style={{ color: v > 0 ? accent : "var(--ink-soft)" }}>
-          {label} · {v}/4.
+          {label} · {v}/5.
         </strong>{" "}
         {comment}
       </p>
@@ -557,7 +558,7 @@ function FocusedCard({
           {isTour ? "Przewodnik mówi…" : eyebrow}
         </p>
         <span className="ml-auto font-mono text-[10px] tracking-wider text-[#c5a059]/70">
-          {intensity}/4
+          {intensity}/5
         </span>
       </div>
 
@@ -804,7 +805,7 @@ function SelectedProfileBar({
             />
             <span className="font-serif italic">{p.label}</span>
             <span className="ml-0.5 inline-flex gap-0.5" aria-hidden>
-              {[0, 1, 2, 3].map((i) => (
+              {[0, 1, 2, 3, 4].map((i) => (
                 <span
                   key={i}
                   className="h-1.5 w-1.5 rounded-full"
@@ -826,7 +827,7 @@ function SelectedProfileBar({
           >
             <span className="font-serif italic">{p.label}</span>
             <span className="ml-0.5 inline-flex gap-0.5" aria-hidden>
-              {[0, 1, 2, 3].map((i) => (
+              {[0, 1, 2, 3, 4].map((i) => (
                 <span
                   key={i}
                   className="h-1.5 w-1.5 rounded-full"

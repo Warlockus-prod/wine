@@ -3,7 +3,7 @@
 /**
  * TasteCompass — interactive SVG wine compass à la vinocompas.pl.
  *
- * 6 sektorów (wrażeń) × 2 tendencje per sector × 5 stopni intensywności (0-4).
+ * 6 sektorów (wrażeń) × 2 tendencje per sector × 6 stopni intensywności (0-5).
  * 12 outer "spokes" total. Each spoke is a clickable annular slice that fills
  * outward from the center as the user taps to set intensity.
  *
@@ -18,8 +18,8 @@
 import { useId, useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { COMPASS_SECTORS, type CompassSector, type Tendencja } from "@/data/wine-compass-kb";
 
-export type Intensity = 0 | 1 | 2 | 3 | 4;
-export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-4
+export type Intensity = 0 | 1 | 2 | 3 | 4 | 5;
+export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-5
 /**
  * Compass progressive-disclosure level.
  *  1 — only 3 base smaki axes (cierpkość / słodycz / kwasowość)
@@ -33,8 +33,8 @@ export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-4
  */
 export type CompassLevel = 1 | 2 | 3;
 
-const MAX_INTENSITY = 4;
-const RING_COUNT = MAX_INTENSITY + 1; // 0..4 = 5 rings
+const MAX_INTENSITY = 5;
+const RING_COUNT = MAX_INTENSITY + 1; // 0..5 = 6 rings
 
 // 3 base smaki at 120° intervals. The compass uses a north-zero,
 // clockwise convention (x = cx + r·sin θ, y = cy − r·cos θ), so θ=0 is
@@ -204,7 +204,7 @@ export default function TasteCompass({
     [profile, setProfile],
   );
 
-  // Level-1 click: cycle a base smak. Same 0..4 ring scale, stored under
+  // Level-1 click: cycle a base smak. Same 0..5 ring scale, stored under
   // `base.<id>` so it doesn't collide with tendencja keys.
   const cycleBase = useCallback(
     (baseId: string) => {

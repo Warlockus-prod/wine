@@ -15,7 +15,7 @@
  * the rest of the flow. There is also a "Skip stage" button.
  *
  * Profile model:
- *   - Stage 1 writes `base.slodycz` / `.cierpkosc` / `.kwasowosc` (0-4).
+ *   - Stage 1 writes `base.slodycz` / `.cierpkosc` / `.kwasowosc` (0-5).
  *   - Stage 2 writes a per-sektor average — the sektor value is fanned out
  *     to both tendencje under it so downstream consumers (chat, pairing)
  *     see a coherent profile even if the user never opened stage 3.
@@ -71,7 +71,7 @@ function dryness(profile: CompassProfile): {
   const s = (profile["base.slodycz"] ?? 0) as number;
   const c = (profile["base.cierpkosc"] ?? 0) as number;
   const k = (profile["base.kwasowosc"] ?? 0) as number;
-  const raw = s * 25 - c * 5 - k * 5 + 15;
+  const raw = s * 18 - c * 3 - k * 3 + 10;
   const score = Math.max(0, Math.min(100, raw));
   let label: string;
   if (score < 8) label = "Bardzo wytrawne";
@@ -412,7 +412,7 @@ function Stage1({
           Kliknij jedną z trzech osi — <strong className="not-italic font-semibold text-[#f4ede0]">Słodycz</strong>,{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Cierpkość</strong> lub{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Kwasowość</strong> — kilka razy, aby ustawić jej
-          siłę od 0 do 4. Strzałka u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
+          siłę od 0 do 5. Strzałka u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
         </p>
       </header>
 
@@ -474,19 +474,19 @@ function BigBaseSlider({
           {label}
         </label>
         <span className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)]">
-          {value}/4
+          {value}/5
         </span>
       </div>
       <input
         id={`bsm-${id}`}
         type="range"
         min={0}
-        max={4}
+        max={5}
         step={1}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-[var(--color-accent-gold)]"
-        aria-label={`${label} 0..4`}
+        aria-label={`${label} 0..5`}
       />
       <p className="mt-2 text-[11px] leading-snug text-[#c5a059]/70">{description}</p>
     </div>
@@ -561,7 +561,7 @@ function Stage2({
           Sześć wrażeń
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Kliknij wybrane wrażenie na kole, aby zwiększyć jego siłę (0–4) — kropki pokażą poziom.
+          Kliknij wybrane wrażenie na kole, aby zwiększyć jego siłę (0–5) — kropki pokażą poziom.
           Po prawej pojawi się opis tego wrażenia. Nie wiesz od czego zacząć? Włącz{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnika</strong>, który oprowadzi Cię po wszystkich sześciu.
         </p>
@@ -596,7 +596,7 @@ function Stage3({
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
           Tryb dla zaawansowanych: każde wrażenie ma dwie tendencje. Kliknij konkretną
-          tendencję na kole, aby dostroić profil (0–4). Po prawej — pełny opis i skojarzenia
+          tendencję na kole, aby dostroić profil (0–5). Po prawej — pełny opis i skojarzenia
           każdej z 12. <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>
