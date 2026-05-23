@@ -34,7 +34,11 @@ export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-5
 export type CompassLevel = 1 | 2 | 3;
 
 const MAX_INTENSITY = 5;
-const RING_COUNT = MAX_INTENSITY + 1; // 0..5 = 6 rings
+// 5 fillable divisions (concentric rings). intensity 0 = empty centre,
+// 1..5 fills one ring each up to the outer edge.
+const RING_COUNT = MAX_INTENSITY;
+// Click cycle visits 6 states: 0 (empty) then 1..5.
+const STATE_COUNT = MAX_INTENSITY + 1;
 
 // 3 base smaki at 120° intervals. The compass uses a north-zero,
 // clockwise convention (x = cx + r·sin θ, y = cy − r·cos θ), so θ=0 is
@@ -180,7 +184,7 @@ export default function TasteCompass({
   const cycleIntensity = useCallback(
     (id: string) => {
       const cur = (profile[id] ?? 0) as Intensity;
-      const next = (cur + 1) % RING_COUNT;
+      const next = (cur + 1) % STATE_COUNT;
       setIntensity(id, next as Intensity);
     },
     [profile, setIntensity],
@@ -194,7 +198,7 @@ export default function TasteCompass({
       const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
       if (!s) return;
       const cur = sektorAvg(profile, sektorId);
-      const next = ((cur + 1) % RING_COUNT) as Intensity;
+      const next = ((cur + 1) % STATE_COUNT) as Intensity;
       setProfile({
         ...profile,
         [s.tendencje[0].id]: next,
@@ -210,7 +214,7 @@ export default function TasteCompass({
     (baseId: string) => {
       const key = `base.${baseId}`;
       const cur = (profile[key] ?? 0) as Intensity;
-      const next = ((cur + 1) % RING_COUNT) as Intensity;
+      const next = ((cur + 1) % STATE_COUNT) as Intensity;
       setIntensity(key, next);
     },
     [profile, setIntensity],
