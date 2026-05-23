@@ -20,7 +20,7 @@ Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 Before any commit/push that will be deployed:
 
 ```bash
-npm run check    # = lint + build + 31 e2e tests; all three must pass
+npm run check    # = lint + build + 36 e2e tests; all three must pass
 ```
 
 Individual:
@@ -40,7 +40,7 @@ All routable pages live under `src/app/[locale]/`. English at root, Polish at `/
 - `/` (or `/pl`) — restaurant directory + Leaflet+OSM map + filters; hero has prominent **Samouczek smaku** gold CTA
 - `/restaurants/[slug]` — per-venue menu + QR (DB-backed via `/api/restaurants/[slug]`)
 - `/pairing?restaurant=<slug>` — bidirectional matching workspace: pick dish → wines re-rank, pick wine → menu re-ranks. Top-3 highlights, auto-select #1 of the other side. Chat panel has 4 bubbles: compare → curated/algo reason → **Vinokompas-vocab 2-sentence explanation** (gold-bordered, AI-generated via `/api/pairing/explain`) → service note. Decant strings localized at render time (`localizeDecant`).
-- `/samouczek` — interactive Vinokompas tutorial: SVG compass (6 sectors × 2 tendencje × 5 intensity rings, ARIA-correct), 3 base-smaki sliders, **3-level CompassExplorer** (sektor → tendencja → skojarzenia) with progressive reveal, **FloatingTasteChat** docked bottom-right (persists across scroll, expand/collapse remembered in localStorage).
+- `/samouczek` — interactive Vinokompas tutorial: SVG compass (6 sectors × 2 tendencje × 5 intensity rings, ARIA-correct), 3 base-smaki sliders, **3-level CompassExplorer** (sektor → tendencja → skojarzenia) with progressive reveal, **FloatingTasteChat** docked bottom-right (persists across scroll, expand/collapse remembered in localStorage). 3-stage `<StagedTutorial>` (SMAK → WRAŻENIA → TENDENCJE) with typewriter tour text + dryness bar above the compass. **Live wine proposals** render under the stages (`InlineProposals`): the live `CompassProfile` is matched against `src/data/samouczek-wines.ts` (18 grape/style entries with compass fingerprints) by the pure cosine matcher in `src/lib/samouczek-match.ts`; each card links to **winnica.pl** search for that grape (originators of the Vinokompas method — robust search URLs, never 404). Profile persists to `localStorage["wn_compass_profile_v1"]`.
 - `/pitch` — editorial sales-pitch landing for restaurant owners.
 - `/admin` — content editor (UI still localStorage; DB serves all reads via API; write API surface ready). Auth gate OFF via `AUTH_GATE_ADMIN=0`.
 - `/admin/signin` — magic-link login flow (waits on SMTP env vars to flip the gate).
@@ -109,5 +109,6 @@ App binds `172.17.0.1:4300` only — public access is via the shared `nginx_serv
 - **Bootstrap your admin user** before flipping the auth gate: `ADMIN_EMAIL=ty@firma.pl npx tsx scripts/db-bootstrap-admin.mts` (run on VPS via docker exec). Then provision SMTP env (EMAIL_SERVER_*) and set `AUTH_GATE_ADMIN=1`. Without this two-step, flipping the gate is a lockout.
 - **Auth gate is currently OFF** (`AUTH_GATE_ADMIN=0`). Magic-link infra is wired and ready; flip to `1` AFTER provisioning SMTP env vars (EMAIL_SERVER_HOST/PORT/USER/PASSWORD/FROM). Until then `/admin/signin` does work but emits the magic link to `docker logs` instead of email.
 - **Seed wine photos and prices are placeholder-grade.** Source-back each label before any commercial pitch.
+- **Image pipeline:** every seeded dish/wine has a generated local photo under `public/{dishes,wines}/<slug>/<id>.png` (50 dishes + 40 wines), mapped in `src/data/{dish,wine}-images.ts`; senses under `public/senses/*.png` (18), mapped in `src/data/sense-images.ts`. Resolution order in `src/lib/food-photos.ts`: explicit `wine.image`/`dish.image` → local map by id → category-keyed Unsplash fallback → generic fallback. **Caveat:** the Unsplash fallbacks are external and DO rot — they were audited+repaired 2026-05-23 (11 dead IDs swapped). When a DB wine id has no entry in the local map (e.g. La Scolca Gavi, Jermann Pinot Grigio on atelier-amaro) it falls to the Unsplash white-wine photo; the durable fix is to re-run `scripts/gen-wine-images.mts` so every served wine id has a local image. Verify images with `node scripts/shoot-proposals.mjs` or a browser `naturalWidth===0` sweep. Icons (`public/app-icon.svg`, `src/app/favicon.ico`, `src/app/manifest.ts`) are all local SVG — the `next.svg`/`globe.svg`/`window.svg`/`file.svg`/`vercel.svg` in `public/` are unused create-next-app leftovers.
 - **PL seed translations are LLM first-pass.** Polish-speaking sommelier must vet wine vocabulary before commercial pitch.
 - **OpenAI cost discipline:** `/api/pairing/explain` is per-(dish,wine) cached client-side so re-selecting doesn't re-spend tokens. `/api/chat` capped at 350 tokens per response. Default model `gpt-5.4-mini` (~$0.0003/exchange).

@@ -82,7 +82,7 @@ const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
     lat: -12.1196,
     lng: -77.0366,
     coverImage:
-      "https://images.unsplash.com/photo-1611141647740-8fffc6e29cf2?w=1200&q=80&auto=format",
+      "https://images.unsplash.com/photo-1535399831218-d5bd36d1a6b3?w=1200&q=80&auto=format",
   },
 };
 
