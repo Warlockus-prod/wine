@@ -754,12 +754,6 @@ export default function PairingPage() {
                     onClick={() => selectWine(wine.id, "list")}
                     className={`relative flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${toneClass}`}
                   >
-                    {topRank ? (
-                      <span className="absolute top-2 right-2 rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-black uppercase">
-                        #{topRank}
-                      </span>
-                    ) : null}
-
                     <span
                       className={`mt-5 h-2.5 w-2.5 shrink-0 rounded-full transition ${
                         isSelected
@@ -810,7 +804,7 @@ export default function PairingPage() {
                           {wine.passport.grape}
                         </span>
                         {rankLabel ? (
-                          <span className="text-[11px] font-semibold text-white/85">{rankLabel}</span>
+                          <span className="text-[11px] font-semibold text-white/85">#{topRank} · {rankLabel}</span>
                         ) : null}
                       </div>
                     </div>
