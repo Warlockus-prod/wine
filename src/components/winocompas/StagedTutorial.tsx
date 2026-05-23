@@ -474,8 +474,10 @@ function Stage1({
           Trzy smaki bazowe
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Zacznij od trzech podstawowych smaków — kliknij oś na kompasie, żeby
-          zwiększyć intensywność. Auto-przewodnik pokaże każdy z nich po kolei.
+          Kliknij jedną z trzech osi — <strong className="not-italic font-semibold text-[#f4ede0]">Słodycz</strong>,{" "}
+          <strong className="not-italic font-semibold text-[#f4ede0]">Cierpkość</strong> lub{" "}
+          <strong className="not-italic font-semibold text-[#f4ede0]">Kwasowość</strong> — kilka razy, aby ustawić jej
+          siłę od 0 do 4. Strzałka u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
         </p>
       </header>
 
@@ -485,11 +487,11 @@ function Stage1({
           onProfileChange={onProfileChange}
           level={1}
           autoStartTour
-          // Dryness arrow lives on the SAME card as the compass (client
-          // request: skala wytrawności widoczna jednocześnie z Vinokompasem
-          // i widać jak się zmienia). It re-renders live on every base-taste
-          // change because `dr` is recomputed each render in the parent.
-          belowCompass={<DrynessArrow score={dr.score} label={dr.label} />}
+          // Dryness arrow ABOVE the compass on the same card (client:
+          // "ja bym ją wręcz dała nad") — first thing visible, updates
+          // live as the user adjusts the base tastes since `dr` is
+          // recomputed each render in the parent.
+          aboveCompass={<DrynessArrow score={dr.score} label={dr.label} />}
         />
       </div>
 
@@ -626,10 +628,11 @@ function DrynessArrow({ score, label }: { score: number; label: string }) {
         {/* Rail */}
         <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#a01024] via-[#c5a059] to-[#5b6b3a]" />
 
-        {/* Tick labels */}
+        {/* Tick labels — the centre is the dry/sweet boundary, so the
+            midpoint reads "Półwytrawne" (semi-dry), not "Półsłodkie". */}
         <div className="absolute inset-x-0 top-0 flex justify-between text-[9px] tracking-wider text-[#c5a059]/65 uppercase">
           <span>Bardzo wytrawne</span>
-          <span>Półsłodkie</span>
+          <span>Półwytrawne</span>
           <span>Bardzo słodkie</span>
         </div>
 
@@ -677,8 +680,9 @@ function Stage2({
           Sześć wrażeń
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Kompas otwiera szóstkę sektorów — kliknij wrażenie, by ustawić jego siłę.
-          Auto-przewodnik przejdzie kolejno po wszystkich sześciu z opisem.
+          Kliknij wybrane wrażenie na kole, aby zwiększyć jego siłę (0–4) — kropki pokażą poziom.
+          Po prawej pojawi się opis tego wrażenia. Nie wiesz od czego zacząć? Włącz{" "}
+          <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnika</strong>, który oprowadzi Cię po wszystkich sześciu.
         </p>
       </header>
 
@@ -710,8 +714,9 @@ function Stage3({
           Dwanaście tendencji
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Najwyższa rozdzielczość — każde wrażenie ma dwie tendencje. Auto-przewodnik
-          przechodzi przez każdą z 12 po kolei z opisem skojarzeń.
+          Tryb dla zaawansowanych: każde wrażenie ma dwie tendencje. Kliknij konkretną
+          tendencję na kole, aby dostroić profil (0–4). Po prawej — pełny opis i skojarzenia
+          każdej z 12. <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>
 

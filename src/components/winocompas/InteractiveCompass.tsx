@@ -38,10 +38,12 @@ interface Props {
    *  greets the user with a presentation instead of a static disc. */
   autoStartTour?: boolean;
   /** Optional content rendered in the LEFT column directly under the
-   *  compass + profile bar — on the SAME card. Stage 1 uses this for the
-   *  dryness arrow so it sits next to the compass and updates live as the
-   *  user adjusts the base tastes. */
+   *  compass + profile bar — on the SAME card. */
   belowCompass?: React.ReactNode;
+  /** Optional content rendered in the LEFT column ABOVE the compass — on
+   *  the same card, first thing visible. Stage 1 uses this for the dryness
+   *  arrow (client request: put it on top, visible at a glance, live). */
+  aboveCompass?: React.ReactNode;
 }
 
 // Tour ID sets per level — what auto-tour cycles through.
@@ -99,6 +101,7 @@ export default function InteractiveCompass({
   level = 3,
   autoStartTour = false,
   belowCompass,
+  aboveCompass,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   // Pinned id stays selected after the user clicks (or hovers chip in the
@@ -211,6 +214,9 @@ export default function InteractiveCompass({
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-7">
       {/* ── Compass ─────────────────────────────────────────────────── */}
       <div className="flex flex-col items-center">
+        {/* Above-compass slot (e.g. live dryness arrow on stage 1) —
+            first thing visible on the card. */}
+        {aboveCompass ? <div className="mb-5 w-full max-w-[440px]">{aboveCompass}</div> : null}
         <div className="w-full max-w-[440px]">
           <TasteCompass
             profile={profile}
@@ -383,6 +389,49 @@ export default function InteractiveCompass({
   );
 }
 
+/**
+ * TourText — typewriter reveal for the auto-tour descriptions. While
+ * `typing` is true, the text types out char-by-char (~22ms/char) with a
+ * blinking caret so the panel reads like a typewriter instead of snapping
+ * between sektor descriptions. When `typing` is false (hover / pinned),
+ * the full text shows instantly. Restarts whenever `text` changes.
+ */
+function TourText({ text, typing }: { text: string; typing: boolean }) {
+  const [shown, setShown] = useState(typing ? "" : text);
+
+  useEffect(() => {
+    if (!typing) {
+      setShown(text);
+      return;
+    }
+    setShown("");
+    let i = 0;
+    const id = window.setInterval(() => {
+      i += 1;
+      setShown(text.slice(0, i));
+      if (i >= text.length) window.clearInterval(id);
+    }, 22);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text, typing]);
+
+  const done = shown.length >= text.length;
+  return (
+    <>
+      {shown}
+      {typing && !done ? (
+        <span
+          aria-hidden
+          className="ml-0.5 inline-block w-[0.5ch] animate-pulse"
+          style={{ color: "var(--color-accent-gold)" }}
+        >
+          ▋
+        </span>
+      ) : null}
+    </>
+  );
+}
+
 function FocusedCard({
   focused,
   profile,
@@ -456,10 +505,15 @@ function FocusedCard({
         ) : null}
       </h3>
 
-      {/* Body — three paragraphs per kind */}
+      {/* Body — three paragraphs per kind. The primary description types
+          out like a typewriter while the auto-tour is running (client:
+          "napisy za szybko skaczą... pismem jak pisze się na maszynie"),
+          and shows instantly on hover/click. */}
       {focused.kind === "base" ? (
         <>
-          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{focused.description}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
+            <TourText text={focused.description} typing={isTour} />
+          </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
             Trzy smaki bazowe — cierpkość, słodycz, kwasowość — to
             podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym
@@ -468,7 +522,9 @@ function FocusedCard({
         </>
       ) : focused.kind === "sektor" ? (
         <>
-          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{focused.sector.short_pl}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
+            <TourText text={focused.sector.short_pl} typing={isTour} />
+          </p>
           <dl className="mt-4 space-y-2 text-[12px] leading-relaxed">
             {focused.sector.tendencje.map((t) => (
               <div
@@ -493,7 +549,9 @@ function FocusedCard({
         </>
       ) : (
         <>
-          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">{focused.sector.short_pl}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
+            <TourText text={focused.sector.short_pl} typing={isTour} />
+          </p>
           <dl className="mt-4 space-y-2.5 text-[13px] leading-relaxed">
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
               <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Skojarzenia</dt>
