@@ -21,7 +21,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { BASE_TASTES, COMPASS_SECTORS } from "@/data/wine-compass-kb";
+import { SENSE_IMAGE_MAP } from "@/data/sense-images";
 import type { CompassLevel, CompassProfile } from "./TasteCompass";
 
 const TasteCompass = dynamic(() => import("./TasteCompass"), { ssr: false });
@@ -520,6 +522,15 @@ function FocusedCard({
   const subtitle =
     focused.kind === "tendencja" ? ` · ${focused.tendencja.name_pl}` : "";
 
+  // Still-life image for this impression (client: "też ważne są obrazki").
+  // tendencja → its own image; sektor → sektor image; base → none.
+  const senseImg =
+    focused.kind === "tendencja"
+      ? SENSE_IMAGE_MAP[focused.tendencja.id] ?? SENSE_IMAGE_MAP[focused.sector.id]
+      : focused.kind === "sektor"
+        ? SENSE_IMAGE_MAP[focused.sector.id]
+        : undefined;
+
   // Intensity per focus kind (used in the value pill upper-right)
   const intensity =
     focused.kind === "base"
@@ -552,7 +563,31 @@ function FocusedCard({
         </span>
       </div>
 
-      <h3 className="pitch-display mt-2 text-2xl text-white">
+      {/* Still-life image of the impression — the "obrazki" from the
+          canonical Vinokompas (citrus for Świeże, leather/oak for
+          Szorstkie, etc.), generated to match the wine-bar aesthetic. */}
+      {senseImg ? (
+        <div
+          className="relative mt-3 h-28 w-full overflow-hidden rounded-xl border"
+          style={{ borderColor: `${accent}44` }}
+        >
+          <Image
+            src={senseImg}
+            alt={title}
+            fill
+            sizes="(min-width: 1024px) 340px, 90vw"
+            unoptimized
+            className="object-cover"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ background: `linear-gradient(180deg, transparent 55%, ${accent}22)` }}
+          />
+        </div>
+      ) : null}
+
+      <h3 className="pitch-display mt-3 text-2xl text-white">
         {title}
         {subtitle ? (
           <em className="font-serif text-base italic text-[#e6dccd]/85">{subtitle}</em>
