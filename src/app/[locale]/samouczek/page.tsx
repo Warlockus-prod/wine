@@ -81,7 +81,7 @@ export default function SamouczekPage() {
         {/* ───────── HERO ───────── */}
         <section
           aria-labelledby="hero-title"
-          className="relative overflow-hidden rounded-[36px] border border-white/8 bg-[radial-gradient(circle_at_10%_20%,rgba(209,21,52,0.18),transparent_45%),radial-gradient(circle_at_90%_85%,rgba(197,160,89,0.18),transparent_45%),linear-gradient(180deg,#1d1013_0%,#120709_100%)] px-5 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20"
+          className="editorial-hero relative overflow-hidden rounded-[36px] border border-white/8 bg-[radial-gradient(circle_at_10%_20%,rgba(209,21,52,0.18),transparent_45%),radial-gradient(circle_at_90%_85%,rgba(197,160,89,0.18),transparent_45%),linear-gradient(180deg,#1d1013_0%,#120709_100%)] px-5 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20"
         >
           <span className="pitch-eyebrow pitch-eyebrow--start">Samouczek Vinokompas</span>
           <h1
@@ -235,7 +235,7 @@ export default function SamouczekPage() {
         {/* ───────── FINAL CTA ───────── */}
         <section
           aria-labelledby="final-title"
-          className="relative overflow-hidden rounded-[36px] border border-[rgba(197,160,89,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(209,21,52,0.32),transparent_60%),linear-gradient(180deg,#1d1013,#100608)] px-5 py-16 text-center sm:px-10 sm:py-20"
+          className="editorial-hero editorial-hero--center relative overflow-hidden rounded-[36px] border border-[rgba(197,160,89,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(209,21,52,0.32),transparent_60%),linear-gradient(180deg,#1d1013,#100608)] px-5 py-16 text-center sm:px-10 sm:py-20"
         >
           <span className="pitch-eyebrow">Gotowe?</span>
           <h2

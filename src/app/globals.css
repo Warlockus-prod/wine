@@ -778,6 +778,24 @@ body {
   min-width: 2.4rem;
 }
 
+/* Editorial hero band (samouczek + final CTA) — dark gradient by default;
+   in light theme becomes a cream wash so it matches the home directory
+   hero and the body text (mapped to ink by the shims) stays readable.
+   Reliable class hook — avoids the fragile [class*="bg-[radial-gradient"]
+   attribute selector that PostCSS/Tailwind didn't always honour. */
+:root[data-theme="light"] .editorial-hero {
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(209, 21, 52, 0.06), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(197, 160, 89, 0.14), transparent 45%),
+    linear-gradient(180deg, var(--surface-deep), var(--surface-elevated)) !important;
+  border-color: var(--gold-hairline) !important;
+}
+:root[data-theme="light"] .editorial-hero--center {
+  background-image:
+    radial-gradient(circle at 50% 120%, rgba(209, 21, 52, 0.10), transparent 60%),
+    linear-gradient(180deg, var(--surface-elevated), var(--surface-deep)) !important;
+}
+
 /* ─────────────────────────────────────────────────────────────────────
    Premium pass — /restaurants/[slug] + /admin sandbox
    Editorial wine-bar / sommelier's notebook aesthetic.
