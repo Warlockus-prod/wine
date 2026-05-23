@@ -1,10 +1,16 @@
-// v4 — current Vinovigator routes (no more legacy /v1/ paths). Bumping
-// CACHE_NAME on every SW change forces all clients to drop the old shell
-// in the activate handler below. Restaurant slug pages are cached
-// network-first by the navigation handler; menu/wine photos under
-// /dishes/* and /wines/* are cached cache-first so once a guest scans
-// the QR at a table, the menu keeps working even if Wi-Fi drops.
-const CACHE_NAME = "wine-shell-v4";
+// v5 — cache strategy reworked so deploys propagate immediately.
+//
+// Previous v4 used cache-first for ALL sub-resources, which served stale
+// JS/CSS chunks (and therefore stale UI copy) to returning visitors until
+// the cache happened to evict. Fixed:
+//   - Navigation (HTML)      → network-first (fresh content, offline
+//                              falls back to cache then /offline).
+//   - /dishes/* /wines/*     → cache-first (immutable heavy photos; the
+//                              point of offline-at-the-table QR scans).
+//   - everything else
+//     (JS, CSS, fonts, API)  → network-first with cache fallback, so a
+//                              new build's chunks always win when online.
+const CACHE_NAME = "wine-shell-v5";
 const OFFLINE_URL = "/offline";
 const SHELL_ROUTES = [
   "/",
@@ -16,6 +22,10 @@ const SHELL_ROUTES = [
   "/admin",
   OFFLINE_URL,
 ];
+
+// Heavy immutable assets we WANT to keep cache-first for table-side
+// offline resilience. These never change for a given URL.
+const CACHE_FIRST_PREFIXES = ["/dishes/", "/wines/"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -35,44 +45,47 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+const networkFirst = async (request) => {
+  try {
+    const response = await fetch(request);
+    // Only cache successful, basic/cors responses.
+    if (response && response.status === 200) {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    if (request.mode === "navigate") return caches.match(OFFLINE_URL);
+    throw new Error("network + cache miss");
+  }
+};
+
+const cacheFirst = async (request) => {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response && response.status === 200) {
+    const copy = response.clone();
+    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+  }
+  return response;
+};
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
+  if (request.method !== "GET") return;
 
-  if (request.method !== "GET") {
+  const url = new URL(request.url);
+
+  // Cache-first only for the heavy immutable photo assets.
+  if (CACHE_FIRST_PREFIXES.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(cacheFirst(request).catch(() => caches.match(OFFLINE_URL)));
     return;
   }
 
-  const isNavigation = request.mode === "navigate";
-
-  if (isNavigation) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(async () => {
-          const cached = await caches.match(request);
-          return cached || caches.match(OFFLINE_URL);
-        }),
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
-
-      return fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(() => caches.match(OFFLINE_URL));
-    }),
-  );
+  // Everything else (HTML, JS, CSS, fonts, API) — network-first so new
+  // deploys win the moment the user is online.
+  event.respondWith(networkFirst(request));
 });
