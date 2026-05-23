@@ -15,7 +15,10 @@ import type { Locale } from "@/i18n/routing";
 const RestaurantMap = dynamic(() => import("@/components/v2/RestaurantMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full w-full items-center justify-center rounded-[30px] border border-white/10 bg-[#130a0b] text-xs tracking-[0.22em] text-gray-500 uppercase">
+    <div
+      className="flex h-full w-full items-center justify-center rounded-[30px] border text-xs tracking-[0.22em] uppercase"
+      style={{ background: "var(--surface-deep)", borderColor: "var(--hairline-strong)", color: "var(--ink-muted)" }}
+    >
       Loading map…
     </div>
   ),
@@ -193,7 +196,10 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="relative h-[520px] overflow-hidden rounded-[30px] border border-white/10 bg-[#130a0b] sm:h-[620px] lg:h-[700px]">
+            <div
+              className="relative h-[520px] overflow-hidden rounded-[30px] border sm:h-[620px] lg:h-[700px]"
+              style={{ background: "var(--surface-deep)", borderColor: "var(--hairline-strong)" }}
+            >
               <RestaurantMap
                 restaurants={filteredRestaurants}
                 selectedSlug={effectiveSelectedSlug}
