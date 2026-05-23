@@ -11,13 +11,6 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
 const page = await ctx.newPage();
 
-const lum = (rgb) => {
-  const m = rgb.match(/\d+/g);
-  if (!m) return 1;
-  const [r, g, b] = m.map(Number);
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-};
-
 for (const url of routes) {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.evaluate(() => localStorage.setItem("vinovigator-theme", "light"));

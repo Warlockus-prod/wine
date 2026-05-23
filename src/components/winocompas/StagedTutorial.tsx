@@ -32,7 +32,13 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Link } from "@/i18n/navigation";
-import { COMPASS_SECTORS, BASE_TASTES } from "@/data/wine-compass-kb";
+import { BASE_TASTES } from "@/data/wine-compass-kb";
+import WineBottleSVG from "@/components/v2/WineBottleSVG";
+import {
+  winnicaSearchUrl,
+  type SamouczekWine,
+} from "@/data/samouczek-wines";
+import { matchWines, filledDimensions } from "@/lib/samouczek-match";
 import type {
   CompassProfile,
   Intensity as IntensityLevel,
@@ -57,102 +63,6 @@ interface Props {
   onChatDisabledChange: (next: boolean) => void;
 }
 
-// ─── icons per wrażenie (sektor) ─────────────────────────────────────────
-// Inline SVG — small, theme-aware via currentColor. Each glyph is hand-
-// shaped so the family of six reads as a set, not random clip-art.
-
-function SectorIcon({ id, className }: { id: string; className?: string }) {
-  // 32×32 viewBox, currentColor stroke + fill where it helps clarity.
-  switch (id) {
-    case "swieze": // citrus + green leaf
-      return (
-        <svg viewBox="0 0 32 32" className={className} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="13" cy="17" r="6" />
-          <path d="M13 11 L13 23 M7 17 L19 17 M9 13 L17 21 M9 21 L17 13" opacity="0.55" />
-          <path d="M19 12 C 22 8, 24 6, 27 6 C 27 9, 25 11, 21 14" />
-        </svg>
-      );
-    case "oleiste": // butter cube + droplet
-      return (
-        <svg viewBox="0 0 32 32" className={className} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="6" y="14" width="14" height="10" rx="1.5" />
-          <path d="M6 18 L20 18" opacity="0.5" />
-          <path d="M22 6 C 25 10, 27 13, 27 16 C 27 19, 24.5 21, 22 21 C 19.5 21, 17 19, 17 16 C 17 13, 19 10, 22 6 Z" />
-        </svg>
-      );
-    case "miekkie": // soft berry
-      return (
-        <svg viewBox="0 0 32 32" className={className} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="20" r="5" />
-          <circle cx="20" cy="18" r="6" />
-          <path d="M14 14 C 14 10, 17 7, 20 6 M22 7 C 25 8, 26 10, 26 12" />
-        </svg>
-      );
-    case "tegie": // coffee bean / mug
-      return (
-        <svg viewBox="0 0 32 32" className={className} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M7 12 L23 12 L21 24 L9 24 Z" />
-          <path d="M23 14 C 27 14, 28 17, 28 19 C 28 21, 27 22, 23 22" />
-          <path d="M11 6 C 11 8, 13 8, 13 10 M16 6 C 16 8, 18 8, 18 10" opacity="0.6" />
-        </svg>
-      );
-    case "szorstkie": // dry leaf / leather
-      return (
-        <svg viewBox="0 0 32 32" className={className} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M16 5 C 9 9, 6 16, 8 25 C 17 26, 25 21, 26 12 C 22 11, 19 8, 16 5 Z" />
-          <path d="M14 9 L17 22 M11 14 L19 14 M12 18 L18 18" opacity="0.55" />
-        </svg>
-      );
-    case "ziemiste": // pebble + drop
-      return (
-        <svg viewBox="0 0 32 32" className={className} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-          <ellipse cx="13" cy="22" rx="8" ry="4.5" />
-          <ellipse cx="20" cy="14" rx="5" ry="3" />
-          <path d="M22 5 C 24 8, 25.5 10, 25.5 12 C 25.5 14, 24 15, 22.5 15 C 21 15, 19.5 14, 19.5 12 C 19.5 10, 20.5 8, 22 5 Z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
-}
-
-// ─── 0..4 dot picker — used in stages 2 and 3 ────────────────────────────
-function DotScale({
-  value,
-  onChange,
-  color,
-  ariaLabel,
-}: {
-  value: number;
-  onChange: (v: IntensityLevel) => void;
-  color: string;
-  ariaLabel: string;
-}) {
-  return (
-    <div className="flex items-center gap-1.5" role="radiogroup" aria-label={ariaLabel}>
-      {[0, 1, 2, 3, 4].map((v) => {
-        const active = v <= value && value > 0;
-        return (
-          <button
-            key={v}
-            type="button"
-            role="radio"
-            aria-checked={value === v}
-            onClick={() => onChange(v as IntensityLevel)}
-            className="h-5 w-5 rounded-full border transition-all hover:scale-110 active:scale-95"
-            style={{
-              borderColor: active ? color : "rgba(197,160,89,0.32)",
-              background: active ? color : "transparent",
-              boxShadow: active ? `0 0 6px ${color}66` : "none",
-            }}
-            aria-label={`${v}/4`}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
 // ─── dryness algorithm placeholder ───────────────────────────────────────
 function dryness(profile: CompassProfile): {
   score: number; // 0-100, higher = sweeter
@@ -173,100 +83,125 @@ function dryness(profile: CompassProfile): {
   return { score, label };
 }
 
-// ─── helpers ─────────────────────────────────────────────────────────────
-const sectorAverage = (profile: CompassProfile, sectorId: string): number => {
-  const s = COMPASS_SECTORS.find((x) => x.id === sectorId);
-  if (!s) return 0;
-  const a = (profile[s.tendencje[0].id] ?? 0) as number;
-  const b = (profile[s.tendencje[1].id] ?? 0) as number;
-  return Math.round((a + b) / 2);
+// ─── live wine proposals — real wines from winnica.pl ─────────────────────
+const STYLE_LABEL_PL: Record<SamouczekWine["style"], string> = {
+  white: "białe",
+  red: "czerwone",
+  rose: "różowe",
+  sparkling: "musujące",
+  dessert: "deserowe",
 };
 
-const setSectorAverage = (
-  profile: CompassProfile,
-  sectorId: string,
-  v: IntensityLevel,
-): CompassProfile => {
-  const s = COMPASS_SECTORS.find((x) => x.id === sectorId);
-  if (!s) return profile;
-  return {
-    ...profile,
-    [s.tendencje[0].id]: v,
-    [s.tendencje[1].id]: v,
-  };
-};
-
-const profileFilledCount = (profile: CompassProfile): number => {
-  let n = 0;
-  for (const s of COMPASS_SECTORS) {
-    for (const t of s.tendencje) if (((profile[t.id] ?? 0) as number) > 0) n++;
-  }
-  for (const b of BASE_TASTES) if (((profile[`base.${b.id}`] ?? 0) as number) > 0) n++;
-  return n;
-};
-
-// ─── matched-wines preview block ─────────────────────────────────────────
-function MatchPreview({ profile, stage }: { profile: CompassProfile; stage: Stage }) {
-  const filled = profileFilledCount(profile);
-  const enough = filled >= 1;
-  const widthPct = Math.min(100, filled * 7);
+function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: Stage }) {
+  const filled = filledDimensions(profile);
+  const matches = matchWines(profile, 3);
+  const enough = matches.length > 0;
 
   return (
-    <div className="mt-6 rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#170d0f] p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
-            Wina dopasowane do twojego smaku
-          </p>
-          <p className="mt-1 font-serif text-sm italic text-[#e6dccd]">
+    <div className="mt-6 rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#170d0f] p-5 sm:p-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="pitch-eyebrow pitch-eyebrow--start">Twoje propozycje</p>
+          <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
+            {enough ? "Wina dopasowane do Twojego smaku" : "Zaznacz smak, a wina pojawią się tutaj"}
+          </h3>
+          <p className="mt-1.5 font-serif text-sm italic text-[#e6dccd]">
             {enough
-              ? `Etap ${stage} z 3 — profil dopracowany w ${filled} parametrach.`
-              : "Wskaż przynajmniej jedno wrażenie, aby zobaczyć propozycje."}
+              ? `Etap ${stage} z 3 — profil opisany w ${filled} ${filled === 1 ? "parametrze" : "parametrach"}. Im więcej zaznaczysz, tym celniejsze dopasowanie.`
+              : "Kliknij smaki, wrażenia lub tendencje powyżej — propozycje wyliczą się od razu pod spodem."}
           </p>
         </div>
         <Link
           href="/pairing"
-          className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
+          className="pitch-cta-ghost inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs"
         >
-          Zobacz wszystkie
+          Pełny dobór
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
       </div>
 
-      {/* Heuristic confidence bar */}
-      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/8">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-[var(--color-accent-gold)] to-primary transition-all duration-700"
-          style={{ width: `${widthPct}%` }}
-        />
-      </div>
-
-      {/* 3 placeholder wine cards — these become real cards once /pairing
-          gets a profile-as-input endpoint; for now we tease the silhouette. */}
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 rounded-xl border border-[rgba(197,160,89,0.18)] bg-[#1a0e10]/60 p-3"
-          >
-            <span
-              aria-hidden
-              className="h-12 w-4 shrink-0 rounded-sm bg-gradient-to-b from-[#5a0a18] to-[#1a0408]"
-              style={{ boxShadow: "inset -1px 0 0 rgba(255,255,255,0.08)" }}
-            />
-            <div className="min-w-0">
-              <p className="truncate font-serif text-sm italic text-[#f4ede0]">
-                {enough ? `Propozycja ${i + 1}` : "—"}
-              </p>
-              <p className="mt-0.5 text-[10px] tracking-[0.18em] text-[#c5a059]/70 uppercase">
-                Otwórz /pairing
-              </p>
+      {enough ? (
+        <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+          {matches.map(({ wine, matchPct }) => (
+            <li key={wine.id}>
+              <a
+                href={winnicaSearchUrl(wine.query)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex h-full flex-col gap-3 rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0e10]/70 p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent-gold)]/60 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="flex h-20 w-8 shrink-0 items-end justify-center" aria-hidden>
+                    <WineBottleSVG
+                      hint={wine.style}
+                      style={wine.style}
+                      grape={wine.grape}
+                      className="h-20 w-auto drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)]"
+                    />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/12 px-2 py-0.5 font-serif text-xs font-semibold text-[var(--color-accent-gold)] tabular-nums">
+                        {matchPct}%
+                      </span>
+                      <span className="text-[10px] tracking-[0.16em] text-[#c5a059]/70 uppercase">
+                        {STYLE_LABEL_PL[wine.style]}
+                      </span>
+                    </div>
+                    <p className="mt-2 font-serif text-base leading-tight text-[#f4ede0]">
+                      {wine.name_pl}
+                    </p>
+                    <p className="mt-0.5 text-[10px] tracking-[0.14em] text-[#c5a059]/70 uppercase">
+                      {wine.region_pl}
+                    </p>
+                  </div>
+                </div>
+                <p className="font-serif text-[13px] leading-snug text-[#e6dccd] italic">
+                  {wine.why_pl}
+                </p>
+                <div className="mt-auto flex items-center justify-between gap-2 border-t border-[rgba(197,160,89,0.16)] pt-3">
+                  <span className="font-serif text-sm text-[#f4ede0]">
+                    od {wine.priceFrom} zł
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.14em] text-[var(--color-accent-gold)] uppercase transition group-hover:gap-1.5">
+                    winnica.pl
+                    <svg width="11" height="8" viewBox="0 0 16 9" fill="none" aria-hidden>
+                      <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 rounded-xl border border-dashed border-[rgba(197,160,89,0.20)] bg-[#1a0e10]/40 p-4"
+            >
+              <span className="h-16 w-6 shrink-0 rounded-sm bg-gradient-to-b from-[#3a2a1c] to-[#1a0e10]" aria-hidden />
+              <span className="font-serif text-sm italic text-[#c5a059]/55">—</span>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      <p className="mt-4 text-[11px] leading-relaxed text-[#c5a059]/65">
+        Propozycje pochodzą z oferty{" "}
+        <a
+          href="https://winnica.pl/pl/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-[var(--color-accent-gold)] underline decoration-[var(--color-accent-gold)]/40 underline-offset-2 hover:decoration-[var(--color-accent-gold)]"
+        >
+          winnica.pl
+        </a>{" "}
+        — twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
+      </p>
     </div>
   );
 }
@@ -450,8 +385,8 @@ export default function StagedTutorial({
         </div>
       </div>
 
-      {/* After-each-stage match preview */}
-      <MatchPreview profile={profile} stage={stage} />
+      {/* Live wine proposals — appear right below, update as the profile changes */}
+      <InlineProposals profile={profile} stage={stage} />
     </div>
   );
 }
@@ -515,60 +450,6 @@ function Stage1({
           ))}
         </div>
       </details>
-    </div>
-  );
-}
-
-function ThreeBeamCompass({ profile }: { profile: CompassProfile }) {
-  // Reads the 3 base values to draw three radiating beams whose length
-  // grows with intensity. Provides a visual answer to "which direction
-  // am I pointing in?". Decorative — no interaction.
-  const cierp = (profile["base.cierpkosc"] ?? 0) as number;
-  const slod = (profile["base.slodycz"] ?? 0) as number;
-  const kwas = (profile["base.kwasowosc"] ?? 0) as number;
-  const len = (v: number) => 25 + v * 14; // 25..81
-
-  return (
-    <div className="relative mx-auto w-full max-w-[260px] aspect-square">
-      <svg viewBox="0 0 200 200" className="h-full w-full" aria-hidden>
-        {/* outer ring */}
-        <circle cx="100" cy="100" r="92" fill="none" stroke="var(--gold-hairline-soft)" strokeWidth="1" />
-        {/* fleur-de-lis stamps */}
-        <text x="100" y="14" textAnchor="middle" fontSize="14" fill="var(--color-accent-gold)" fontFamily="serif">⚜</text>
-        <text x="178" y="180" fontSize="10" fill="var(--color-accent-gold)" opacity="0.6">⚜</text>
-        <text x="14" y="180" fontSize="10" fill="var(--color-accent-gold)" opacity="0.6">⚜</text>
-
-        {/* 3 beams */}
-        <g stroke="#c5a059" strokeWidth="2" strokeLinecap="round" fill="none">
-          <line x1="100" y1="100" x2="100" y2={100 - len(cierp)} />
-          <line
-            x1="100"
-            y1="100"
-            x2={100 + Math.cos((30 * Math.PI) / 180) * len(slod)}
-            y2={100 + Math.sin((30 * Math.PI) / 180) * len(slod)}
-          />
-          <line
-            x1="100"
-            y1="100"
-            x2={100 - Math.cos((30 * Math.PI) / 180) * len(kwas)}
-            y2={100 + Math.sin((30 * Math.PI) / 180) * len(kwas)}
-          />
-        </g>
-
-        {/* labels */}
-        <text x="100" y="22" textAnchor="middle" fontSize="9" letterSpacing="2" fill="var(--ink)">
-          CIERPKOŚĆ
-        </text>
-        <text x="180" y="160" textAnchor="end" fontSize="9" letterSpacing="2" fill="var(--ink)">
-          SŁODYCZ
-        </text>
-        <text x="20" y="160" textAnchor="start" fontSize="9" letterSpacing="2" fill="var(--ink)">
-          KWASOWOŚĆ
-        </text>
-
-        {/* center dot */}
-        <circle cx="100" cy="100" r="3" fill="var(--color-accent-gold)" />
-      </svg>
     </div>
   );
 }

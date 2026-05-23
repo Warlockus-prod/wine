@@ -398,15 +398,14 @@ export default function InteractiveCompass({
  * between sektor descriptions. When `typing` is false (hover / pinned),
  * the full text shows instantly. Restarts whenever `text` changes.
  */
+// NOTE: callers MUST pass `key={`${typing}:${text}`}` so this remounts when
+// the text changes — the useState initializer then handles the reset and the
+// effect only updates state from the interval callback (lint-clean).
 function TourText({ text, typing }: { text: string; typing: boolean }) {
   const [shown, setShown] = useState(typing ? "" : text);
 
   useEffect(() => {
-    if (!typing) {
-      setShown(text);
-      return;
-    }
-    setShown("");
+    if (!typing) return;
     let i = 0;
     const id = window.setInterval(() => {
       i += 1;
@@ -414,7 +413,6 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
       if (i >= text.length) window.clearInterval(id);
     }, 22);
     return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, typing]);
 
   const done = shown.length >= text.length;
@@ -607,7 +605,7 @@ function FocusedCard({
       {focused.kind === "base" ? (
         <>
           <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
-            <TourText text={focused.description} typing={isTour} />
+            <TourText key={`${isTour}:${focused.description}`} text={focused.description} typing={isTour} />
           </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
             Trzy smaki bazowe — cierpkość, słodycz, kwasowość — to
@@ -618,7 +616,7 @@ function FocusedCard({
       ) : focused.kind === "sektor" ? (
         <>
           <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
-            <TourText text={focused.sector.short_pl} typing={isTour} />
+            <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
           </p>
           <dl className="mt-4 space-y-2 text-[12px] leading-relaxed">
             {focused.sector.tendencje.map((t) => (
@@ -645,7 +643,7 @@ function FocusedCard({
       ) : (
         <>
           <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
-            <TourText text={focused.sector.short_pl} typing={isTour} />
+            <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
           </p>
           <dl className="mt-4 space-y-2.5 text-[13px] leading-relaxed">
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
