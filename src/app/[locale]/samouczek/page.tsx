@@ -74,7 +74,7 @@ export default function SamouczekPage() {
   }, [chatDisabled]);
 
   return (
-    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4ede0]">
+    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[color:var(--ink)]">
       <Navigation />
 
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
@@ -91,7 +91,7 @@ export default function SamouczekPage() {
             3 etapy.{" "}
             <em className="block">Każde wino dopasowane.</em>
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[#d4cabc] sm:text-lg">
+          <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
             Vinokompas to system, w którym każdy znajdzie swoje wino w 3 prostych krokach.
             Zaczynasz od smaku, dorzucasz wrażenia, a jeśli chcesz — zagłębiasz się w tendencje.
             Po każdym etapie zobaczysz wina dopasowane do twojego profilu.
@@ -126,7 +126,7 @@ export default function SamouczekPage() {
               <h2 id="kompas-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
                 Twój scenariusz dopasowania
               </h2>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#cbc1b1]">
+              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
                 Trzy etapy — każdy z własną rozdzielczością. Możesz przejść etap, pominąć
                 go i wrócić później. Profil zapisuje się automatycznie i pracuje dalej w widoku Pairing.
               </p>
@@ -151,7 +151,7 @@ export default function SamouczekPage() {
               <h2 id="metoda-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
                 Metoda degustacji
               </h2>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#cbc1b1]">
+              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
                 Sześć kroków, dzięki którym przestaniesz „tylko pić” a zaczniesz nazywać wrażenia.
               </p>
             </div>
@@ -168,7 +168,7 @@ export default function SamouczekPage() {
                 </span>
                 <div>
                   <h3 className="pitch-display text-xl text-white sm:text-2xl">{step.title_pl}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1] sm:text-base">{step.body_pl}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">{step.body_pl}</p>
                 </div>
               </li>
             ))}
@@ -185,7 +185,7 @@ export default function SamouczekPage() {
               <h2 id="faq-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
                 Pytania i odpowiedzi
               </h2>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#cbc1b1]">
+              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
                 Najczęstsze wątpliwości. Jeśli czegoś brakuje — włącz czat przy scenariuszu i zapytaj przewodnika.
               </p>
             </div>
@@ -220,7 +220,7 @@ export default function SamouczekPage() {
                   >
                     <div className="min-h-0 overflow-hidden">
                       <div className="pb-6 pl-[2.4rem] pr-8 sm:pl-[3.4rem]">
-                        <p className="text-sm leading-relaxed text-[#d4cabc] sm:text-base">{item.a_pl}</p>
+                        <p className="text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">{item.a_pl}</p>
                       </div>
                     </div>
                   </div>
@@ -244,7 +244,7 @@ export default function SamouczekPage() {
           >
             Twój profil jest zapisany. Czas znaleźć wina.
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#cbc1b1]">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
             Otwórz widok Pairing i wybierz danie — zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
