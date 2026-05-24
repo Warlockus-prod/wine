@@ -132,6 +132,10 @@ interface Props {
    *  Used by <InteractiveCompass> for the guided auto-tour. Accepts a
    *  tendencja id, sektor id, or `base.<smak>` id. */
   externalHighlightId?: string | null;
+  /** Auto-tour demo preview — animates filled rings on a sektor/tendencja to
+   *  *demonstrate* intensity, WITHOUT touching the profile. `level` is the
+   *  number of rings (1..MAX) to show. Cleared between tour steps. */
+  demoFill?: { id: string; level: number } | null;
   /** Hide the bottom legend (tag chips) — useful when wrapper provides its
    *  own info side-panel. */
   hideLegend?: boolean;
@@ -157,6 +161,7 @@ export default function TasteCompass({
   size,
   onHoverChange,
   externalHighlightId,
+  demoFill,
   hideLegend = false,
   level = 3,
 }: Props) {
@@ -413,6 +418,50 @@ export default function TasteCompass({
                 return <g key={`l2fillg-${sector.id}`}>{slices}</g>;
               })
             : null}
+
+        {/* Demo intensity preview (auto-tour) — animated rings on the focused
+            sektor/tendencja to SHOW that intensity varies. Visual only; never
+            mutates the profile. */}
+        {demoFill && demoFill.level > 0
+          ? (() => {
+              const sektor = COMPASS_SECTORS.find((s) => s.id === demoFill.id);
+              let geo: { start: number; end: number; color: string } | null = null;
+              if (sektor) {
+                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+                const sIdx = COMPASS_SECTORS.indexOf(sektor);
+                const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+                geo = {
+                  start: angleCenter - arc / 2 + 0.01,
+                  end: angleCenter + arc / 2 - 0.01,
+                  color: sektor.color,
+                };
+              } else {
+                const sp = spokes.find((x) => x.tendencja.id === demoFill.id);
+                if (sp) geo = { start: sp.start, end: sp.end, color: sp.sector.color };
+              }
+              if (!geo) return null;
+              const bands = [];
+              for (let i = 0; i < demoFill.level; i++) {
+                bands.push(
+                  <path
+                    key={`demo-${i}`}
+                    d={annularPath(cx, cy, rInner + ringStep * i, rInner + ringStep * (i + 1), geo.start + 0.005, geo.end - 0.005)}
+                    fill={geo.color}
+                    fillOpacity={0.62}
+                    stroke="#fff"
+                    strokeOpacity={0.3}
+                    strokeWidth={0.5}
+                    pointerEvents="none"
+                  >
+                    {i === demoFill.level - 1 ? (
+                      <animate attributeName="fill-opacity" values="0.3;0.7;0.3" dur="1.1s" repeatCount="indefinite" />
+                    ) : null}
+                  </path>,
+                );
+              }
+              return <g>{bands}</g>;
+            })()
+          : null}
 
         {/* Hover / tour highlight — handles three target kinds:
             1) tendencja id  → highlight that spoke (current behaviour)

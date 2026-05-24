@@ -113,6 +113,13 @@ export default function InteractiveCompass({
   const [tourIdx, setTourIdx] = useState(0);
   const [tourSpeed, setTourSpeed] = useState<TourSpeedId>("normal");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Clicking the compass during the tour interrupts it: pause, show the
+  // user's selection + comment, then auto-resume after 3s.
+  const [interrupt, setInterrupt] = useState(false);
+  const resumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Demo intensity preview level (0..5), ramps while a sektor is narrated.
+  const [demoLevel, setDemoLevel] = useState(0);
+  const tourActive = tourOn && !interrupt;
 
   // Effective interval: explicit prop wins, otherwise pick from preset.
   const intervalMs =
@@ -133,9 +140,9 @@ export default function InteractiveCompass({
     }
   }, [level, autoStartTour]);
 
-  // Tour ticks
+  // Tour ticks — paused while interrupted (user is interacting).
   useEffect(() => {
-    if (!tourOn) {
+    if (!tourActive) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -148,9 +155,14 @@ export default function InteractiveCompass({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [tourOn, intervalMs, tourIds.length]);
+  }, [tourActive, intervalMs, tourIds.length]);
 
-  const tourId = tourOn ? tourIds[tourIdx] : null;
+  // Clear any pending resume timer on unmount.
+  useEffect(() => () => {
+    if (resumeRef.current) clearTimeout(resumeRef.current);
+  }, []);
+
+  const tourId = tourActive ? tourIds[tourIdx] : null;
   // Priority: tour > hover > pinned. Tour wraps the others while playing;
   // outside of tour the pinned selection is baseline and hover provides
   // the live preview.
@@ -212,6 +224,64 @@ export default function InteractiveCompass({
     );
   }, [focused]);
 
+  // Demo intensity ramp: while the tour narrates a sektor/tendencja, animate
+  // a 0→5 preview on the compass to show that intensity varies. Visual only.
+  useEffect(() => {
+    // All setDemoLevel calls run inside rAF/interval callbacks (not the effect
+    // body) so they don't trip react-hooks/set-state-in-effect.
+    if (!tourActive || !tourId || tourId.startsWith("base.")) {
+      const raf = requestAnimationFrame(() => setDemoLevel(0));
+      return () => cancelAnimationFrame(raf);
+    }
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      const raf = requestAnimationFrame(() => setDemoLevel(3));
+      return () => cancelAnimationFrame(raf);
+    }
+    const raf = requestAnimationFrame(() => setDemoLevel(0));
+    let lvl = 0;
+    const id = setInterval(() => {
+      lvl += 1;
+      setDemoLevel(lvl);
+      if (lvl >= 5) clearInterval(id);
+    }, 320);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
+  }, [tourActive, tourId]);
+
+  // Compass interaction — applies the change, then (during the tour) pauses on
+  // the clicked item, comments on its intensity, and auto-resumes after 3s.
+  const handleCompassChange = (next: CompassProfile) => {
+    onProfileChange(next);
+    if (!tourOn) return;
+    let changedId: string | null = null;
+    const keys = new Set([...Object.keys(next), ...Object.keys(profile)]);
+    for (const k of keys) {
+      if ((next[k] ?? 0) !== (profile[k] ?? 0)) {
+        changedId = k;
+        break;
+      }
+    }
+    if (changedId) {
+      let displayId = changedId;
+      if (level === 2 && !changedId.startsWith("base.")) {
+        const s = COMPASS_SECTORS.find((sec) =>
+          sec.tendencje.some((t) => t.id === changedId),
+        );
+        displayId = s?.id ?? changedId;
+      }
+      const idx = tourIds.indexOf(displayId);
+      if (idx >= 0) setTourIdx(idx);
+    }
+    setInterrupt(true);
+    if (resumeRef.current) clearTimeout(resumeRef.current);
+    resumeRef.current = setTimeout(() => setInterrupt(false), 3000);
+  };
+
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-7">
       {/* ── Compass ─────────────────────────────────────────────────── */}
@@ -222,16 +292,28 @@ export default function InteractiveCompass({
         <div className="w-full max-w-[440px]">
           <TasteCompass
             profile={profile}
-            onChange={onProfileChange}
+            onChange={handleCompassChange}
             level={level}
             // Tour wins; pinned (last-clicked) wins over nothing — both are
             // bridged through this single prop so the spoke pulses as long
             // as that selection is "current".
             externalHighlightId={tourId ?? pinnedId}
+            demoFill={
+              tourActive && tourId && !tourId.startsWith("base.") && demoLevel > 0
+                ? { id: tourId, level: demoLevel }
+                : null
+            }
             onHoverChange={setHovered}
             hideLegend
           />
         </div>
+
+        {tourActive ? (
+          <p className="mt-2 max-w-[440px] text-center text-[11px] leading-snug text-[var(--color-accent-gold)]/70">
+            Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) —
+            kliknij koło, aby wybrać siłę.
+          </p>
+        ) : null}
 
         {/* Tour controls */}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
