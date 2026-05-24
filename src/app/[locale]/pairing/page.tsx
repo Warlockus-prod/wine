@@ -584,7 +584,7 @@ export default function PairingPage() {
                     onClick={() => selectDish(dish.id, "cards")}
                     className={`group flex w-full items-start gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all duration-300 ${
                       isActive
-                        ? "active-dish-glow scale-[1.02] border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(209,21,52,0.20),0_18px_42px_rgba(209,21,52,0.32)]"
+                        ? "active-dish-glow -translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(209,21,52,0.20),0_18px_42px_rgba(209,21,52,0.32)]"
                         : "border-white/8 bg-black/18 opacity-60 hover:border-white/22 hover:opacity-100"
                     }`}
                   >
@@ -736,7 +736,7 @@ export default function PairingPage() {
 
                 const toneClass =
                   isSelected
-                    ? "scale-[1.02] border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/14 to-[var(--color-accent-gold)]/12 shadow-[0_0_0_3px_rgba(197,160,89,0.32),0_24px_48px_rgba(209,21,52,0.30)] opacity-100"
+                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/14 to-[var(--color-accent-gold)]/12 shadow-[0_0_0_3px_rgba(197,160,89,0.32),0_24px_48px_rgba(209,21,52,0.30)] opacity-100"
                     : topRank === 1
                       ? "border-amber-200/65 bg-amber-300/10 opacity-100"
                       : topRank === 2
