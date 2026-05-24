@@ -96,6 +96,10 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
   const filled = filledDimensions(profile);
   const matches = matchWines(profile, 3);
   const enough = matches.length > 0;
+  // When embedded in an iframe (shop integration) open the shop in the TOP
+  // window so the buying flow stays in one tab/session; standalone → new tab.
+  const linkTarget =
+    typeof window !== "undefined" && window.self !== window.top ? "_top" : "_blank";
 
   return (
     <div className="mt-6 rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#170d0f] p-5 sm:p-6">
@@ -128,7 +132,7 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
             <li key={wine.id}>
               <a
                 href={winnicaSearchUrl(wine.query)}
-                target="_blank"
+                target={linkTarget}
                 rel="noopener noreferrer"
                 className="group flex h-full flex-col gap-3 rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0e10]/70 p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent-gold)]/60 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
               >
