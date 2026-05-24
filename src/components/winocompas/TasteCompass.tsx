@@ -15,7 +15,7 @@
  * via uncontrolled `defaultProfile`.
  */
 
-import { useId, useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { useId, useMemo, useState, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 import { COMPASS_SECTORS, type CompassSector, type Tendencja } from "@/data/wine-compass-kb";
 
 export type Intensity = 0 | 1 | 2 | 3 | 4 | 5;
@@ -195,36 +195,6 @@ export default function TasteCompass({
     [profile, setIntensity],
   );
 
-  // Level-2 click: cycle the average for the sektor and fan it to BOTH
-  // tendencje under it (so downstream consumers see a coherent profile
-  // even when the user never opens level 3).
-  const cycleSektor = useCallback(
-    (sektorId: string) => {
-      const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
-      if (!s) return;
-      const cur = sektorAvg(profile, sektorId);
-      const next = ((cur + 1) % STATE_COUNT) as Intensity;
-      setProfile({
-        ...profile,
-        [s.tendencje[0].id]: next,
-        [s.tendencje[1].id]: next,
-      });
-    },
-    [profile, setProfile],
-  );
-
-  // Level-1 click: cycle a base smak. Same 0..5 ring scale, stored under
-  // `base.<id>` so it doesn't collide with tendencja keys.
-  const cycleBase = useCallback(
-    (baseId: string) => {
-      const key = `base.${baseId}`;
-      const cur = (profile[key] ?? 0) as Intensity;
-      const next = ((cur + 1) % STATE_COUNT) as Intensity;
-      setIntensity(key, next);
-    },
-    [profile, setIntensity],
-  );
-
   // Geometry — viewBox 440 gives 20px breathing room on each side so the
   // outermost labels (text-anchor=start at the east point) never clip out
   // of the parent container at 390px viewport. Compass disc itself stays
@@ -235,6 +205,39 @@ export default function TasteCompass({
   const rOuter = 165;
   const rInner = 36;
   const ringStep = (rOuter - rInner) / RING_COUNT;
+
+  // Radial pick — intensity follows the ring the user clicks (the dial fills
+  // to where you tap: 3rd ring → 3, 5th ring → 5). Clicking the current level
+  // (or the centre hub) resets to 0, so tapping the outer ring again clears
+  // it and the fill starts over. Feels organic, not like a counter.
+  const ringFromEvent = (e: ReactMouseEvent<SVGElement>): number => {
+    const svg = e.currentTarget.ownerSVGElement;
+    const ctm = svg?.getScreenCTM();
+    if (!svg || !ctm) return 1;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const p = pt.matrixTransform(ctm.inverse());
+    const dist = Math.hypot(p.x - cx, p.y - cy);
+    if (dist <= rInner) return 0;
+    return Math.max(1, Math.min(MAX_INTENSITY, Math.ceil((dist - rInner) / ringStep)));
+  };
+  const nextFromClick = (clicked: number, cur: number): Intensity =>
+    (clicked === 0 || clicked === cur ? 0 : clicked) as Intensity;
+
+  const pickIntensity = (e: ReactMouseEvent<SVGElement>, id: string) => {
+    setIntensity(id, nextFromClick(ringFromEvent(e), (profile[id] ?? 0) as number));
+  };
+  const pickSektor = (e: ReactMouseEvent<SVGElement>, sektorId: string) => {
+    const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
+    if (!s) return;
+    const next = nextFromClick(ringFromEvent(e), sektorAvg(profile, sektorId));
+    setProfile({ ...profile, [s.tendencje[0].id]: next, [s.tendencje[1].id]: next });
+  };
+  const pickBase = (e: ReactMouseEvent<SVGElement>, baseId: string) => {
+    const key = `base.${baseId}`;
+    setIntensity(key, nextFromClick(ringFromEvent(e), (profile[key] ?? 0) as number));
+  };
 
   const [hovered, setHovered] = useState<string | null>(null);
   const focusedRef = useRef<string | null>(null);
@@ -561,7 +564,7 @@ export default function TasteCompass({
                 aria-valuemax={MAX_INTENSITY}
                 aria-valuenow={value}
                 aria-valuetext={`${value} z ${MAX_INTENSITY}`}
-                onClick={() => cycleSektor(sector.id)}
+                onClick={(e) => pickSektor(e, sector.id)}
                 onMouseEnter={() => reportHover(sector.id)}
                 onMouseLeave={() =>
                   reportHover(hovered === sector.id ? null : hovered)
@@ -595,7 +598,7 @@ export default function TasteCompass({
                 aria-valuemax={MAX_INTENSITY}
                 aria-valuenow={value}
                 aria-valuetext={`${value} z ${MAX_INTENSITY}`}
-                onClick={() => cycleBase(axis.id)}
+                onClick={(e) => pickBase(e, axis.id)}
                 onMouseEnter={() => reportHover(id)}
                 onMouseLeave={() =>
                   reportHover(hovered === id ? null : hovered)
@@ -622,7 +625,7 @@ export default function TasteCompass({
               aria-valuemax={MAX_INTENSITY}
               aria-valuenow={fit}
               aria-valuetext={`${fit} z ${MAX_INTENSITY}`}
-              onClick={() => cycleIntensity(s.tendencja.id)}
+              onClick={(e) => pickIntensity(e, s.tendencja.id)}
               onMouseEnter={() => reportHover(s.tendencja.id)}
               onMouseLeave={() =>
                 reportHover(hovered === s.tendencja.id ? null : hovered)
