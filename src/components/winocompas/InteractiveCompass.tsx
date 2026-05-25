@@ -241,17 +241,20 @@ export default function InteractiveCompass({
       return () => cancelAnimationFrame(raf);
     }
     const raf = requestAnimationFrame(() => setDemoLevel(0));
+    // Fill speed tracks the tour speed (WOLNO/NORMALNIE/SZYBKO): one ring per
+    // ~1/6 of the narration window, so 0→5 fills smoothly over most of it.
+    const demoStep = Math.max(300, Math.round(intervalMs / 6));
     let lvl = 0;
     const id = setInterval(() => {
       lvl += 1;
       setDemoLevel(lvl);
       if (lvl >= 5) clearInterval(id);
-    }, 320);
+    }, demoStep);
     return () => {
       cancelAnimationFrame(raf);
       clearInterval(id);
     };
-  }, [tourActive, tourId]);
+  }, [tourActive, tourId, intervalMs]);
 
   // Compass interaction — applies the change, then (during the tour) pauses on
   // the clicked item, comments on its intensity, and auto-resumes after 3s.
