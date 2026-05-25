@@ -128,8 +128,8 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
 
       {enough ? (
         <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-          {matches.map(({ wine, matchPct }) => (
-            <li key={wine.id}>
+          {matches.map(({ wine, matchPct }, i) => (
+            <li key={wine.id} className="vk-rise" style={{ animationDelay: `${i * 80}ms` }}>
               <a
                 href={winnicaSearchUrl(wine.query)}
                 target={linkTarget}

@@ -88,7 +88,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "oleiste.maslo",
         name_pl: "Masłowość, tostowość, orzechy",
-        shortLabel_pl: "Masło · orzechy",
+        shortLabel_pl: "Masło",
         associations_pl: "masło, orzechy, tosty, drożdże, ciasteczka maślane, pierniczki",
         examples_pl:
           "Różnego rodzaju produkty „tłuste”. Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
@@ -117,7 +117,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "miekkie.dojrzale",
         name_pl: "Dojrzałe owoce",
-        shortLabel_pl: "Dojrzałe owoce",
+        shortLabel_pl: "Dojrzałe",
         associations_pl:
           "w czerwonym: śliwki, wiśnie, maliny, jagody, truskawki, jeżyny, figi, porzeczka. W białym: jabłka, gruszki, morele, agrest",
         examples_pl: "Klasyczne owocowe nuty występujące w młodych, owocowych winach.",
@@ -146,7 +146,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "tegie.cigaro",
         name_pl: "Czekolada, kawa, tytoń",
-        shortLabel_pl: "Czekolada · kawa",
+        shortLabel_pl: "Czekolada",
         associations_pl: "czekolada, kawa, tytoń, słodkie cygaro",
         examples_pl:
           "Ciężka tendencja, która przywodzi na myśl „klub gentelmena”, „klub golfowy”, „sklep ze słodyczami” czy „sklep z cygarami”. Zwykle w winach czerwonych.",
@@ -155,7 +155,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "tegie.suszone",
         name_pl: "Suszone owoce",
-        shortLabel_pl: "Suszone owoce",
+        shortLabel_pl: "Suszone",
         associations_pl:
           "w czerwonych: wędzone śliwki, suszone śliwki, daktyle, żurawina. W białych: suszona morela, rodzynki, daktyle, jabłka, pomarańcze, banany, orientalne przyprawy",
         examples_pl: "Intensywne wrażenie. To trochę skojarzenie z wigilijnym suszem.",
@@ -175,7 +175,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "szorstkie.pizmo",
         name_pl: "Piżmo, skóra",
-        shortLabel_pl: "Piżmo · skóra",
+        shortLabel_pl: "Piżmo",
         associations_pl: "skojarzenia zwierzęce — zapach mokrego psa, konia, stajni, skóry",
         examples_pl: "Tego rodzaju wrażenia spotykamy w czerwonych winach.",
         found_in_pl: "wina czerwone",
@@ -183,7 +183,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "szorstkie.dab",
         name_pl: "Dąb, dym, garbniki",
-        shortLabel_pl: "Dąb · dym",
+        shortLabel_pl: "Dąb",
         associations_pl:
           "drewno, nieheblowana deska, zapach ogniska, tytoń z papierosa, ściąganie na języku przy cierpkich owocach",
         examples_pl: "Szeroka rodzina wrażeń „szorstkich” i „cierpkich”.",
@@ -212,7 +212,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
       {
         id: "ziemiste.sciolka",
         name_pl: "Ściółka leśna",
-        shortLabel_pl: "Ściółka leśna",
+        shortLabel_pl: "Ściółka",
         associations_pl: "ściółka leśna, ścięta trawa, fiołki, lawenda",
         examples_pl:
           "Wrażenia kojarzone z lasem, glebą zwykle znajdujemy w winach czerwonych; trawę mamy w białych jak Sauvignon Blanc.",

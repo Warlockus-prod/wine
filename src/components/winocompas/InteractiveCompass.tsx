@@ -457,6 +457,7 @@ export default function InteractiveCompass({
       >
         {focused ? (
           <FocusedCard
+            key={focusedId ?? "idle"}
             focused={focused}
             profile={profile}
             isTour={tourOn}
@@ -629,7 +630,7 @@ function FocusedCard({
         : ((profile[focused.tendencja.id] ?? 0) as number);
 
   return (
-    <div>
+    <div className="vk-swap">
       <div className="flex items-baseline gap-3">
         <span
           className="inline-block h-3 w-3 rounded-full"
@@ -653,7 +654,7 @@ function FocusedCard({
       {senseImg ? (
         <div
           className="relative mt-3 h-28 w-full overflow-hidden rounded-xl border"
-          style={{ borderColor: `${accent}44` }}
+          style={{ borderColor: `${accent}44`, background: `linear-gradient(135deg, ${accent}26, transparent 70%)` }}
         >
           <Image
             src={senseImg}
@@ -731,16 +732,16 @@ function FocusedCard({
           <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
             <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
           </p>
-          <dl className="mt-4 space-y-2.5 text-[13px] leading-relaxed">
-            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
+          <dl className="mt-4 divide-y divide-[rgba(197,160,89,0.16)] text-[13px] leading-relaxed">
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
               <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Skojarzenia</dt>
               <dd className="text-[#e6dccd]/90">{focused.tendencja.associations_pl}</dd>
             </div>
-            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
               <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Przykład</dt>
               <dd className="font-serif italic text-[#e6dccd]/85">{focused.tendencja.examples_pl}</dd>
             </div>
-            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3">
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
               <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Spotkasz w</dt>
               <dd className="text-[#cbc1b1]">{focused.tendencja.found_in_pl}</dd>
             </div>

@@ -450,10 +450,10 @@ export default function TasteCompass({
                     key={`demo-${i}`}
                     d={annularPath(cx, cy, rInner + ringStep * i, rInner + ringStep * (i + 1), geo.start + 0.005, geo.end - 0.005)}
                     fill={geo.color}
-                    fillOpacity={0.62}
+                    fillOpacity={0.82}
                     stroke="#fff"
-                    strokeOpacity={0.3}
-                    strokeWidth={0.5}
+                    strokeOpacity={0.5}
+                    strokeWidth={0.6}
                     pointerEvents="none"
                   >
                     {i === demoFill.level - 1 ? (

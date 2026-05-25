@@ -709,6 +709,16 @@ body {
   .pitch-cta-primary, .pitch-cta-primary:hover { transform: none; }
 }
 
+/* Light opacity swap — for the auto-tour guide panel crossfade on each step. */
+@keyframes vk-swap-in { from { opacity: 0; } to { opacity: 1; } }
+.vk-swap { animation: vk-swap-in 180ms ease-out both; }
+/* Gentle staggered rise — for wine-proposal cards appearing. */
+@keyframes vk-rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.vk-rise { animation: vk-rise-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .vk-swap, .vk-rise { animation: none; }
+}
+
 /* Phone mockup */
 .pitch-phone {
   border: 1px solid rgba(255, 255, 255, 0.1);

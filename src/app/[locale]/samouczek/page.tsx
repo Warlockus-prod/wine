@@ -220,7 +220,7 @@ export default function SamouczekPage() {
                   >
                     <div className="min-h-0 overflow-hidden">
                       <div className="pb-6 pl-[2.4rem] pr-8 sm:pl-[3.4rem]">
-                        <p className="text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">{item.a_pl}</p>
+                        <p className="pitch-dropcap text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">{item.a_pl}</p>
                       </div>
                     </div>
                   </div>
