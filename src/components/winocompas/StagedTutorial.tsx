@@ -5,7 +5,7 @@
  *
  * Author's brief (Magdalena Surgiel-Czyż / Vinocompas):
  *   1) SMAK       — fill 3 base tastes (cierpkość, słodycz, kwasowość)
- *                   then read the wytrawność (dryness) arrow.
+ *                   then read the wytrawność (dryness) meter.
  *   2) WRAŻENIA   — fill the 6 wrażenia (tęgość, miękkość, oleistość,
  *                   świeżość, ziemistość, szorstkość). Icons drive each.
  *   3) TENDENCJE  — advanced: fill the 12 tendencje with colour
@@ -416,7 +416,7 @@ function Stage1({
           Kliknij jedną z trzech osi — <strong className="not-italic font-semibold text-[#f4ede0]">Słodycz</strong>,{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Cierpkość</strong> lub{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Kwasowość</strong> — kilka razy, aby ustawić jej
-          siłę od 0 do 5. Strzałka u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
+          siłę od 0 do 5. Wskaźnik u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
         </p>
       </header>
 
@@ -426,11 +426,11 @@ function Stage1({
           onProfileChange={onProfileChange}
           level={1}
           autoStartTour
-          // Dryness arrow ABOVE the compass on the same card (client:
+          // Dryness meter ABOVE the compass on the same card (client:
           // "ja bym ją wręcz dała nad") — first thing visible, updates
           // live as the user adjusts the base tastes since `dr` is
           // recomputed each render in the parent.
-          aboveCompass={<DrynessArrow score={dr.score} label={dr.label} />}
+          aboveCompass={<DrynessMeter score={dr.score} label={dr.label} />}
         />
       </div>
 
@@ -497,9 +497,10 @@ function BigBaseSlider({
   );
 }
 
-function DrynessArrow({ score, label }: { score: number; label: string }) {
-  // Score 0..100 maps onto the arrow position along the rail.
-  const x = `${score}%`;
+function DrynessMeter({ score, label }: { score: number; label: string }) {
+  // Score 0..100 → marker position along the rail, clamped a touch off the
+  // rounded ends so the pin never hangs into empty space at the extremes.
+  const pos = Math.max(3, Math.min(97, score));
   return (
     <div className="mt-7 rounded-2xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/55 p-5">
       <div className="flex items-baseline justify-between gap-3">
@@ -509,37 +510,41 @@ function DrynessArrow({ score, label }: { score: number; label: string }) {
         <p className="font-serif text-base italic text-white">{label}</p>
       </div>
 
-      <div className="relative mt-4 h-12 w-full">
+      {/* Zone labels live in their own row so the marker can never collide
+          with them. The centre is the dry/sweet boundary → "Półwytrawne". */}
+      <div className="mt-4 flex justify-between text-[9px] tracking-wider text-[#c5a059]/65 uppercase">
+        <span>Bardzo wytrawne</span>
+        <span>Półwytrawne</span>
+        <span>Bardzo słodkie</span>
+      </div>
+
+      {/* Rail + position pin */}
+      <div className="relative mt-5 h-8 w-full">
         {/* Rail */}
-        <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#a01024] via-[#c5a059] to-[#5b6b3a]" />
+        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#a01024] via-[#c5a059] to-[#5b6b3a]" />
 
-        {/* Tick labels — the centre is the dry/sweet boundary, so the
-            midpoint reads "Półwytrawne" (semi-dry), not "Półsłodkie". */}
-        <div className="absolute inset-x-0 top-0 flex justify-between text-[9px] tracking-wider text-[#c5a059]/65 uppercase">
-          <span>Bardzo wytrawne</span>
-          <span>Półwytrawne</span>
-          <span>Bardzo słodkie</span>
-        </div>
-
-        {/* Arrow */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 ease-out"
-          style={{ left: x, transform: `translate(-50%, -50%)` }}
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <circle cx="12" cy="12" r="10" fill="#fff" stroke="#c5a059" strokeWidth="2" />
-            <path d="M8 12 L 16 12 M 13 9 L 16 12 L 13 15" stroke="#150a0c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-
-        {/* Tick marks */}
+        {/* Tick marks under the rail */}
         <div className="absolute inset-x-0 bottom-0 flex justify-between">
           {Array.from({ length: 6 }).map((_, i) => (
-            <span
-              key={i}
-              className="h-2 w-px bg-[var(--color-accent-gold)]/40"
-            />
+            <span key={i} className="h-1.5 w-px bg-[var(--color-accent-gold)]/35" />
           ))}
+        </div>
+
+        {/* Position pin — a teardrop whose tip rests on the rail, marking
+            the exact point. Reads as "you are here", not a button. */}
+        <div
+          className="absolute top-1/2 transition-[left] duration-500 ease-out"
+          style={{ left: `${pos}%`, transform: "translate(-50%, -100%)" }}
+        >
+          <svg width="19" height="24" viewBox="0 0 24 30" fill="none" aria-hidden>
+            <path
+              d="M12 1.5a8.5 8.5 0 0 1 8.5 8.5c0 6.2-8.5 18.5-8.5 18.5S3.5 16.2 3.5 10A8.5 8.5 0 0 1 12 1.5z"
+              fill="#f4ede0"
+              stroke="#c5a059"
+              strokeWidth="2"
+            />
+            <circle cx="12" cy="10" r="3.1" fill="#7a1020" />
+          </svg>
         </div>
       </div>
     </div>
