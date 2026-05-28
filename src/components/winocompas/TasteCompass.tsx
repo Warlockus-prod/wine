@@ -769,8 +769,13 @@ export default function TasteCompass({
           const beamLen = rInner + ringStep * value;
           const beamX = cx + beamLen * xUnit;
           const beamY = cy + beamLen * yUnit;
-          const labelX = cx + (rOuter + 30) * xUnit;
-          const labelY = cy + (rOuter + 30) * yUnit;
+          // Labels sit just past the rim. Long ones (KWASOWOŚĆ at the
+          // lower-left spoke) would clip the SVG edge on a ~390px viewport,
+          // so clamp the centre inward to keep the whole text box on-canvas.
+          const labelR = rOuter + 28;
+          const halfW = axis.label.length * (level === 1 ? 13 : 10.5) * 0.42;
+          const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
+          const labelY = cy + labelR * yUnit;
           const dimWhenIrrelevant = level >= 2 ? 0.4 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">

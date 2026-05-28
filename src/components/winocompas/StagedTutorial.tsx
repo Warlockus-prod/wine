@@ -507,7 +507,9 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
         <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
           Wytrawność wina
         </p>
-        <p className="font-serif text-base italic text-white">{label}</p>
+        <p className="font-serif text-base italic text-white" aria-live="polite">
+          {label}
+        </p>
       </div>
 
       {/* Zone labels live in their own row so the marker can never collide
