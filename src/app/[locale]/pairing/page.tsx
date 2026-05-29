@@ -23,7 +23,9 @@ import {
   getRestaurantMatchForDishWine,
 } from "@/lib/restaurant-pairing-adapter";
 import { usePairingDataset } from "@/lib/pairing-store";
-import { useRestaurantCatalog } from "@/lib/restaurant-store";
+import useSWR from "swr";
+import { swrFetcher } from "@/lib/api-client";
+import type { CatalogRestaurant } from "@/lib/restaurant-directory";
 import type { Locale } from "@/i18n/routing";
 import type { PairingDish, PairingWine } from "@/types/pairing";
 
@@ -83,13 +85,18 @@ const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[], locale: 
 
 export default function PairingPage() {
   const { dataset } = usePairingDataset();
-  const { getRestaurantBySlug } = useRestaurantCatalog();
   const locale = useLocale() as Locale;
   const tx = useTranslations("pairing");
   const [restaurantContextSlug, setRestaurantContextSlug] = useState<string | null>(null);
-  const restaurantContext = restaurantContextSlug
-    ? getRestaurantBySlug(restaurantContextSlug)
-    : null;
+  // Restaurant-scoped context now reads the DB→seed read-path via the API
+  // (was the localStorage catalog). Global sandbox mode still uses
+  // usePairingDataset. SWR resolves async; until then context is null and
+  // the page shows the sandbox dataset, then swaps in the scoped one.
+  const { data: ctxResp } = useSWR<{ data: CatalogRestaurant | null }>(
+    restaurantContextSlug ? `/api/restaurants/${restaurantContextSlug}` : null,
+    swrFetcher,
+  );
+  const restaurantContext = ctxResp?.data ?? null;
   const activeDataset = useMemo(
     () => (restaurantContext ? buildPairingDatasetFromRestaurant(restaurantContext) : dataset),
     [dataset, restaurantContext],

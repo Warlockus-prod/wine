@@ -40,11 +40,13 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
 
   await page.goto("/pairing?restaurant=atelier-amaro");
   await expect(page).toHaveURL(/\/pairing\?restaurant=atelier-amaro/);
+  // Scoped context now loads via the DB→seed API (SWR), not synchronous
+  // localStorage — allow for the network round-trip under parallel load.
   // Context label varies by locale ("Context: …" / "Kontekst: …").
-  await expect(page.getByText(/(?:context|kontekst): atelier amaro/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible();
-  await expect(page.getByRole("button", { name: /marchesi antinori tignanello/i }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible();
+  await expect(page.getByText(/(?:context|kontekst): atelier amaro/i)).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole("button", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole("button", { name: /marchesi antinori tignanello/i }).first()).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole("heading", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible({ timeout: 10000 });
 });
 
 test("restaurant guest page server-renders the DB→seed read-path", async ({ page }) => {
