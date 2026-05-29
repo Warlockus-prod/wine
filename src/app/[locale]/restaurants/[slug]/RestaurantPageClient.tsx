@@ -22,14 +22,19 @@ import RestaurantPairingPanel from "@/components/v2/RestaurantPairingPanel";
 import { Link } from "@/i18n/navigation";
 import { t } from "@/lib/localized";
 import { getDishImage, getWineImage } from "@/lib/food-photos";
-import { useRestaurantCatalog } from "@/lib/restaurant-store";
+import type { CatalogRestaurant } from "@/lib/restaurant-directory";
 import type { Locale } from "@/i18n/routing";
 
-export default function RestaurantPageClient({ slug }: { slug: string }) {
+export default function RestaurantPageClient({
+  slug,
+  restaurant,
+}: {
+  slug: string;
+  restaurant: CatalogRestaurant | null;
+}) {
   const tx = useTranslations("restaurant");
   const lng = useLocale() as Locale;
-  const { getRestaurantBySlug } = useRestaurantCatalog();
-  const restaurant = getRestaurantBySlug(slug);
+  void slug; // slug retained for future client-side actions; data now arrives server-side (DB→seed)
   // Pairing panel is integrated; track which dish the user clicked from
   // the menu list. Default to the first dish so the panel has data on
   // first paint instead of an empty state.

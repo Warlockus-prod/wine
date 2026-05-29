@@ -26,8 +26,8 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
 
   await page.goto("/restaurants/atelier-amaro");
   await expect(page).toHaveURL(/\/restaurants\/atelier-amaro/);
-  // Restaurant data hydrates client-side (useRestaurantCatalog SWR) — give
-  // the heading a chance to mount before asserting on the QR aside.
+  // Restaurant data is now server-rendered from the DB→seed read-path
+  // (resolveRestaurantBySlug). In e2e there is no DB, so it falls back to seed.
   await expect(page.getByRole("heading", { name: /atelier amaro/i }).first()).toBeVisible({ timeout: 10000 });
   // QR aside text varies by negotiated locale (EN: "Direct access QR",
   // PL: "QR — bezpośredni dostęp"). Either is fine — we just want to
@@ -47,33 +47,20 @@ test("v2 admin + discover + restaurant flow", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /porcini in black garlic|borowik/i }).first()).toBeVisible();
 });
 
-test("restaurant admin edits flow into restaurant page and scoped pairing", async ({ page }) => {
-  await page.goto("/admin");
-
-  const restaurantAdmin = page.locator("section", { hasText: "Restaurant content manager" }).first();
-  await expect(restaurantAdmin).toBeVisible();
-
-  const dishName = `Restaurant Smoke Dish ${Date.now()}`;
-  const wineName = `Restaurant Smoke Wine ${Date.now()}`;
-
-  await restaurantAdmin.getByPlaceholder("Restaurant dish name").fill(dishName);
-  await restaurantAdmin.getByPlaceholder("Restaurant dish description").fill(
-    "Automated restaurant dish for smoke test",
-  );
-  await restaurantAdmin.getByRole("button", { name: "Add restaurant dish" }).click();
-
-  await restaurantAdmin.getByPlaceholder("Restaurant wine name").fill(wineName);
-  await restaurantAdmin.getByPlaceholder("Region").fill("Test Valley, Europe");
-  await restaurantAdmin.getByPlaceholder("Restaurant wine notes").fill(
-    "Bright citrus, clean acidity and a focused finish.",
-  );
-  await restaurantAdmin.getByRole("button", { name: "Add restaurant wine" }).click();
-
+test("restaurant guest page server-renders the DB→seed read-path", async ({ page }) => {
+  // P0-1: the guest page no longer reads localStorage; it is server-rendered
+  // from resolveRestaurantBySlug (DB-canonical, seed fallback). This test
+  // verifies the read-path renders menu + cellar content for a known venue.
+  // (Cross-page propagation of *edits* now requires a real DB and is covered
+  // by integration testing against staging, not this localStorage-free e2e.)
   await page.goto("/restaurants/atelier-amaro");
-  await expect(page.getByText(dishName).first()).toBeVisible();
-  await expect(page.getByText(wineName).first()).toBeVisible();
+  await expect(page).toHaveURL(/\/restaurants\/atelier-amaro/);
 
-  await page.goto("/pairing?restaurant=atelier-amaro");
-  await expect(page.getByRole("button", { name: new RegExp(dishName, "i") }).first()).toBeVisible();
-  await expect(page.getByRole("button", { name: new RegExp(wineName, "i") }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /atelier amaro/i }).first()).toBeVisible({
+    timeout: 10000,
+  });
+
+  // Seed dish + wine for this venue render from the server read-path.
+  await expect(page.getByText(/porcini in black garlic|borowik/i).first()).toBeVisible();
+  await expect(page.getByText(/tignanello/i).first()).toBeVisible();
 });

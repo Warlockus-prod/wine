@@ -2,9 +2,15 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { catalogRestaurants } from "@/lib/restaurant-directory";
+import { resolveRestaurantBySlug } from "@/lib/db-restaurants";
 import { t } from "@/lib/localized";
 import type { Locale } from "@/i18n/routing";
 import RestaurantPageClient from "./RestaurantPageClient";
+
+// DB-canonical read-path with seed fallback. ISR: published edits surface
+// within ~60s without per-request DB load. Slugs absent from
+// generateStaticParams still render on demand (dynamicParams defaults true).
+export const revalidate = 60;
 
 export function generateStaticParams() {
   const out: Array<{ locale: string; slug: string }> = [];
@@ -25,7 +31,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug, locale } = await params;
   const lng = locale as Locale;
-  const restaurant = catalogRestaurants.find((r) => r.slug === slug);
+  const { data: restaurant } = await resolveRestaurantBySlug(slug);
   if (!restaurant) {
     return {
       title: "Restaurant — Vinovigator AI",
@@ -78,5 +84,7 @@ export default async function RestaurantPage({
   const { slug, locale } = await params;
   setRequestLocale(locale);
 
-  return <RestaurantPageClient slug={slug} />;
+  const { data: restaurant } = await resolveRestaurantBySlug(slug);
+
+  return <RestaurantPageClient slug={slug} restaurant={restaurant} />;
 }
