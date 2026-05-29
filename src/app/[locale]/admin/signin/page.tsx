@@ -9,10 +9,21 @@ import { useSearchParams } from "next/navigation";
 // gymnastics.
 export const dynamic = "force-dynamic";
 
+// Open-redirect guard (audit P0-2 / P1-1): `returnTo` is attacker-controllable
+// via the URL and flows into signIn({ callbackUrl }). Only accept a same-origin
+// internal path within the admin area (optionally locale-prefixed). Reject
+// absolute URLs (https://evil.com), protocol-relative (//evil.com), and any
+// non-admin path — falling back to /admin.
+function safeReturnTo(raw: string | null): string {
+  const fallback = "/admin";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return fallback;
+  return /^\/(?:[a-z]{2}\/)?admin(?:\/|$|\?)/.test(raw) ? raw : fallback;
+}
+
 function SignInForm() {
   const search = useSearchParams();
   const status = search.get("status");
-  const returnTo = search.get("returnTo") ?? "/admin";
+  const returnTo = safeReturnTo(search.get("returnTo"));
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState(status === "check-email");
