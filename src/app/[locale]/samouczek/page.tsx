@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import SamouczekClient from "./SamouczekClient";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wine.icoffio.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
 
 // The tutorial UI is PL-primary and uses inline copy (no i18n namespace), so
 // metadata strings are defined here per locale rather than via getTranslations.
