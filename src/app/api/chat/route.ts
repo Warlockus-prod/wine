@@ -25,13 +25,12 @@ const MAX_TURNS = 12; // server-side cap
 const MAX_USER_CHARS = 2000;
 const MAX_RESPONSE_TOKENS = 350;
 
-// ─── Per-anonymousId rate limit (4-hour rolling window) ───────────────
+// ─── Per-anonymousId rate limit (24-hour rolling window) ──────────────
 // In-memory only — fine for a single-container deploy. If we ever scale
 // horizontally, swap for Redis or postgres. Limit prevents one guest
-// from burning OpenAI tokens by spamming the chat. Defaults are
-// intentionally generous: ~1 message every 8 minutes on average.
-const RATE_WINDOW_MS = 4 * 60 * 60 * 1000; // 4h
-const RATE_MAX_PER_WINDOW = 30;            // 30 messages / 4h per anon id
+// from burning OpenAI tokens by spamming the chat.
+const RATE_WINDOW_MS = 24 * 60 * 60 * 1000; // 24h (1 day)
+const RATE_MAX_PER_WINDOW = 50;             // 50 messages / day per anon id
 type RateBuckets = Map<string, number[]>;
 // Module-scope so it survives across requests within a single instance.
 const rateBuckets: RateBuckets =
@@ -134,8 +133,8 @@ export async function POST(request: Request) {
       {
         error:
           minutes >= 60
-            ? `Limit pytań na sesję wyczerpany. Wróć za około ${Math.ceil(minutes / 60)} godz. — przewodnik dostępny ${RATE_MAX_PER_WINDOW} razy na 4 godziny.`
-            : `Trochę za szybko. Wróć za ~${minutes} min — limit ${RATE_MAX_PER_WINDOW} pytań / 4 godz.`,
+            ? `Dzienny limit pytań wyczerpany. Wróć za około ${Math.ceil(minutes / 60)} godz. — przewodnik dostępny ${RATE_MAX_PER_WINDOW} razy na dobę.`
+            : `Trochę za szybko. Wróć za ~${minutes} min — limit ${RATE_MAX_PER_WINDOW} pytań na dobę.`,
         retryAfter: rate.retryAfter,
       },
       { status: 429, headers: { "Retry-After": String(rate.retryAfter) } },
