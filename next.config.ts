@@ -10,20 +10,61 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 // Origins allowed to embed the /embed/* routes (samouczek widget) in an
 // iframe. Keep this tight — only the shop + our own domain.
 const EMBED_FRAME_ANCESTORS =
-  "frame-ancestors 'self' https://winnica.pl https://*.winnica.pl https://wine.icoffio.com;";
+  "frame-ancestors 'self' https://winnica.pl https://*.winnica.pl https://wine.icoffio.com";
+
+// `unsafe-eval` is only needed by the webpack dev server (eval source maps).
+// Production bundles — including Mapbox GL — don't need it, so we drop it there.
+const isDev = process.env.NODE_ENV !== "production";
+
+// Shared CSP. `script/style 'unsafe-inline'` is required by Next's hydration,
+// the next-themes inline theme script, and Tailwind's injected styles.
+// `img-src https:` keeps the Unsplash/Wikimedia/QR/Mapbox photo fallbacks
+// working. OpenAI is called server-side only, so it needs no connect-src entry.
+const buildCsp = (frameAncestors: string) =>
+  [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "form-action 'self'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "style-src 'self' 'unsafe-inline'",
+    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+    "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
+    "worker-src 'self' blob:",
+    frameAncestors,
+  ].join("; ");
+
+// Headers safe on every route. Framing is handled per-route below (the embed
+// widget must stay cross-origin-framable; the rest of the site must not).
+const BASE_SECURITY_HEADERS = [
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: projectRoot,
   async headers() {
+    const embedHeaders = [
+      ...BASE_SECURITY_HEADERS,
+      { key: "Content-Security-Policy", value: buildCsp(EMBED_FRAME_ANCESTORS) },
+    ];
     return [
+      // Embed widget — framable by the winnica shop (+ us). No X-Frame-Options
+      // here: it can't allow-list a cross-origin parent; frame-ancestors does.
+      { source: "/embed/:path*", headers: embedHeaders },
+      { source: "/:locale/embed/:path*", headers: embedHeaders },
+      // Everything else — locked to same-origin framing. The negative lookahead
+      // stops this rule from emitting a second, conflicting CSP on /embed/*.
       {
-        // EN at root (localePrefix "as-needed") + PL/other under /:locale.
-        source: "/embed/:path*",
-        headers: [{ key: "Content-Security-Policy", value: EMBED_FRAME_ANCESTORS }],
-      },
-      {
-        source: "/:locale/embed/:path*",
-        headers: [{ key: "Content-Security-Policy", value: EMBED_FRAME_ANCESTORS }],
+        source: "/((?!embed/|[a-z]{2}/embed/).*)",
+        headers: [
+          ...BASE_SECURITY_HEADERS,
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Content-Security-Policy", value: buildCsp("frame-ancestors 'self'") },
+        ],
       },
     ];
   },

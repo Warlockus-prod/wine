@@ -11,7 +11,13 @@ import { eq, asc } from "drizzle-orm";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
-import { ApiError, apiHandler, requireAuth, requireRestaurantMember } from "@/lib/api-acl";
+import {
+  ApiError,
+  apiHandler,
+  requireAuth,
+  requireRestaurantMember,
+  enforceWriteRateLimit,
+} from "@/lib/api-acl";
 import { logEvent } from "@/lib/server-events";
 import { toLocalizedString } from "@/lib/localized";
 
@@ -57,8 +63,9 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   return apiHandler(async () => {
+    enforceWriteRateLimit(request);
     const { slug } = await params;
-    const user = await requireAuth();
+    const user = await requireAuth(request);
     const restaurant = await requireRestaurantMember(user, slug);
 
     let body: unknown;

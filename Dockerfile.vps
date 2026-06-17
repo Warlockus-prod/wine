@@ -6,6 +6,15 @@ RUN npm ci --no-audit --no-fund
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Public (NEXT_PUBLIC_*) vars are inlined into the client bundle at build time.
+# They are NOT secret (they ship in the browser bundle), so passing them as
+# build args is safe — actual secrets stay out of the image entirely
+# (.dockerignore excludes .env*; they're injected at runtime via --env-file).
+# update_wine_web.sh sources these from .env.local and passes --build-arg.
+ARG NEXT_PUBLIC_MAPBOX_TOKEN=""
+ARG NEXT_PUBLIC_SITE_URL=""
+ENV NEXT_PUBLIC_MAPBOX_TOKEN=$NEXT_PUBLIC_MAPBOX_TOKEN
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
@@ -30,5 +39,9 @@ COPY --from=builder /app/scripts ./scripts
 # tsx (devDep) executes db-seed.mts directly without a build step; tsconfig
 # is needed so the TypeScript transformer respects path aliases / target.
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
+# Drop root: run as the image's built-in unprivileged `node` user. .next must
+# stay writable for ISR cache writes at runtime.
+RUN mkdir -p /app/.next/cache && chown -R node:node /app/.next
+USER node
 EXPOSE 3000
 CMD ["npm", "run", "start", "--", "-H", "0.0.0.0", "-p", "3000"]

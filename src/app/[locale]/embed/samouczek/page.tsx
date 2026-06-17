@@ -34,12 +34,23 @@ const FloatingTasteChat = dynamic(
 
 const PROFILE_STORAGE_KEY = "wn_compass_profile_v1";
 
+// Origins allowed to host this widget in an iframe (must match the CSP
+// frame-ancestors in next.config.ts). We post only to these — never "*" — and
+// we ignore inbound messages from anywhere else (audit P1-4).
+const ALLOWED_PARENT_ORIGINS = [
+  "https://winnica.pl",
+  "https://www.winnica.pl",
+  "https://wine.icoffio.com",
+];
+
 function postToParent(msg: Record<string, unknown>) {
   if (typeof window === "undefined" || window.parent === window) return;
-  try {
-    window.parent.postMessage({ source: "vinokompas", ...msg }, "*");
-  } catch {
-    /* ignore */
+  for (const origin of ALLOWED_PARENT_ORIGINS) {
+    try {
+      window.parent.postMessage({ source: "vinokompas", ...msg }, origin);
+    } catch {
+      /* ignore */
+    }
   }
 }
 
@@ -78,6 +89,8 @@ export default function EmbedSamouczekPage() {
   useEffect(() => {
     postToParent({ type: "vinokompas:ready" });
     const onMsg = (e: MessageEvent) => {
+      // Only trust messages from an allowed parent origin (audit P1-4).
+      if (!ALLOWED_PARENT_ORIGINS.includes(e.origin)) return;
       const data = e.data as { type?: string } | null;
       if (data?.type === "vinokompas:set-user") {
         // Phase 2: verify token server-side, load the account's profile.

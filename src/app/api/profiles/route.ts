@@ -3,6 +3,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { logEvent } from "@/lib/server-events";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,8 +14,12 @@ export const dynamic = "force-dynamic";
 
 const profileSchema = z.object({
   anonymousId: z.string().uuid(),
-  compass: z.record(z.string(), z.number().min(0).max(4)),
-  baseTastes: z.record(z.string(), z.number().min(0).max(4)),
+  compass: z
+    .record(z.string(), z.number().min(0).max(4))
+    .refine((o) => Object.keys(o).length <= 24, "compass too large"),
+  baseTastes: z
+    .record(z.string(), z.number().min(0).max(4))
+    .refine((o) => Object.keys(o).length <= 8, "baseTastes too large"),
 });
 
 /** GET /api/profiles?anonymousId=... — restore on revisit. */
@@ -47,6 +52,14 @@ export async function GET(request: Request) {
 
 /** POST /api/profiles — upsert by anonymousId. */
 export async function POST(request: Request) {
+  const rl = rateLimit(`profiles:${clientIp(request)}`, 30, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -56,32 +69,51 @@ export async function POST(request: Request) {
 
   const parsed = profileSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Invalid payload", details: parsed.error.format() },
-      { status: 400 },
-    );
+    // Don't echo the schema shape back to the client.
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
   try {
-    const [row] = await db
-      .insert(schema.tasteProfiles)
-      .values({
-        anonymousId: parsed.data.anonymousId,
-        compass: parsed.data.compass,
-        baseTastes: parsed.data.baseTastes,
-      })
-      .returning({ id: schema.tasteProfiles.id });
+    // App-level upsert keyed on anonymousId. The table has no unique constraint
+    // on anonymous_id (adding one needs a dedup migration), so we update-if-
+    // exists here to stop unbounded duplicate-row growth (audit M2).
+    const [existing] = await db
+      .select({ id: schema.tasteProfiles.id })
+      .from(schema.tasteProfiles)
+      .where(eq(schema.tasteProfiles.anonymousId, parsed.data.anonymousId))
+      .limit(1);
+
+    let id: string;
+    if (existing) {
+      await db
+        .update(schema.tasteProfiles)
+        .set({
+          compass: parsed.data.compass,
+          baseTastes: parsed.data.baseTastes,
+          updatedAt: new Date(),
+        })
+        .where(eq(schema.tasteProfiles.id, existing.id));
+      id = existing.id;
+    } else {
+      const [row] = await db
+        .insert(schema.tasteProfiles)
+        .values({
+          anonymousId: parsed.data.anonymousId,
+          compass: parsed.data.compass,
+          baseTastes: parsed.data.baseTastes,
+        })
+        .returning({ id: schema.tasteProfiles.id });
+      id = row.id;
+    }
 
     await logEvent({
       type: "profile_save",
-      profileId: row.id,
+      profileId: id,
       anonymousId: parsed.data.anonymousId,
-      props: {
-        compass_keys: Object.keys(parsed.data.compass).length,
-      },
+      props: { compass_keys: Object.keys(parsed.data.compass).length },
     });
 
-    return NextResponse.json({ data: { id: row.id } });
+    return NextResponse.json({ data: { id } });
   } catch (err) {
     console.warn("[profiles] POST failed", err);
     return NextResponse.json({ error: "DB unavailable" }, { status: 503 });

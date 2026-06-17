@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logEvent } from "@/lib/server-events";
-import { EVENT_TYPES, type EventType } from "@/db/schema";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,20 +10,45 @@ export const dynamic = "force-dynamic";
 // Soft-fail on validation error so a bad client never gets a 4xx that
 // trips browser network panels.
 
+// Only these event types may be reported by the browser. Server-emitted types
+// (admin_*, chat_*, pairing_match, profile_save) are written via logEvent
+// directly and must NOT be forgeable from the client — accepting them here
+// would let anyone poison the audit/analytics trail (audit M1).
+const CLIENT_EVENT_TYPES = [
+  "page_view",
+  "restaurant_view",
+  "dish_select",
+  "wine_select",
+  "pairing_request",
+  "compass_intensity_set",
+] as const;
+
 const eventSchema = z.object({
-  type: z.enum(EVENT_TYPES as readonly [EventType, ...EventType[]]),
+  type: z.enum(CLIENT_EVENT_TYPES),
   restaurantId: z.string().uuid().nullish(),
   dishId: z.string().uuid().nullish(),
   wineId: z.string().uuid().nullish(),
   profileId: z.string().uuid().nullish(),
-  sessionId: z.string().nullish(),
+  sessionId: z.string().max(128).nullish(),
   anonymousId: z.string().uuid().nullish(),
-  props: z.record(z.string(), z.unknown()).optional(),
+  // Bound the free-form bag so it can't be used to bloat the events table.
+  props: z
+    .record(z.string(), z.unknown())
+    .refine((p) => JSON.stringify(p).length <= 4000, "props too large")
+    .optional(),
 });
 
 const payloadSchema = z.union([eventSchema, z.array(eventSchema).max(50)]);
 
 export async function POST(request: Request) {
+  const rl = rateLimit(`events:${clientIp(request)}`, 120, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();

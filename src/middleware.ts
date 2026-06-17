@@ -1,52 +1,40 @@
 /**
  * Composed middleware: i18n routing + lightweight admin gate.
  *
- * Runs in edge runtime — must NOT import the full Auth.js config (which
- * pulls postgres + nodemailer, neither available in edge). Instead we
- * probe the standard Auth.js session cookie. Real session validation
- * happens in API route handlers and `auth()` calls inside server pages
- * where node runtime is available.
+ * Runs in the edge runtime — must NOT import the full Auth.js config (it pulls
+ * postgres + nodemailer, neither available in edge). The admin gate here is a
+ * simple env-based HTTP Basic Auth (see src/lib/admin-auth.ts, which has zero
+ * DB imports). When AUTH_GATE_ADMIN=1 it challenges /admin; the write APIs
+ * re-validate the same credentials server-side in src/lib/api-acl.ts.
  *
- * If AUTH_GATE_ADMIN=0 the gate is fully disabled (current pilot mode —
- * admin stays open while SMTP for magic-link is being set up).
+ * When AUTH_GATE_ADMIN!=1 the gate is fully disabled (pilot mode — admin stays
+ * open). To turn it on: set AUTH_GATE_ADMIN=1 + ADMIN_PASSWORD in the env.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { ADMIN_GATE_ENABLED, checkBasicAuth, BASIC_AUTH_CHALLENGE } from "./lib/admin-auth";
 
 const intl = createIntlMiddleware(routing);
 
 const ADMIN_PATH_RE = /^\/(?:[a-z]{2}\/)?admin(\/|$)/;
-const SIGNIN_PATH_RE = /^\/(?:[a-z]{2}\/)?admin\/signin(\/|$)/;
-const GATE_ENABLED = process.env.AUTH_GATE_ADMIN === "1";
-
-const SESSION_COOKIE_NAMES = [
-  "authjs.session-token",
-  "__Secure-authjs.session-token",
-  "next-auth.session-token",
-  "__Secure-next-auth.session-token",
-];
 
 export default function middleware(request: NextRequest) {
   const intlResponse = intl(request);
-  if (!GATE_ENABLED) return intlResponse;
+  if (!ADMIN_GATE_ENABLED()) return intlResponse;
 
-  const { pathname, search } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   if (!ADMIN_PATH_RE.test(pathname)) return intlResponse;
-  if (SIGNIN_PATH_RE.test(pathname)) return intlResponse;
 
-  // Cheap cookie probe — sufficient gatekeeper at the edge. The actual
-  // session is re-validated server-side via auth() in API/RSC.
-  const hasSession = SESSION_COOKIE_NAMES.some((name) => request.cookies.get(name));
-  if (hasSession) return intlResponse;
-
-  const localeMatch = pathname.match(/^\/([a-z]{2})\//);
-  const localePrefix = localeMatch ? `/${localeMatch[1]}` : "";
-  const returnTo = encodeURIComponent(pathname + search);
-  return NextResponse.redirect(
-    new URL(`${localePrefix}/admin/signin?returnTo=${returnTo}`, request.url),
-  );
+  // Basic Auth gate (pilot stopgap, audit C1). Once the browser authenticates
+  // here, its same-origin fetches to the write API carry the same credentials,
+  // which api-acl re-validates. Fails CLOSED when ADMIN_PASSWORD is unset.
+  if (checkBasicAuth(request.headers.get("authorization"))) return intlResponse;
+  return new NextResponse("Authentication required.", {
+    status: 401,
+    headers: BASIC_AUTH_CHALLENGE,
+  });
 }
 
 export const config = {

@@ -1,0 +1,29 @@
+# Keep secrets and bulky/local-only paths out of the Docker build context.
+# Critically: .env* must NEVER enter the image — the OpenAI key, DATABASE_URL
+# and AUTH_SECRET live there. Secrets are injected at RUNTIME via --env-file
+# (see update_wine_web.sh). Public NEXT_PUBLIC_* vars are passed as --build-arg.
+.env
+.env.*
+*.env
+
+# VCS + agent worktrees (huge, never needed in the image)
+.git
+.gitignore
+.claude
+
+# Installed/Generated — rebuilt inside the image
+node_modules
+.next
+out
+
+# Test + tooling artifacts
+playwright-report
+test-results
+coverage
+*.log
+npm-debug.log*
+
+# Editor / OS cruft
+.vscode
+.idea
+.DS_Store

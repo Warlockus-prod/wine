@@ -143,10 +143,13 @@ export async function POST(request: Request) {
   }
 
   const profileNote = profileToSummary(body.profile);
+  // Untrusted page context: trim + cap, and demote to a USER-role note (not a
+  // system message) so it can't impersonate instructions — prompt-injection
+  // hardening (audit P1-3).
+  const pageContextClean =
+    typeof body.pageContext === "string" ? body.pageContext.trim().slice(0, 600) : "";
   const pageNote =
-    typeof body.pageContext === "string" && body.pageContext.trim().length > 0
-      ? `Aktualnie użytkownik ogląda: ${body.pageContext.trim().slice(0, 600)}`
-      : null;
+    pageContextClean.length > 0 ? `Aktualnie użytkownik ogląda: ${pageContextClean}` : null;
 
   let openai: OpenAI;
   try {
@@ -175,7 +178,7 @@ export async function POST(request: Request) {
       messages: [
         { role: "system", content: buildChatSystemPrompt() },
         ...(profileNote ? [{ role: "system" as const, content: profileNote }] : []),
-        ...(pageNote ? [{ role: "system" as const, content: pageNote }] : []),
+        ...(pageNote ? [{ role: "user" as const, content: pageNote }] : []),
         ...cleaned,
       ],
     });

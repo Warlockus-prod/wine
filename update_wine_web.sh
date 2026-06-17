@@ -5,8 +5,6 @@ cd /opt/repos/wine_web_wn
 git fetch origin
 git checkout main
 git pull --ff-only origin main
-docker build -f Dockerfile.vps -t wine_web_wn:latest .
-docker rm -f wine_web_wn_app >/dev/null 2>&1 || true
 
 ENV_FILE=/opt/repos/wine_web_wn/.env.local
 if [[ -f "$ENV_FILE" ]]; then
@@ -15,6 +13,23 @@ else
   echo "WARN: $ENV_FILE missing — /api/chat and DB-backed routes will fail."
   ENV_ARG=()
 fi
+
+# Public NEXT_PUBLIC_* vars must be inlined at BUILD time. They are not secret
+# (they ship in the client bundle), so we pass them as --build-arg. Secrets are
+# NEVER baked into the image — .dockerignore excludes .env*, and they're
+# injected at runtime via --env-file above. Without this the Mapbox map renders
+# blank, because .env.local is no longer copied into the build context.
+BUILD_ARGS=()
+if [[ -f "$ENV_FILE" ]]; then
+  while IFS= read -r line; do
+    case "$line" in
+      NEXT_PUBLIC_*=*) BUILD_ARGS+=(--build-arg "$line") ;;
+    esac
+  done < "$ENV_FILE"
+fi
+
+docker build -f Dockerfile.vps ${BUILD_ARGS[@]+"${BUILD_ARGS[@]}"} -t wine_web_wn:latest .
+docker rm -f wine_web_wn_app >/dev/null 2>&1 || true
 
 # Ensure the project's docker network exists (idempotent — first deploy after
 # Postgres bootstrap created it; this no-ops on subsequent runs).

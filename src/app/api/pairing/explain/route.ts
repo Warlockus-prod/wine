@@ -17,6 +17,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { COMPASS_SECTORS, BASE_TASTES } from "@/data/wine-compass-kb";
 import { logEvent } from "@/lib/server-events";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -88,6 +89,16 @@ Base tastes: ${tastes}
 }
 
 export async function POST(request: Request) {
+  // OpenAI-backed → cost-abuse surface. Throttle per IP (the client also caches
+  // per dish×wine, so legit usage stays well under this).
+  const rl = rateLimit(`explain:${clientIp(request)}`, 30, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests", retryAfter: rl.retryAfter },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
