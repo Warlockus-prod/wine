@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { resolveRestaurants } from "@/lib/db-restaurants";
 import HomeClient from "./HomeClient";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wine.icoffio.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
 
 // DB-canonical directory with seed fallback. ISR: published edits surface
 // within ~60s. Data is fetched server-side so the directory is in the SSR

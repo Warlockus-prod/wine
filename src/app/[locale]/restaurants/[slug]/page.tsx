@@ -22,7 +22,7 @@ export function generateStaticParams() {
   return out;
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wine.icoffio.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
 
 export async function generateMetadata({
   params,
