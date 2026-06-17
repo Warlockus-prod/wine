@@ -10,7 +10,7 @@ import { routing } from "@/i18n/routing";
  * via QR. Tutorial + pairing get medium (0.6); admin omitted (operator-only).
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wine.icoffio.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

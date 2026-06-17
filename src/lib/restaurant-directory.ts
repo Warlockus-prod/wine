@@ -1,7 +1,7 @@
 import { seedRestaurants } from "@/data/seed-restaurants";
 import type { Restaurant } from "@/types/restaurant";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wine.icoffio.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
 
 export type RestaurantMeta = {
   country: string;
