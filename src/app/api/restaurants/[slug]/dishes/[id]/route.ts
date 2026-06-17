@@ -2,7 +2,13 @@ import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
-import { ApiError, apiHandler, requireAuth, requireRestaurantMember } from "@/lib/api-acl";
+import {
+  ApiError,
+  apiHandler,
+  requireAuth,
+  requireRestaurantMember,
+  enforceWriteRateLimit,
+} from "@/lib/api-acl";
 import { logEvent } from "@/lib/server-events";
 import { toLocalizedString } from "@/lib/localized";
 
@@ -37,8 +43,9 @@ export async function PUT(
   { params }: { params: Promise<{ slug: string; id: string }> },
 ) {
   return apiHandler(async () => {
+    enforceWriteRateLimit(request);
     const { slug, id } = await params;
-    const user = await requireAuth();
+    const user = await requireAuth(request);
     const restaurant = await requireRestaurantMember(user, slug);
     await loadDish(restaurant.id, id); // 404 guard
 
@@ -64,7 +71,7 @@ export async function PUT(
     const [row] = await db
       .update(schema.dishes)
       .set(patch)
-      .where(eq(schema.dishes.id, id))
+      .where(and(eq(schema.dishes.id, id), eq(schema.dishes.restaurantId, restaurant.id)))
       .returning();
 
     void logEvent({
@@ -79,16 +86,19 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string; id: string }> },
 ) {
   return apiHandler(async () => {
+    enforceWriteRateLimit(request);
     const { slug, id } = await params;
-    const user = await requireAuth();
+    const user = await requireAuth(request);
     const restaurant = await requireRestaurantMember(user, slug);
     await loadDish(restaurant.id, id);
 
-    await db.delete(schema.dishes).where(eq(schema.dishes.id, id));
+    await db
+      .delete(schema.dishes)
+      .where(and(eq(schema.dishes.id, id), eq(schema.dishes.restaurantId, restaurant.id)));
 
     void logEvent({
       type: "admin_dish_delete",

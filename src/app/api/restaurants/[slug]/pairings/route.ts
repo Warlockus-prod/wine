@@ -13,7 +13,13 @@ import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
-import { ApiError, apiHandler, requireAuth, requireRestaurantMember } from "@/lib/api-acl";
+import {
+  ApiError,
+  apiHandler,
+  requireAuth,
+  requireRestaurantMember,
+  enforceWriteRateLimit,
+} from "@/lib/api-acl";
 import { logEvent } from "@/lib/server-events";
 import { toLocalizedString } from "@/lib/localized";
 
@@ -54,8 +60,9 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   return apiHandler(async () => {
+    enforceWriteRateLimit(request);
     const { slug } = await params;
-    const user = await requireAuth();
+    const user = await requireAuth(request);
     const restaurant = await requireRestaurantMember(user, slug);
 
     let body: unknown;
@@ -120,13 +127,18 @@ export async function DELETE(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   return apiHandler(async () => {
+    enforceWriteRateLimit(request);
     const { slug } = await params;
     const url = new URL(request.url);
-    const dishId = url.searchParams.get("dishId");
-    const wineId = url.searchParams.get("wineId");
-    if (!dishId || !wineId) throw new ApiError(400, "dishId & wineId required");
+    const ids = z
+      .object({ dishId: z.string().uuid(), wineId: z.string().uuid() })
+      .safeParse({
+        dishId: url.searchParams.get("dishId"),
+        wineId: url.searchParams.get("wineId"),
+      });
+    if (!ids.success) throw new ApiError(400, "Valid dishId & wineId required");
 
-    const user = await requireAuth();
+    const user = await requireAuth(request);
     const restaurant = await requireRestaurantMember(user, slug);
 
     const result = await db
@@ -134,19 +146,20 @@ export async function DELETE(
       .where(
         and(
           eq(schema.curatedPairings.restaurantId, restaurant.id),
-          eq(schema.curatedPairings.dishId, dishId),
-          eq(schema.curatedPairings.wineId, wineId),
+          eq(schema.curatedPairings.dishId, ids.data.dishId),
+          eq(schema.curatedPairings.wineId, ids.data.wineId),
         ),
-      );
+      )
+      .returning({ id: schema.curatedPairings.id });
 
     void logEvent({
       type: "admin_pairing_delete",
       restaurantId: restaurant.id,
-      dishId,
-      wineId,
+      dishId: ids.data.dishId,
+      wineId: ids.data.wineId,
       props: { actor: user.id },
     });
 
-    return NextResponse.json({ ok: true, deleted: result.length ?? 1 });
+    return NextResponse.json({ ok: true, deleted: result.length });
   });
 }

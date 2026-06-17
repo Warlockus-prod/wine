@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 type Locale = "pl" | "en";
 
@@ -64,12 +66,6 @@ type PairingResult = {
   wineId: string;
   score: number;
   reason: string;
-};
-
-type CuratedInput = {
-  dishId?: string;
-  wineId?: string;
-  reason?: string;
 };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -229,18 +225,65 @@ function scoreWine(dish: DishInput, wine: WineInput): PairingResult {
   };
 }
 
+const bodySchema = z.object({
+  dish: z.object({
+    id: z.string().max(100).optional(),
+    name: z.string().max(300).optional(),
+    description: z.string().max(2000).optional(),
+    tags: z.array(z.string().max(60)).max(30).optional(),
+  }),
+  wines: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(100),
+        name: z.string().max(300).optional(),
+        description: z.string().max(2000).optional(),
+        tags: z.array(z.string().max(60)).max(30).optional(),
+        passport: z
+          .object({
+            grape: z.string().max(100).optional(),
+            abv: z.number().optional(),
+            body: z.enum(["light", "medium", "full"]).optional(),
+            acidity: z.enum(["low", "medium", "high"]).optional(),
+            tannin: z.enum(["none", "soft", "medium", "high"]).optional(),
+            servingTempC: z.string().max(40).optional(),
+            decant: z.string().max(200).optional(),
+          })
+          .optional(),
+      }),
+    )
+    .min(1)
+    .max(200),
+  curated: z
+    .array(
+      z.object({
+        dishId: z.string().max(100).optional(),
+        wineId: z.string().max(100).optional(),
+        reason: z.string().max(1000).optional(),
+      }),
+    )
+    .max(1000)
+    .optional(),
+  locale: z.enum(["pl", "en"]).optional(),
+});
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as {
-      dish?: DishInput;
-      wines?: WineInput[];
-      curated?: CuratedInput[];
-      locale?: Locale;
-    };
+    // Public + CPU-bound scorer → throttle per IP and bound the payload so a
+    // huge wines[] can't burn the event loop (algorithmic DoS, audit M3).
+    const rl = rateLimit(`pairing:${clientIp(request)}`, 60, 60_000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: "Too many requests", retryAfter: rl.retryAfter },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+      );
+    }
 
-    if (!body?.dish || !Array.isArray(body.wines) || body.wines.length === 0) {
+    const parsed = bodySchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
+    const body = parsed.data;
 
     // Locale resolution priority: explicit body.locale → URL ?locale param.
     // Default keeps EN to avoid silently breaking older clients.
