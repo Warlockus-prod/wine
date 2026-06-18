@@ -674,56 +674,6 @@ export default function PairingClient() {
                   {tx("winesCount", { count: sortedWines.length })}
                 </span>
               </div>
-
-              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {[
-                  { rank: "#1", label: tx("bestMatch"), item: rankedMatches.best, tone: "border-primary/40 bg-primary/10" },
-                  {
-                    rank: "#2",
-                    label: tx("alternative"),
-                    item: rankedMatches.alternative,
-                    tone: "border-sky-300/25 bg-sky-300/10",
-                  },
-                  {
-                    rank: "#3",
-                    label: tx("budgetPick"),
-                    item: rankedMatches.budget,
-                    tone: "border-emerald-400/30 bg-emerald-500/10",
-                  },
-                ].map((entry) => (
-                  <button
-                    key={entry.rank}
-                    type="button"
-                    onClick={() => entry.item && selectWine(entry.item.wine.id, "top-3")}
-                    disabled={!entry.item}
-                    className={`min-w-0 overflow-hidden rounded-2xl border px-3 py-3 text-left transition ${
-                      entry.item
-                        ? `${entry.tone} ${
-                            selectedWineId === entry.item.wine.id
-                              ? "ring-2 ring-white/65"
-                              : "hover:border-primary/45"
-                          }`
-                        : "border-white/10 bg-black/20 opacity-45"
-                    }`}
-                  >
-                    <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
-                      {entry.rank} {entry.label}
-                    </p>
-                    {entry.item ? (
-                      <>
-                        <p className="mt-1 line-clamp-1 text-sm font-semibold text-white">
-                          {t(entry.item.wine.name, locale)}
-                        </p>
-                        <p className="truncate text-xs text-gray-300">
-                          {tx("matchPercent", { score: entry.item.match.score })} • ${entry.item.wine.price}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="mt-1 text-xs text-gray-500">{tx("noRankedWine")}</p>
-                    )}
-                  </button>
-                ))}
-              </div>
             </div>
 
             <div className="hide-scrollbar -mx-1.5 flex max-h-[62vh] flex-col gap-3 overflow-y-auto px-1.5 py-1.5">
