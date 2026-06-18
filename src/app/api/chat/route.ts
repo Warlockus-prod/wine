@@ -26,7 +26,7 @@ const MAX_USER_CHARS = 2000;
 const MAX_RESPONSE_TOKENS = 350;
 
 // ─── Per-anonymousId rate limit (24-hour rolling window) ──────────────
-// In-memory only — fine for a single-container deploy. If we ever scale
+// In-memory only - fine for a single-container deploy. If we ever scale
 // horizontally, swap for Redis or postgres. Limit prevents one guest
 // from burning OpenAI tokens by spamming the chat.
 const RATE_WINDOW_MS = 24 * 60 * 60 * 1000; // 24h (1 day)
@@ -133,8 +133,8 @@ export async function POST(request: Request) {
       {
         error:
           minutes >= 60
-            ? `Dzienny limit pytań wyczerpany. Wróć za około ${Math.ceil(minutes / 60)} godz. — przewodnik dostępny ${RATE_MAX_PER_WINDOW} razy na dobę.`
-            : `Trochę za szybko. Wróć za ~${minutes} min — limit ${RATE_MAX_PER_WINDOW} pytań na dobę.`,
+            ? `Dzienny limit pytań wyczerpany. Wróć za około ${Math.ceil(minutes / 60)} godz. - przewodnik dostępny ${RATE_MAX_PER_WINDOW} razy na dobę.`
+            : `Trochę za szybko. Wróć za ~${minutes} min - limit ${RATE_MAX_PER_WINDOW} pytań na dobę.`,
         retryAfter: rate.retryAfter,
       },
       { status: 429, headers: { "Retry-After": String(rate.retryAfter) } },
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
 
   const profileNote = profileToSummary(body.profile);
   // Untrusted page context: trim + cap, and demote to a USER-role note (not a
-  // system message) so it can't impersonate instructions — prompt-injection
+  // system message) so it can't impersonate instructions - prompt-injection
   // hardening (audit P1-3).
   const pageContextClean =
     typeof body.pageContext === "string" ? body.pageContext.trim().slice(0, 600) : "";
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
   } catch (err) {
     return NextResponse.json(
       {
-        error: "Bot tymczasowo niedostępny — brak konfiguracji OpenAI.",
+        error: "Bot tymczasowo niedostępny - brak konfiguracji OpenAI.",
         debug: process.env.NODE_ENV === "development" ? String(err) : undefined,
       },
       { status: 503 },
@@ -187,7 +187,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Bot nie zwrócił odpowiedzi." }, { status: 502 });
     }
 
-    // Log both sides for analytics — fire-and-forget, never blocks reply.
+    // Log both sides for analytics - fire-and-forget, never blocks reply.
     const lastUser = cleaned[cleaned.length - 1];
     const isUuid = (v: string | undefined): v is string =>
       !!v && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
@@ -222,7 +222,7 @@ export async function POST(request: Request) {
     const e = err as { status?: number; message?: string };
     return NextResponse.json(
       {
-        error: "Błąd bota — spróbuj ponownie za chwilę.",
+        error: "Błąd bota - spróbuj ponownie za chwilę.",
         debug: process.env.NODE_ENV === "development" ? e.message : undefined,
       },
       { status: e.status && e.status >= 400 && e.status < 600 ? e.status : 502 },

@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * StagedTutorial — 3-step Vinokompas wine-finding flow.
+ * StagedTutorial - 3-step Vinokompas wine-finding flow.
  *
  * Author's brief (Magdalena Surgiel-Czyż / Vinocompas):
- *   1) SMAK       — fill 3 base tastes (cierpkość, słodycz, kwasowość)
+ *   1) SMAK       - fill 3 base tastes (cierpkość, słodycz, kwasowość)
  *                   then read the wytrawność (dryness) meter.
- *   2) WRAŻENIA   — fill the 6 wrażenia (tęgość, miękkość, oleistość,
+ *   2) WRAŻENIA   - fill the 6 wrażenia (tęgość, miękkość, oleistość,
  *                   świeżość, ziemistość, szorstkość). Icons drive each.
- *   3) TENDENCJE  — advanced: fill the 12 tendencje with colour
+ *   3) TENDENCJE  - advanced: fill the 12 tendencje with colour
  *                   thumbnails. Skip-able for non-experts.
  *
  * After every stage the user can preview matching wines without finishing
@@ -16,12 +16,12 @@
  *
  * Profile model:
  *   - Stage 1 writes `base.slodycz` / `.cierpkosc` / `.kwasowosc` (0-5).
- *   - Stage 2 writes a per-sektor average — the sektor value is fanned out
+ *   - Stage 2 writes a per-sektor average - the sektor value is fanned out
  *     to both tendencje under it so downstream consumers (chat, pairing)
  *     see a coherent profile even if the user never opened stage 3.
  *   - Stage 3 writes the canonical per-tendencja values directly. If the
  *     user later edits stage 2, stage-3 values are overwritten by the
- *     fanned-out average — that's intentional ("simpler input wins until
+ *     fanned-out average - that's intentional ("simpler input wins until
  *     you bother with the harder one").
  *
  * Dryness algorithm is a placeholder until tata + Kuba ship the real one:
@@ -44,7 +44,7 @@ import type {
   Intensity as IntensityLevel,
 } from "./TasteCompass";
 
-// Heavy SVG dial — single instance reused across all 3 stages, level
+// Heavy SVG dial - single instance reused across all 3 stages, level
 // changes per stage to progressively reveal layers.
 const InteractiveCompass = dynamic(() => import("./InteractiveCompass"), {
   ssr: false,
@@ -83,7 +83,7 @@ function dryness(profile: CompassProfile): {
   return { score, label };
 }
 
-// ─── live wine proposals — real wines from winnica.pl ─────────────────────
+// ─── live wine proposals - real wines from winnica.pl ─────────────────────
 const STYLE_LABEL_PL: Record<SamouczekWine["style"], string> = {
   white: "białe",
   red: "czerwone",
@@ -111,8 +111,8 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
           </h3>
           <p className="mt-1.5 font-serif text-sm italic text-[#e6dccd]">
             {enough
-              ? `Etap ${stage} z 3 — profil opisany w ${filled} ${filled === 1 ? "parametrze" : "parametrach"}. Im więcej zaznaczysz, tym celniejsze dopasowanie.`
-              : "Kliknij smaki, wrażenia lub tendencje powyżej — propozycje wyliczą się od razu pod spodem."}
+              ? `Etap ${stage} z 3 - profil opisany w ${filled} ${filled === 1 ? "parametrze" : "parametrach"}. Im więcej zaznaczysz, tym celniejsze dopasowanie.`
+              : "Kliknij smaki, wrażenia lub tendencje powyżej - propozycje wyliczą się od razu pod spodem."}
           </p>
         </div>
         <Link
@@ -188,7 +188,7 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
               className="flex items-center gap-3 rounded-xl border border-dashed border-[rgba(197,160,89,0.20)] bg-[#1a0e10]/40 p-4"
             >
               <span className="h-16 w-6 shrink-0 rounded-sm bg-gradient-to-b from-[#3a2a1c] to-[#1a0e10]" aria-hidden />
-              <span className="font-serif text-sm italic text-[#c5a059]/55">—</span>
+              <span className="font-serif text-sm italic text-[#c5a059]/55">-</span>
             </div>
           ))}
         </div>
@@ -204,7 +204,7 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
         >
           winnica.pl
         </a>{" "}
-        — twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
+        - twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
       </p>
     </div>
   );
@@ -389,7 +389,7 @@ export default function StagedTutorial({
         </div>
       </div>
 
-      {/* Live wine proposals — appear right below, update as the profile changes */}
+      {/* Live wine proposals - appear right below, update as the profile changes */}
       <InlineProposals profile={profile} stage={stage} />
     </div>
   );
@@ -413,9 +413,9 @@ function Stage1({
           Trzy smaki bazowe
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Kliknij jedną z trzech osi — <strong className="not-italic font-semibold text-[#f4ede0]">Słodycz</strong>,{" "}
+          Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4ede0]">Słodycz</strong>,{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Cierpkość</strong> lub{" "}
-          <strong className="not-italic font-semibold text-[#f4ede0]">Kwasowość</strong> — kilka razy, aby ustawić jej
+          <strong className="not-italic font-semibold text-[#f4ede0]">Kwasowość</strong> - kilka razy, aby ustawić jej
           siłę od 0 do 5. Wskaźnik u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
         </p>
       </header>
@@ -427,7 +427,7 @@ function Stage1({
           level={1}
           autoStartTour
           // Dryness meter ABOVE the compass on the same card (client:
-          // "ja bym ją wręcz dała nad") — first thing visible, updates
+          // "ja bym ją wręcz dała nad") - first thing visible, updates
           // live as the user adjusts the base tastes since `dr` is
           // recomputed each render in the parent.
           aboveCompass={<DrynessMeter score={dr.score} label={dr.label} />}
@@ -532,7 +532,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
           ))}
         </div>
 
-        {/* Position pin — a teardrop whose tip rests on the rail, marking
+        {/* Position pin - a teardrop whose tip rests on the rail, marking
             the exact point. Reads as "you are here", not a button. */}
         <div
           className="absolute top-1/2 transition-[left] duration-500 ease-out"
@@ -553,7 +553,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
   );
 }
 
-// (Karty | Kompas view toggle removed — every stage now uses the
+// (Karty | Kompas view toggle removed - every stage now uses the
 //  interactive compass directly. Cards mode is no longer needed.)
 
 // ─── stage 2: WRAŻENIA ───────────────────────────────────────────────────
@@ -572,7 +572,7 @@ function Stage2({
           Sześć wrażeń
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Kliknij wybrane wrażenie na kole, aby zwiększyć jego siłę (0–5) — kropki pokażą poziom.
+          Kliknij wybrane wrażenie na kole, aby zwiększyć jego siłę (0-5) - kropki pokażą poziom.
           Po prawej pojawi się opis tego wrażenia. Nie wiesz od czego zacząć? Włącz{" "}
           <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnika</strong>, który oprowadzi Cię po wszystkich sześciu.
         </p>
@@ -607,7 +607,7 @@ function Stage3({
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
           Tryb dla zaawansowanych: każde wrażenie ma dwie tendencje. Kliknij konkretną
-          tendencję na kole, aby dostroić profil (0–5). Po prawej — pełny opis i skojarzenia
+          tendencję na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
           każdej z 12. <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>

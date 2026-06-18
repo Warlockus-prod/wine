@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * RestaurantPairingPanel — integrated dish↔wine pairing right on the
+ * RestaurantPairingPanel - integrated dish↔wine pairing right on the
  * restaurant page. Replaces the "go to /pairing for this" indirection.
  *
  * UX:
@@ -144,7 +144,7 @@ export default function RestaurantPairingPanel({
         setMatches(m);
       })
       .catch(() => {
-        // Silent fail — fallback ranking from `dish.pairings` already in place.
+        // Silent fail - fallback ranking from `dish.pairings` already in place.
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -194,7 +194,7 @@ export default function RestaurantPairingPanel({
         setExplanation(data.explanation);
       })
       .catch(() => {
-        /* silent — keep panel functional without the bonus prose */
+        /* silent - keep panel functional without the bonus prose */
       })
       .finally(() => {
         if (!cancelled) setExplainLoading(false);
@@ -209,7 +209,7 @@ export default function RestaurantPairingPanel({
     if (activeDishId) setMobileOpen(true);
   }, [activeDishId]);
 
-  // Empty state — no dish picked yet
+  // Empty state - no dish picked yet
   if (!activeDish) {
     return (
       <PanelShell mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}>
@@ -289,7 +289,7 @@ export default function RestaurantPairingPanel({
         </div>
       </div>
 
-      {/* Top 3 wines — skeleton placeholders while /api/pairing resolves
+      {/* Top 3 wines - skeleton placeholders while /api/pairing resolves
           so the panel doesn't pulse a single label and look broken. */}
       <div className="flex-1 overflow-y-auto p-4">
         <p className="mb-3 text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "var(--ink-muted)" }}>
@@ -376,7 +376,7 @@ export default function RestaurantPairingPanel({
           })}
         </ol>
 
-        {/* Vinokompas-vocab explanation — bonus card under the list */}
+        {/* Vinokompas-vocab explanation - bonus card under the list */}
         {explainLoading || explanation ? (
           <div
             className="mt-4 rounded-xl border p-3"
@@ -427,7 +427,7 @@ function PanelShell({
   children: React.ReactNode;
   mobileOpen: boolean;
   setMobileOpen: (v: boolean) => void;
-  /** Tiny preview row shown in the collapsed mobile state — typically
+  /** Tiny preview row shown in the collapsed mobile state - typically
    *  active dish thumb + #1 wine score. Click expands the sheet. */
   peek?: React.ReactNode;
 }) {
@@ -519,8 +519,8 @@ function PanelEmpty({
       </h3>
       <p className="mt-1 text-[12px] italic" style={{ color: "var(--ink-soft)" }}>
         {lng === "pl"
-          ? "Kliknij dowolną pozycję z menu — pokażę top-3 win z karty restauracji."
-          : "Tap any menu item — I'll surface the top-3 wines from this restaurant's cellar."}
+          ? "Kliknij dowolną pozycję z menu - pokażę top-3 win z karty restauracji."
+          : "Tap any menu item - I'll surface the top-3 wines from this restaurant's cellar."}
       </p>
       <ol className="mt-3 grid gap-1.5 overflow-y-auto pr-1">
         {dishes.slice(0, 6).map((d) => (

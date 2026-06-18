@@ -80,7 +80,7 @@ export default function HomeClient({
   // unmount via callback ref returning undefined.
   const cardRefs = useRef<Map<string, HTMLElement>>(new Map());
   // Track whether the latest selection came from a USER action (map click,
-  // catalog click) vs initial mount — only auto-scroll on user actions to
+  // catalog click) vs initial mount - only auto-scroll on user actions to
   // avoid jumping the page on first paint.
   const userPickedRef = useRef(false);
   const handlePick = (slug: string) => {
@@ -186,7 +186,7 @@ export default function HomeClient({
 
         {/* Map gets a full-width row at the top so the user can actually see
             restaurant placement across Europe. The catalogue list lives in
-            its own section below — the previous side-by-side cramming hid
+            its own section below - the previous side-by-side cramming hid
             most map markers behind the catalog column. */}
         <section className="mt-6">
           <article className="rounded-[34px] border border-white/10 bg-black/15 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)]">
@@ -375,7 +375,7 @@ export default function HomeClient({
                       </span>
                     </div>
 
-                    <div className="mt-4 grid gap-3 rounded-[24px] border border-white/8 bg-black/16 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                    <div className="mt-4 flex flex-col gap-3 rounded-[24px] border border-white/8 bg-black/16 p-3">
                       <div className="min-w-0">
                         <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
                           {tx("directUrl")}

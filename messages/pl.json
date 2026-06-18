@@ -11,11 +11,11 @@
   "home": {
     "directoryEyebrow": "Katalog restauracji",
     "directoryTitle": "Wybierz restaurację. Otwórz menu. Znajdź swoje wino.",
-    "directorySubtitle": "Każda restauracja ma własną stronę i kod QR. Zeskanuj go telefonem — menu otwiera się od razu, bez aplikacji, bez logowania.",
+    "directorySubtitle": "Każda restauracja ma własną stronę i kod QR. Zeskanuj go telefonem - menu otwiera się od razu, bez aplikacji, bez logowania.",
     "statsRestaurants": "Restauracje",
     "statsCities": "Miasta",
     "statsQrReady": "QR gotowe",
-    "directoryFootnote": "Pięć restauracji w Polsce — pełne menu, pełna karta win, gotowe do łączenia.",
+    "directoryFootnote": "Pięć restauracji w Polsce - pełne menu, pełna karta win, gotowe do łączenia.",
     "tagline": "AI sommelier dla restauracyjnych menu",
     "mapTitle": "Na mapie",
     "mapSubtitle": "Stuknij marker, aby otworzyć restaurację.",
@@ -45,7 +45,7 @@
   "restaurant": {
     "menuTitle": "Dania popisowe",
     "wineListTitle": "Aktualna piwnica",
-    "qrTitle": "QR — bezpośredni dostęp",
+    "qrTitle": "QR - bezpośredni dostęp",
     "qrHint": "Zeskanuj kod QR, aby od razu otworzyć stronę restauracji na telefonie.",
     "menu": "Menu",
     "wineList": "Karta win",
@@ -59,7 +59,7 @@
     "pickWineForDish": "Wino do tego dania",
     "pairingWidgetEyebrow": "AI sommelier",
     "pairingWidgetTitle": "Dobierz wino do każdej pozycji w 5 sekund",
-    "pairingWidgetSub": "Otwórz interaktywny widok łączenia — kliknij danie, model dopasuje 3 najlepsze wina z karty restauracji wraz z uzasadnieniem.",
+    "pairingWidgetSub": "Otwórz interaktywny widok łączenia - kliknij danie, model dopasuje 3 najlepsze wina z karty restauracji wraz z uzasadnieniem.",
     "topThreeWines": "Top 3 wina z piwnicy",
     "matchingWines": "Dobieram wina…",
     "activeDishHint": "wina po prawej stronie",
@@ -73,7 +73,7 @@
   "pairing": {
     "workspace": "Przestrzeń łączenia",
     "headline": "Wybierz danie. Wybierz wino. Przeczytaj uzasadnienie poniżej.",
-    "subheading": "Ekran ułożony jest jako dwie listy obok siebie. Wybór dania zmienia ranking win, wybór wina zmienia kolejność menu, a dolny panel działa jak czat bota — bez pola tekstowego.",
+    "subheading": "Ekran ułożony jest jako dwie listy obok siebie. Wybór dania zmienia ranking win, wybór wina zmienia kolejność menu, a dolny panel działa jak czat bota - bez pola tekstowego.",
     "context": "Kontekst: {name} • {city}",
     "aiAnalyzing": "AI analizuje",
     "aiReady": "AI gotowe",
@@ -140,7 +140,7 @@
     }
   },
   "pitch": {
-    "metaTitle": "Cellar Compass — dla właścicieli restauracji",
+    "metaTitle": "Cellar Compass - dla właścicieli restauracji",
     "metaDescription": "Sommelier w kieszeni każdego gościa. Cellar Compass zamienia menu i piwnicę w cichą rozmowę z każdym gościem.",
     "nav": {
       "menu": "Propozycja",
@@ -152,7 +152,7 @@
       "openDemo": "Otwórz demo"
     },
     "hero": {
-      "eyebrow": "Cellar Compass — dla restauracji",
+      "eyebrow": "Cellar Compass - dla restauracji",
       "title": "Sommelier",
       "titleAccent": "w każdej kieszeni.",
       "lede": "Cellar Compass zamienia twoje menu i piwnicę w cichą rozmowę z każdym gościem. Bez szkolenia obsługi. Bez backendu. Działa w pięć minut.",
@@ -163,15 +163,15 @@
     "how": {
       "eyebrow": "I.",
       "title": "Jak to działa",
-      "subtitle": "Cztery momenty — od wydrukowanego QR-a do nalanego kieliszka.",
+      "subtitle": "Cztery momenty - od wydrukowanego QR-a do nalanego kieliszka.",
       "step1Title": "QR na stoliku",
-      "step1Body": "Każdy lokal dostaje unikalny URL i kod QR. Wydrukuj, zalaminuj, włóż do okładki rachunku. Gość skanuje, doświadczenie się otwiera — bez instalowania aplikacji.",
+      "step1Body": "Każdy lokal dostaje unikalny URL i kod QR. Wydrukuj, zalaminuj, włóż do okładki rachunku. Gość skanuje, doświadczenie się otwiera - bez instalowania aplikacji.",
       "step2Title": "Gość wybiera danie",
-      "step2Body": "Menu jest twoje — ze zdjęciami i cenami. Wybór dania to jedyne wejście — nie ma okna czatu, nie ma narzędzia do nauki.",
+      "step2Body": "Menu jest twoje - ze zdjęciami i cenami. Wybór dania to jedyne wejście - nie ma okna czatu, nie ma narzędzia do nauki.",
       "step3Title": "Trzy najlepsze wina",
       "step3Body": "Algorytm dostrojony do treściwości, kwasowości i tanin ocenia każdą etykietę z twojej karty. Najlepsze trafienie wybiera się samo, a uzasadnienie pojawia się jak cicha wiadomość od bota.",
       "step4Title": "Twój sommelier dalej prowadzi",
-      "step4Body": "Ręczne wpisy kuratorskie mają pierwszeństwo. Zdanie napisane przez twojego sommeliera — po polsku i angielsku — zastępuje algorytmiczny szkic."
+      "step4Body": "Ręczne wpisy kuratorskie mają pierwszeństwo. Zdanie napisane przez twojego sommeliera - po polsku i angielsku - zastępuje algorytmiczny szkic."
     },
     "what": {
       "eyebrow": "II.",
@@ -182,11 +182,11 @@
       "f2Title": "Mapa Europy",
       "f2Body": "Prawdziwa Leaflet+OSM. Goście was znajdują, agencje widzą sieć.",
       "f3Title": "Ranking dwustronny",
-      "f3Body": "Wybierz danie — wina się przegrupują. Wybierz wino — menu się przesortuje.",
+      "f3Body": "Wybierz danie - wina się przegrupują. Wybierz wino - menu się przesortuje.",
       "f4Title": "Wpisy sommeliera",
       "f4Body": "Twoje słowa, nie maszyny. Wpisy kuratorskie biją algorytm.",
       "f5Title": "Dwujęzyczne EN ↔ PL",
-      "f5Body": "Każde danie, każde wino, każde uzasadnienie — w obu językach.",
+      "f5Body": "Każde danie, każde wino, każde uzasadnienie - w obu językach.",
       "f6Title": "Mobile-first",
       "f6Body": "Zaprojektowane na telefon gościa, nie laptop kierownika.",
       "f7Title": "Bez backendu",
@@ -198,7 +198,7 @@
       "eyebrow": "III.",
       "title": "Trzy widoki, jeden produkt",
       "subtitle": "Co widzi gość, co widzicie wy, co edytuje sommelier.",
-      "phoneCaption": "Czat łączenia — widok gościa",
+      "phoneCaption": "Czat łączenia - widok gościa",
       "phoneSub": "Odpowiedź bota, bez okna wprowadzania",
       "mapCaption": "Mapa odkrywania",
       "mapSub": "Filtruj po mieście, kuchni, formacie",
@@ -221,7 +221,7 @@
     "pricing": {
       "eyebrow": "V.",
       "title": "Współpraca",
-      "subtitle": "Zaczynamy od małego — z pełną świadomością. Demo nie udaje gotowego produktu.",
+      "subtitle": "Zaczynamy od małego - z pełną świadomością. Demo nie udaje gotowego produktu.",
       "tier1Name": "Demo",
       "tier1Price": "Bezpłatnie",
       "tier1Tagline": "To, na co właśnie patrzycie.",
@@ -256,10 +256,10 @@
       "q2": "Czy możemy zabrać dane i odejść?",
       "a2": "Tak. Panel ma już Eksport JSON. Produkcja dodaje CSV i kopię zapasową jednym kliknięciem do waszego Google Drive lub S3.",
       "q3": "Co ze zdjęciami i cenami win?",
-      "a3": "Demo niesie etykiety zastępcze. Przed pokazem dla gości wymieniamy każdy wpis na zweryfikowane zdjęcie rocznika i aktualną cenę rynkową — to część pilotażu.",
+      "a3": "Demo niesie etykiety zastępcze. Przed pokazem dla gości wymieniamy każdy wpis na zweryfikowane zdjęcie rocznika i aktualną cenę rynkową - to część pilotażu.",
       "q4": "Czy goście potrzebują internetu?",
-      "a4": "Tak — tylko żeby otworzyć stronę. Po załadowaniu doświadczenie działa offline; cache'ujemy menu i łączenia przez service workera.",
-      "q5": "Wielojęzyczność — tylko polski?",
+      "a4": "Tak - tylko żeby otworzyć stronę. Po załadowaniu doświadczenie działa offline; cache'ujemy menu i łączenia przez service workera.",
+      "q5": "Wielojęzyczność - tylko polski?",
       "a5": "EN i PL działają teraz. Dodanie włoskiego, francuskiego, hiszpańskiego czy niemieckiego to jednodniowa wymiana słownika; schemat jest już do tego ukształtowany.",
       "q6": "Co się dzieje po roku dema?",
       "a6": "Albo razem przeprowadziliśmy płatny pilotaż, albo odchodzicie z eksportem JSON i kodami QR w kieszeni. Brak vendor lock-in z założenia."
@@ -275,7 +275,7 @@
     "ornament": "· · ·"
   },
   "admin": {
-    "kicker": "Panel — nowy styl",
+    "kicker": "Panel - nowy styl",
     "title": "Studio Admin V2",
     "subtitle": "Zarządzaj danymi API łączenia: dodawaj/edytuj dania i wina, potem uruchamiaj testy API na żywo.",
     "stats": {
@@ -336,7 +336,7 @@
       "title": "Kuratorskie połączenia",
       "subtitle": "Wybierz wina dla dania ręcznie i wpisz uzasadnienie, które gość zobaczy w panelu czatu. Wpisy kuratorskie nadpisują algorytm.",
       "noDishes": "Dodaj co najmniej jedno danie, aby skonfigurować połączenia.",
-      "notCurated": "Brak wpisu kuratorskiego — decyduje algorytm.",
+      "notCurated": "Brak wpisu kuratorskiego - decyduje algorytm.",
       "reasonEnPlaceholder": "Why it works (English)",
       "reasonPlPlaceholder": "Dlaczego pasuje (polski)"
     },
@@ -357,7 +357,7 @@
   "notFound": {
     "eyebrow": "Coś poszło nie tak",
     "title": "Nie znaleźliśmy tej strony",
-    "subtitle": "Wygląda na to, że ten link wygasł lub został przeniesiony. Wybierz coś poniżej — powrót do mapy restauracji, polecana karta lub przewodnik Vinokompas.",
+    "subtitle": "Wygląda na to, że ten link wygasł lub został przeniesiony. Wybierz coś poniżej - powrót do mapy restauracji, polecana karta lub przewodnik Vinokompas.",
     "backHome": "Wróć do listy restauracji",
     "featured": "Zajrzyj do {name}",
     "openTutorial": "Samouczek Vinokompas"

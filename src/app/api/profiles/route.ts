@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Anonymous-id is a uuid v4 minted client-side and stored in localStorage.
-// We trust it as an opaque token — no privacy claim, just a stable
+// We trust it as an opaque token - no privacy claim, just a stable
 // identifier so the same browser can re-open its profile later.
 
 const profileSchema = z.object({
@@ -22,7 +22,7 @@ const profileSchema = z.object({
     .refine((o) => Object.keys(o).length <= 8, "baseTastes too large"),
 });
 
-/** GET /api/profiles?anonymousId=... — restore on revisit. */
+/** GET /api/profiles?anonymousId=... - restore on revisit. */
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const anonymousId = url.searchParams.get("anonymousId");
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
   }
 }
 
-/** POST /api/profiles — upsert by anonymousId. */
+/** POST /api/profiles - upsert by anonymousId. */
 export async function POST(request: Request) {
   const rl = rateLimit(`profiles:${clientIp(request)}`, 30, 60_000);
   if (!rl.ok) {

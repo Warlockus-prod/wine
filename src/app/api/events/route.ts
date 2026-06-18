@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 // Only these event types may be reported by the browser. Server-emitted types
 // (admin_*, chat_*, pairing_match, profile_save) are written via logEvent
-// directly and must NOT be forgeable from the client — accepting them here
+// directly and must NOT be forgeable from the client - accepting them here
 // would let anyone poison the audit/analytics trail (audit M1).
 const CLIENT_EVENT_TYPES = [
   "page_view",
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
   }
 
   const list = Array.isArray(parsed.data) ? parsed.data : [parsed.data];
-  // Fire-and-forget — never block the client. Errors logged in logEvent.
+  // Fire-and-forget - never block the client. Errors logged in logEvent.
   await Promise.all(list.map((e) => logEvent(e)));
 
   return NextResponse.json({ ok: true, count: list.length });

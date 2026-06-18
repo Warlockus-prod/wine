@@ -1,9 +1,9 @@
 /**
- * WineBottleSVG — silhouette bottle placeholder for wines without imageUrl.
+ * WineBottleSVG - silhouette bottle placeholder for wines without imageUrl.
  *
  * Style detection mirrors the heuristics in restaurant-pairing-adapter.ts:
  * the wine.style + wine.grape strings drive the bottle shape and the
- * liquid tint. Sizing is responsive — viewBox is 60×200 (3:10 aspect),
+ * liquid tint. Sizing is responsive - viewBox is 60×200 (3:10 aspect),
  * scale via CSS width/height.
  */
 
@@ -55,7 +55,7 @@ const detectShape = (style?: string, grape?: string): ShapeProps => {
     return { shoulderRadius: 0.6, shoulderHeight: 0.55, bodyWidth: 0.7, neckWidth: 0.22, totalHeight: 198 };
   if (/(pinot|chardonnay|burgundy|chablis)/.test(s))
     return { shoulderRadius: 0.95, shoulderHeight: 0.28, bodyWidth: 0.85, neckWidth: 0.26, totalHeight: 194 };
-  // Default — Bordeaux: high straight shoulders.
+  // Default - Bordeaux: high straight shoulders.
   return { shoulderRadius: 0.25, shoulderHeight: 0.28, bodyWidth: 0.85, neckWidth: 0.26, totalHeight: 196 };
 };
 
@@ -81,7 +81,7 @@ export default function WineBottleSVG({
   const tone = palette[hint ?? detectStyle(style, grape)];
   const shape = detectShape(style, grape);
 
-  // Geometry — 60×200 viewBox so the silhouette feels properly tall.
+  // Geometry - 60×200 viewBox so the silhouette feels properly tall.
   const VIEW_W = 60;
   const VIEW_H = 200;
   const cx = VIEW_W / 2;
@@ -94,7 +94,7 @@ export default function WineBottleSVG({
   const halfNeck = neckW / 2;
   const shoulderH = bottleH * shape.shoulderHeight;
   const yShoulder = yTop + shoulderH;
-  // Curve control for shoulder — higher radius pulls curve toward neck top.
+  // Curve control for shoulder - higher radius pulls curve toward neck top.
   const curveX = shape.shoulderRadius * (halfBody - halfNeck);
 
   const bottlePath = [
@@ -123,7 +123,7 @@ export default function WineBottleSVG({
   // Capsule (foil at neck top)
   const capsuleH = bottleH * 0.08;
 
-  // Label — rounded rectangle on lower body
+  // Label - rounded rectangle on lower body
   const labelW = bodyW - 8;
   const labelH = bottleH * 0.18;
   const labelX = cx - labelW / 2;
@@ -155,7 +155,7 @@ export default function WineBottleSVG({
       {/* Bottle body */}
       <path d={bottlePath} fill="url(#wb-glass-shine)" stroke="rgba(0,0,0,0.4)" strokeWidth="0.6" />
 
-      {/* Capsule overlay — sits on top of bottle path */}
+      {/* Capsule overlay - sits on top of bottle path */}
       <path
         d={`M ${cx - halfNeck} ${yTop + 4} L ${cx - halfNeck} ${yTop + capsuleH} Q ${cx - halfNeck - 0.4} ${yTop + capsuleH + 1} ${cx - halfNeck + 1} ${yTop + capsuleH + 1} L ${cx + halfNeck - 1} ${yTop + capsuleH + 1} Q ${cx + halfNeck + 0.4} ${yTop + capsuleH + 1} ${cx + halfNeck} ${yTop + capsuleH} L ${cx + halfNeck} ${yTop + 4} Z`}
         fill="url(#wb-cap-shine)"

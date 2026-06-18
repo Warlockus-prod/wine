@@ -18,7 +18,7 @@ export default function Navigation() {
   const locale = useLocale() as Locale;
   const tx = useTranslations("nav");
 
-  // Public-facing menu: Admin / Panel are intentionally removed — operator
+  // Public-facing menu: Admin / Panel are intentionally removed - operator
   // entrance lives in the right-side action button instead.
   const menuLinks = [
     { href: "/", label: tx("home") },
@@ -47,7 +47,7 @@ export default function Navigation() {
             href="/"
             className="-ml-2 flex h-12 items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-white/5"
             onClick={() => setMobileOpen(false)}
-            aria-label="Vinovigator AI — strona główna"
+            aria-label="Vinovigator AI - strona główna"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded bg-primary text-white">
               <Icon name="wine_bar" className="text-base" />
@@ -96,7 +96,7 @@ export default function Navigation() {
                 </button>
               ))}
             </div>
-            {/* Viewport switcher toggle — only on desktop, hidden inside iframe */}
+            {/* Viewport switcher toggle - only on desktop, hidden inside iframe */}
             {showViewportToggle ? (
               <button
                 type="button"
@@ -107,7 +107,7 @@ export default function Navigation() {
                 <span>Mobile</span>
               </button>
             ) : null}
-            {/* Operator entrance — leads to /admin (Panel). Renamed from
+            {/* Operator entrance - leads to /admin (Panel). Renamed from
                 "Sign In" + the previous Admin link merged into one button. */}
             <Link
               href="/admin"
@@ -186,7 +186,7 @@ export default function Navigation() {
         </div>
       ) : null}
 
-      {/* Mobile preview overlay — portalled to body */}
+      {/* Mobile preview overlay - portalled to body */}
       {previewMode
         ? createPortal(
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm">

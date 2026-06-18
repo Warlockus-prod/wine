@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * InteractiveCompass — TasteCompass + side info-panel + auto-tour.
+ * InteractiveCompass - TasteCompass + side info-panel + auto-tour.
  *
  * Two interaction modes share one panel:
  *
@@ -14,7 +14,7 @@
  *                       Click cycles intensity 0→1→2→3→4→0 (TasteCompass
  *                       behavior).
  *
- *  CTA inside the side panel: "Otwórz przewodnika" — fires the global
+ *  CTA inside the side panel: "Otwórz przewodnika" - fires the global
  *  `wn:open-chat` event so FloatingTasteChat can pop open with the
  *  current sektor as context. (Listener is wired in the chat component.)
  */
@@ -33,22 +33,22 @@ interface Props {
   onProfileChange: (next: CompassProfile) => void;
   /** Tour rotation interval in ms; defaults to 2800 (≈3s/spoke). */
   tourMs?: number;
-  /** Progressive-disclosure level — flows into TasteCompass and selects
+  /** Progressive-disclosure level - flows into TasteCompass and selects
    *  which IDs the auto-tour cycles through. */
   level?: CompassLevel;
   /** Auto-start the tour when the component mounts. Used so each stage
    *  greets the user with a presentation instead of a static disc. */
   autoStartTour?: boolean;
   /** Optional content rendered in the LEFT column directly under the
-   *  compass + profile bar — on the SAME card. */
+   *  compass + profile bar - on the SAME card. */
   belowCompass?: React.ReactNode;
-  /** Optional content rendered in the LEFT column ABOVE the compass — on
+  /** Optional content rendered in the LEFT column ABOVE the compass - on
    *  the same card, first thing visible. Stage 1 uses this for the dryness
    *  arrow (client request: put it on top, visible at a glance, live). */
   aboveCompass?: React.ReactNode;
 }
 
-// Tour ID sets per level — what auto-tour cycles through.
+// Tour ID sets per level - what auto-tour cycles through.
 const ALL_TENDENCJE_IDS = COMPASS_SECTORS.flatMap((s) =>
   s.tendencje.map((t) => t.id),
 );
@@ -88,7 +88,7 @@ const findFocus = (id: string | null): FocusRecord | null => {
   return null;
 };
 
-// Tour pacing presets — labeled so the UI control reads naturally.
+// Tour pacing presets - labeled so the UI control reads naturally.
 const TOUR_SPEEDS = [
   { id: "slow", ms: 5000, label: "Wolno" },
   { id: "normal", ms: 3200, label: "Normalnie" },
@@ -128,7 +128,7 @@ export default function InteractiveCompass({
   // Tour cycles through level-specific id set (3 base / 6 sektor / 12 spoke).
   const tourIds = useMemo(() => tourIdsForLevel(level), [level]);
 
-  // Reset tour position when level changes — otherwise an idx of 11 from
+  // Reset tour position when level changes - otherwise an idx of 11 from
   // a level-3 run would crash level-1's 3-item set. Auto-start the tour
   // for stages that ask for it. Lint-disable required: localStorage- and
   // prop-driven sync state is the only safe place to set it.
@@ -140,7 +140,7 @@ export default function InteractiveCompass({
     }
   }, [level, autoStartTour]);
 
-  // Tour ticks — paused while interrupted (user is interacting).
+  // Tour ticks - paused while interrupted (user is interacting).
   useEffect(() => {
     if (!tourActive) {
       if (intervalRef.current) {
@@ -176,7 +176,7 @@ export default function InteractiveCompass({
   useEffect(() => {
     const prev = prevProfileRef.current;
     prevProfileRef.current = profile;
-    // Find first changed key — pick the level-appropriate display id.
+    // Find first changed key - pick the level-appropriate display id.
     const allKeys = new Set([...Object.keys(profile), ...Object.keys(prev)]);
     for (const k of allKeys) {
       if ((profile[k] ?? 0) === (prev[k] ?? 0)) continue;
@@ -184,7 +184,7 @@ export default function InteractiveCompass({
       if (k.startsWith("base.")) {
         displayId = k;
       } else if (level === 2) {
-        // Tendencja change at L2 — find its sektor and pin that.
+        // Tendencja change at L2 - find its sektor and pin that.
         const s = COMPASS_SECTORS.find((sec) => sec.tendencje.some((t) => t.id === k));
         displayId = s?.id ?? k;
       } else {
@@ -218,7 +218,7 @@ export default function InteractiveCompass({
     window.dispatchEvent(
       new CustomEvent("wn:open-chat", {
         detail: {
-          prefill: `Opowiedz mi więcej o wrażeniu „${label}" — czego szukać w winie?`,
+          prefill: `Opowiedz mi więcej o wrażeniu „${label}" - czego szukać w winie?`,
         },
       }),
     );
@@ -256,7 +256,7 @@ export default function InteractiveCompass({
     };
   }, [tourActive, tourId, intervalMs]);
 
-  // Compass interaction — applies the change, then (during the tour) pauses on
+  // Compass interaction - applies the change, then (during the tour) pauses on
   // the clicked item, comments on its intensity, and auto-resumes after 3s.
   const handleCompassChange = (next: CompassProfile) => {
     onProfileChange(next);
@@ -289,7 +289,7 @@ export default function InteractiveCompass({
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-7">
       {/* ── Compass ─────────────────────────────────────────────────── */}
       <div className="flex flex-col items-center">
-        {/* Above-compass slot (e.g. live dryness arrow on stage 1) —
+        {/* Above-compass slot (e.g. live dryness arrow on stage 1) -
             first thing visible on the card. */}
         {aboveCompass ? <div className="mb-5 w-full max-w-[440px]">{aboveCompass}</div> : null}
         <div className="w-full max-w-[440px]">
@@ -297,7 +297,7 @@ export default function InteractiveCompass({
             profile={profile}
             onChange={handleCompassChange}
             level={level}
-            // Tour wins; pinned (last-clicked) wins over nothing — both are
+            // Tour wins; pinned (last-clicked) wins over nothing - both are
             // bridged through this single prop so the spoke pulses as long
             // as that selection is "current".
             externalHighlightId={tourId ?? pinnedId}
@@ -313,7 +313,7 @@ export default function InteractiveCompass({
 
         {tourActive ? (
           <p className="mt-2 max-w-[440px] text-center text-[11px] leading-snug text-[var(--color-accent-gold)]/70">
-            Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) —
+            Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) -
             kliknij koło, aby wybrać siłę.
           </p>
         ) : null}
@@ -352,7 +352,7 @@ export default function InteractiveCompass({
                   // Pin the spoke the tour was just on so the info panel
                   // keeps showing it after pause (otherwise focusedId
                   // collapses to null and the panel reverts to the idle
-                  // state — confusing UX).
+                  // state - confusing UX).
                   if (tourId) setPinnedId(tourId);
                   setTourOn(false);
                 }}
@@ -380,7 +380,7 @@ export default function InteractiveCompass({
               >
                 {tourIdx + 1} / {tourIds.length}
               </span>
-              {/* Speed picker — sits inline with tour controls. */}
+              {/* Speed picker - sits inline with tour controls. */}
               <div className="ml-2 flex items-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#1a0f12]/55 p-0.5" role="radiogroup" aria-label="Tempo przewodnika">
                 {TOUR_SPEEDS.map((s) => {
                   const active = s.id === tourSpeed;
@@ -414,7 +414,7 @@ export default function InteractiveCompass({
             : "Najedź lub kliknij, aby ustawić intensywność"}
         </p>
 
-        {/* Selected-profile bar — animated chips appear as the user clicks
+        {/* Selected-profile bar - animated chips appear as the user clicks
             spokes. Replaces TasteCompass's default legend (we hideLegend
             because this is more on-brand and uses sektor colour swatches). */}
         <SelectedProfileBar
@@ -424,7 +424,7 @@ export default function InteractiveCompass({
         />
 
         {/* Stage-specific slot under the compass (e.g. the live dryness
-            arrow on stage 1) — same card, always visible. */}
+            arrow on stage 1) - same card, always visible. */}
         {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
       </div>
 
@@ -478,14 +478,14 @@ export default function InteractiveCompass({
 }
 
 /**
- * TourText — typewriter reveal for the auto-tour descriptions. While
+ * TourText - typewriter reveal for the auto-tour descriptions. While
  * `typing` is true, the text types out char-by-char (~22ms/char) with a
  * blinking caret so the panel reads like a typewriter instead of snapping
  * between sektor descriptions. When `typing` is false (hover / pinned),
  * the full text shows instantly. Restarts whenever `text` changes.
  */
 // NOTE: callers MUST pass `key={`${typing}:${text}`}` so this remounts when
-// the text changes — the useState initializer then handles the reset and the
+// the text changes - the useState initializer then handles the reset and the
 // effect only updates state from the interval callback (lint-clean).
 function TourText({ text, typing }: { text: string; typing: boolean }) {
   const [shown, setShown] = useState(typing ? "" : text);
@@ -519,18 +519,18 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
 }
 
 /**
- * SelectionComment — the guide's live reaction to how strongly the user
+ * SelectionComment - the guide's live reaction to how strongly the user
  * marked the focused element. 0 = a nudge to click; 1-4 = an interpretation
  * of that intensity. Gives the panel a "the przewodnik is watching what I
  * do" feel instead of static description text.
  */
 const INTENSITY_COMMENTS: Record<number, string> = {
-  0: "Jeszcze nie zaznaczone — kliknij koło, aby ustawić siłę (0–5).",
-  1: "Ledwo wyczuwalne — subtelny akcent w tle.",
-  2: "Delikatne — lekko zaznaczone.",
-  3: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
-  4: "Mocne — jeden z głównych charakterów Twojego wina.",
-  5: "Dominujące — definiuje styl, którego szukasz.",
+  0: "Jeszcze nie zaznaczone - kliknij koło, aby ustawić siłę (0-5).",
+  1: "Ledwo wyczuwalne - subtelny akcent w tle.",
+  2: "Delikatne - lekko zaznaczone.",
+  3: "Umiarkowane - wyraźnie obecne, ale nie dominuje.",
+  4: "Mocne - jeden z głównych charakterów Twojego wina.",
+  5: "Dominujące - definiuje styl, którego szukasz.",
 };
 
 function SelectionComment({
@@ -648,7 +648,7 @@ function FocusedCard({
         </span>
       </div>
 
-      {/* Still-life image of the impression — the "obrazki" from the
+      {/* Still-life image of the impression - the "obrazki" from the
           canonical Vinokompas (citrus for Świeże, leather/oak for
           Szorstkie, etc.), generated to match the wine-bar aesthetic. */}
       {senseImg ? (
@@ -679,13 +679,13 @@ function FocusedCard({
         ) : null}
       </h3>
 
-      {/* Live commentary on the user's selection — the guide reacts to the
+      {/* Live commentary on the user's selection - the guide reacts to the
           intensity they set (client: "czy ten przewodnik nie powinien
           komentować tego co zaznaczyłam?"). Updates instantly on every
           click because `intensity` is read from the profile each render. */}
       <SelectionComment intensity={intensity} accent={accent} label={title} />
 
-      {/* Body — three paragraphs per kind. The primary description types
+      {/* Body - three paragraphs per kind. The primary description types
           out like a typewriter while the auto-tour is running (client:
           "napisy za szybko skaczą... pismem jak pisze się na maszynie"),
           and shows instantly on hover/click. */}
@@ -695,7 +695,7 @@ function FocusedCard({
             <TourText key={`${isTour}:${focused.description}`} text={focused.description} typing={isTour} />
           </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
-            Trzy smaki bazowe — cierpkość, słodycz, kwasowość — to
+            Trzy smaki bazowe - cierpkość, słodycz, kwasowość - to
             podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym
             wyraźniej dominują w twoim ulubionym profilu.
           </p>
@@ -786,7 +786,7 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
       </h3>
       <p className="mt-3 text-sm leading-relaxed text-[#e6dccd]">
         Tarcza Vinokompasu pokaże opis każdego elementu. Możesz też pozwolić,
-        by przewodnik przeszedł przez {what.plural} automatycznie — wystarczy nacisnąć przycisk poniżej.
+        by przewodnik przeszedł przez {what.plural} automatycznie - wystarczy nacisnąć przycisk poniżej.
       </p>
       <button
         type="button"
@@ -855,7 +855,7 @@ function SelectedProfileBar({
   if (total === 0) {
     return (
       <p className="mt-5 text-center font-serif text-xs italic text-[var(--color-accent-gold)] opacity-75">
-        Twój profil pojawi się tutaj — wskaż intensywność dotykiem koła.
+        Twój profil pojawi się tutaj - wskaż intensywność dotykiem koła.
       </p>
     );
   }

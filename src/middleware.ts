@@ -1,13 +1,13 @@
 /**
  * Composed middleware: i18n routing + lightweight admin gate.
  *
- * Runs in the edge runtime — must NOT import the full Auth.js config (it pulls
+ * Runs in the edge runtime - must NOT import the full Auth.js config (it pulls
  * postgres + nodemailer, neither available in edge). The admin gate here is a
  * simple env-based HTTP Basic Auth (see src/lib/admin-auth.ts, which has zero
  * DB imports). When AUTH_GATE_ADMIN=1 it challenges /admin; the write APIs
  * re-validate the same credentials server-side in src/lib/api-acl.ts.
  *
- * When AUTH_GATE_ADMIN!=1 the gate is fully disabled (pilot mode — admin stays
+ * When AUTH_GATE_ADMIN!=1 the gate is fully disabled (pilot mode - admin stays
  * open). To turn it on: set AUTH_GATE_ADMIN=1 + ADMIN_PASSWORD in the env.
  */
 

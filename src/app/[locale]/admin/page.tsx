@@ -187,7 +187,7 @@ export default function AdminPage() {
   const [statusKey, setStatusKey] = useState(0);
   const [mobileTab, setMobileTab] = useState<"dishes" | "wines">("dishes");
 
-  // Auto-clear status pill after 3.5s — keeps the chrome feeling alive instead
+  // Auto-clear status pill after 3.5s - keeps the chrome feeling alive instead
   // of static. The keyed re-mount restarts the checkmark draw on every change.
   useEffect(() => {
     if (!statusText) return;
@@ -537,7 +537,7 @@ export default function AdminPage() {
               Edytuj <em className="italic text-[var(--color-accent-gold)]">restauracje w bazie</em>
             </h2>
             <p className="mt-2 font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-              Dania, wina i łączenia konkretnej restauracji — zapis prosto do bazy
+              Dania, wina i łączenia konkretnej restauracji - zapis prosto do bazy
               danych. To jedyne miejsce, w którym zmiany są trwałe i widoczne dla gości.
             </p>
           </div>
@@ -563,11 +563,11 @@ export default function AdminPage() {
               </h1>
               <div className="pitch-rule pitch-rule--short mt-4" />
               <p className="mt-4 max-w-xl font-serif text-base italic leading-relaxed text-[#e6dccd]">
-                Globalna pracownia łączeń — dodawaj dania i wina, kuruj rekomendacje,
+                Globalna pracownia łączeń - dodawaj dania i wina, kuruj rekomendacje,
                 testuj odpowiedzi modelu API.
               </p>
               <p className="mt-4 inline-flex max-w-xl items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-900/15 px-3 py-2 text-[11px] font-semibold tracking-wide text-amber-200/90 uppercase">
-                Piaskownica — zmiany zapisują się tylko lokalnie (localStorage), nie trafiają do bazy ani do gości
+                Piaskownica - zmiany zapisują się tylko lokalnie (localStorage), nie trafiają do bazy ani do gości
               </p>
             </div>
 
@@ -593,7 +593,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Toolbar — cream pill row */}
+          {/* Toolbar - cream pill row */}
           <div className="relative z-10 mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"

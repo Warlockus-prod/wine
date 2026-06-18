@@ -10,7 +10,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "Polish Modern",
     city: "Warszawa",
     description:
-      { en: "Modern Polish fine dining in Łazienki — fermented vegetables, foraged herbs, game and quiet European bottles.", pl: "Nowoczesna kuchnia polska w Łazienkach — fermentowane warzywa, dzika zwierzyna, zioła z lasu i spokojne europejskie wina." },
+      { en: "Modern Polish fine dining in Łazienki - fermented vegetables, foraged herbs, game and quiet European bottles.", pl: "Nowoczesna kuchnia polska w Łazienkach - fermentowane warzywa, dzika zwierzyna, zioła z lasu i spokojne europejskie wina." },
     coverGradient: "from-[#2f4a35] via-[#5d7a4d] to-[#c4ad7a]",
     wines: [
       {
@@ -86,7 +86,7 @@ export const seedRestaurants: Restaurant[] = [
         notes: { en: "Pear, lemon zest, and saline minerality.", pl: "Gruszka, skórka cytryny i słona mineralność." },
       },
     ],
-    // Atelier Amaro · Polish Modern menu — fermentation, foraging, game.
+    // Atelier Amaro · Polish Modern menu - fermentation, foraging, game.
     // Wojciech Modest Amaro signatures: dialogue with Polish forest, lake
     // and pasture, executed at Michelin precision. Replaces the old
     // mistakenly-Italian content that was in seed since v1.
@@ -266,14 +266,14 @@ export const seedRestaurants: Restaurant[] = [
   {
     id: "r2",
     // slug kept for URL/QR stability; brand re-cast as Sukiyabashi Jiro
-    // (Tokyo) — fits the existing Japanese dish content (sushi/sashimi/
+    // (Tokyo) - fits the existing Japanese dish content (sushi/sashimi/
     // ramen) much better than the previous abstract "Tasting Menu" label.
     slug: "senses-warsaw",
     name: { en: "Sukiyabashi Jiro", pl: "Sukiyabashi Jiro" },
     cuisine: "Japanese",
     city: "Tokyo",
     description:
-      { en: "Three-Michelin-star sushi-ya in Ginza — single-service omakase counter, day-fresh fish from Toyosu, decades of practiced rice technique.", pl: "Trzygwiazdkowa sushi-ya w Ginzie — pojedyncza zmiana, omakase przy ladzie, ryby z porannego targu Toyosu i lata praktyki w gotowaniu ryżu." },
+      { en: "Three-Michelin-star sushi-ya in Ginza - single-service omakase counter, day-fresh fish from Toyosu, decades of practiced rice technique.", pl: "Trzygwiazdkowa sushi-ya w Ginzie - pojedyncza zmiana, omakase przy ladzie, ryby z porannego targu Toyosu i lata praktyki w gotowaniu ryżu." },
     coverGradient: "from-[#1a1a24] via-[#3a3a52] to-[#a8a8c0]",
     wines: [
       {
@@ -371,7 +371,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r2-d2",
         name: { en: "Omakase Nigiri Set", pl: "Zestaw nigiri omakase" },
         category: "Sushi",
-        description: { en: "Chef selection of seasonal nigiri, wasabi, and nikiri glaze.", pl: "Wybór szefa kuchni — sezonowe nigiri, wasabi i glazura nikiri." },
+        description: { en: "Chef selection of seasonal nigiri, wasabi, and nikiri glaze.", pl: "Wybór szefa kuchni - sezonowe nigiri, wasabi i glazura nikiri." },
         price: 46,
         pairings: [
           {
@@ -524,7 +524,7 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r3",
-    // Rebranded to Osteria Francescana (Modena) — Massimo Bottura's
+    // Rebranded to Osteria Francescana (Modena) - Massimo Bottura's
     // 3-star avant-garde Italian. Existing pasta+seafood menu fits
     // because both kitchens are Italian; deeper Bottura signatures
     // (5 ages of Parmigiano, oops dropped lemon tart) come in the
@@ -534,7 +534,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "Italian",
     city: "Modena",
     description:
-      { en: "Three-Michelin-star avant-garde Italian on Via Stella — Bottura's irreverent dialogue with Modena's tradition: aged balsamico, Parmigiano-Reggiano, slow-cooked pasta, and the cellars of Emilia-Romagna.", pl: "Trzygwiazdkowa awangardowa włoska kuchnia przy Via Stella — bezczelny dialog Bottury z tradycją Modeny: leżakowany ocet balsamiczny, Parmigiano-Reggiano, wolno gotowana pasta i piwnice Emilii-Romanii." },
+      { en: "Three-Michelin-star avant-garde Italian on Via Stella - Bottura's irreverent dialogue with Modena's tradition: aged balsamico, Parmigiano-Reggiano, slow-cooked pasta, and the cellars of Emilia-Romagna.", pl: "Trzygwiazdkowa awangardowa włoska kuchnia przy Via Stella - bezczelny dialog Bottury z tradycją Modeny: leżakowany ocet balsamiczny, Parmigiano-Reggiano, wolno gotowana pasta i piwnice Emilii-Romanii." },
     coverGradient: "from-[#5f2f23] via-[#a04d2b] to-[#e1a65b]",
     wines: [
       {
@@ -785,7 +785,7 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r4",
-    // Rebranded to Lasserre (Paris) — French classique. Existing menu
+    // Rebranded to Lasserre (Paris) - French classique. Existing menu
     // (pierogi, żurek, goose) gets a French rewrite in the next commit;
     // for now the brand+city flip ships and dishes/wines stay until
     // proper French content lands with AI-generated dish photos.
@@ -794,7 +794,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "French Classic",
     city: "Paris",
     description:
-      { en: "Two-Michelin-star French classique on Avenue Franklin D. Roosevelt — couture-grade haute cuisine, the famous retractable rooftop, escargots de Bourgogne, canard à l'orange, and a 70-year-old cellar.", pl: "Dwugwiazdkowa francuska klasyka przy Avenue Franklin D. Roosevelt — haute cuisine klasy couture, słynny otwierany dach, ślimaki burgundzkie, kaczka à l'orange i piwnica licząca 70 lat." },
+      { en: "Two-Michelin-star French classique on Avenue Franklin D. Roosevelt - couture-grade haute cuisine, the famous retractable rooftop, escargots de Bourgogne, canard à l'orange, and a 70-year-old cellar.", pl: "Dwugwiazdkowa francuska klasyka przy Avenue Franklin D. Roosevelt - haute cuisine klasy couture, słynny otwierany dach, ślimaki burgundzkie, kaczka à l'orange i piwnica licząca 70 lat." },
     coverGradient: "from-[#2e2540] via-[#5e4d8a] to-[#c9b8e6]",
     wines: [
       {
@@ -1045,16 +1045,16 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r5",
-    // Rebranded to Maido (Lima) — world #1 in 50 Best 2025, Peruvian-
+    // Rebranded to Maido (Lima) - world #1 in 50 Best 2025, Peruvian-
     // Japanese (Nikkei) cuisine. Existing menu (ceviche, tiradito,
     // lomo saltado, anticuchos, picarones) is already Peruvian/Nikkei
-    // and matches perfectly — no dish rewrite needed.
+    // and matches perfectly - no dish rewrite needed.
     slug: "brovariusz-wroclaw",
     name: { en: "Maido", pl: "Maido" },
     cuisine: "Peruvian Nikkei",
     city: "Lima",
     description:
-      { en: "World #1 Peruvian-Japanese (Nikkei) tasting house at Calle San Martín — Mitsuharu Tsumura's dialogue between Lima's coast and Osaka's tradition: Pacific seafood, ají amarillo, ponzu and Andean tubers.", pl: "Światowy numer 1 — peruwiańsko-japońska (Nikkei) restauracja degustacyjna przy Calle San Martín — dialog Mitsuharu Tsumury między wybrzeżem Limy a tradycją Osaki: owoce morza Pacyfiku, ají amarillo, ponzu i andyjskie bulwy." },
+      { en: "World #1 Peruvian-Japanese (Nikkei) tasting house at Calle San Martín - Mitsuharu Tsumura's dialogue between Lima's coast and Osaka's tradition: Pacific seafood, ají amarillo, ponzu and Andean tubers.", pl: "Światowy numer 1 - peruwiańsko-japońska (Nikkei) restauracja degustacyjna przy Calle San Martín - dialog Mitsuharu Tsumury między wybrzeżem Limy a tradycją Osaki: owoce morza Pacyfiku, ají amarillo, ponzu i andyjskie bulwy." },
     coverGradient: "from-[#5a2a1a] via-[#d96a3a] to-[#f4d68a]",
     wines: [
       {

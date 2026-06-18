@@ -135,6 +135,6 @@ const WRITE_WINDOW_MS = 60_000;
 export function enforceWriteRateLimit(request: Request): void {
   const verdict = rateLimit(`write:${clientIp(request)}`, WRITE_LIMIT, WRITE_WINDOW_MS);
   if (!verdict.ok) {
-    throw new ApiError(429, "Too many requests — slow down.", verdict.retryAfter);
+    throw new ApiError(429, "Too many requests - slow down.", verdict.retryAfter);
   }
 }

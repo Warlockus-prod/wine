@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 // via the URL and flows into signIn({ callbackUrl }). Only accept a same-origin
 // internal path within the admin area (optionally locale-prefixed). Reject
 // absolute URLs (https://evil.com), protocol-relative (//evil.com), and any
-// non-admin path — falling back to /admin.
+// non-admin path - falling back to /admin.
 function safeReturnTo(raw: string | null): string {
   const fallback = "/admin";
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return fallback;
@@ -59,17 +59,17 @@ function SignInForm() {
       </p>
       <h1 className="pitch-display mt-3 text-3xl text-white">Logowanie do panelu</h1>
       <p className="mt-3 text-sm leading-relaxed text-[#cbc1b1]">
-        Wpisz email — wyślemy magic-link, kliknięcie zaloguje cię bez hasła.
+        Wpisz email - wyślemy magic-link, kliknięcie zaloguje cię bez hasła.
       </p>
 
       {done ? (
         <div className="mt-6 rounded-xl border border-emerald-500/30 bg-emerald-900/20 p-4 text-sm text-emerald-100">
           <p className="font-semibold">Sprawdź skrzynkę.</p>
           <p className="mt-1 text-emerald-200/85">
-            Wysłaliśmy link logowania na <span className="font-mono">{email}</span>. Klikniesz — wrócisz prosto do panelu.
+            Wysłaliśmy link logowania na <span className="font-mono">{email}</span>. Klikniesz - wrócisz prosto do panelu.
           </p>
           <p className="mt-3 text-[11px] italic text-emerald-300/70">
-            Jeśli SMTP jeszcze nie skonfigurowane — link pojawi się w logach kontenera (admin VPS-a wie skąd wziąć).
+            Jeśli SMTP jeszcze nie skonfigurowane - link pojawi się w logach kontenera (admin VPS-a wie skąd wziąć).
           </p>
         </div>
       ) : (

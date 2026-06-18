@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * CompassExplorer — three-level interactive view of the Vinokompas:
+ * CompassExplorer - three-level interactive view of the Vinokompas:
  *
- *   Level 1: 6 wrażeń (sektorów)        — overview cards, color chips
- *   Level 2: 12 tendencji (per sector)   — exposed when sector is opened
- *   Level 3: associations + examples    — exposed when tendencja is opened
+ *   Level 1: 6 wrażeń (sektorów)        - overview cards, color chips
+ *   Level 2: 12 tendencji (per sector)   - exposed when sector is opened
+ *   Level 3: associations + examples    - exposed when tendencja is opened
  *
  * Pairs with <TasteCompass> on the same page: tapping a sector here syncs
  * focus to the dial via the shared `selectedSector` state lifted to parent
@@ -44,7 +44,7 @@ export default function CompassExplorer({ externalSector, onSectorChange }: Prop
 
   return (
     <section
-      aria-label="Trzy poziomy Vinokompasu — poznaj od ogółu do szczegółu"
+      aria-label="Trzy poziomy Vinokompasu - poznaj od ogółu do szczegółu"
       className="space-y-4"
     >
       <header className="rounded-2xl border border-[rgba(197,160,89,0.22)] bg-[rgba(197,160,89,0.04)] p-5">
@@ -55,7 +55,7 @@ export default function CompassExplorer({ externalSector, onSectorChange }: Prop
           Od 6 wrażeń, przez 12 tendencji, do konkretnych skojarzeń.
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
-          Kliknij sektor — rozwiniesz dwie tendencje. Kliknij tendencję — zobaczysz konkretne skojarzenia, w jakich winach je znajdziesz, i jak je rozpoznać przy stole.
+          Kliknij sektor - rozwiniesz dwie tendencje. Kliknij tendencję - zobaczysz konkretne skojarzenia, w jakich winach je znajdziesz, i jak je rozpoznać przy stole.
         </p>
       </header>
 
@@ -104,7 +104,7 @@ function SectorCard({
           : undefined,
       }}
     >
-      {/* Top — sector header (always visible, click to expand) */}
+      {/* Top - sector header (always visible, click to expand) */}
       <button
         type="button"
         onClick={onToggle}
@@ -138,7 +138,7 @@ function SectorCard({
         </span>
       </button>
 
-      {/* Level 2 — tendencje (revealed on expand) */}
+      {/* Level 2 - tendencje (revealed on expand) */}
       <div
         className="grid overflow-hidden transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
         style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
@@ -212,7 +212,7 @@ function TendencjaRow({
         </span>
       </button>
 
-      {/* Level 3 — associations + examples (revealed on tendencja open) */}
+      {/* Level 3 - associations + examples (revealed on tendencja open) */}
       <div
         className="grid overflow-hidden transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
         style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}

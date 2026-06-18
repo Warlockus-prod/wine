@@ -1,5 +1,5 @@
 /**
- * Inline-SVG icon set — replaces the Material Symbols web font for all app
+ * Inline-SVG icon set - replaces the Material Symbols web font for all app
  * chrome (nav, tab bar, theme toggle, chat). The font approach flashed the
  * ligature NAME ("light_mode", "settings") while loading and sometimes never
  * resolved over mobile networks, overlapping the wordmark. These SVGs have no

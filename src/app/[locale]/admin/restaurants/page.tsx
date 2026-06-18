@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * /admin/restaurants — picker for the per-restaurant editor.
+ * /admin/restaurants - picker for the per-restaurant editor.
  *
  * Lists all restaurants from the public read API (always reflects DB) so
  * the operator picks the one to edit. Each card shows row counts pulled
- * lazily by SWR — no waterfall, parallel request per card.
+ * lazily by SWR - no waterfall, parallel request per card.
  */
 
 import useSWR from "swr";
@@ -40,7 +40,7 @@ export default function AdminRestaurantsPage() {
               Per-restaurant edytor
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#cbc1b1]">
-              Wybierz restaurację, by edytować dania, wina i kuratorskie połączenia. Zmiany trafiają od razu do bazy — pojawiają się u gości w widoku Pairing po odświeżeniu.
+              Wybierz restaurację, by edytować dania, wina i kuratorskie połączenia. Zmiany trafiają od razu do bazy - pojawiają się u gości w widoku Pairing po odświeżeniu.
             </p>
             <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-[rgba(197,160,89,0.3)] bg-[rgba(197,160,89,0.06)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
               {data?.source === "db" ? "DB live" : "Seed fallback"}

@@ -34,7 +34,7 @@ export async function generateMetadata({
   const { data: restaurant } = await resolveRestaurantBySlug(slug);
   if (!restaurant) {
     return {
-      title: "Restaurant — Vinovigator AI",
+      title: "Restaurant - Vinovigator AI",
       description:
         lng === "pl"
           ? "Restauracja niedostępna. Otwórz stronę główną."

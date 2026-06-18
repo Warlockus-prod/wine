@@ -1,7 +1,7 @@
 /**
  * /api/restaurants/[slug]/dishes
- *  GET   — list dishes for a restaurant (public)
- *  POST  — create a dish (admin/editor; pilot mode unrestricted)
+ *  GET   - list dishes for a restaurant (public)
+ *  POST  - create a dish (admin/editor; pilot mode unrestricted)
  *
  * Localized fields (name, description) accept either a plain string (we
  * mirror to {en,pl}) or a fully-shaped {en,pl} object for explicit control.

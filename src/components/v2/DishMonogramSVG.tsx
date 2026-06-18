@@ -1,9 +1,9 @@
 /**
- * DishMonogramSVG — gold-foil monogram for dish category cards.
+ * DishMonogramSVG - gold-foil monogram for dish category cards.
  *
  * Lightweight SVG glyph keyed off `category`. Categories that don't match
  * fall back to a "fleur" mark so the rhythm is never broken. Renders at
- * any size — viewBox 32×32, scale via parent CSS.
+ * any size - viewBox 32×32, scale via parent CSS.
  */
 
 interface Props {
@@ -99,7 +99,7 @@ function pickGlyph(category?: string): ReactElement {
     );
   }
 
-  // Default — fleur-de-lis (matches the wine-list mark)
+  // Default - fleur-de-lis (matches the wine-list mark)
   return (
     <g fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M16 4c-2 4-4 6-4 9 0 2 1 3 4 3s4-1 4-3c0-3-2-5-4-9z" />

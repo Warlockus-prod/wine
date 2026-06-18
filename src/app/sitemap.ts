@@ -3,7 +3,7 @@ import { catalogRestaurants } from "@/lib/restaurant-directory";
 import { routing } from "@/i18n/routing";
 
 /**
- * sitemap.ts — Next.js App Router auto-generates /sitemap.xml from this.
+ * sitemap.ts - Next.js App Router auto-generates /sitemap.xml from this.
  *
  * Lists every static + dynamic route per locale. Restaurant pages get the
  * highest priority (0.8) since those are guest-facing entry points scanned
@@ -30,7 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Restaurant pages × locales — high priority (QR entry points)
+  // Restaurant pages × locales - high priority (QR entry points)
   for (const locale of routing.locales) {
     const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
     for (const r of catalogRestaurants) {

@@ -1,5 +1,5 @@
 /**
- * Auth.js v5 (NextAuth) — magic-link auth backed by Drizzle.
+ * Auth.js v5 (NextAuth) - magic-link auth backed by Drizzle.
  *
  * SMTP is not provisioned yet. The "console-log" provider below mints the
  * standard verification token but writes the magic link to server stdout
@@ -44,7 +44,7 @@ const baseConfig = {
     async session({ session, user }) {
       // Surface user.role on the session so middleware can gate by role.
       if (session.user) {
-        // @ts-expect-error — augmenting next-auth types in module-augmentation
+        // @ts-expect-error - augmenting next-auth types in module-augmentation
         session.user.role = (user as { role?: string }).role ?? "staff";
         session.user.id = user.id;
       }
@@ -56,7 +56,7 @@ const baseConfig = {
 
 // Mailer: use SMTP if configured, otherwise log link to stdout for the
 // deployer to fish out of `docker logs`. Both shapes go through the
-// Nodemailer provider — different `server` value (`null` triggers the
+// Nodemailer provider - different `server` value (`null` triggers the
 // stub `sendVerificationRequest` instead of dispatching).
 const provider = hasSmtp
   ? Nodemailer({

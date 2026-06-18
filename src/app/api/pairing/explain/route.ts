@@ -1,11 +1,11 @@
 /**
- * /api/pairing/explain — generate a 2-sentence Vinokompas-vocabulary
+ * /api/pairing/explain - generate a 2-sentence Vinokompas-vocabulary
  * rationale for a specific dish × wine pair, on-demand from /pairing.
  *
  * Why a separate route from /api/pairing:
  *  - Score+rank for ALL wines runs offline-friendly heuristics (deterministic,
  *    fast, free).
- *  - The lyrical "why" only matters for the SELECTED wine — paying for an
+ *  - The lyrical "why" only matters for the SELECTED wine - paying for an
  *    OpenAI call per click is fine, paying per ranked wine is not.
  *
  * The KB system prompt grounds the bot in the 6 sektorów / 12 tendencji /
@@ -26,7 +26,7 @@ const reqSchema = z.object({
   dish: z.object({
     name: z.string().min(1).max(200),
     // Description may be empty for DB-sourced items (wines carry `notes`, some
-    // entries have no prose) — tolerate it instead of 400-ing the whole bubble.
+    // entries have no prose) - tolerate it instead of 400-ing the whole bubble.
     description: z.string().max(500).optional().default(""),
   }),
   wine: z.object({
@@ -120,13 +120,13 @@ export async function POST(request: Request) {
   const userMessage =
     locale === "pl"
       ? `Połączenie:
-DANIE: ${dish.name} — ${dish.description}
-WINO: ${wine.name}${wine.grape ? ` (${wine.grape})` : ""}${wine.region ? `, ${wine.region}` : ""} — ${wine.description}
+DANIE: ${dish.name} - ${dish.description}
+WINO: ${wine.name}${wine.grape ? ` (${wine.grape})` : ""}${wine.region ? `, ${wine.region}` : ""} - ${wine.description}
 
 Wyjaśnij dwoma zdaniami, używając słownika Vinokompasu.`
       : `Pair:
-DISH: ${dish.name} — ${dish.description}
-WINE: ${wine.name}${wine.grape ? ` (${wine.grape})` : ""}${wine.region ? `, ${wine.region}` : ""} — ${wine.description}
+DISH: ${dish.name} - ${dish.description}
+WINE: ${wine.name}${wine.grape ? ` (${wine.grape})` : ""}${wine.region ? `, ${wine.region}` : ""} - ${wine.description}
 
 Explain in two sentences using Vinokompas vocabulary.`;
 

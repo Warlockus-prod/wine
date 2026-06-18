@@ -5,7 +5,7 @@ import { clientIp, rateLimit } from "@/lib/rate-limit";
 type Locale = "pl" | "en";
 
 // All reason strings translated. Key = stable English source line; value =
-// PL translation. The scorer still works with English keys internally —
+// PL translation. The scorer still works with English keys internally -
 // we resolve to the active locale once at the end of the request.
 const PL: Record<string, string> = {
   "High acidity refreshes the palate and balances richer textures.":

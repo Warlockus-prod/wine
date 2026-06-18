@@ -115,7 +115,7 @@ export const seedPairingDataset: PairingDataset = {
       rating: 4.5,
       description: {
         en: "Dense dark fruit, spice, and powerful structure for rich dishes.",
-        pl: "Gęste, ciemne owoce, korzenne nuty i mocna struktura — pod treściwe dania.",
+        pl: "Gęste, ciemne owoce, korzenne nuty i mocna struktura - pod treściwe dania.",
       },
       image:
         "https://upload.wikimedia.org/wikipedia/commons/2/21/PenfoldsGrange.jpg",
@@ -230,8 +230,8 @@ export const seedPairingDataset: PairingDataset = {
       dishId: "beef-tartare",
       wineId: "pinot",
       reason: {
-        en: "Lighter Pinot Noir is the classic foil for tartare — it lifts shallots and capers without crushing them.",
-        pl: "Lżejsze Pinot Noir to klasyczny partner tatara — wydobywa szalotkę i kapary, nie miażdżąc ich.",
+        en: "Lighter Pinot Noir is the classic foil for tartare - it lifts shallots and capers without crushing them.",
+        pl: "Lżejsze Pinot Noir to klasyczny partner tatara - wydobywa szalotkę i kapary, nie miażdżąc ich.",
       },
     },
     {

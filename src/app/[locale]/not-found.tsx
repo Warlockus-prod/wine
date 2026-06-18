@@ -6,10 +6,10 @@ import { t } from "@/lib/localized";
 import type { Locale } from "@/i18n/routing";
 
 /**
- * Editorial 404 — instead of the default Next.js text-only "Page Not
+ * Editorial 404 - instead of the default Next.js text-only "Page Not
  * Found", we land the guest on an apology card and offer 3 next moves:
  * a random restaurant from the catalogue, the homepage, and the
- * Vinokompas tutorial. Server component — no client JS needed.
+ * Vinokompas tutorial. Server component - no client JS needed.
  */
 export default async function NotFound() {
   const lng = (await getLocale()) as Locale;
@@ -17,7 +17,7 @@ export default async function NotFound() {
 
   // Pick a deterministic restaurant by route hash (locale length stable
   // server+client) so SSR/CSR agree without using Date.now (impure call
-  // during render — react-hooks lint flags it).
+  // during render - react-hooks lint flags it).
   const featured =
     catalogRestaurants.length > 0
       ? catalogRestaurants[lng.length % catalogRestaurants.length]

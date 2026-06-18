@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * FloatingTasteChat — bottom-right floating chat button that expands into
+ * FloatingTasteChat - bottom-right floating chat button that expands into
  * the full <TasteChat> panel. Lives in viewport (position: fixed) so it
  * stays accessible across page scroll. Collapsed state = a single round
  * button with an icon and unread/idle pulse; expanded = a side panel that
@@ -46,7 +46,7 @@ export default function FloatingTasteChat({
   disabled = false,
   pageContext,
 }: Props) {
-  // Lazy state init reads localStorage exactly once on mount — no render
+  // Lazy state init reads localStorage exactly once on mount - no render
   // thrash, no setState-in-effect lint, no SSR mismatch (this whole
   // component is loaded via next/dynamic ssr:false in callers).
   const [open, setOpen] = useState<boolean>(() => {
@@ -90,16 +90,16 @@ export default function FloatingTasteChat({
   }, [disabled]);
 
   if (!hydrated) {
-    // SSR placeholder — render nothing to avoid layout shift on hydration.
+    // SSR placeholder - render nothing to avoid layout shift on hydration.
     return null;
   }
 
-  // Disabled mode — hide everything. Don't even leave the launcher dot.
+  // Disabled mode - hide everything. Don't even leave the launcher dot.
   if (disabled) return null;
 
   return (
     <>
-      {/* Floating launcher — visible whenever chat is collapsed */}
+      {/* Floating launcher - visible whenever chat is collapsed */}
       {!open ? (
         <button
           type="button"
@@ -117,13 +117,13 @@ export default function FloatingTasteChat({
         </button>
       ) : null}
 
-      {/* Expanded panel — viewport-pinned. Mobile: half-screen so the page
+      {/* Expanded panel - viewport-pinned. Mobile: half-screen so the page
           underneath stays visible (≈55vh, capped). Desktop: 380×~700 docked
-          bottom-right. The drag-handle pill at the top is decorative — taps
+          bottom-right. The drag-handle pill at the top is decorative - taps
           the chat title hides the panel for parity with the X button. */}
       {open ? (
         <>
-          {/* Mobile-only soft backdrop — not a hard scrim, just enough wash
+          {/* Mobile-only soft backdrop - not a hard scrim, just enough wash
               so users see the chat is overlay rather than the page. */}
           <button
             type="button"
@@ -138,7 +138,7 @@ export default function FloatingTasteChat({
             aria-label="Przewodnik Vinokompasu"
           >
             <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
-              {/* Drag-handle pill at the top edge — purely visual cue that
+              {/* Drag-handle pill at the top edge - purely visual cue that
                   this is a sheet you can dismiss. Taps the panel header to
                   toggle (mobile only). */}
               <button

@@ -8,7 +8,7 @@ import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 
-// Page-aware sommelier chat — opens by default on /pairing so the user
+// Page-aware sommelier chat - opens by default on /pairing so the user
 // can converse about whatever dish/wine they're inspecting. The
 // pageContext prop tells the bot what's on screen.
 const FloatingTasteChat = dynamic(() => import("@/components/winocompas/FloatingTasteChat"), {
@@ -470,7 +470,7 @@ export default function PairingClient() {
   // the dish that pairs best with that wine so the chat panel reads as
   // "X (top dish for this wine) × Y (selected wine)" without forcing a
   // second tap. activeDishHasBeenChosen tracks whether the user already
-  // pointed at a dish — we only re-pick when no explicit dish choice is in
+  // pointed at a dish - we only re-pick when no explicit dish choice is in
   // play, otherwise we'd fight their selection.
   const userPickedDishRef = useRef(false);
   useEffect(() => {
@@ -893,7 +893,7 @@ export default function PairingClient() {
                       ) : (
                         <>
                           <p className="text-sm leading-6 text-gray-100">{vinokompasExplanation}</p>
-                          {/* "Talk to AI sommelier" — fires wn:open-chat with
+                          {/* "Talk to AI sommelier" - fires wn:open-chat with
                               a prefill that asks the bot to elaborate on this
                               specific dish×wine. The chat panel opens (or
                               activates if collapsed) and auto-sends. */}
@@ -988,7 +988,7 @@ export default function PairingClient() {
 
       <MobileTabBar />
 
-      {/* Page-aware sommelier chat — opens by default on /pairing. The
+      {/* Page-aware sommelier chat - opens by default on /pairing. The
           pageContext string is rebuilt every render so the bot always
           knows the currently focused dish + wine + restaurant. Stored
           conversation key is shared with the rest of the app so the

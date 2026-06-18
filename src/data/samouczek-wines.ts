@@ -1,14 +1,14 @@
 /**
- * samouczek-wines.ts — wine catalogue for the Vinokompas tutorial.
+ * samouczek-wines.ts - wine catalogue for the Vinokompas tutorial.
  *
- * Source: winnica.pl — the originators of the Vinocompas methodology this
+ * Source: winnica.pl - the originators of the Vinocompas methodology this
  * whole tutorial is built on (they ship the public "Vinocompas" taste tool).
  * The samouczek is NOT tied to any single restaurant, so proposals are
  * matched against the live taste profile and link back to winnica.pl's
  * selection of that grape/style.
  *
  * Each entry is a grape/style (not a volatile SKU) so the "buy" link always
- * lands on real, in-stock products via winnica.pl search — it never 404s.
+ * lands on real, in-stock products via winnica.pl search - it never 404s.
  *
  * `fingerprint` maps a CompassProfile key → strength 0..4 (how strongly the
  * wine expresses that base taste / tendencja). Keys MUST match the ids in
@@ -27,7 +27,7 @@ export interface SamouczekWine {
   id: string;
   /** Grape / style headline, PL. */
   name_pl: string;
-  /** Grape variety — drives the bottle silhouette + the shop search. */
+  /** Grape variety - drives the bottle silhouette + the shop search. */
   grape: string;
   /** Region label, PL. */
   region_pl: string;
@@ -43,7 +43,7 @@ export interface SamouczekWine {
 }
 
 export const SAMOUCZEK_WINES: SamouczekWine[] = [
-  // ── ŚWIEŻE — crisp, citrus, green ─────────────────────────────────────
+  // ── ŚWIEŻE - crisp, citrus, green ─────────────────────────────────────
   {
     id: "riesling-wytrawny",
     name_pl: "Riesling wytrawny",
@@ -51,7 +51,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Mosel, Niemcy",
     style: "white",
     priceFrom: 59,
-    why_pl: "Rześka kwasowość i cytrusowy nerw — esencja świeżości.",
+    why_pl: "Rześka kwasowość i cytrusowy nerw - esencja świeżości.",
     fingerprint: { "swieze.cytrusy": 4, "swieze.zielone": 2, "ziemiste.mineraly": 3, "base.kwasowosc": 4 },
     query: "Riesling",
   },
@@ -62,7 +62,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Loara, Francja",
     style: "white",
     priceFrom: 55,
-    why_pl: "Zielone zioła, agrest i tnąca świeżość — wino-orzeźwienie.",
+    why_pl: "Zielone zioła, agrest i tnąca świeżość - wino-orzeźwienie.",
     fingerprint: { "swieze.zielone": 4, "swieze.cytrusy": 3, "base.kwasowosc": 4 },
     query: "Sauvignon Blanc",
   },
@@ -73,7 +73,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Veneto, Włochy",
     style: "white",
     priceFrom: 45,
-    why_pl: "Lekkie, cytrusowe i bezpretensjonalne — czysta przyjemność.",
+    why_pl: "Lekkie, cytrusowe i bezpretensjonalne - czysta przyjemność.",
     fingerprint: { "swieze.cytrusy": 3, "swieze.zielone": 2, "base.kwasowosc": 3 },
     query: "Pinot Grigio",
   },
@@ -89,7 +89,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     query: "Gruner Veltliner",
   },
 
-  // ── OLEISTE — buttery, toasty, tropical ───────────────────────────────
+  // ── OLEISTE - buttery, toasty, tropical ───────────────────────────────
   {
     id: "chardonnay-beczkowe",
     name_pl: "Chardonnay beczkowe",
@@ -97,7 +97,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Burgundia, Francja",
     style: "white",
     priceFrom: 79,
-    why_pl: "Masło, tosty i orzechy z dębowej beczki — gęsta oleistość.",
+    why_pl: "Masło, tosty i orzechy z dębowej beczki - gęsta oleistość.",
     fingerprint: { "oleiste.maslo": 4, "oleiste.tropikalne": 2, "swieze.cytrusy": 1 },
     query: "Chardonnay",
   },
@@ -108,7 +108,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Rhône, Francja",
     style: "white",
     priceFrom: 69,
-    why_pl: "Morela, mango i kwiaty — żywiczna, tropikalna pełnia.",
+    why_pl: "Morela, mango i kwiaty - żywiczna, tropikalna pełnia.",
     fingerprint: { "oleiste.tropikalne": 4, "oleiste.maslo": 2, "miekkie.dojrzale": 2 },
     query: "Viognier",
   },
@@ -121,7 +121,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Veneto, Włochy",
     style: "sparkling",
     priceFrom: 49,
-    why_pl: "Drobne bąbelki, zielone jabłko i cytrus — lekkość i radość.",
+    why_pl: "Drobne bąbelki, zielone jabłko i cytrus - lekkość i radość.",
     fingerprint: { "swieze.cytrusy": 3, "miekkie.dojrzale": 2, "base.kwasowosc": 3 },
     query: "Prosecco",
   },
@@ -132,12 +132,12 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Piemont, Włochy",
     style: "sparkling",
     priceFrom: 52,
-    why_pl: "Brzoskwinia, liczi i miód — delikatna, musująca słodycz.",
+    why_pl: "Brzoskwinia, liczi i miód - delikatna, musująca słodycz.",
     fingerprint: { "oleiste.tropikalne": 3, "miekkie.dojrzale": 3, "base.slodycz": 4 },
     query: "Moscato",
   },
 
-  // ── MIĘKKIE — ripe fruit, jam ─────────────────────────────────────────
+  // ── MIĘKKIE - ripe fruit, jam ─────────────────────────────────────────
   {
     id: "merlot",
     name_pl: "Merlot",
@@ -145,7 +145,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Bordeaux, Francja",
     style: "red",
     priceFrom: 59,
-    why_pl: "Dojrzała śliwka i aksamit — łagodne, okrągłe czerwone.",
+    why_pl: "Dojrzała śliwka i aksamit - łagodne, okrągłe czerwone.",
     fingerprint: { "miekkie.dojrzale": 4, "miekkie.konfitury": 2, "base.cierpkosc": 2 },
     query: "Merlot",
   },
@@ -167,12 +167,12 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Burgundia, Francja",
     style: "red",
     priceFrom: 89,
-    why_pl: "Wiśnia, leśna ściółka i jedwab — eleganckie, ziemiste.",
+    why_pl: "Wiśnia, leśna ściółka i jedwab - eleganckie, ziemiste.",
     fingerprint: { "ziemiste.sciolka": 4, "miekkie.dojrzale": 2, "ziemiste.mineraly": 2, "base.cierpkosc": 1 },
     query: "Pinot Noir",
   },
 
-  // ── SZORSTKIE — tannin, oak, leather ──────────────────────────────────
+  // ── SZORSTKIE - tannin, oak, leather ──────────────────────────────────
   {
     id: "chianti",
     name_pl: "Chianti Classico",
@@ -180,7 +180,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Toskania, Włochy",
     style: "red",
     priceFrom: 69,
-    why_pl: "Wiśnia, zioła i wytrawne taniny — klasyk do stołu.",
+    why_pl: "Wiśnia, zioła i wytrawne taniny - klasyk do stołu.",
     fingerprint: { "szorstkie.dab": 3, "ziemiste.sciolka": 2, "miekkie.dojrzale": 2, "base.cierpkosc": 3, "base.kwasowosc": 2 },
     query: "Chianti",
   },
@@ -191,7 +191,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Bordeaux / Toskania",
     style: "red",
     priceFrom: 75,
-    why_pl: "Czarna porzeczka, cedr i dębowa struktura — moc i taniny.",
+    why_pl: "Czarna porzeczka, cedr i dębowa struktura - moc i taniny.",
     fingerprint: { "tegie.cigaro": 3, "szorstkie.dab": 3, "miekkie.konfitury": 2, "base.cierpkosc": 4 },
     query: "Cabernet Sauvignon",
   },
@@ -202,12 +202,12 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Piemont, Włochy",
     style: "red",
     priceFrom: 119,
-    why_pl: "Róża, smoła i potężne taniny — szorstki arystokrata.",
+    why_pl: "Róża, smoła i potężne taniny - szorstki arystokrata.",
     fingerprint: { "szorstkie.dab": 3, "szorstkie.pizmo": 2, "ziemiste.sciolka": 3, "tegie.suszone": 3, "base.cierpkosc": 4 },
     query: "Nebbiolo",
   },
 
-  // ── TĘGIE — bold, dried, smoky ────────────────────────────────────────
+  // ── TĘGIE - bold, dried, smoky ────────────────────────────────────────
   {
     id: "syrah-shiraz",
     name_pl: "Syrah / Shiraz",
@@ -215,7 +215,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Rhône / Australia",
     style: "red",
     priceFrom: 65,
-    why_pl: "Wędzonka, czarny pieprz i suszona śliwka — tęga, dymna moc.",
+    why_pl: "Wędzonka, czarny pieprz i suszona śliwka - tęga, dymna moc.",
     fingerprint: { "tegie.cigaro": 4, "tegie.suszone": 2, "szorstkie.pizmo": 2, "miekkie.konfitury": 2, "base.cierpkosc": 3 },
     query: "Syrah",
   },
@@ -237,7 +237,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Veneto, Włochy",
     style: "red",
     priceFrom: 139,
-    why_pl: "Suszone wiśnie, figi i czekolada — tęgie, skoncentrowane.",
+    why_pl: "Suszone wiśnie, figi i czekolada - tęgie, skoncentrowane.",
     fingerprint: { "miekkie.konfitury": 4, "tegie.suszone": 4, "base.slodycz": 1, "base.cierpkosc": 3 },
     query: "Amarone",
   },
@@ -248,7 +248,7 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
     region_pl: "Douro, Portugalia",
     style: "dessert",
     priceFrom: 89,
-    why_pl: "Karmel, suszone owoce i orzechy — słodki, tęgi finał.",
+    why_pl: "Karmel, suszone owoce i orzechy - słodki, tęgi finał.",
     fingerprint: { "tegie.suszone": 4, "miekkie.konfitury": 3, "base.slodycz": 4, "base.cierpkosc": 2 },
     query: "Porto",
   },

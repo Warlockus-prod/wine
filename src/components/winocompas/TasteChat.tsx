@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TasteChat — read-only-style chat with the Vinokompas guide bot.
+ * TasteChat - read-only-style chat with the Vinokompas guide bot.
  *
  * UX rules (per Jakub Parowski feedback in /pairing):
  *  - Bot replies in chat bubbles, no typing indicator clutter.
@@ -31,13 +31,13 @@ const SUGGESTIONS_PL = [
 ];
 
 const HELLO_PL =
-  "Cześć — jestem przewodnikiem Vinokompasu. Pytaj o smaki, wrażenia, podpowiem jak odczytać twój profil. Możesz też kliknąć propozycję pytania poniżej.";
+  "Cześć - jestem przewodnikiem Vinokompasu. Pytaj o smaki, wrażenia, podpowiem jak odczytać twój profil. Możesz też kliknąć propozycję pytania poniżej.";
 
 interface Props {
   profile?: CompassProfile;
   /** Stable storage key so we keep the conversation across reloads. */
   storageKey?: string;
-  /** Page-aware context — short summary of what the user is currently
+  /** Page-aware context - short summary of what the user is currently
    *  looking at (e.g. "Dish: Duck Confit · Wine: Trimbach Riesling ·
    *  Restaurant: Atelier Amaro"). Sent to /api/chat as a system-level hint
    *  so the bot can ground its replies. NOT shown in the chat UI. */
@@ -104,7 +104,7 @@ export default function TasteChat({
     };
     window.addEventListener("wn:open-chat", handler);
     return () => window.removeEventListener("wn:open-chat", handler);
-    // `send` is stable enough — re-running on profile change isn't an issue
+    // `send` is stable enough - re-running on profile change isn't an issue
     // because handler reads the latest `send` via closure of this render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -151,7 +151,7 @@ export default function TasteChat({
           ...next,
           {
             role: "assistant",
-            content: "Hmm, chwilowo nie mogę odpowiedzieć — spróbuj ponownie za chwilę.",
+            content: "Hmm, chwilowo nie mogę odpowiedzieć - spróbuj ponownie za chwilę.",
           },
         ];
       });

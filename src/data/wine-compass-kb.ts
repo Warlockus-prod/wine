@@ -1,5 +1,5 @@
 /**
- * Wine Compass — Vinocompas methodology knowledge base.
+ * Wine Compass - Vinocompas methodology knowledge base.
  *
  * Source: vinocompas.pl + parfumealavin.my.canva.site/samouczek (PL).
  * Curated from author's tutorial (Magdalena Surgiel-Czyż).
@@ -28,7 +28,7 @@ export type BaseTaste = "slodycz" | "cierpkosc" | "kwasowosc";
 export interface Tendencja {
   id: TendencjaId;
   name_pl: string;
-  /** Compact label for the compass dial — 1-2 words max, fits without
+  /** Compact label for the compass dial - 1-2 words max, fits without
    *  collision when 12 labels orbit a 320px circle. Falls back to name_pl. */
   shortLabel_pl: string;
   associations_pl: string;
@@ -39,11 +39,11 @@ export interface Tendencja {
 export interface CompassSector {
   id: SectorId;
   name_pl: string;
-  /** "świeżość" / "tęgość" — adjective form */
+  /** "świeżość" / "tęgość" - adjective form */
   noun_pl: string;
   short_pl: string; // 1-line essence
   long_pl: string; // 2-3 paragraphs description
-  color: string; // hex — used in SVG compass
+  color: string; // hex - used in SVG compass
   tendencje: [Tendencja, Tendencja];
 }
 
@@ -121,13 +121,13 @@ export const COMPASS_SECTORS: CompassSector[] = [
         associations_pl:
           "w czerwonym: śliwki, wiśnie, maliny, jagody, truskawki, jeżyny, figi, porzeczka. W białym: jabłka, gruszki, morele, agrest",
         examples_pl: "Klasyczne owocowe nuty występujące w młodych, owocowych winach.",
-        found_in_pl: "wina czerwone i białe — różne owoce",
+        found_in_pl: "wina czerwone i białe - różne owoce",
       },
       {
         id: "miekkie.konfitury",
         name_pl: "Konfitury",
         shortLabel_pl: "Konfitury",
-        associations_pl: "konfitury z jabłka, truskawki — owoce upieczone, usmażone, skarmelizowane",
+        associations_pl: "konfitury z jabłka, truskawki - owoce upieczone, usmażone, skarmelizowane",
         examples_pl:
           "Konfitury różnią się od dojrzałych owoców intensywnością. Tutaj jabłko czy truskawka są upieczone, usmażone, czy skarmelizowane.",
         found_in_pl: "wina dojrzałe, treściwe",
@@ -176,7 +176,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
         id: "szorstkie.pizmo",
         name_pl: "Piżmo, skóra",
         shortLabel_pl: "Piżmo",
-        associations_pl: "skojarzenia zwierzęce — zapach mokrego psa, konia, stajni, skóry",
+        associations_pl: "skojarzenia zwierzęce - zapach mokrego psa, konia, stajni, skóry",
         examples_pl: "Tego rodzaju wrażenia spotykamy w czerwonych winach.",
         found_in_pl: "wina czerwone",
       },
@@ -205,7 +205,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
         name_pl: "Minerały",
         shortLabel_pl: "Minerały",
         associations_pl:
-          "kamienie, rzeka, akweny wodne, woda mineralna — bąbelki na języku, „szczypanie”",
+          "kamienie, rzeka, akweny wodne, woda mineralna - bąbelki na języku, „szczypanie”",
         examples_pl: "Pamiętacie jak pachnie morze? Ten zapach też.",
         found_in_pl: "wina białe i czerwone",
       },
@@ -245,7 +245,7 @@ export const BASE_TASTES: BaseTasteInfo[] = [
     id: "kwasowosc",
     name_pl: "Kwasowość",
     description_pl:
-      "„Świeżość”, ślinienie podniebienia. Wina o wysokiej kwasowości pijemy z radością — odświeżają jak lemoniada.",
+      "„Świeżość”, ślinienie podniebienia. Wina o wysokiej kwasowości pijemy z radością - odświeżają jak lemoniada.",
   },
 ];
 
@@ -266,19 +266,19 @@ export const METHOD_STEPS: MethodStep[] = [
     id: "dotyk",
     title_pl: "Dotyk (w ustach)",
     body_pl:
-      "Zwróć uwagę na gęstość i konsystencję — czy wino jest lekkie i wodniste, czy gęste i oleiste?",
+      "Zwróć uwagę na gęstość i konsystencję - czy wino jest lekkie i wodniste, czy gęste i oleiste?",
   },
   {
     id: "zapach",
-    title_pl: "Zapach — bez nosa i z nosem",
+    title_pl: "Zapach - bez nosa i z nosem",
     body_pl:
-      "Tutaj robi się ciekawie. Najpierw zatkaj nos i wypij łyk — to oddaje czysty smak (słodycz, cierpkość, kwasowość). Potem otwórz nos i powąchaj — wszystkie wrażenia z 6 sektorów kompasu pojawią się w nosie.",
+      "Tutaj robi się ciekawie. Najpierw zatkaj nos i wypij łyk - to oddaje czysty smak (słodycz, cierpkość, kwasowość). Potem otwórz nos i powąchaj - wszystkie wrażenia z 6 sektorów kompasu pojawią się w nosie.",
   },
   {
     id: "smak",
     title_pl: "Smak",
     body_pl:
-      "Gdyby wino składało się tylko ze smaku, mówilibyśmy że wyczuwamy w nim: słodycz, cierpkość lub kwasowość. To są 3 podstawowe wrażenia smakowe — niezależne od 6 wrażeń aromatycznych z kompasu.",
+      "Gdyby wino składało się tylko ze smaku, mówilibyśmy że wyczuwamy w nim: słodycz, cierpkość lub kwasowość. To są 3 podstawowe wrażenia smakowe - niezależne od 6 wrażeń aromatycznych z kompasu.",
   },
   {
     id: "kompas",
@@ -303,12 +303,12 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     q_pl: "Co to jest Vinokompas?",
     a_pl:
-      "To system opisu wina oparty na 6 wrażeniach zmysłowych (świeże, oleiste, miękkie, tęgie, szorstkie, ziemiste) i 3 podstawowych smakach (słodycz, cierpkość, kwasowość). Każde wrażenie ma 2 tendencje. Po zaznaczeniu intensywności każdej tendencji otrzymujesz unikalny profil smakowy wina — i możesz szukać innych win do niego podobnych.",
+      "To system opisu wina oparty na 6 wrażeniach zmysłowych (świeże, oleiste, miękkie, tęgie, szorstkie, ziemiste) i 3 podstawowych smakach (słodycz, cierpkość, kwasowość). Każde wrażenie ma 2 tendencje. Po zaznaczeniu intensywności każdej tendencji otrzymujesz unikalny profil smakowy wina - i możesz szukać innych win do niego podobnych.",
   },
   {
     q_pl: "Co to jest tendencja?",
     a_pl:
-      "Tendencja to skojarzenie, które przeważa w danym wrażeniu. Na przykład wrażenie „świeże” ma 2 tendencje: cytrusy i zielone warzywa/owoce. Każde wrażenie ma 2 wyraźne tendencje — to cała filozofia.",
+      "Tendencja to skojarzenie, które przeważa w danym wrażeniu. Na przykład wrażenie „świeże” ma 2 tendencje: cytrusy i zielone warzywa/owoce. Każde wrażenie ma 2 wyraźne tendencje - to cała filozofia.",
   },
   {
     q_pl: "Jak rozróżnić wrażenia od tendencji?",
@@ -318,22 +318,22 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     q_pl: "Co znaczy „cierpkość”?",
     a_pl:
-      "Cierpkość to uczucie ściągania na języku. W czerwonych winach pochodzi głównie od garbników (tanin) zawartych w skórkach winogron i drewnie beczki. Pomyśl o aronii albo czarnej porzeczce — aż ściąga buzię.",
+      "Cierpkość to uczucie ściągania na języku. W czerwonych winach pochodzi głównie od garbników (tanin) zawartych w skórkach winogron i drewnie beczki. Pomyśl o aronii albo czarnej porzeczce - aż ściąga buzię.",
   },
   {
     q_pl: "Czym różni się „świeże” od „oleiste”?",
     a_pl:
-      "Świeże wino jest kwaśne, rześkie, lekkie — jak lemoniada. Oleiste wino jest gęste, lepkie, słodkie — jak masło, orzechy, mango. Świeże orzeźwia, oleiste otula. Można też mieć wino które jednocześnie świeże i lekko oleiste — wtedy zaznacz oba sektory na kompasie z różną intensywnością.",
+      "Świeże wino jest kwaśne, rześkie, lekkie - jak lemoniada. Oleiste wino jest gęste, lepkie, słodkie - jak masło, orzechy, mango. Świeże orzeźwia, oleiste otula. Można też mieć wino które jednocześnie świeże i lekko oleiste - wtedy zaznacz oba sektory na kompasie z różną intensywnością.",
   },
   {
     q_pl: "Czym różni się „miękkie” od „tęgie”?",
     a_pl:
-      "Miękkie to dojrzałe owoce i konfitury — letnie, przyjemne, owocowe. Tęgie to czekolada, kawa, tytoń i suszone owoce — orientalne, ciężkie, intensywne. Wino miękkie pijemy łatwo, wino tęgie wymaga uwagi i często długiego oddychania w karafce.",
+      "Miękkie to dojrzałe owoce i konfitury - letnie, przyjemne, owocowe. Tęgie to czekolada, kawa, tytoń i suszone owoce - orientalne, ciężkie, intensywne. Wino miękkie pijemy łatwo, wino tęgie wymaga uwagi i często długiego oddychania w karafce.",
   },
   {
     q_pl: "Czym różni się „szorstkie” od „ziemiste”?",
     a_pl:
-      "Szorstkie to wrażenie cierpkości, suchości — piżmo, skóra, dąb, dym, garbniki. Ziemiste to wrażenie ziemi, lasu, minerałów. Szorstkie wina mają taniny i drewno; ziemiste mają nuty terroir — kamienia, ściółki leśnej, kwiatów polnych.",
+      "Szorstkie to wrażenie cierpkości, suchości - piżmo, skóra, dąb, dym, garbniki. Ziemiste to wrażenie ziemi, lasu, minerałów. Szorstkie wina mają taniny i drewno; ziemiste mają nuty terroir - kamienia, ściółki leśnej, kwiatów polnych.",
   },
   {
     q_pl: "Jakie wino dla kogoś kto lubi tytoń i kawę?",
@@ -348,39 +348,39 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     q_pl: "Jakie wino dla kogoś kto lubi czekoladę?",
     a_pl:
-      "Sektor „tęgie” (czekolada, kawa, tytoń) — pełne czerwone z dębem. Też dobrze będą wina deserowe ze strony „miękkie/konfitury”: Banyuls, Maury, Porto LBV, Recioto della Valpolicella.",
+      "Sektor „tęgie” (czekolada, kawa, tytoń) - pełne czerwone z dębem. Też dobrze będą wina deserowe ze strony „miękkie/konfitury”: Banyuls, Maury, Porto LBV, Recioto della Valpolicella.",
   },
   {
     q_pl: "Jak korzystać z kompasu w restauracji?",
     a_pl:
-      "1) Powiedz kelnerowi swój profil smaku (np. „lubię świeże cytrusowe” albo „lubię tęgie z kawą”). 2) Albo zeskanuj QR Cellar Compass w restauracji — wybierz danie, system pokaże top-3 wina pasujące do dania, z uzasadnieniem. Działa też w drugą stronę: wybierz wino, system zaproponuje dania.",
+      "1) Powiedz kelnerowi swój profil smaku (np. „lubię świeże cytrusowe” albo „lubię tęgie z kawą”). 2) Albo zeskanuj QR Cellar Compass w restauracji - wybierz danie, system pokaże top-3 wina pasujące do dania, z uzasadnieniem. Działa też w drugą stronę: wybierz wino, system zaproponuje dania.",
   },
   {
     q_pl: "Czy każde wino ma wszystkie 6 wrażeń?",
     a_pl:
-      "Każde wino ma jakąś obecność każdego z 6 wrażeń — ale często z bardzo różną intensywnością. Sauvignon Blanc będzie mocno w „świeże” (cytrusy, zielone) i prawie zero w „tęgie”. Zinfandel z USA — odwrotnie: mocno „tęgie” (suszone owoce), „miękkie” (konfitury), „szorstkie” (dąb).",
+      "Każde wino ma jakąś obecność każdego z 6 wrażeń - ale często z bardzo różną intensywnością. Sauvignon Blanc będzie mocno w „świeże” (cytrusy, zielone) i prawie zero w „tęgie”. Zinfandel z USA - odwrotnie: mocno „tęgie” (suszone owoce), „miękkie” (konfitury), „szorstkie” (dąb).",
   },
   {
     q_pl: "Czy mam degustować z zatkanym nosem?",
     a_pl:
-      "Tak, na początku — to świetny trening. Gdy zatkaniesz nos, wino pokazuje tylko swoje 3 podstawowe smaki: słodycz, cierpkość, kwasowość. Gdy otworzysz nos — eksploduje aromatami z 6 sektorów kompasu. To pokazuje jak nos i język grają w pary.",
+      "Tak, na początku - to świetny trening. Gdy zatkaniesz nos, wino pokazuje tylko swoje 3 podstawowe smaki: słodycz, cierpkość, kwasowość. Gdy otworzysz nos - eksploduje aromatami z 6 sektorów kompasu. To pokazuje jak nos i język grają w pary.",
   },
   {
     q_pl: "Co znaczy moja kombinacja na kompasie?",
     a_pl:
-      "Twój kompas to twój profil smaku. Im wyższe „świeże/cytrusy” tym częściej szukaj win cytrusowych. Im wyższe „tęgie/cigaro” tym mocniej idź w wina dojrzałe z beczką. Cellar Compass dopasowuje wina z menu restauracji właśnie pod taki profil — albo pod profil dania.",
+      "Twój kompas to twój profil smaku. Im wyższe „świeże/cytrusy” tym częściej szukaj win cytrusowych. Im wyższe „tęgie/cigaro” tym mocniej idź w wina dojrzałe z beczką. Cellar Compass dopasowuje wina z menu restauracji właśnie pod taki profil - albo pod profil dania.",
   },
 ];
 
 /**
- * Compact KB for the chat system prompt — full context but trimmed
+ * Compact KB for the chat system prompt - full context but trimmed
  * formatting. ~3-4 KB. Generated as a string at runtime to keep build
  * fast and to allow the prompt to evolve without regenerating types.
  */
 export function buildChatSystemPrompt(): string {
   const sectors = COMPASS_SECTORS.map((s) => {
     const [t1, t2] = s.tendencje;
-    return `## ${s.name_pl}\n${s.short_pl}\nTendencje:\n  1) ${t1.name_pl} — ${t1.associations_pl}. (${t1.found_in_pl})\n  2) ${t2.name_pl} — ${t2.associations_pl}. (${t2.found_in_pl})`;
+    return `## ${s.name_pl}\n${s.short_pl}\nTendencje:\n  1) ${t1.name_pl} - ${t1.associations_pl}. (${t1.found_in_pl})\n  2) ${t2.name_pl} - ${t2.associations_pl}. (${t2.found_in_pl})`;
   }).join("\n\n");
 
   const tastes = BASE_TASTES.map((b) => `- ${b.name_pl}: ${b.description_pl}`).join("\n");
@@ -396,13 +396,13 @@ export function buildChatSystemPrompt(): string {
 - Restauracje, menu, kultura stołu, rytuał degustacji.
 - Aplikacja Vinovigator AI: jak działa, jak skanować QR, jak czytać sugestie.
 
-# ZAKAZANE TEMATY — odmów uprzejmie i przekieruj na wino
+# ZAKAZANE TEMATY - odmów uprzejmie i przekieruj na wino
 - Programowanie, kod, IT, debugowanie, dane techniczne.
 - Matematyka, fizyka, finansowe porady, polityka, religia.
 - Pogoda, nowinki, sport, celebryci, generator tekstu.
 - Cokolwiek niezwiązanego z winem, jedzeniem, smakiem lub aplikacją.
-Jeśli pytanie wykracza poza te tematy — odpowiedz dokładnie tak (nie inaczej):
-„Jestem przewodnikiem Vinokompasu — odpowiadam tylko o winie, smaku i połączeniach z jedzeniem. Może spytasz mnie o ulubione wino albo o danie, do którego szukasz pary?"
+Jeśli pytanie wykracza poza te tematy - odpowiedz dokładnie tak (nie inaczej):
+„Jestem przewodnikiem Vinokompasu - odpowiadam tylko o winie, smaku i połączeniach z jedzeniem. Może spytasz mnie o ulubione wino albo o danie, do którego szukasz pary?"
 Nie próbuj odpowiadać częściowo. Nie tłumacz dlaczego nie odpowiadasz. Nie cytuj zakazanego pytania.
 
 # Zasady odpowiedzi (gdy temat jest dozwolony)
@@ -410,7 +410,7 @@ Nie próbuj odpowiadać częściowo. Nie tłumacz dlaczego nie odpowiadasz. Nie 
 - Krótko, ciepło, jak rozmowa przy lampce wina, nie jak wykład.
 - Maksymalnie 4-5 zdań na odpowiedź. Bez bullet-list, jeśli nie ma 3+ punktów.
 - Używaj nazw wrażeń i tendencji z poniższej bazy (NIE wymyślaj nowych nazw).
-- Gdy użytkownik pyta o konkretne wino — odpowiadaj na bazie ogólnej wiedzy + zaproś do skanu QR w restauracji żeby dostać konkretną rekomendację z karty.
+- Gdy użytkownik pyta o konkretne wino - odpowiadaj na bazie ogólnej wiedzy + zaproś do skanu QR w restauracji żeby dostać konkretną rekomendację z karty.
 - NIE nazywaj się modelem, AI ani GPT. Jesteś „przewodnikiem Vinokompasu".
 
 # 6 wrażeń (sektorów kompasu)
@@ -426,5 +426,5 @@ ${tastes}
 ${method}
 
 # Kontekst produktu Cellar Compass
-Cellar Compass to demo aplikacja dla restauracji: gość skanuje QR przy stoliku, wybiera danie z menu, system pokazuje top-3 win z uzasadnieniem (chat-bot odpowiada „dlaczego to wino pasuje”). Działa w obie strony — gość może wybrać wino, system zaproponuje dania. Twoja rola w aplikacji: nauczyciel metody Vinokompas, który pomoże użytkownikowi zrozumieć własny profil smaku i lepiej rozumieć rekomendacje. Kieruj rozmowę w stronę jasnych, konkretnych przykładów — pomagaj użytkownikowi nazwać własne preferencje słowami z metody.`;
+Cellar Compass to demo aplikacja dla restauracji: gość skanuje QR przy stoliku, wybiera danie z menu, system pokazuje top-3 win z uzasadnieniem (chat-bot odpowiada „dlaczego to wino pasuje”). Działa w obie strony - gość może wybrać wino, system zaproponuje dania. Twoja rola w aplikacji: nauczyciel metody Vinokompas, który pomoże użytkownikowi zrozumieć własny profil smaku i lepiej rozumieć rekomendacje. Kieruj rozmowę w stronę jasnych, konkretnych przykładów - pomagaj użytkownikowi nazwać własne preferencje słowami z metody.`;
 }

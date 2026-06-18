@@ -21,7 +21,7 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Vinovigator AI — Wine pairing for restaurants",
+  title: "Vinovigator AI - Wine pairing for restaurants",
   description:
     "Vinovigator AI: kompas smaku, mapa restauracji, QR przy stoliku, dwustronny matching dania i wina z uzasadnieniem językiem Vinokompasu.",
   manifest: "/manifest.webmanifest",
@@ -62,7 +62,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
-        {/* Icons are now inline SVG (src/components/v2/Icon.tsx) — no external
+        {/* Icons are now inline SVG (src/components/v2/Icon.tsx) - no external
             icon font, so no FOUC / ligature-text flash on slow networks, and no
             Google-Fonts dependency. The display fonts are self-hosted via
             next/font. */}

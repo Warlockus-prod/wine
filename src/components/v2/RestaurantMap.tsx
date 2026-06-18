@@ -22,7 +22,7 @@ type Props = {
   onSelect: (slug: string) => void;
 };
 
-// Mapbox style URLs — official Mapbox-hosted styles. light-v11 is a clean
+// Mapbox style URLs - official Mapbox-hosted styles. light-v11 is a clean
 // white-canvas map suited to the cream UI; dark-v11 is the night-mode
 // satellite-style we use in dark theme. Switching style at runtime via
 // map.setStyle() preserves markers and viewport.
@@ -53,11 +53,11 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
   }, [restaurants]);
 
   // Init map once. Guard against WebGL absence (headless Chromium in CI/e2e
-   // has no WebGL by default — Mapbox would throw and break hydration).
+   // has no WebGL by default - Mapbox would throw and break hydration).
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
     if (!TOKEN) {
-      console.warn("Mapbox token missing — set NEXT_PUBLIC_MAPBOX_TOKEN");
+      console.warn("Mapbox token missing - set NEXT_PUBLIC_MAPBOX_TOKEN");
       return;
     }
     if (!mapboxgl.supported || !mapboxgl.supported()) {
@@ -99,7 +99,7 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Theme swap — call map.setStyle() when the user toggles dark/light.
+  // Theme swap - call map.setStyle() when the user toggles dark/light.
   // Mapbox preserves source data + custom layers across setStyle but
   // markers are external DOM elements, so they re-attach themselves
   // automatically on the new style. No need to recreate them.
@@ -194,7 +194,7 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
     map.flyTo({ center: [r.lng, r.lat], zoom: Math.max(map.getZoom(), 8), duration: 700 });
 
     // Close every popup that isn't the selected one, then open the active
-    // one (idempotent — togglePopup would close an already-open popup).
+    // one (idempotent - togglePopup would close an already-open popup).
     for (const [slug, marker] of markersRef.current.entries()) {
       const p = marker.getPopup();
       if (!p) continue;

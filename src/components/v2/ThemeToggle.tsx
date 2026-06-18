@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * ThemeToggle — single-button switcher between dark and light theme.
+ * ThemeToggle - single-button switcher between dark and light theme.
  *
  * Behavior:
  *  - Reads/writes through `next-themes` (so it's persisted + system-aware).
  *  - Shows the icon for the OPPOSITE of the current theme (sun when dark,
- *    moon when light) — that's the conventional "what I'll switch to" cue.
+ *    moon when light) - that's the conventional "what I'll switch to" cue.
  *  - Uses `resolvedTheme` instead of `theme` because `theme` can be
- *    "system" — we want the actually-rendered value.
+ *    "system" - we want the actually-rendered value.
  *  - Renders a stable placeholder pre-mount so the layout doesn't shift
  *    when next-themes hydrates.
  */
@@ -28,14 +28,14 @@ export default function ThemeToggle({ withLabel, className }: Props) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // SSR-safe mount flag — required for next-themes to avoid hydration
+    // SSR-safe mount flag - required for next-themes to avoid hydration
     // mismatch. Standard pattern; the new-rules lint complains about it,
     // but there's no other way to detect "we are now in the browser".
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
-  // SSR / pre-hydration placeholder — same dimensions, no flash.
+  // SSR / pre-hydration placeholder - same dimensions, no flash.
   if (!mounted) {
     return (
       <button

@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * /embed/samouczek — "naked" Vinokompas tutorial for iframe embedding in an
- * external site (e.g. the winnica.pl shop). No site nav / hero / FAQ — just
+ * /embed/samouczek - "naked" Vinokompas tutorial for iframe embedding in an
+ * external site (e.g. the winnica.pl shop). No site nav / hero / FAQ - just
  * the interactive compass, the 3 stages and the live wine proposals.
  *
  * Talks to the embedding page via postMessage (origin-agnostic outward; the
  * PARENT must verify event.origin === our embed origin):
  *   ⬆ { source:"vinokompas", type:"vinokompas:ready" }            on mount
  *   ⬆ { source:"vinokompas", type:"vinokompas:resize", height }   on size change
- *   ⬇ { type:"vinokompas:set-user", token }   (phase 2 — SSO/account binding)
+ *   ⬇ { type:"vinokompas:set-user", token }   (phase 2 - SSO/account binding)
  *
  * Phase 2 (needs the shop's contract): verify the JWT in set-user, load the
  * customer's saved profile, swap the proposal source to the shop catalog
@@ -35,7 +35,7 @@ const FloatingTasteChat = dynamic(
 const PROFILE_STORAGE_KEY = "wn_compass_profile_v1";
 
 // Origins allowed to host this widget in an iframe (must match the CSP
-// frame-ancestors in next.config.ts). We post only to these — never "*" — and
+// frame-ancestors in next.config.ts). We post only to these - never "*" - and
 // we ignore inbound messages from anywhere else (audit P1-4).
 const ALLOWED_PARENT_ORIGINS = [
   "https://winnica.pl",

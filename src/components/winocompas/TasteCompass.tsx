@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TasteCompass — interactive SVG wine compass à la vinocompas.pl.
+ * TasteCompass - interactive SVG wine compass à la vinocompas.pl.
  *
  * 6 sektorów (wrażeń) × 2 tendencje per sector × 6 stopni intensywności (0-5).
  * 12 outer "spokes" total. Each spoke is a clickable annular slice that fills
@@ -11,7 +11,7 @@
  * is more reliable on touch). Desktop additionally supports hover preview and
  * keyboard navigation (Tab through spokes, ↑/↓ to change intensity).
  *
- * State is fully controlled — parent owns the profile. Local mode also works
+ * State is fully controlled - parent owns the profile. Local mode also works
  * via uncontrolled `defaultProfile`.
  */
 
@@ -22,13 +22,13 @@ export type Intensity = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-5
 /**
  * Compass progressive-disclosure level.
- *  1 — only 3 base smaki axes (cierpkość / słodycz / kwasowość)
- *  2 — adds 6 sektor wedges (świeżość · oleistość · miękkość · tęgość ·
+ *  1 - only 3 base smaki axes (cierpkość / słodycz / kwasowość)
+ *  2 - adds 6 sektor wedges (świeżość · oleistość · miękkość · tęgość ·
  *      szorstkość · ziemistość) clickable as a whole
- *  3 — full 12-tendencja interactive compass (default; backwards-compat)
+ *  3 - full 12-tendencja interactive compass (default; backwards-compat)
  *
  * Each level adds a layer of click targets and labels. The underlying
- * profile model stays the same — sektor clicks fan their value to both
+ * profile model stays the same - sektor clicks fan their value to both
  * tendencje under that sektor; base clicks set base.<id>.
  */
 export type CompassLevel = 1 | 2 | 3;
@@ -45,7 +45,7 @@ const STATE_COUNT = MAX_INTENSITY + 1;
 // the top. Matches the canonical Vinokompas layout:
 //   CIERPKOŚĆ top · SŁODYCZ lower-right (4 o'clock) · KWASOWOŚĆ lower-left.
 // (Previously these used -π/2 offsets from a math-convention which put
-//  CIERPKOŚĆ on the left and clipped its label — fixed.)
+//  CIERPKOŚĆ on the left and clipped its label - fixed.)
 const BASE_AXES = [
   { id: "cierpkosc", label: "CIERPKOŚĆ", angle: 0 },                    // top
   { id: "slodycz",   label: "SŁODYCZ",   angle: (2 * Math.PI) / 3 },   // lower-right (4 o'clock)
@@ -128,15 +128,15 @@ interface Props {
    *  Bubbled IDs may be tendencja id, sektor id, or `base.<smak>` id
    *  depending on the active level. */
   onHoverChange?: (focusId: string | null) => void;
-  /** Force a focus highlight from the parent — overrides internal hover.
+  /** Force a focus highlight from the parent - overrides internal hover.
    *  Used by <InteractiveCompass> for the guided auto-tour. Accepts a
    *  tendencja id, sektor id, or `base.<smak>` id. */
   externalHighlightId?: string | null;
-  /** Auto-tour demo preview — animates filled rings on a sektor/tendencja to
+  /** Auto-tour demo preview - animates filled rings on a sektor/tendencja to
    *  *demonstrate* intensity, WITHOUT touching the profile. `level` is the
    *  number of rings (1..MAX) to show. Cleared between tour steps. */
   demoFill?: { id: string; level: number } | null;
-  /** Hide the bottom legend (tag chips) — useful when wrapper provides its
+  /** Hide the bottom legend (tag chips) - useful when wrapper provides its
    *  own info side-panel. */
   hideLegend?: boolean;
   /** Progressive-disclosure level (1=base only, 2=+sektor, 3=+tendencje).
@@ -144,7 +144,7 @@ interface Props {
   level?: CompassLevel;
 }
 
-// Sektor avg helper — fans the same value to both tendencje under a sektor.
+// Sektor avg helper - fans the same value to both tendencje under a sektor.
 const sektorAvg = (profile: CompassProfile, sektorId: string): number => {
   const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
   if (!s) return 0;
@@ -195,10 +195,10 @@ export default function TasteCompass({
     [profile, setIntensity],
   );
 
-  // Geometry — viewBox 440 gives 20px breathing room on each side so the
+  // Geometry - viewBox 440 gives 20px breathing room on each side so the
   // outermost labels (text-anchor=start at the east point) never clip out
   // of the parent container at 390px viewport. Compass disc itself stays
-  // visually unchanged — only the SVG canvas is wider.
+  // visually unchanged - only the SVG canvas is wider.
   const VIEW = 440;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
@@ -206,7 +206,7 @@ export default function TasteCompass({
   const rInner = 36;
   const ringStep = (rOuter - rInner) / RING_COUNT;
 
-  // Radial pick — intensity follows the ring the user clicks (the dial fills
+  // Radial pick - intensity follows the ring the user clicks (the dial fills
   // to where you tap: 3rd ring → 3, 5th ring → 5). Clicking the current level
   // (or the centre hub) resets to 0, so tapping the outer ring again clears
   // it and the fill starts over. Feels organic, not like a counter.
@@ -305,10 +305,10 @@ export default function TasteCompass({
         viewBox={`0 0 ${VIEW} ${VIEW}`}
         className="taste-compass-svg"
         role="application"
-        aria-label="Tarcza Vinokompasu — zaznacz intensywność każdej tendencji"
+        aria-label="Tarcza Vinokompasu - zaznacz intensywność każdej tendencji"
       >
         <defs>
-          {/* BG gradient reads from semantic tokens — flips dark↔white per
+          {/* BG gradient reads from semantic tokens - flips dark↔white per
               theme without re-rendering. */}
           <radialGradient id={`${baseId}-bg`} cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="var(--surface-elevated)" />
@@ -343,7 +343,7 @@ export default function TasteCompass({
           );
         })}
 
-        {/* Concentric ring lines — theme-aware via hairline var */}
+        {/* Concentric ring lines - theme-aware via hairline var */}
         {Array.from({ length: RING_COUNT + 1 }).map((_, i) => (
           <circle
             key={`ring-${i}`}
@@ -356,7 +356,7 @@ export default function TasteCompass({
           />
         ))}
 
-        {/* Spokes — radial dividers between tendencje. Faded out at level 1
+        {/* Spokes - radial dividers between tendencje. Faded out at level 1
             (when only base axes matter) so the disc reads simpler. */}
         {SPOKES.map((s) => {
           const x = cx + rOuter * Math.sin(s.angle - s.half);
@@ -375,7 +375,7 @@ export default function TasteCompass({
           );
         })}
 
-        {/* Filled intensity — at level 3 we draw per-tendencja (12 wedges);
+        {/* Filled intensity - at level 3 we draw per-tendencja (12 wedges);
             at level 2 we paint the average across BOTH tendencje of each
             sektor as a single wide wedge so the L2 view stays clean. */}
         {level >= 3
@@ -422,7 +422,7 @@ export default function TasteCompass({
               })
             : null}
 
-        {/* Demo intensity preview (auto-tour) — animated rings on the focused
+        {/* Demo intensity preview (auto-tour) - animated rings on the focused
             sektor/tendencja to SHOW that intensity varies. Visual only; never
             mutates the profile. */}
         {demoFill && demoFill.level > 0
@@ -466,7 +466,7 @@ export default function TasteCompass({
             })()
           : null}
 
-        {/* Hover / tour highlight — handles three target kinds:
+        {/* Hover / tour highlight - handles three target kinds:
             1) tendencja id  → highlight that spoke (current behaviour)
             2) sektor id     → highlight whole sektor wedge (level 2)
             3) base.<id>     → glow on the matching base axis (level 1) */}
@@ -525,7 +525,7 @@ export default function TasteCompass({
                 </path>
               );
             }
-            // 3) base.<id> (level 1) — glow disc behind the matching beam
+            // 3) base.<id> (level 1) - glow disc behind the matching beam
             if (effectiveHover.startsWith("base.")) {
               const baseId = effectiveHover.slice(5);
               const axis = BASE_AXES.find((a) => a.id === baseId);
@@ -543,7 +543,7 @@ export default function TasteCompass({
             return null;
           })()}
 
-        {/* Level-2 click overlay — one wedge per sektor (cycles avg) */}
+        {/* Level-2 click overlay - one wedge per sektor (cycles avg) */}
         {level === 2 &&
           COMPASS_SECTORS.map((sector, sIdx) => {
             const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
@@ -575,7 +575,7 @@ export default function TasteCompass({
             );
           })}
 
-        {/* Level-1 click overlay — 3 broad wedges, each ~120° wide,
+        {/* Level-1 click overlay - 3 broad wedges, each ~120° wide,
             centred on the corresponding base axis. Big touch areas so
             mobile users can tap easily. */}
         {level === 1 &&
@@ -609,7 +609,7 @@ export default function TasteCompass({
             );
           })}
 
-        {/* Touch / click target — full spoke wedge (level 3 only) */}
+        {/* Touch / click target - full spoke wedge (level 3 only) */}
         {level >= 3 && spokes.map((s) => {
           const fit = s.intensity;
           return (
@@ -620,7 +620,7 @@ export default function TasteCompass({
               stroke="transparent"
               tabIndex={0}
               role="slider"
-              aria-label={`${s.sector.name_pl} — ${s.tendencja.name_pl}`}
+              aria-label={`${s.sector.name_pl} - ${s.tendencja.name_pl}`}
               aria-valuemin={0}
               aria-valuemax={MAX_INTENSITY}
               aria-valuenow={fit}
@@ -637,7 +637,7 @@ export default function TasteCompass({
           );
         })}
 
-        {/* Center hub + 6-pointed compass star — fill flips per theme */}
+        {/* Center hub + 6-pointed compass star - fill flips per theme */}
         <circle cx={cx} cy={cy} r={rInner} fill="var(--surface-deep)" stroke="var(--gold-hairline)" strokeWidth={0.7} />
         <text
           x={cx}
@@ -653,10 +653,10 @@ export default function TasteCompass({
           Vinokompas
         </text>
 
-        {/* Outer labels — horizontal text, smart-anchored by quadrant.
+        {/* Outer labels - horizontal text, smart-anchored by quadrant.
             Long labels split on `·` into two lines. The label sits on a
             short radial tick line for premium chart-y feel.
-            Only rendered at level 3 (12 tendencje view) — at lower levels
+            Only rendered at level 3 (12 tendencje view) - at lower levels
             this would clutter the disc. */}
         {showLabels && level >= 3 &&
           spokes.map((s) => {
@@ -727,7 +727,7 @@ export default function TasteCompass({
             );
           })}
 
-        {/* Sector noun labels — one per sector, larger, between the 2 tendencje.
+        {/* Sector noun labels - one per sector, larger, between the 2 tendencje.
             Faded at level 1 (compass shows only base axes there) and given
             a stronger weight at level 2 (where sektor IS the unit of work). */}
         {level >= 2 && COMPASS_SECTORS.map((sector, sIdx) => {
@@ -757,7 +757,7 @@ export default function TasteCompass({
           );
         })}
 
-        {/* Base-smak axis overlay — 3 gold beams + labels at the perimeter.
+        {/* Base-smak axis overlay - 3 gold beams + labels at the perimeter.
             Always rendered so the user keeps the reference even at level
             2/3, but visually loud only at level 1 (where it's the only
             interaction). Beam length = base intensity × ringStep (0..rOuter). */}
@@ -789,7 +789,7 @@ export default function TasteCompass({
                 strokeWidth={0.8}
                 strokeDasharray="2 3"
               />
-              {/* Filled beam — proportional to value */}
+              {/* Filled beam - proportional to value */}
               {value > 0 ? (
                 <line
                   x1={cx}
@@ -802,7 +802,7 @@ export default function TasteCompass({
                   opacity={0.85}
                 />
               ) : null}
-              {/* Tip dot at axis end (always visible — the click hint) */}
+              {/* Tip dot at axis end (always visible - the click hint) */}
               <circle
                 cx={cx + rOuter * xUnit}
                 cy={cy + rOuter * yUnit}
@@ -811,7 +811,7 @@ export default function TasteCompass({
                 opacity={value > 0 ? 1 : 0.55}
               />
               {/* Label + value stacked in SCREEN space (value directly below
-                  the label) so they never collide regardless of axis angle —
+                  the label) so they never collide regardless of axis angle -
                   the old radial value pill overlapped the label on the lower
                   spokes. High-contrast theme-aware --ink replaces the dim gold
                   so both read on dark AND light. */}
@@ -850,7 +850,7 @@ export default function TasteCompass({
         })}
       </svg>
 
-      {/* Live legend — shows what's currently selected.
+      {/* Live legend - shows what's currently selected.
           Hidden when the wrapper provides its own info side-panel. */}
       {hideLegend ? null : <CompassLegend profile={profile} onClear={() => setProfile({})} />}
     </div>
@@ -873,7 +873,7 @@ function CompassLegend({
   if (selected.length === 0) {
     return (
       <p className="mt-3 text-center font-serif text-xs italic text-[var(--color-accent-gold)] opacity-80">
-        Dotknij sektor i wskaż intensywność (od 0 do 4) — kompas zapamięta twój profil.
+        Dotknij sektor i wskaż intensywność (od 0 do 4) - kompas zapamięta twój profil.
       </p>
     );
   }

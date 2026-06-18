@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * /admin/restaurants/[slug] — DB-backed per-restaurant editor.
+ * /admin/restaurants/[slug] - DB-backed per-restaurant editor.
  *
- * Three tabs: Dishes / Wines / Curated Pairings — each backed by SWR
+ * Three tabs: Dishes / Wines / Curated Pairings - each backed by SWR
  * hooks that fetch from the DB-canonical write API. Mutations call the
  * mutator hooks which optimistically refetch on success.
  *
- * EN | PL inputs side-by-side for every localized field — same pattern as
+ * EN | PL inputs side-by-side for every localized field - same pattern as
  * the legacy /admin sandbox so muscle memory carries over.
  */
 
@@ -42,7 +42,7 @@ export default function PerRestaurantEditor({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  // Next 16 — params is a Promise; `use()` unwraps it inside a client component.
+  // Next 16 - params is a Promise; `use()` unwraps it inside a client component.
   const { slug } = use(params);
   const locale = useLocale() as Locale;
   const [tab, setTab] = useState<TabId>("dishes");
@@ -112,7 +112,7 @@ export default function PerRestaurantEditor({
 
         {dishesErr || winesErr || pairingsErr ? (
           <p className="mb-4 rounded-xl border border-rose-500/30 bg-rose-900/20 px-3 py-2 text-sm text-rose-100">
-            Błąd ładowania danych — odśwież stronę. Nawet jeśli się nie uda, oryginalne dane w bazie są bezpieczne.
+            Błąd ładowania danych - odśwież stronę. Nawet jeśli się nie uda, oryginalne dane w bazie są bezpieczne.
           </p>
         ) : null}
 
@@ -215,7 +215,7 @@ function DishesTab({
         ))}
         {dishes.length === 0 ? (
           <p className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-gray-400">
-            Brak dań. Dodaj pierwsze powyżej — zobaczysz je od razu.
+            Brak dań. Dodaj pierwsze powyżej - zobaczysz je od razu.
           </p>
         ) : null}
       </div>
@@ -546,7 +546,7 @@ function PairingsTab({
         >
           {dishes.map((d) => (
             <option key={d.id} value={d.id}>
-              {t(d.name, locale)} — {d.category}
+              {t(d.name, locale)} - {d.category}
             </option>
           ))}
         </select>

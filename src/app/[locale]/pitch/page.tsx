@@ -85,7 +85,7 @@ export default async function PitchPage({
               </p>
             </div>
             <div className="max-w-[80%] rounded-2xl rounded-bl-md border border-white/10 bg-black/30 px-3 py-2">
-              <p className="text-[10px] leading-snug text-gray-200">Serve at 8–10°C. No decant.</p>
+              <p className="text-[10px] leading-snug text-gray-200">Serve at 8-10°C. No decant.</p>
             </div>
           </div>
         </div>

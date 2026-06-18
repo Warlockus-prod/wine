@@ -25,7 +25,7 @@ if (!url) {
   // Don't throw at import — lots of build-time imports must work without the
   // DB (e.g. type-only re-exports). Throw on first actual query attempt.
   console.warn(
-    "[db] DATABASE_URL is not set — DB calls will fail. Set it in .env.local.",
+    "[db] DATABASE_URL is not set - DB calls will fail. Set it in .env.local.",
   );
 }
 

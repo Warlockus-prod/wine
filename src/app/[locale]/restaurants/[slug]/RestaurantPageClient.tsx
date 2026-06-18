@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * Per-venue page — premium editorial pass.
+ * Per-venue page - premium editorial pass.
  *
  * Aesthetic: wine-bar tasting brochure. Hero lands with a 1s staggered
  * cascade (cuisine pills → name → description → CTAs → QR), each menu/wine
  * row has a gold underline that draws on hover, suggested pairings sit on
  * ribbon cards (gold notch + ❦ watermark). All visual placeholders are
- * inline SVG — no external images. Mobile gets a sticky pairing CTA + a
+ * inline SVG - no external images. Mobile gets a sticky pairing CTA + a
  * "Listen to sommelier" floating link on desktop top-right.
  */
 
@@ -142,7 +142,7 @@ export default function RestaurantPageClient({
                 </Link>
               </div>
 
-              {/* Stat strip — sits over the dark cover gradient in BOTH
+              {/* Stat strip - sits over the dark cover gradient in BOTH
                   themes, so we keep explicit white text + dark backdrop
                   via inline styles (escapes the light-mode text-white shim
                   that would otherwise turn this ink-on-black). */}
@@ -210,7 +210,7 @@ export default function RestaurantPageClient({
         {/* ─────────── PAIRING WIDGET (always visible, above the menu) ─────
              Big, gold-bordered, two-column row that announces the AI
              pairing flow. The previous experience hid this affordance
-             behind a tiny QR-aside button — easy to miss. */}
+             behind a tiny QR-aside button - easy to miss. */}
         <section className="mt-8">
           <Link
             href={`/pairing?restaurant=${restaurant.slug}`}
@@ -243,7 +243,7 @@ export default function RestaurantPageClient({
 
         {/* ─────────── MENU + WINE LIST ─────────── */}
         <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          {/* Menu — editorial list with monograms + drop-cap */}
+          {/* Menu - editorial list with monograms + drop-cap */}
           <article className="surface-parchment rounded-[28px] border border-white/10 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
             <header className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
@@ -296,7 +296,7 @@ export default function RestaurantPageClient({
                         unoptimized
                         loading="lazy"
                       />
-                      {/* Gold-foil corner monogram overlay — anchors the brand
+                      {/* Gold-foil corner monogram overlay - anchors the brand
                           look on top of the photo without obscuring it. */}
                       <div className="absolute right-1 bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-[var(--color-accent-gold)] backdrop-blur">
                         <DishMonogramSVG category={dish.category} className="h-3 w-3" />
@@ -319,7 +319,7 @@ export default function RestaurantPageClient({
                       </p>
                       {/* Active-state hint: pairing panel on the right (or
                           mobile bottom-sheet) is already showing top-3 wines
-                          for this dish — no per-row CTA needed anymore. */}
+                          for this dish - no per-row CTA needed anymore. */}
                       {isActive ? (
                         <p className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
                           <span aria-hidden>→</span>
@@ -337,7 +337,7 @@ export default function RestaurantPageClient({
             </ul>
           </article>
 
-          {/* Wines — bottle silhouettes + region/grape eyebrow */}
+          {/* Wines - bottle silhouettes + region/grape eyebrow */}
           <article className="surface-parchment-strong rounded-[28px] border border-white/10 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
             <header className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
@@ -409,7 +409,7 @@ export default function RestaurantPageClient({
           </article>
         </section>
 
-        {/* ─────────── SUGGESTED PAIRINGS — TASTING NOTEBOOK RIBBONS ─────────── */}
+        {/* ─────────── SUGGESTED PAIRINGS - TASTING NOTEBOOK RIBBONS ─────────── */}
         <section className="mt-8 rounded-[28px] border border-white/10 bg-[#150a0c] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-7">
           <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-white/8 pb-4">
             <div>
@@ -443,7 +443,7 @@ export default function RestaurantPageClient({
         </section>
       </main>
 
-      {/* Integrated pairing panel — desktop docked right, mobile bottom-sheet.
+      {/* Integrated pairing panel - desktop docked right, mobile bottom-sheet.
           Replaces the previous floating "ask sommelier" link and the sticky
           mobile CTA: both pointed to /pairing as a separate page. Now the
           pairing UX lives inline. The standalone /pairing route still works

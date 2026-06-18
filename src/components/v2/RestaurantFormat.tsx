@@ -7,10 +7,10 @@ import Icon from "./Icon";
  *   "Sushi-ya · 3⭐ Michelin", "Haute cuisine · 2⭐ Michelin",
  *   "Peruvian Nikkei · World #1", "Fine Dining".
  * The old UI dumped the whole string (emoji star and all) into a single
- * coloured gradient pill, which read as cramped and inorganic — the ⭐ glyph
+ * coloured gradient pill, which read as cramped and inorganic - the ⭐ glyph
  * renders inconsistently across platforms. This splits it: the cuisine type
  * keeps the brand gradient pill, and the accolade becomes a refined gold
- * "medal" — real SVG stars + "MICHELIN" (or the accolade text) on a gold
+ * "medal" - real SVG stars + "MICHELIN" (or the accolade text) on a gold
  * hairline chip that matches the rest of the gold-leaf brand language.
  */
 export default function RestaurantFormat({

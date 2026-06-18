@@ -11,11 +11,11 @@
   "home": {
     "directoryEyebrow": "Restaurant Directory",
     "directoryTitle": "Pick a restaurant. Open the menu. Find your wine.",
-    "directorySubtitle": "Each restaurant has its own page and QR code. Scan it on a phone — the menu opens directly, no app, no login.",
+    "directorySubtitle": "Each restaurant has its own page and QR code. Scan it on a phone - the menu opens directly, no app, no login.",
     "statsRestaurants": "Restaurants",
     "statsCities": "Cities",
     "statsQrReady": "QR ready",
-    "directoryFootnote": "Five live restaurants in Poland — full menu, full wine card, ready to pair.",
+    "directoryFootnote": "Five live restaurants in Poland - full menu, full wine card, ready to pair.",
     "tagline": "AI sommelier for restaurant menus",
     "mapTitle": "On the map",
     "mapSubtitle": "Tap a marker to open the restaurant.",
@@ -59,7 +59,7 @@
     "pickWineForDish": "Wine for this dish",
     "pairingWidgetEyebrow": "AI sommelier",
     "pairingWidgetTitle": "Pair every dish in 5 seconds",
-    "pairingWidgetSub": "Open the interactive pairing view — tap a dish and the model surfaces the top 3 wines from this restaurant's list with reasoning.",
+    "pairingWidgetSub": "Open the interactive pairing view - tap a dish and the model surfaces the top 3 wines from this restaurant's list with reasoning.",
     "topThreeWines": "Top 3 wines from the cellar",
     "matchingWines": "Matching wines…",
     "activeDishHint": "wines on the right",
@@ -140,7 +140,7 @@
     }
   },
   "pitch": {
-    "metaTitle": "Cellar Compass — for restaurant owners",
+    "metaTitle": "Cellar Compass - for restaurant owners",
     "metaDescription": "A sommelier in every guest's pocket. Cellar Compass turns your menu and cellar into a quiet conversation with every diner.",
     "nav": {
       "menu": "The proposition",
@@ -152,7 +152,7 @@
       "openDemo": "Open the demo"
     },
     "hero": {
-      "eyebrow": "Cellar Compass — for restaurants",
+      "eyebrow": "Cellar Compass - for restaurants",
       "title": "A sommelier",
       "titleAccent": "in every pocket.",
       "lede": "Cellar Compass turns your menu and cellar into a quiet conversation with every guest. No staff training. No backend. Live in five minutes.",
@@ -163,15 +163,15 @@
     "how": {
       "eyebrow": "I.",
       "title": "How it works",
-      "subtitle": "Four moments — from a printed QR to a poured glass.",
+      "subtitle": "Four moments - from a printed QR to a poured glass.",
       "step1Title": "QR on the table",
-      "step1Body": "Each venue gets a unique URL and QR. Print, laminate, slip into the bill folder. The diner scans, the experience opens — no app to install.",
+      "step1Body": "Each venue gets a unique URL and QR. Print, laminate, slip into the bill folder. The diner scans, the experience opens - no app to install.",
       "step2Title": "Guest picks a dish",
-      "step2Body": "The menu is yours, with photos and prices. Choosing a dish is the only input — there is no chat box, no tool to learn.",
+      "step2Body": "The menu is yours, with photos and prices. Choosing a dish is the only input - there is no chat box, no tool to learn.",
       "step3Title": "Top three wines, ranked",
       "step3Body": "An algorithm tuned to body, acidity, and tannin scores every label on your list. The top match is auto-selected with the rationale shown like a quiet message from the bot.",
       "step4Title": "Your sommelier still leads",
-      "step4Body": "Hand-curated overrides take precedence. A sentence written by your sommelier — in English and Polish — replaces the algorithm's draft."
+      "step4Body": "Hand-curated overrides take precedence. A sentence written by your sommelier - in English and Polish - replaces the algorithm's draft."
     },
     "what": {
       "eyebrow": "II.",
@@ -182,11 +182,11 @@
       "f2Title": "European map",
       "f2Body": "Real-world Leaflet+OSM. Guests find you, agencies find your network.",
       "f3Title": "Two-way ranking",
-      "f3Body": "Pick a dish — wines re-order. Pick a wine — the menu re-orders.",
+      "f3Body": "Pick a dish - wines re-order. Pick a wine - the menu re-orders.",
       "f4Title": "Sommelier overrides",
       "f4Body": "Your wording, not the machine's. Curated entries beat the algorithm.",
       "f5Title": "Bilingual EN ↔ PL",
-      "f5Body": "Every dish, every wine, every rationale — in both languages.",
+      "f5Body": "Every dish, every wine, every rationale - in both languages.",
       "f6Title": "Mobile-first",
       "f6Body": "Designed for the phone in the diner's hand, not the manager's laptop.",
       "f7Title": "No backend",
@@ -198,7 +198,7 @@
       "eyebrow": "III.",
       "title": "Three views, one product",
       "subtitle": "What the guest sees, what you see, what your sommelier edits.",
-      "phoneCaption": "The pairing chat — guest view",
+      "phoneCaption": "The pairing chat - guest view",
       "phoneSub": "A bot reply, no input box",
       "mapCaption": "The discovery map",
       "mapSub": "Filter by city, cuisine, format",
@@ -256,10 +256,10 @@
       "q2": "Can we export and walk away?",
       "a2": "Yes. The admin has Export JSON today. Production adds CSV and a one-click backup to your Google Drive or S3 bucket.",
       "q3": "What about the wine photos and prices?",
-      "a3": "The demo carries placeholder labels. Before any guest-facing pitch we replace each entry with a verified vintage photo and current market price — that is part of the pilot.",
+      "a3": "The demo carries placeholder labels. Before any guest-facing pitch we replace each entry with a verified vintage photo and current market price - that is part of the pilot.",
       "q4": "Do guests need internet?",
-      "a4": "Yes — only to open the page. Once loaded the experience is offline-capable; we cache the menu and pairings via the service worker.",
-      "q5": "Multi-language — Polish only?",
+      "a4": "Yes - only to open the page. Once loaded the experience is offline-capable; we cache the menu and pairings via the service worker.",
+      "q5": "Multi-language - Polish only?",
       "a5": "EN and PL are live now. Adding Italian, French, Spanish or German is a one-day swap of the locale dictionary; the schema is already shaped for it.",
       "q6": "What happens after a year of demo?",
       "a6": "Either we have run a paid pilot together, or you walk away with the JSON export and your QR codes in your pocket. There is no lock-in by design."
@@ -336,7 +336,7 @@
       "title": "Curated Pairings",
       "subtitle": "Hand-pick wines for a dish and write the rationale shown to the guest in the chat panel. Curated entries override the algorithm.",
       "noDishes": "Add at least one dish to configure pairings.",
-      "notCurated": "Not curated for this dish — algorithm decides.",
+      "notCurated": "Not curated for this dish - algorithm decides.",
       "reasonEnPlaceholder": "Why it works (English)",
       "reasonPlPlaceholder": "Dlaczego pasuje (polski)"
     },
@@ -357,7 +357,7 @@
   "notFound": {
     "eyebrow": "Something went sideways",
     "title": "We couldn't find that page",
-    "subtitle": "It looks like this link expired or moved. Pick a path below — back to the restaurant map, a featured card, or the Vinokompas tutorial.",
+    "subtitle": "It looks like this link expired or moved. Pick a path below - back to the restaurant map, a featured card, or the Vinokompas tutorial.",
     "backHome": "Back to the restaurant map",
     "featured": "Visit {name}",
     "openTutorial": "Vinokompas tutorial"

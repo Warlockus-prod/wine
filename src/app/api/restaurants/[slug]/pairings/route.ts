@@ -1,11 +1,11 @@
 /**
  * /api/restaurants/[slug]/pairings
- *  GET    — list curated pairings (public)
- *  POST   — upsert one curated pairing (admin/editor)
- *  DELETE — remove via ?dishId=&wineId=
+ *  GET    - list curated pairings (public)
+ *  POST   - upsert one curated pairing (admin/editor)
+ *  DELETE - remove via ?dishId=&wineId=
  *
  * Pairings have a unique (restaurant_id, dish_id, wine_id) constraint, so
- * POST is idempotent — submit the same triple twice and it updates the
+ * POST is idempotent - submit the same triple twice and it updates the
  * reason / boost.
  */
 

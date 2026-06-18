@@ -8,7 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { METHOD_STEPS, FAQ_ITEMS } from "@/data/wine-compass-kb";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
-// 3-stage flow lives in this client component; load lazily — keeps the
+// 3-stage flow lives in this client component; load lazily - keeps the
 // hero static-renderable and the heavy SVG/dot pickers off the critical
 // path until the user scrolls.
 const StagedTutorial = dynamic(() => import("@/components/winocompas/StagedTutorial"), {
@@ -31,10 +31,10 @@ export default function SamouczekClient() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   // Hydrate persisted state in useEffect (NOT lazy useState) so SSR and
-  // first-client-render produce identical HTML — hydration-mismatch-free.
+  // first-client-render produce identical HTML - hydration-mismatch-free.
   // The lint rule `react-hooks/set-state-in-effect` flags this; it's a
   // false positive for the "external-store hydration" case (per React 19
-  // docs, equivalent to a network fetch) — keeping the disable.
+  // docs, equivalent to a network fetch) - keeping the disable.
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -93,7 +93,7 @@ export default function SamouczekClient() {
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
             Vinokompas to system, w którym każdy znajdzie swoje wino w 3 prostych krokach.
-            Zaczynasz od smaku, dorzucasz wrażenia, a jeśli chcesz — zagłębiasz się w tendencje.
+            Zaczynasz od smaku, dorzucasz wrażenia, a jeśli chcesz - zagłębiasz się w tendencje.
             Po każdym etapie zobaczysz wina dopasowane do twojego profilu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -127,7 +127,7 @@ export default function SamouczekClient() {
                 Twój scenariusz dopasowania
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Trzy etapy — każdy z własną rozdzielczością. Możesz przejść etap, pominąć
+                Trzy etapy - każdy z własną rozdzielczością. Możesz przejść etap, pominąć
                 go i wrócić później. Profil zapisuje się automatycznie i pracuje dalej w widoku Pairing.
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function SamouczekClient() {
 
         <Ornament />
 
-        {/* ───────── METODA — 6 STEPS ───────── */}
+        {/* ───────── METODA - 6 STEPS ───────── */}
         <section aria-labelledby="metoda-title" className="scroll-mt-24">
           <header className="mb-10 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">II.</span>
@@ -186,7 +186,7 @@ export default function SamouczekClient() {
                 Pytania i odpowiedzi
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Najczęstsze wątpliwości. Jeśli czegoś brakuje — włącz czat przy scenariuszu i zapytaj przewodnika.
+                Najczęstsze wątpliwości. Jeśli czegoś brakuje - włącz czat przy scenariuszu i zapytaj przewodnika.
               </p>
             </div>
           </header>
@@ -245,7 +245,7 @@ export default function SamouczekClient() {
             Twój profil jest zapisany. Czas znaleźć wina.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-            Otwórz widok Pairing i wybierz danie — zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
+            Otwórz widok Pairing i wybierz danie - zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/pairing" className="pitch-cta-primary">
@@ -260,7 +260,7 @@ export default function SamouczekClient() {
 
       <MobileTabBar />
 
-      {/* Floating persistent chat — hidden when user has disabled it via
+      {/* Floating persistent chat - hidden when user has disabled it via
           the toggle inside <StagedTutorial>. */}
       <FloatingTasteChat profile={profile} disabled={chatDisabled} />
     </div>
