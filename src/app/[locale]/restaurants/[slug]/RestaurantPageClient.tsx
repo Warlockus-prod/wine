@@ -13,6 +13,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
@@ -172,12 +173,14 @@ export default function RestaurantPageClient({
             <aside className="hero-qr-rise rounded-[26px] border border-white/12 bg-black/22 p-4 backdrop-blur-sm sm:rounded-[30px] sm:p-5">
               <div className="flex items-center gap-4 xl:flex-col xl:items-stretch">
                 <div className="relative flex shrink-0 flex-col items-center rounded-[18px] border border-white/10 bg-white/95 p-2 sm:rounded-[24px] sm:p-4">
-                  <Image
-                    src={restaurant.qrUrl}
-                    alt={`QR code for ${t(restaurant.name, lng)}`}
-                    width={192}
-                    height={192}
-                    unoptimized
+                  <QRCodeSVG
+                    value={restaurant.restaurantUrl}
+                    role="img"
+                    aria-label={`QR code for ${t(restaurant.name, lng)}`}
+                    bgColor="#ffffff"
+                    fgColor="#150a0c"
+                    level="M"
+                    marginSize={0}
                     className="h-24 w-24 sm:h-36 sm:w-36 xl:h-48 xl:w-48"
                   />
                   {/* Gold corner brackets framing the QR */}

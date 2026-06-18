@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
@@ -344,12 +344,14 @@ export default function HomeClient({
                           color: "var(--ink-soft)",
                         }}
                       >
-                        <Image
-                          src={restaurant.qrUrl}
-                          alt={`QR code for ${t(restaurant.name, locale)}`}
-                          width={96}
-                          height={96}
-                          unoptimized
+                        <QRCodeSVG
+                          value={restaurant.restaurantUrl}
+                          role="img"
+                          aria-label={`QR code for ${t(restaurant.name, locale)}`}
+                          bgColor="#ffffff"
+                          fgColor="#150a0c"
+                          level="M"
+                          marginSize={0}
                           className="h-24 w-24 rounded-xl bg-white p-2"
                         />
                         <span className="text-[10px] font-semibold tracking-[0.18em] text-gray-400 uppercase">

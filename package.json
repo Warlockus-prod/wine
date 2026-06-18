@@ -21,6 +21,7 @@
     "nodemailer": "^7.0.13",
     "openai": "^6.36.0",
     "postgres": "^3.4.9",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "swr": "^2.4.1",
