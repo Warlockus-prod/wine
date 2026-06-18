@@ -701,7 +701,7 @@ export default function PairingClient() {
                         : topRank === 3
                           ? "border-emerald-300/50 bg-emerald-300/10 opacity-90"
                           : isMatch
-                            ? "border-primary/20 bg-white/4 opacity-72 hover:opacity-100"
+                            ? "border-primary/20 bg-white/4 opacity-90 hover:opacity-100"
                             : "border-white/6 bg-black/14 opacity-35 grayscale hover:opacity-55";
 
                 return (
