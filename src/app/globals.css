@@ -57,8 +57,8 @@
   /* Type — wine-ink scale. ink-muted darkened for legibility on white. */
   --ink: #1a0f11;
   --ink-strong: #0a0506;
-  --ink-soft: #4a3438;
-  --ink-muted: #6f5d57;
+  --ink-soft: #3a2a2d;   /* darker → crisper secondary text on cream (was #4a3438) */
+  --ink-muted: #574742;  /* darker → meta/labels readable on cream (was #6f5d57) */
 
   /* Lines — clearly visible on white so cards have crisp edges (the
      previous 0.06/0.14 made everything look muddy / borderless). */
