@@ -658,7 +658,7 @@ export default function PairingClient() {
 
           <section
             ref={wineListRef}
-            className="min-w-0 rounded-[30px] border border-white/10 bg-[#120a0ccc] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5"
+            className="min-w-0 rounded-[30px] border border-white/10 bg-black/15 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5"
           >
             <div className="mb-4 border-b border-white/8 pb-4">
               <div className="flex flex-wrap items-end justify-between gap-3">
@@ -692,18 +692,19 @@ export default function PairingClient() {
                         ? tx("budgetPick")
                         : null;
 
+                // Mirror the Menu column's card styling so the two columns
+                // read as one consistent surface (the wine column used to be a
+                // dark panel with per-rank gold/blue/green tints that clashed
+                // with the light Menu column and hurt readability). Only the
+                // selected/best wine gets the gold highlight; the rest are
+                // neutral and theme-aware; rank is conveyed by the #1/#2/#3
+                // badge below, not the whole-card colour.
                 const toneClass =
                   isSelected
-                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/14 to-[var(--color-accent-gold)]/12 shadow-[0_0_0_3px_rgba(197,160,89,0.32),0_24px_48px_rgba(209,21,52,0.30)] opacity-100"
-                    : topRank === 1
-                      ? "border-amber-200/65 bg-amber-300/10 opacity-100"
-                      : topRank === 2
-                        ? "border-sky-300/50 bg-sky-300/10 opacity-95"
-                        : topRank === 3
-                          ? "border-emerald-300/50 bg-emerald-300/10 opacity-90"
-                          : isMatch
-                            ? "border-primary/20 bg-white/4 opacity-90 hover:opacity-100"
-                            : "border-white/6 bg-black/14 opacity-35 grayscale hover:opacity-55";
+                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(197,160,89,0.30),0_18px_42px_rgba(197,160,89,0.22)] opacity-100"
+                    : isMatch
+                      ? "border-2 border-white/8 bg-black/18 opacity-90 hover:border-white/22 hover:opacity-100"
+                      : "border-2 border-white/6 bg-black/14 opacity-40 grayscale hover:opacity-60";
 
                 return (
                   <button
