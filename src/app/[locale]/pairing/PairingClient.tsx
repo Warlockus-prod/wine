@@ -579,7 +579,7 @@ export default function PairingClient() {
               </span>
             </div>
 
-            <div className="hide-scrollbar flex max-h-[62vh] flex-col gap-3 overflow-y-auto pr-1">
+            <div className="hide-scrollbar -mx-1.5 flex max-h-[62vh] flex-col gap-3 overflow-y-auto px-1.5 py-1.5">
               {sortedDishes.map((dish) => {
                 const isActive = dish.id === activeDish.id;
                 const ranking = selectedWine ? dishRankings.get(dish.id) : null;
@@ -726,7 +726,7 @@ export default function PairingClient() {
               </div>
             </div>
 
-            <div className="hide-scrollbar flex max-h-[62vh] flex-col gap-3 overflow-y-auto pr-1">
+            <div className="hide-scrollbar -mx-1.5 flex max-h-[62vh] flex-col gap-3 overflow-y-auto px-1.5 py-1.5">
               {sortedWines.map((wine) => {
                 const match = matchMap.get(wine.id);
                 const isMatch = Boolean(match);
