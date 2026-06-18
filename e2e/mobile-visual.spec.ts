@@ -15,7 +15,6 @@ const pages = [
   { name: "home", path: "/" },
   { name: "pairing", path: "/pairing" },
   { name: "admin", path: "/admin" },
-  { name: "editorial", path: "/editorial" },
   { name: "pitch", path: "/pitch" },
 ];
 

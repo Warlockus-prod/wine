@@ -14,6 +14,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
+import RestaurantFormat from "@/components/v2/RestaurantFormat";
 import { useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
@@ -102,9 +103,10 @@ export default function RestaurantPageClient({
                 <span className="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm">
                   {restaurant.cuisine}
                 </span>
-                <span className="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm">
-                  {restaurant.format}
-                </span>
+                <RestaurantFormat
+                  format={restaurant.format}
+                  typeClassName="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm"
+                />
                 <span className="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm">
                   {restaurant.city}, {restaurant.country}
                 </span>

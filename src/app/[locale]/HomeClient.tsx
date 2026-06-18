@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
+import RestaurantFormat from "@/components/v2/RestaurantFormat";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MobileTabBar from "@/components/v2/MobileTabBar";
@@ -321,11 +322,10 @@ export default function HomeClient({
                         className="min-w-0 flex-1 text-left"
                       >
                         <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={`rounded-full bg-gradient-to-r px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-white uppercase ${restaurant.coverGradient}`}
-                          >
-                            {restaurant.format}
-                          </span>
+                          <RestaurantFormat
+                            format={restaurant.format}
+                            typeClassName={`rounded-full bg-gradient-to-r px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-white uppercase ${restaurant.coverGradient}`}
+                          />
                           <span className="text-[11px] font-semibold tracking-[0.18em] text-gray-500 uppercase">
                             {restaurant.city}, {restaurant.country}
                           </span>

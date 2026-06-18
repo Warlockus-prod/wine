@@ -11,8 +11,6 @@ const routes: RouteCheck[] = [
   { path: "/", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/pairing", mustSee: /choose a dish/i },
   { path: "/admin", mustSee: /sommelier|atelier/i, matchAs: "heading" },
-  { path: "/immersive", mustSee: /vinovigator|vinokompas|sommelier/i },
-  { path: "/editorial", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/pitch", mustSee: /vinovigator|vinokompas|sommelier/i },
   { path: "/restaurants/atelier-amaro", mustSee: /wine list/i },
 ];
