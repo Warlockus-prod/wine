@@ -7,6 +7,7 @@ import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import ThemeToggle from "./ThemeToggle";
+import Icon from "@/components/v2/Icon";
 
 const PHONE_WIDTH = 390;
 const PHONE_HEIGHT = 844;
@@ -49,7 +50,7 @@ export default function Navigation() {
             aria-label="Vinovigator AI — strona główna"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded bg-primary text-white">
-              <span className="material-icons text-base">wine_bar</span>
+              <Icon name="wine_bar" className="text-base" />
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
               Vinovigator<span className="text-primary"> AI</span>
@@ -102,7 +103,7 @@ export default function Navigation() {
                 onClick={() => setPreviewMode(true)}
                 className="hidden items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/15 px-3 py-2 text-xs font-semibold text-primary transition-all hover:bg-primary hover:text-white md:flex"
               >
-                <span className="material-icons text-sm">smartphone</span>
+                <Icon name="smartphone" className="text-sm" />
                 <span>Mobile</span>
               </button>
             ) : null}
@@ -112,7 +113,7 @@ export default function Navigation() {
               href="/admin"
               className="hidden items-center gap-2 rounded-lg border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-sm font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20 md:inline-flex"
             >
-              <span className="material-icons text-base">person</span>
+              <Icon name="person" className="text-base" />
               Panel
             </Link>
             <button
@@ -121,7 +122,7 @@ export default function Navigation() {
               onClick={() => setMobileOpen((prev) => !prev)}
               className="inline-flex rounded-lg border border-white/20 bg-white/10 p-2.5 text-white transition hover:bg-white/20 md:hidden"
             >
-              <span className="material-icons text-base">{mobileOpen ? "close" : "menu"}</span>
+              <Icon name={mobileOpen ? "close" : "menu"} className="text-base" />
             </button>
           </div>
         </div>
@@ -204,7 +205,7 @@ export default function Navigation() {
                   onClick={() => setPreviewMode(false)}
                   className="flex items-center gap-2 rounded-full border border-white/20 bg-surface-dark px-4 py-2.5 text-sm font-semibold text-white shadow-2xl transition hover:border-primary hover:bg-primary"
                 >
-                  <span className="material-icons text-sm">close</span>
+                  <Icon name="close" className="text-sm" />
                   Close
                 </button>
               </div>

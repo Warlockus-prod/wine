@@ -25,6 +25,7 @@ import {
 import { usePairingDataset } from "@/lib/pairing-store";
 import useSWR from "swr";
 import { swrFetcher } from "@/lib/api-client";
+import Icon from "@/components/v2/Icon";
 import type { CatalogRestaurant } from "@/lib/restaurant-directory";
 import type { Locale } from "@/i18n/routing";
 import type { PairingDish, PairingWine } from "@/types/pairing";
@@ -856,7 +857,7 @@ export default function PairingClient() {
               <article className="rounded-[28px] border border-primary/16 bg-[#170d0ff0] p-5">
                 <div className="flex items-center gap-3 border-b border-white/8 pb-4">
                   <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/18 text-primary">
-                    <span className="material-icons text-lg">smart_toy</span>
+                    <Icon name="smart_toy" className="text-lg" />
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold tracking-[0.22em] text-primary uppercase">

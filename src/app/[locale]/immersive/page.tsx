@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
+import Icon from "@/components/v2/Icon";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 const RESTAURANTS = [
@@ -94,7 +95,7 @@ export default function ImmersivePage() {
                 className="flex items-center gap-2 rounded bg-primary px-8 py-4 text-sm font-bold tracking-widest uppercase opacity-0 transition-all duration-300 hover:scale-105 hover:bg-red-700 animate-[fade-in-up_1s_ease-out_0.8s_forwards]"
               >
                 <span>Explore Pairings</span>
-                <span className="material-icons text-sm">arrow_forward</span>
+                <Icon name="arrow_forward" className="text-sm" />
               </Link>
             </div>
           </section>
@@ -118,7 +119,7 @@ export default function ImmersivePage() {
           href="/pairing"
           className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/30 transition-transform duration-300 hover:scale-110"
         >
-          <span className="material-icons text-white">smart_toy</span>
+          <Icon name="smart_toy" className="text-white" />
           <span className="pointer-events-none absolute right-full mr-4 whitespace-nowrap rounded bg-white px-3 py-1 text-xs font-bold text-ink opacity-0 transition-opacity group-hover:opacity-100">
             Ask Vinovigator AI
           </span>

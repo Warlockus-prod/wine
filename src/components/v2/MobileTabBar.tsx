@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Icon, { type IconName } from "@/components/v2/Icon";
 
-const tabs = [
+const tabs: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Discover", icon: "travel_explore" },
   { href: "/pairing", label: "Pairing", icon: "wine_bar" },
   { href: "/admin", label: "Admin", icon: "settings" },
@@ -28,7 +29,7 @@ export default function MobileTabBar() {
                   active ? "bg-primary/20 text-primary" : "text-gray-300"
                 }`}
               >
-                <span className="material-icons text-base">{tab.icon}</span>
+                <Icon name={tab.icon} className="text-base" />
                 <span>{tab.label}</span>
               </Link>
             </li>

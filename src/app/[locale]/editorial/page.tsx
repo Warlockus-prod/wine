@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
+import Icon from "@/components/v2/Icon";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 
 const CURATED_CARDS = [
@@ -82,18 +83,14 @@ export default function EditorialPage() {
                 className="group flex items-center justify-center gap-3 rounded-lg bg-primary px-8 py-4 shadow-lg shadow-primary/20 transition hover:bg-red-700"
               >
                 <span className="font-medium tracking-wide">Book Experience</span>
-                <span className="material-icons text-sm transition-transform group-hover:translate-x-1">
-                  arrow_forward
-                </span>
+                <Icon name="arrow_forward" className="text-sm transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/"
                 className="group flex items-center justify-center gap-3 rounded-lg border border-white/10 px-8 py-4 transition hover:bg-white/5"
               >
                 <span className="font-medium tracking-wide">View Menu</span>
-                <span className="material-icons text-sm text-gray-400 transition-colors group-hover:text-primary">
-                  restaurant_menu
-                </span>
+                <Icon name="restaurant_menu" className="text-sm text-gray-400 transition-colors group-hover:text-primary" />
               </Link>
               <Link
                 href="/pitch"
@@ -146,7 +143,7 @@ export default function EditorialPage() {
               <article className="max-w-xs cursor-pointer rounded-xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-md transition-transform hover:-translate-y-1">
                 <div className="mb-2 flex items-center gap-3">
                   <div className="rounded-full bg-primary/20 p-1.5">
-                    <span className="material-icons text-sm text-primary">auto_awesome</span>
+                    <Icon name="auto_awesome" className="text-sm text-primary" />
                   </div>
                   <span className="text-xs font-bold tracking-widest text-white/90 uppercase">
                     AI Sommelier
@@ -176,7 +173,7 @@ export default function EditorialPage() {
         </div>
 
         <p className="mx-auto mb-3 max-w-7xl px-6 text-xs tracking-wider text-gray-500 uppercase md:hidden">
-          <span className="material-icons align-middle text-sm">swipe</span> Swipe to explore
+          <Icon name="swipe" className="inline-block align-middle text-sm" /> Swipe to explore
         </p>
         <div className="carousel-mask hide-scrollbar flex gap-6 overflow-x-auto px-6 pb-10">
           {CURATED_CARDS.map((card) => (
@@ -215,7 +212,7 @@ export default function EditorialPage() {
             className="group relative flex aspect-[3/4] w-72 flex-none flex-col items-center justify-center rounded-lg border border-dashed border-gray-700 bg-surface-dark/50 transition-colors hover:bg-surface-dark md:w-80"
           >
             <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary transition-transform group-hover:scale-110">
-              <span className="material-icons">arrow_forward</span>
+              <Icon name="arrow_forward" />
             </div>
             <span className="font-medium text-gray-400">Open Backup Catalog</span>
           </Link>

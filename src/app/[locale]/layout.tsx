@@ -62,21 +62,10 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        {/* Material Symbols Outlined (actively maintained, superset). The
-            legacy /icon?family=Material+Icons endpoint lacks newer glyphs
-            (wine_bar, smart_toy, light_mode, travel_explore…) so they fell
-            back to ligature text. globals.css maps the .material-icons class
-            onto this font so every icon renders without touching components. */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&display=block"
-          rel="stylesheet"
-        />
+        {/* Icons are now inline SVG (src/components/v2/Icon.tsx) — no external
+            icon font, so no FOUC / ligature-text flash on slow networks, and no
+            Google-Fonts dependency. The display fonts are self-hosted via
+            next/font. */}
       </head>
       <body
         className={`${plusJakartaSans.variable} ${playfairDisplay.variable} antialiased`}

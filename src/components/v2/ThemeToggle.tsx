@@ -15,6 +15,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import Icon from "@/components/v2/Icon";
 
 interface Props {
   /** When true, renders the larger labelled variant for mobile menus. */
@@ -44,7 +45,7 @@ export default function ThemeToggle({ withLabel, className }: Props) {
           withLabel ? "h-10 px-3" : "h-10 w-10"
         } ${className ?? ""}`}
       >
-        <span className="material-icons text-[18px] opacity-0">light_mode</span>
+        <Icon name="light_mode" className="text-[18px] opacity-0" />
       </button>
     );
   }
@@ -64,12 +65,11 @@ export default function ThemeToggle({ withLabel, className }: Props) {
         withLabel ? "h-10 px-3 text-xs font-semibold tracking-wider uppercase" : "h-10 w-10"
       } ${className ?? ""}`}
     >
-      <span
-        className="material-icons text-[18px] transition-transform duration-300 group-hover:rotate-12"
+      <Icon
+        name={icon}
+        className="text-[18px] transition-transform duration-300 group-hover:rotate-12"
         style={{ color: isLight ? "var(--ink-strong)" : "var(--color-accent-gold)" }}
-      >
-        {icon}
-      </span>
+      />
       {withLabel ? <span>{label}</span> : null}
     </button>
   );
