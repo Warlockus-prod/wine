@@ -565,10 +565,7 @@ export default function PairingClient() {
           <section className="min-w-0 rounded-[30px] border border-white/10 bg-black/15 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5">
             <div className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
-                <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
-                  {tx("column1")}
-                </p>
-                <h2 className="mt-1 text-2xl font-bold text-white">{tx("menu")}</h2>
+                <h2 className="text-2xl font-bold text-white">{tx("menu")}</h2>
                 <p className="mt-1 text-sm text-gray-400">
                   {tx("reorderedFor", {
                     name: selectedWine ? t(selectedWine.name, locale) : tx("selectedWine"),
@@ -663,10 +660,7 @@ export default function PairingClient() {
             <div className="mb-4 border-b border-white/8 pb-4">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
-                    {tx("column2")}
-                  </p>
-                  <h2 className="mt-1 text-2xl font-bold text-white">{tx("wineList")}</h2>
+                  <h2 className="text-2xl font-bold text-white">{tx("wineList")}</h2>
                   <p className="mt-1 text-sm text-gray-400">
                     {tx("rankedFor", { name: t(activeDish.name, locale) })}
                   </p>
