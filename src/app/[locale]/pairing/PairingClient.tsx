@@ -855,7 +855,7 @@ export default function PairingClient() {
             </div>
 
             <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-              <article className="rounded-[28px] border border-primary/16 bg-[#170d0ff0] p-5">
+              <article className="rounded-[28px] border border-primary/16 bg-black/15 p-5 backdrop-blur-sm">
                 <div className="flex items-center gap-3 border-b border-white/8 pb-4">
                   <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/18 text-primary">
                     <Icon name="smart_toy" className="text-lg" />
