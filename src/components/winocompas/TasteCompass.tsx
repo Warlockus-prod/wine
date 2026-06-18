@@ -646,8 +646,13 @@ export default function TasteCompass({
           fontFamily="var(--font-serif)"
           fontStyle="italic"
           fontSize={12}
+          fontWeight={500}
           fill="var(--color-accent-gold)"
-          opacity={0.9}
+          stroke="var(--compass-halo-center)"
+          strokeWidth={2.2}
+          strokeLinejoin="round"
+          paintOrder="stroke"
+          opacity={1}
           pointerEvents="none"
         >
           Vinokompas
@@ -706,7 +711,11 @@ export default function TasteCompass({
                   fontWeight={600}
                   letterSpacing="0.04em"
                   fill="var(--ink)"
-                  opacity={0.9}
+                  stroke="var(--compass-halo)"
+                  strokeWidth={1.8}
+                  strokeLinejoin="round"
+                  paintOrder="stroke"
+                  opacity={1}
                   className="select-none"
                 >
                   {lines.length === 1 ? (
@@ -746,9 +755,13 @@ export default function TasteCompass({
               fontFamily="var(--font-serif)"
               fontStyle="italic"
               fontSize={level === 2 ? 13 : 11}
-              fontWeight={level === 2 ? 600 : 500}
+              fontWeight={600}
               fill="var(--ink)"
-              opacity={level === 2 ? 0.95 : 0.65}
+              stroke="var(--compass-halo)"
+              strokeWidth={2.4}
+              strokeLinejoin="round"
+              paintOrder="stroke"
+              opacity={level === 2 ? 1 : 0.85}
               pointerEvents="none"
               className="select-none"
             >

@@ -312,7 +312,7 @@ export default function InteractiveCompass({
         </div>
 
         {tourActive ? (
-          <p className="mt-2 max-w-[440px] text-center text-[11px] leading-snug text-[var(--color-accent-gold)]/70">
+          <p className="mt-2 max-w-[440px] text-center text-[11px] leading-snug text-[var(--ink-soft)]">
             Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) -
             kliknij koło, aby wybrać siłę.
           </p>

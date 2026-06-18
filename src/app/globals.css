@@ -18,6 +18,10 @@
   --surface-deep: #150a0c;        /* hero, ribbon body, parchment base */
   --surface-input: #1a0e10;       /* form fields */
   --surface-terminal: #0a0506;    /* API playground */
+  /* Compass label halo (paint-order:stroke under the fill) — dark in dark
+     theme so the light ink text cuts out cleanly over any wedge colour. */
+  --compass-halo: rgba(21, 10, 12, 0.82);
+  --compass-halo-center: rgba(8, 4, 5, 0.55);   /* gold medallion: dark in both themes */
   --ink: #f4ede0;                 /* primary text on dark */
   --ink-strong: #ffffff;          /* bright headings on dark */
   --ink-soft: #d6cdc0;            /* secondary text */
@@ -53,6 +57,10 @@
   --surface-deep: #faf6ec;       /* hero / ribbon — barely-there cream wash */
   --surface-input: #fbfbf9;      /* forms — almost white */
   --surface-terminal: #1d1316;   /* terminal stays dark on purpose */
+  /* Light theme: halo is cream so the dark ink text cuts out over pastel
+     wedges; center medallion keeps a dark halo so the gold reads on cream. */
+  --compass-halo: rgba(250, 246, 236, 0.92);
+  --compass-halo-center: rgba(21, 10, 12, 0.6);
 
   /* Type — wine-ink scale. ink-muted darkened for legibility on white. */
   --ink: #1a0f11;
