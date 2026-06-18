@@ -1,18 +1,14 @@
-import { expect, test, devices, type TestOptions } from "@playwright/test";
+import { expect, test, devices } from "@playwright/test";
 
 const mobileUse = (() => {
   const device = devices["iPhone 13"];
-  const use: TestOptions = {
+  return {
     viewport: device.viewport,
     userAgent: device.userAgent,
     deviceScaleFactor: device.deviceScaleFactor,
     isMobile: device.isMobile,
     hasTouch: device.hasTouch,
-    locale: device.locale,
-    colorScheme: device.colorScheme,
   };
-
-  return use;
 })();
 
 const pages = [

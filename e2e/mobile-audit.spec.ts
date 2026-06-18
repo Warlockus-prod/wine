@@ -1,4 +1,4 @@
-import { expect, test, devices, type TestOptions } from "@playwright/test";
+import { expect, test, devices } from "@playwright/test";
 
 type RouteCheck = {
   path: string;
@@ -17,14 +17,12 @@ const routes: RouteCheck[] = [
   { path: "/restaurants/atelier-amaro", mustSee: /wine list/i },
 ];
 
-const makeMobileUse = (device: (typeof devices)[keyof typeof devices]): TestOptions => ({
+const makeMobileUse = (device: (typeof devices)[keyof typeof devices]) => ({
   viewport: device.viewport,
   userAgent: device.userAgent,
   deviceScaleFactor: device.deviceScaleFactor,
   isMobile: device.isMobile,
   hasTouch: device.hasTouch,
-  locale: device.locale,
-  colorScheme: device.colorScheme,
 });
 
 const profiles = [
