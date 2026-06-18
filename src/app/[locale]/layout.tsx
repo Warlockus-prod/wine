@@ -68,10 +68,14 @@ export default async function LocaleLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        {/* Material Symbols Outlined (actively maintained, superset). The
+            legacy /icon?family=Material+Icons endpoint lacks newer glyphs
+            (wine_bar, smart_toy, light_mode, travel_explore…) so they fell
+            back to ligature text. globals.css maps the .material-icons class
+            onto this font so every icon renders without touching components. */}
         <link
-          href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0"
           rel="stylesheet"
-          fetchPriority="low"
         />
       </head>
       <body
