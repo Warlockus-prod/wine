@@ -25,11 +25,13 @@ export const dynamic = "force-dynamic";
 const reqSchema = z.object({
   dish: z.object({
     name: z.string().min(1).max(200),
-    description: z.string().min(1).max(500),
+    // Description may be empty for DB-sourced items (wines carry `notes`, some
+    // entries have no prose) — tolerate it instead of 400-ing the whole bubble.
+    description: z.string().max(500).optional().default(""),
   }),
   wine: z.object({
     name: z.string().min(1).max(200),
-    description: z.string().min(1).max(500),
+    description: z.string().max(500).optional().default(""),
     grape: z.string().max(100).optional(),
     region: z.string().max(100).optional(),
   }),

@@ -74,7 +74,7 @@ export default async function LocaleLayout({
             back to ligature text. globals.css maps the .material-icons class
             onto this font so every icon renders without touching components. */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&display=block"
           rel="stylesheet"
         />
       </head>

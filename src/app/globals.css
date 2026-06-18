@@ -157,6 +157,19 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 :root[data-theme="light"] .text-gray-400 { color: var(--ink-soft) !important; }
 :root[data-theme="light"] .text-gray-500 { color: var(--ink-muted) !important; }
 
+/* Status-pill / accent text that is light-tinted for the dark theme becomes
+   invisible on cream in light mode (e.g. the "AI GOTOWE" badge uses
+   text-emerald-300 on a faint green bg). Remap to readable 700-weight inks so
+   the pills stay legible in BOTH themes. */
+:root[data-theme="light"] .text-emerald-300,
+:root[data-theme="light"] .text-emerald-200 { color: #047857 !important; }
+:root[data-theme="light"] .text-amber-300,
+:root[data-theme="light"] .text-amber-200 { color: #b45309 !important; }
+:root[data-theme="light"] .text-sky-300,
+:root[data-theme="light"] .text-sky-200 { color: #0369a1 !important; }
+:root[data-theme="light"] .text-rose-300,
+:root[data-theme="light"] .text-rose-200 { color: #be123c !important; }
+
 /* Surfaces */
 :root[data-theme="light"] .bg-background-dark { background-color: var(--surface) !important; }
 :root[data-theme="light"] .bg-surface-dark,
