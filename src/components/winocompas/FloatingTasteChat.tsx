@@ -105,7 +105,7 @@ export default function FloatingTasteChat({
           type="button"
           onClick={() => toggle(true)}
           aria-label="Otwórz przewodnika Vinokompasu"
-          className="group fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(209,21,52,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
+          className="group fixed right-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(209,21,52,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="text-white">

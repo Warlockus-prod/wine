@@ -810,7 +810,11 @@ export default function TasteCompass({
                 fill="var(--color-accent-gold)"
                 opacity={value > 0 ? 1 : 0.55}
               />
-              {/* Label */}
+              {/* Label + value stacked in SCREEN space (value directly below
+                  the label) so they never collide regardless of axis angle —
+                  the old radial value pill overlapped the label on the lower
+                  spokes. High-contrast theme-aware --ink replaces the dim gold
+                  so both read on dark AND light. */}
               <text
                 x={labelX}
                 y={labelY}
@@ -819,23 +823,23 @@ export default function TasteCompass({
                 fontFamily="var(--font-display)"
                 fontSize={level === 1 ? 13 : 10.5}
                 fontWeight={700}
-                letterSpacing="0.18em"
-                fill="var(--color-accent-gold)"
+                letterSpacing="0.16em"
+                fill="var(--ink)"
                 className="select-none"
               >
                 {axis.label}
               </text>
-              {/* Value pill at axis end (level 1 only — too noisy at higher levels) */}
               {level === 1 ? (
                 <text
-                  x={cx + (rOuter + 14) * xUnit}
-                  y={cy + (rOuter + 14) * yUnit}
+                  x={labelX}
+                  y={labelY + 16}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fontFamily="ui-monospace, SFMono-Regular, monospace"
-                  fontSize={10}
+                  fontSize={11}
+                  fontWeight={600}
                   fill="var(--ink)"
-                  opacity={0.75}
+                  opacity={0.78}
                   className="select-none"
                 >
                   {value}/{MAX_INTENSITY}
