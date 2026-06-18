@@ -27,8 +27,12 @@ const buildCsp = (frameAncestors: string) =>
     "object-src 'none'",
     "form-action 'self'",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
-    "style-src 'self' 'unsafe-inline'",
+    // Google Fonts: the Material Icons/Symbols stylesheet is served by
+    // fonts.googleapis.com and the font files by fonts.gstatic.com. Without
+    // these, CSP blocks the icon font and icons render as ligature text
+    // (e.g. "wine_bar", "settings") for every user.
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
     "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
     "worker-src 'self' blob:",
