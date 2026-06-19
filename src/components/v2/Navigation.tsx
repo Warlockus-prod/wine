@@ -64,7 +64,9 @@ export default function Navigation() {
                 <Link
                   key={link.href}
                   className={`text-sm font-medium transition ${
-                    active ? "text-primary" : "text-gray-300 hover:text-white"
+                    active
+                      ? "text-white underline decoration-[#d11534] decoration-2 underline-offset-[6px]"
+                      : "text-gray-300 hover:text-white"
                   }`}
                   href={link.href}
                 >
@@ -101,7 +103,7 @@ export default function Navigation() {
               <button
                 type="button"
                 onClick={() => setPreviewMode(true)}
-                className="hidden items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/15 px-3 py-2 text-xs font-semibold text-primary transition-all hover:bg-primary hover:text-white md:flex"
+                className="hidden items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/15 px-3 py-2 text-xs font-semibold text-white transition-all hover:bg-primary hover:text-white md:flex"
               >
                 <Icon name="smartphone" className="text-sm" />
                 <span>Mobile</span>
