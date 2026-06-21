@@ -85,13 +85,6 @@ const findFocus = (id: string | null): FocusRecord | null => {
   return null;
 };
 
-// Tour pacing presets - labeled so the UI control reads naturally.
-const TOUR_SPEEDS = [
-  { id: "slow", ms: 5000, label: "Wolno" },
-  { id: "normal", ms: 3200, label: "Normalnie" },
-  { id: "fast", ms: 1800, label: "Szybko" },
-] as const;
-type TourSpeedId = (typeof TOUR_SPEEDS)[number]["id"];
 
 export default function InteractiveCompass({
   profile,
@@ -107,7 +100,6 @@ export default function InteractiveCompass({
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [tourOn, setTourOn] = useState(autoStartTour);
   const [tourIdx, setTourIdx] = useState(0);
-  const [tourSpeed, setTourSpeed] = useState<TourSpeedId>("normal");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Clicking the compass during the tour interrupts it: pause, show the
   // user's selection + comment, then auto-resume after 3s.
@@ -118,8 +110,7 @@ export default function InteractiveCompass({
   const tourActive = tourOn && !interrupt;
 
   // Effective interval: explicit prop wins, otherwise pick from preset.
-  const intervalMs =
-    tourMs ?? TOUR_SPEEDS.find((s) => s.id === tourSpeed)?.ms ?? 3200;
+  const intervalMs = tourMs ?? 600;
 
   // Tour cycles through level-specific id set (3 base / 6 sektor / 12 spoke).
   const tourIds = useMemo(() => tourIdsForLevel(level), [level]);
@@ -131,9 +122,13 @@ export default function InteractiveCompass({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTourIdx(0);
-    if (autoStartTour) {
-      setTourOn(true);
-    }
+    if (!autoStartTour) return;
+    setTourOn(true);
+    // Brief auto-presentation: play one pass then hand over to the user — no
+    // manual controls (feedback: "просто пару секунд презентация анимация").
+    const count = tourIdsForLevel(level).length;
+    const stop = window.setTimeout(() => setTourOn(false), count * 600 + 250);
+    return () => window.clearTimeout(stop);
   }, [level, autoStartTour]);
 
   // Tour ticks - paused while interrupted (user is interacting).
@@ -191,16 +186,6 @@ export default function InteractiveCompass({
       break;
     }
   }, [profile, level]);
-
-  const stepTour = useCallback(
-    (dir: 1 | -1) => {
-      setTourIdx((i) => {
-        const n = tourIds.length;
-        return (i + dir + n) % n;
-      });
-    },
-    [tourIds.length],
-  );
 
   const onAskGuide = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -313,100 +298,8 @@ export default function InteractiveCompass({
           </p>
         ) : null}
 
-        {/* Tour controls */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-          {!tourOn ? (
-            <button
-              type="button"
-              onClick={() => {
-                setTourOn(true);
-                setTourIdx(0);
-              }}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-xs font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
-            >
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
-                <path d="M3 2 L10 6 L3 10 Z" />
-              </svg>
-              Auto-przewodnik
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => stepTour(-1)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6e1d6] transition hover:bg-white/10"
-                aria-label="Poprzednia tendencja"
-              >
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
-                  <path d="M9 2 L2 6 L9 10 Z" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  // Pin the spoke the tour was just on so the info panel
-                  // keeps showing it after pause (otherwise focusedId
-                  // collapses to null and the panel reverts to the idle
-                  // state - confusing UX).
-                  if (tourId) setPinnedId(tourId);
-                  setTourOn(false);
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-rose-500/35 bg-rose-900/20 px-4 py-2 text-xs font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
-              >
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
-                  <rect x="2" y="2" width="3" height="8" />
-                  <rect x="7" y="2" width="3" height="8" />
-                </svg>
-                Zatrzymaj
-              </button>
-              <button
-                type="button"
-                onClick={() => stepTour(1)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6e1d6] transition hover:bg-white/10"
-                aria-label="Następna tendencja"
-              >
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
-                  <path d="M3 2 L10 6 L3 10 Z" />
-                </svg>
-              </button>
-              <span
-                className="ml-1 font-mono text-[11px] tracking-wider text-[#c79f69]/70"
-                aria-live="polite"
-              >
-                {tourIdx + 1} / {tourIds.length}
-              </span>
-              {/* Speed picker - sits inline with tour controls. */}
-              <div className="mt-2 flex w-full items-center justify-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#0b1f44]/55 p-0.5 sm:mt-0 sm:ml-2 sm:w-auto" role="radiogroup" aria-label="Tempo przewodnika">
-                {TOUR_SPEEDS.map((s) => {
-                  const active = s.id === tourSpeed;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      onClick={() => setTourSpeed(s.id)}
-                      className={`rounded-full px-2.5 py-1.5 text-[10px] font-bold tracking-wider uppercase transition ${
-                        active
-                          ? "bg-[var(--color-accent-gold)] text-[#081634]"
-                          : "text-[#e6e1d6]/70 hover:text-[#f4efe9]"
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
-
         <p className="mt-3 text-center text-[11px] tracking-wider text-[#c79f69]/55 uppercase">
-          {tourOn
-            ? `Przewodnik prowadzi przez ${tourIds.length} ${
-                level === 1 ? "smaki bazowe" : level === 2 ? "wrażeń" : "tendencji"
-              }`
-            : "Najedź lub kliknij, aby ustawić intensywność"}
+          Najedź lub kliknij, aby ustawić intensywność
         </p>
 
         {/* Selected-profile bar - animated chips appear as the user clicks
