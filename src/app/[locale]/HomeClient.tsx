@@ -267,7 +267,7 @@ export default function HomeClient({
                       style={{
                         borderColor: "rgba(199, 159, 105, 0.45)",
                         background: "rgba(199, 159, 105, 0.15)",
-                        color: "#ff6680",
+                        color: "var(--color-accent-gold)",
                       }}
                     >
                       {tx("openPairing")}

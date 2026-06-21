@@ -344,7 +344,7 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 /* Red-rosé chips (badges) — keep wine accent but lighter base */
 :root[data-theme="light"] [class*="bg-rose-"] {
   background-color: rgba(199, 159, 105, 0.12) !important;
-  color: #8a0a22 !important;
+  color: #0b1f44 !important;
 }
 :root[data-theme="light"] [class*="border-rose-"] {
   border-color: rgba(199, 159, 105, 0.28) !important;
@@ -708,7 +708,7 @@ body {
   gap: 0.85rem;
   padding: 0.95rem 1.6rem;
   background: linear-gradient(180deg, #c79f69 0%, #b0894f 100%);
-  color: #fff5e8;
+  color: #0b1f44;
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -732,13 +732,13 @@ body {
    The dark-mode glow shadow becomes a soft warm shadow (no glowing
    "screen-saver" feel on light backgrounds). */
 :root[data-theme="light"] .pitch-cta-primary {
-  background: linear-gradient(180deg, #b81230 0%, #8a0a22 100%);
+  background: linear-gradient(180deg, #0b1f44 0%, #16294f 100%);
   color: #fbf3e3;
-  border: 1px solid rgba(155, 105, 22, 0.55);
+  border: 1px solid rgba(156, 117, 54, 0.55);
   box-shadow:
     0 1px 0 rgba(255, 230, 200, 0.22) inset,
-    0 6px 20px rgba(138, 10, 34, 0.20),
-    0 1px 2px rgba(40, 10, 12, 0.10);
+    0 6px 20px rgba(11, 31, 68, 0.20),
+    0 1px 2px rgba(11, 31, 68, 0.10);
 }
 :root[data-theme="light"] .pitch-cta-primary:hover {
   box-shadow:
@@ -1022,7 +1022,7 @@ body {
   left: 1.4rem;
   width: 16px;
   height: 26px;
-  background: linear-gradient(180deg, #c79f69, #8a0c22);
+  background: linear-gradient(180deg, #c79f69, #0b1f44);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
