@@ -58,7 +58,7 @@ export default function PerRestaurantEditor({
   };
 
   return (
-    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4ede0]">
+    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4efe9]">
       <Navigation />
 
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
@@ -86,7 +86,7 @@ export default function PerRestaurantEditor({
                   onClick={() => setTab(id)}
                   className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
                     tab === id
-                      ? "bg-primary text-white shadow-[0_4px_18px_rgba(209,21,52,0.32)]"
+                      ? "bg-primary text-white shadow-[0_4px_18px_rgba(199,159,105,0.32)]"
                       : "text-gray-300 hover:text-white"
                   }`}
                 >
@@ -194,7 +194,7 @@ function DishesTab({
 
   return (
     <section className="space-y-5">
-      <article className="rounded-2xl border border-white/10 bg-[#150a0c] p-5">
+      <article className="rounded-2xl border border-white/10 bg-[#081634] p-5">
         <h2 className="text-lg font-semibold text-white">Nowe danie</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <input className={inputCls} placeholder="Name (EN)" aria-label="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -270,7 +270,7 @@ function DishRow({
   };
 
   return (
-    <article className="overflow-hidden rounded-xl border border-white/10 bg-[#150a0c]">
+    <article className="overflow-hidden rounded-xl border border-white/10 bg-[#081634]">
       <button type="button" onClick={() => setOpen((p) => !p)} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/4">
         <span className="text-[10px] font-bold tracking-wider text-[var(--color-accent-gold)] uppercase">{dish.category}</span>
         <span className="font-semibold text-white">{t(dish.name, locale)}</span>
@@ -354,7 +354,7 @@ function WinesTab({
 
   return (
     <section className="space-y-5">
-      <article className="rounded-2xl border border-white/10 bg-[#150a0c] p-5">
+      <article className="rounded-2xl border border-white/10 bg-[#081634] p-5">
         <h2 className="text-lg font-semibold text-white">Nowe wino</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <input className={inputCls} placeholder="Name (EN)" aria-label="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -431,7 +431,7 @@ function WineRow({
   };
 
   return (
-    <article className="overflow-hidden rounded-xl border border-white/10 bg-[#150a0c]">
+    <article className="overflow-hidden rounded-xl border border-white/10 bg-[#081634]">
       <button type="button" onClick={() => setOpen((p) => !p)} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/4">
         <span className="text-[10px] font-bold tracking-wider text-[var(--color-accent-gold)] uppercase">{wine.style}</span>
         <span className="font-semibold text-white">{t(wine.name, locale)}</span>
@@ -537,7 +537,7 @@ function PairingsTab({
 
   return (
     <section className="space-y-5">
-      <article className="rounded-2xl border border-white/10 bg-[#150a0c] p-5">
+      <article className="rounded-2xl border border-white/10 bg-[#081634] p-5">
         <p className="text-[11px] font-bold tracking-wider text-[var(--color-accent-gold)] uppercase">Wybierz danie</p>
         <select
           value={dishOk}
@@ -560,7 +560,7 @@ function PairingsTab({
             <article
               key={w.id}
               className={`rounded-xl border p-4 transition-colors ${
-                selected ? "border-primary/45 bg-primary/8" : "border-white/10 bg-[#150a0c]"
+                selected ? "border-primary/45 bg-primary/8" : "border-white/10 bg-[#081634]"
               }`}
             >
               <label className="flex cursor-pointer items-start gap-2 text-sm font-semibold text-white">
@@ -600,4 +600,4 @@ function PairingsTab({
 }
 
 const inputCls =
-  "w-full rounded-lg border border-white/12 bg-[#1a0e10] px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none";
+  "w-full rounded-lg border border-white/12 bg-[#122446] px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none";

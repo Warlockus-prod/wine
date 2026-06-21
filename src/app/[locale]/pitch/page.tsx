@@ -40,10 +40,10 @@ export default async function PitchPage({
 
   const PhoneMockup = (
     <div className="pitch-phone w-[260px] flex-shrink-0">
-      <div className="rounded-[26px] bg-[#150a0c] p-3">
+      <div className="rounded-[26px] bg-[#081634] p-3">
         {/* Header pill */}
         <div className="mb-3 flex items-center justify-between">
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-semibold tracking-[0.22em] text-[#f4c1c8] uppercase">
+          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-semibold tracking-[0.22em] text-[#e1d3b5] uppercase">
             Pairing
           </span>
           <span className="text-[9px] tracking-[0.22em] text-emerald-300/80 uppercase">
@@ -53,17 +53,17 @@ export default async function PitchPage({
 
         {/* Top match card */}
         <div className="mb-3 rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/20 to-primary/5 p-3">
-          <p className="text-[8px] font-bold tracking-[0.22em] text-[#f4c1c8] uppercase">
+          <p className="text-[8px] font-bold tracking-[0.22em] text-[#e1d3b5] uppercase">
             #1 Best Match
           </p>
           <p className="mt-1 text-[13px] font-semibold text-white leading-tight">
             Trimbach Riesling
           </p>
-          <p className="text-[10px] text-[#e6d3c0]/80">96% • Alsace, 2020</p>
+          <p className="text-[10px] text-[#e1d3b5]/80">96% • Alsace, 2020</p>
         </div>
 
         {/* Sommelier Bot panel */}
-        <div className="rounded-2xl border border-[rgba(197,160,89,0.22)] bg-[#170d0f] p-3">
+        <div className="rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44] p-3">
           <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-3">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" /></svg>
@@ -94,7 +94,7 @@ export default async function PitchPage({
   );
 
   const MapMockup = (
-    <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#0f0709] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
+    <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#060e22] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
       <div className="pitch-browser-bar">
         <span className="pitch-browser-dot bg-[#ff5f57]" />
         <span className="pitch-browser-dot bg-[#febc2e]" />
@@ -103,10 +103,10 @@ export default async function PitchPage({
           wine.icoffio.com/pl
         </span>
       </div>
-      <div className="relative h-[200px] bg-[radial-gradient(circle_at_30%_20%,rgba(209,21,52,0.16),transparent_40%),radial-gradient(circle_at_75%_70%,rgba(197,160,89,0.12),transparent_40%),linear-gradient(160deg,#1a0e10,#0c0506)]">
+      <div className="relative h-[200px] bg-[radial-gradient(circle_at_30%_20%,rgba(199,159,105,0.16),transparent_40%),radial-gradient(circle_at_75%_70%,rgba(199,159,105,0.12),transparent_40%),linear-gradient(160deg,#122446,#060e22)]">
         {/* Faux coastline strokes */}
         <svg viewBox="0 0 300 200" className="absolute inset-0 h-full w-full opacity-25" aria-hidden>
-          <path d="M20 140 L60 110 L80 120 L120 90 L160 88 L200 70 L240 82 L270 70 L290 100 L260 130 L220 145 L180 142 L140 150 L100 158 L60 150 Z" stroke="rgba(197,160,89,0.5)" strokeWidth="0.6" fill="rgba(255,255,255,0.04)" />
+          <path d="M20 140 L60 110 L80 120 L120 90 L160 88 L200 70 L240 82 L270 70 L290 100 L260 130 L220 145 L180 142 L140 150 L100 158 L60 150 Z" stroke="rgba(199,159,105,0.5)" strokeWidth="0.6" fill="rgba(255,255,255,0.04)" />
         </svg>
         {/* Markers */}
         {[
@@ -122,11 +122,11 @@ export default async function PitchPage({
             style={{ left: m.left, top: m.top }}
             title={m.label}
           >
-            <span className="block h-3 w-3 rounded-full border-2 border-white/85 bg-primary shadow-[0_0_0_6px_rgba(209,21,52,0.18)]" />
+            <span className="block h-3 w-3 rounded-full border-2 border-white/85 bg-primary shadow-[0_0_0_6px_rgba(199,159,105,0.18)]" />
           </span>
         ))}
         {/* Floating venue card */}
-        <div className="absolute right-3 bottom-3 left-3 rounded-xl border border-white/10 bg-[#170d0fec] p-3 backdrop-blur">
+        <div className="absolute right-3 bottom-3 left-3 rounded-xl border border-white/10 bg-[#0b1f44ec] p-3 backdrop-blur">
           <p className="text-[8px] font-bold tracking-[0.24em] text-primary uppercase">
             Selected
           </p>
@@ -138,13 +138,13 @@ export default async function PitchPage({
   );
 
   const AdminMockup = (
-    <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#100709] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
-      <div className="border-b border-white/6 bg-[#1a0e10] px-4 py-3">
+    <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#081634] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
+      <div className="border-b border-white/6 bg-[#122446] px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <span className="text-[10px] font-bold tracking-[0.22em] text-primary uppercase">
             V2 Admin Studio
           </span>
-          <span className="rounded-full border border-[rgba(197,160,89,0.32)] px-2 py-0.5 text-[9px] tracking-wider text-[var(--color-accent-gold)] uppercase">
+          <span className="rounded-full border border-[rgba(199,159,105,0.32)] px-2 py-0.5 text-[9px] tracking-wider text-[var(--color-accent-gold)] uppercase">
             EN | PL
           </span>
         </div>
@@ -157,7 +157,7 @@ export default async function PitchPage({
             <div key={name} className="rounded-lg border border-white/8 bg-black/30 p-2">
               <div className="grid grid-cols-2 gap-1">
                 <div className="rounded bg-white/4 px-2 py-1 text-[10px] text-gray-200">{name}</div>
-                <div className="rounded bg-white/4 px-2 py-1 text-[10px] italic text-[#e6d3c0]">{name === "Escargots" ? "Ślimaki" : name === "Duck Confit" ? "Konfitowana kaczka" : "Tatar"}</div>
+                <div className="rounded bg-white/4 px-2 py-1 text-[10px] italic text-[#e1d3b5]">{name === "Escargots" ? "Ślimaki" : name === "Duck Confit" ? "Konfitowana kaczka" : "Tatar"}</div>
               </div>
               <div className="mt-1 h-2 rounded bg-white/4" />
             </div>
@@ -214,14 +214,14 @@ export default async function PitchPage({
   }));
 
   return (
-    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4ede0]">
+    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4efe9]">
       <Navigation />
 
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
         {/* ──────────────────────────  HERO  ────────────────────────── */}
         <section
           aria-labelledby="hero-title"
-          className="relative overflow-hidden rounded-[40px] border border-white/8 bg-[radial-gradient(circle_at_8%_18%,rgba(209,21,52,0.22),transparent_42%),radial-gradient(circle_at_92%_82%,rgba(197,160,89,0.18),transparent_46%),linear-gradient(180deg,#1d1013_0%,#120709_100%)] px-6 py-14 sm:px-12 sm:py-20 lg:px-16 lg:py-28"
+          className="relative overflow-hidden rounded-[40px] border border-white/8 bg-[radial-gradient(circle_at_8%_18%,rgba(199,159,105,0.22),transparent_42%),radial-gradient(circle_at_92%_82%,rgba(199,159,105,0.18),transparent_46%),linear-gradient(180deg,#122a52_0%,#081634_100%)] px-6 py-14 sm:px-12 sm:py-20 lg:px-16 lg:py-28"
         >
           <div className="pitch-corner pitch-corner--tl hidden lg:block" aria-hidden />
           <div className="pitch-corner pitch-corner--br hidden lg:block" aria-hidden />
@@ -263,7 +263,7 @@ export default async function PitchPage({
               className="pitch-fade relative flex items-center justify-center lg:justify-end"
               style={{ animationDelay: "150ms" }}
             >
-              <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(197,160,89,0.18),transparent_60%)]" aria-hidden />
+              <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(199,159,105,0.18),transparent_60%)]" aria-hidden />
               <div className="relative">
                 <div className="absolute -top-6 -left-10 hidden lg:block">
                   <span className="pitch-stamp">
@@ -304,7 +304,7 @@ export default async function PitchPage({
               return (
                 <li
                   key={i}
-                  className={`grid gap-6 rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(34,18,22,0.7),rgba(20,11,13,0.7))] p-6 transition-colors duration-500 hover:border-[rgba(197,160,89,0.35)] sm:p-8 lg:grid-cols-[8rem_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-12 ${isEven ? "lg:rounded-tl-[60px]" : "lg:rounded-tr-[60px]"}`}
+                  className={`grid gap-6 rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(34,18,22,0.7),rgba(20,11,13,0.7))] p-6 transition-colors duration-500 hover:border-[rgba(199,159,105,0.35)] sm:p-8 lg:grid-cols-[8rem_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-12 ${isEven ? "lg:rounded-tl-[60px]" : "lg:rounded-tr-[60px]"}`}
                 >
                   <span className="pitch-display text-5xl text-[var(--color-accent-gold)]">
                     {String(i + 1).padStart(2, "0")}
@@ -337,18 +337,18 @@ export default async function PitchPage({
             </div>
           </header>
 
-          <div className="grid gap-px overflow-hidden rounded-3xl border border-[rgba(197,160,89,0.18)] bg-[rgba(197,160,89,0.18)] sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-px overflow-hidden rounded-3xl border border-[rgba(199,159,105,0.18)] bg-[rgba(199,159,105,0.18)] sm:grid-cols-2 lg:grid-cols-4">
             {features.map((f, i) => (
               <article
                 key={i}
-                className="group relative bg-[#150a0c] p-7 transition-colors duration-500 hover:bg-[#1c1014]"
+                className="group relative bg-[#081634] p-7 transition-colors duration-500 hover:bg-[#1c1014]"
               >
                 <span className="pitch-roman text-[0.72rem]">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="pitch-display mt-4 text-xl text-white sm:text-2xl">{f.title}</h3>
                 <p className="mt-3 text-sm leading-[1.65] text-[#cbc1b1]">{f.body}</p>
                 <span
                   aria-hidden
-                  className="absolute right-6 bottom-6 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(197,160,89,0.35)] text-[var(--color-accent-gold)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  className="absolute right-6 bottom-6 inline-flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(199,159,105,0.35)] text-[var(--color-accent-gold)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 >
                   <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
                     <path d="M1 5.5h9m0 0L6 1m4 4.5L6 10" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
@@ -428,7 +428,7 @@ export default async function PitchPage({
             </div>
           </header>
 
-          <div className="relative grid gap-8 rounded-3xl border border-[rgba(197,160,89,0.22)] bg-gradient-to-br from-[#150a0c] to-[#0d0506] p-10 sm:grid-cols-2 sm:p-14 lg:grid-cols-4">
+          <div className="relative grid gap-8 rounded-3xl border border-[rgba(199,159,105,0.22)] bg-gradient-to-br from-[#081634] to-[#0d0506] p-10 sm:grid-cols-2 sm:p-14 lg:grid-cols-4">
             <div className="pitch-corner pitch-corner--tl" aria-hidden />
             <div className="pitch-corner pitch-corner--tr" aria-hidden />
             <div className="pitch-corner pitch-corner--bl" aria-hidden />
@@ -473,12 +473,12 @@ export default async function PitchPage({
                   key={i}
                   className={`relative flex flex-col rounded-3xl border p-8 transition-colors duration-500 ${
                     featured
-                      ? "lg:-translate-y-4 border-[rgba(197,160,89,0.55)] bg-[radial-gradient(circle_at_50%_0%,rgba(197,160,89,0.16),transparent_55%),linear-gradient(180deg,#1f1115,#150a0c)] shadow-[0_28px_70px_rgba(0,0,0,0.4)]"
-                      : "border-white/10 bg-[#140a0c] hover:border-white/20"
+                      ? "lg:-translate-y-4 border-[rgba(199,159,105,0.55)] bg-[radial-gradient(circle_at_50%_0%,rgba(199,159,105,0.16),transparent_55%),linear-gradient(180deg,#1f1115,#081634)] shadow-[0_28px_70px_rgba(0,0,0,0.4)]"
+                      : "border-white/10 bg-[#081634] hover:border-white/20"
                   }`}
                 >
                   {featured ? (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-[rgba(197,160,89,0.6)] bg-[#1f1115] px-3 py-1 text-[10px] font-semibold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-[rgba(199,159,105,0.6)] bg-[#1f1115] px-3 py-1 text-[10px] font-semibold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                       {tx("pricing.tier2Featured")}
                     </span>
                   ) : null}
@@ -498,14 +498,14 @@ export default async function PitchPage({
 
                   <p className="mt-3 font-serif text-sm italic text-[#cbc1b1]">{tier.tagline}</p>
 
-                  <span className="my-6 block h-px w-full bg-[rgba(197,160,89,0.18)]" aria-hidden />
+                  <span className="my-6 block h-px w-full bg-[rgba(199,159,105,0.18)]" aria-hidden />
 
                   <ul className="space-y-3">
                     {tier.features.map((f, fi) => (
                       <li key={fi} className="flex items-start gap-3 text-sm leading-relaxed text-[#d4cabc]">
                         <span
                           aria-hidden
-                          className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[rgba(197,160,89,0.45)] text-[var(--color-accent-gold)]"
+                          className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[rgba(199,159,105,0.45)] text-[var(--color-accent-gold)]"
                         >
                           <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                             <path d="M1.5 4.2L3.2 6L6.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -562,7 +562,7 @@ export default async function PitchPage({
         {/* ──────────────────────────  FINAL CTA  ────────────────────────── */}
         <section
           aria-labelledby="final-title"
-          className="relative overflow-hidden rounded-[40px] border border-[rgba(197,160,89,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(209,21,52,0.32),transparent_60%),linear-gradient(180deg,#1d1013,#100608)] px-6 py-20 text-center sm:px-12 lg:px-16 lg:py-28"
+          className="relative overflow-hidden rounded-[40px] border border-[rgba(199,159,105,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(199,159,105,0.32),transparent_60%),linear-gradient(180deg,#122a52,#081634)] px-6 py-20 text-center sm:px-12 lg:px-16 lg:py-28"
         >
           <div className="pitch-corner pitch-corner--tl" aria-hidden />
           <div className="pitch-corner pitch-corner--tr" aria-hidden />

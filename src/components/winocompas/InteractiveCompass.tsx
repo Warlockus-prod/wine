@@ -339,7 +339,7 @@ export default function InteractiveCompass({
               <button
                 type="button"
                 onClick={() => stepTour(-1)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6e1d6] transition hover:bg-white/10"
                 aria-label="Poprzednia tendencja"
               >
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
@@ -367,7 +367,7 @@ export default function InteractiveCompass({
               <button
                 type="button"
                 onClick={() => stepTour(1)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6e1d6] transition hover:bg-white/10"
                 aria-label="Następna tendencja"
               >
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
@@ -375,13 +375,13 @@ export default function InteractiveCompass({
                 </svg>
               </button>
               <span
-                className="ml-1 font-mono text-[11px] tracking-wider text-[#c5a059]/70"
+                className="ml-1 font-mono text-[11px] tracking-wider text-[#c79f69]/70"
                 aria-live="polite"
               >
                 {tourIdx + 1} / {tourIds.length}
               </span>
               {/* Speed picker - sits inline with tour controls. */}
-              <div className="mt-2 flex w-full items-center justify-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#1a0f12]/55 p-0.5 sm:mt-0 sm:ml-2 sm:w-auto" role="radiogroup" aria-label="Tempo przewodnika">
+              <div className="mt-2 flex w-full items-center justify-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#0b1f44]/55 p-0.5 sm:mt-0 sm:ml-2 sm:w-auto" role="radiogroup" aria-label="Tempo przewodnika">
                 {TOUR_SPEEDS.map((s) => {
                   const active = s.id === tourSpeed;
                   return (
@@ -393,8 +393,8 @@ export default function InteractiveCompass({
                       onClick={() => setTourSpeed(s.id)}
                       className={`rounded-full px-2.5 py-1.5 text-[10px] font-bold tracking-wider uppercase transition ${
                         active
-                          ? "bg-[var(--color-accent-gold)] text-[#150a0c]"
-                          : "text-[#e6dccd]/70 hover:text-[#f4ede0]"
+                          ? "bg-[var(--color-accent-gold)] text-[#081634]"
+                          : "text-[#e6e1d6]/70 hover:text-[#f4efe9]"
                       }`}
                     >
                       {s.label}
@@ -406,7 +406,7 @@ export default function InteractiveCompass({
           )}
         </div>
 
-        <p className="mt-3 text-center text-[11px] tracking-wider text-[#c5a059]/55 uppercase">
+        <p className="mt-3 text-center text-[11px] tracking-wider text-[#c79f69]/55 uppercase">
           {tourOn
             ? `Przewodnik prowadzi przez ${tourIds.length} ${
                 level === 1 ? "smaki bazowe" : level === 2 ? "wrażeń" : "tendencji"
@@ -442,7 +442,7 @@ export default function InteractiveCompass({
           return {
             background: focused
               ? `linear-gradient(180deg, ${
-                  focused.kind === "base" ? "rgba(197,160,89,0.12)" : accent + "1f"
+                  focused.kind === "base" ? "rgba(199,159,105,0.12)" : accent + "1f"
                 }, transparent 70%), var(--surface-elevated)`
               : "var(--surface-elevated)",
             borderColor:
@@ -589,7 +589,7 @@ function FocusedCard({
   const accent =
     focused.kind === "tendencja" || focused.kind === "sektor"
       ? focused.sector.color
-      : "#c5a059";
+      : "#c79f69";
 
   // Title + subtitle vary per kind
   const eyebrow =
@@ -636,14 +636,14 @@ function FocusedCard({
           className="inline-block h-3 w-3 rounded-full"
           style={{
             background: accent,
-            boxShadow: `0 0 0 2px #150a0c, 0 0 0 4px ${accent}55`,
+            boxShadow: `0 0 0 2px #081634, 0 0 0 4px ${accent}55`,
           }}
           aria-hidden
         />
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: accent }}>
           {isTour ? "Przewodnik mówi…" : eyebrow}
         </p>
-        <span className="ml-auto font-mono text-[10px] tracking-wider text-[#c5a059]/70">
+        <span className="ml-auto font-mono text-[10px] tracking-wider text-[#c79f69]/70">
           {intensity}/5
         </span>
       </div>
@@ -675,7 +675,7 @@ function FocusedCard({
       <h3 className="pitch-display mt-3 text-2xl text-white">
         {title}
         {subtitle ? (
-          <em className="font-serif text-base italic text-[#e6dccd]/85">{subtitle}</em>
+          <em className="font-serif text-base italic text-[#e6e1d6]/85">{subtitle}</em>
         ) : null}
       </h3>
 
@@ -691,7 +691,7 @@ function FocusedCard({
           and shows instantly on hover/click. */}
       {focused.kind === "base" ? (
         <>
-          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
             <TourText key={`${isTour}:${focused.description}`} text={focused.description} typing={isTour} />
           </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
@@ -702,14 +702,14 @@ function FocusedCard({
         </>
       ) : focused.kind === "sektor" ? (
         <>
-          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
             <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
           </p>
           <dl className="mt-4 space-y-2 text-[12px] leading-relaxed">
             {focused.sector.tendencje.map((t) => (
               <div
                 key={t.id}
-                className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-3 border-b border-[rgba(197,160,89,0.15)] pb-2 last:border-0"
+                className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-3 border-b border-[rgba(199,159,105,0.15)] pb-2 last:border-0"
               >
                 <dt className="font-serif text-[12px] italic text-[var(--color-accent-gold)]">
                   {t.name_pl}
@@ -719,7 +719,7 @@ function FocusedCard({
             ))}
           </dl>
           <details className="mt-4 group">
-            <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4ede0]">
+            <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
               ❦ Pełny opis sektora
             </summary>
             <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
@@ -729,25 +729,25 @@ function FocusedCard({
         </>
       ) : (
         <>
-          <p className="mt-2 text-sm leading-relaxed text-[#e6dccd]">
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
             <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
           </p>
-          <dl className="mt-4 divide-y divide-[rgba(197,160,89,0.16)] text-[13px] leading-relaxed">
+          <dl className="mt-4 divide-y divide-[rgba(199,159,105,0.16)] text-[13px] leading-relaxed">
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Skojarzenia</dt>
-              <dd className="text-[#e6dccd]/90">{focused.tendencja.associations_pl}</dd>
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">Skojarzenia</dt>
+              <dd className="text-[#e6e1d6]/90">{focused.tendencja.associations_pl}</dd>
             </div>
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Przykład</dt>
-              <dd className="font-serif italic text-[#e6dccd]/85">{focused.tendencja.examples_pl}</dd>
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">Przykład</dt>
+              <dd className="font-serif italic text-[#e6e1d6]/85">{focused.tendencja.examples_pl}</dd>
             </div>
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c5a059]/65 uppercase">Spotkasz w</dt>
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">Spotkasz w</dt>
               <dd className="text-[#cbc1b1]">{focused.tendencja.found_in_pl}</dd>
             </div>
           </dl>
           <details className="mt-4 group">
-            <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4ede0]">
+            <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
               ❦ Pełny opis sektora
             </summary>
             <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">{focused.sector.long_pl}</p>
@@ -784,7 +784,7 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
       <h3 className="pitch-display mt-3 text-2xl text-white">
         Najedź na koło lub<br />uruchom przewodnika
       </h3>
-      <p className="mt-3 text-sm leading-relaxed text-[#e6dccd]">
+      <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
         Tarcza Vinokompasu pokaże opis każdego elementu. Możesz też pozwolić,
         by przewodnik przeszedł przez {what.plural} automatycznie - wystarczy nacisnąć przycisk poniżej.
       </p>
@@ -803,14 +803,14 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
         {COMPASS_SECTORS.map((s) => (
           <li
             key={s.id}
-            className="flex items-center gap-1.5 rounded-md border border-[rgba(197,160,89,0.18)] bg-[#1a0f12]/60 px-2 py-1.5"
+            className="flex items-center gap-1.5 rounded-md border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/60 px-2 py-1.5"
           >
             <span
               aria-hidden
               className="h-2.5 w-2.5 rounded-full"
               style={{ background: s.color }}
             />
-            <span className="truncate text-[#e6dccd]">{s.name_pl}</span>
+            <span className="truncate text-[#e6e1d6]">{s.name_pl}</span>
           </li>
         ))}
       </ul>
@@ -861,7 +861,7 @@ function SelectedProfileBar({
   }
 
   return (
-    <div className="mt-5 w-full max-w-[440px] rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#1a0f12]/55 p-3">
+    <div className="mt-5 w-full max-w-[440px] rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#0b1f44]/55 p-3">
       <div className="mb-2 flex items-baseline justify-between gap-2 px-1">
         <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
           Twój profil · {total}
@@ -881,7 +881,7 @@ function SelectedProfileBar({
             key={p.id}
             onMouseEnter={() => onPickHover(p.id)}
             onMouseLeave={() => onPickHover(null)}
-            className="profile-chip inline-flex items-center gap-1.5 rounded-full border bg-[#1a0e10]/70 px-2.5 py-1 text-[11px] text-[#f4ede0] transition hover:scale-105"
+            className="profile-chip inline-flex items-center gap-1.5 rounded-full border bg-[#122446]/70 px-2.5 py-1 text-[11px] text-[#f4efe9] transition hover:scale-105"
             style={{ borderColor: `${p.color}66` }}
           >
             <span
@@ -895,7 +895,7 @@ function SelectedProfileBar({
                 <span
                   key={i}
                   className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: i < p.intensity ? p.color : "rgba(197,160,89,0.18)" }}
+                  style={{ background: i < p.intensity ? p.color : "rgba(199,159,105,0.18)" }}
                 />
               ))}
             </span>
@@ -917,7 +917,7 @@ function SelectedProfileBar({
                 <span
                   key={i}
                   className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: i < p.intensity ? "var(--color-accent-gold)" : "rgba(197,160,89,0.20)" }}
+                  style={{ background: i < p.intensity ? "var(--color-accent-gold)" : "rgba(199,159,105,0.20)" }}
                 />
               ))}
             </span>

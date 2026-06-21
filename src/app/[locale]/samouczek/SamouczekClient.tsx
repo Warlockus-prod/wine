@@ -81,7 +81,7 @@ export default function SamouczekClient() {
         {/* ───────── HERO ───────── */}
         <section
           aria-labelledby="hero-title"
-          className="editorial-hero relative overflow-hidden rounded-[36px] border border-white/8 bg-[radial-gradient(circle_at_10%_20%,rgba(209,21,52,0.18),transparent_45%),radial-gradient(circle_at_90%_85%,rgba(197,160,89,0.18),transparent_45%),linear-gradient(180deg,#1d1013_0%,#120709_100%)] px-5 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20"
+          className="editorial-hero relative overflow-hidden rounded-[36px] border border-white/8 bg-[radial-gradient(circle_at_10%_20%,rgba(199,159,105,0.18),transparent_45%),radial-gradient(circle_at_90%_85%,rgba(199,159,105,0.18),transparent_45%),linear-gradient(180deg,#122a52_0%,#081634_100%)] px-5 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20"
         >
           <span className="pitch-eyebrow pitch-eyebrow--start">Samouczek Vinokompas</span>
           <h1
@@ -161,7 +161,7 @@ export default function SamouczekClient() {
             {METHOD_STEPS.map((step, i) => (
               <li
                 key={step.id}
-                className="grid gap-4 rounded-3xl border border-white/8 bg-[#150a0c] p-5 transition-colors duration-500 hover:border-[rgba(197,160,89,0.32)] sm:p-7 lg:grid-cols-[7rem_minmax(0,1fr)] lg:items-start lg:gap-10"
+                className="grid gap-4 rounded-3xl border border-white/8 bg-[#081634] p-5 transition-colors duration-500 hover:border-[rgba(199,159,105,0.32)] sm:p-7 lg:grid-cols-[7rem_minmax(0,1fr)] lg:items-start lg:gap-10"
               >
                 <span className="pitch-display text-4xl text-[var(--color-accent-gold)] sm:text-5xl">
                   {String(i + 1).padStart(2, "0")}
@@ -191,22 +191,22 @@ export default function SamouczekClient() {
             </div>
           </header>
 
-          <ul className="border-t border-[rgba(197,160,89,0.18)]">
+          <ul className="border-t border-[rgba(199,159,105,0.18)]">
             {FAQ_ITEMS.map((item, i) => {
               const open = i === openFaq;
               return (
-                <li key={i} className="border-b border-[rgba(197,160,89,0.18)]">
+                <li key={i} className="border-b border-[rgba(199,159,105,0.18)]">
                   <button
                     type="button"
                     aria-expanded={open}
                     onClick={() => setOpenFaq(open ? null : i)}
-                    className="group flex w-full items-start gap-2 py-5 text-left transition-colors hover:bg-[rgba(197,160,89,0.04)] sm:py-6"
+                    className="group flex w-full items-start gap-2 py-5 text-left transition-colors hover:bg-[rgba(199,159,105,0.04)] sm:py-6"
                   >
                     <span className="pitch-faq-marker pt-1">{String(i + 1).padStart(2, "0")}.</span>
                     <span className="pitch-faq-q">{item.q_pl}</span>
                     <span
                       aria-hidden
-                      className="ml-3 mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(197,160,89,0.32)] text-[var(--color-accent-gold)] transition-transform duration-500"
+                      className="ml-3 mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(199,159,105,0.32)] text-[var(--color-accent-gold)] transition-transform duration-500"
                       style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
                     >
                       <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
@@ -235,7 +235,7 @@ export default function SamouczekClient() {
         {/* ───────── FINAL CTA ───────── */}
         <section
           aria-labelledby="final-title"
-          className="editorial-hero editorial-hero--center relative overflow-hidden rounded-[36px] border border-[rgba(197,160,89,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(209,21,52,0.32),transparent_60%),linear-gradient(180deg,#1d1013,#100608)] px-5 py-16 text-center sm:px-10 sm:py-20"
+          className="editorial-hero editorial-hero--center relative overflow-hidden rounded-[36px] border border-[rgba(199,159,105,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(199,159,105,0.32),transparent_60%),linear-gradient(180deg,#122a52,#081634)] px-5 py-16 text-center sm:px-10 sm:py-20"
         >
           <span className="pitch-eyebrow">Gotowe?</span>
           <h2

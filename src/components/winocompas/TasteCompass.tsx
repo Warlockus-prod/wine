@@ -798,7 +798,7 @@ export default function TasteCompass({
                 y1={cy}
                 x2={cx + (rOuter - 4) * xUnit}
                 y2={cy + (rOuter - 4) * yUnit}
-                stroke="rgba(197, 160, 89, 0.30)"
+                stroke="rgba(199, 159, 105, 0.30)"
                 strokeWidth={0.8}
                 strokeDasharray="2 3"
               />

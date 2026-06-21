@@ -21,12 +21,12 @@ const palette: Record<
   WineStyleHint,
   { glass: string; liquid: string; capsule: string; label: string }
 > = {
-  red: { glass: "#0a3315", liquid: "#5a0a18", capsule: "#1a0408", label: "#f4ede0" },
-  white: { glass: "#5b6b3a", liquid: "#e7d68a", capsule: "#2a1f10", label: "#f4ede0" },
-  sparkling: { glass: "#0d3520", liquid: "#e7c97a", capsule: "#c5a059", label: "#0c0506" },
-  rose: { glass: "#a8a098", liquid: "#e8a4a0", capsule: "#3a1a1a", label: "#f4ede0" },
-  dessert: { glass: "#3a1a08", liquid: "#a85a18", capsule: "#1a0408", label: "#f4ede0" },
-  default: { glass: "#1a0a0c", liquid: "#5a0a18", capsule: "#0c0506", label: "#f4ede0" },
+  red: { glass: "#0a3315", liquid: "#5a0a18", capsule: "#0b1f44", label: "#f4efe9" },
+  white: { glass: "#5b6b3a", liquid: "#e7d68a", capsule: "#2a1f10", label: "#f4efe9" },
+  sparkling: { glass: "#0d3520", liquid: "#e7c97a", capsule: "#c79f69", label: "#060e22" },
+  rose: { glass: "#a8a098", liquid: "#e8a4a0", capsule: "#3a1a1a", label: "#f4efe9" },
+  dessert: { glass: "#3a1a08", liquid: "#a85a18", capsule: "#0b1f44", label: "#f4efe9" },
+  default: { glass: "#0b1f44", liquid: "#5a0a18", capsule: "#060e22", label: "#f4efe9" },
 };
 
 const detectStyle = (style?: string, grape?: string): WineStyleHint => {

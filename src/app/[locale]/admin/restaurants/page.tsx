@@ -29,7 +29,7 @@ export default function AdminRestaurantsPage() {
   const { data, error, isLoading } = useSWR<ListResponse>("/api/restaurants", swrFetcher);
 
   return (
-    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4ede0]">
+    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4efe9]">
       <Navigation />
 
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
@@ -42,7 +42,7 @@ export default function AdminRestaurantsPage() {
             <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#cbc1b1]">
               Wybierz restaurację, by edytować dania, wina i kuratorskie połączenia. Zmiany trafiają od razu do bazy - pojawiają się u gości w widoku Pairing po odświeżeniu.
             </p>
-            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-[rgba(197,160,89,0.3)] bg-[rgba(197,160,89,0.06)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-[rgba(199,159,105,0.3)] bg-[rgba(199,159,105,0.06)] px-3 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
               {data?.source === "db" ? "DB live" : "Seed fallback"}
             </p>
           </div>
@@ -66,7 +66,7 @@ export default function AdminRestaurantsPage() {
               <li key={r.id}>
                 <Link
                   href={`/admin/restaurants/${r.slug}`}
-                  className={`group block h-full rounded-3xl border border-white/10 bg-[#150a0c] p-5 transition-colors hover:border-[var(--color-accent-gold)] hover:bg-[#1a0e10]`}
+                  className={`group block h-full rounded-3xl border border-white/10 bg-[#081634] p-5 transition-colors hover:border-[var(--color-accent-gold)] hover:bg-[#122446]`}
                 >
                   <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                     {r.city}

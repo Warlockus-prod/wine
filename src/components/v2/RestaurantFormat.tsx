@@ -36,7 +36,7 @@ export default function RestaurantFormat({
 
       {stars > 0 ? (
         <span
-          className="inline-flex items-center gap-0.5 rounded-full border border-[var(--color-accent-gold)]/40 bg-[#1a0f11] px-2 py-1"
+          className="inline-flex items-center gap-0.5 rounded-full border border-[var(--color-accent-gold)]/40 bg-[#0b1f44] px-2 py-1"
           title={`${stars}-star Michelin`}
         >
           {Array.from({ length: stars }).map((_, i) => (
@@ -47,7 +47,7 @@ export default function RestaurantFormat({
           </span>
         </span>
       ) : otherAccolade ? (
-        <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-accent-gold)]/40 bg-[#1a0f11] px-2 py-1 text-[9px] font-bold tracking-[0.16em] text-[var(--color-accent-gold)] uppercase">
+        <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-accent-gold)]/40 bg-[#0b1f44] px-2 py-1 text-[9px] font-bold tracking-[0.16em] text-[var(--color-accent-gold)] uppercase">
           <Icon name="star" className="text-[10px]" />
           {otherAccolade}
         </span>

@@ -342,7 +342,7 @@ export default function RestaurantPairingPanel({
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold"
                     style={{
                       background: rank === 1 ? "var(--color-accent-gold)" : "var(--surface-deep)",
-                      color: rank === 1 ? "#150a0c" : "var(--ink-soft)",
+                      color: rank === 1 ? "#081634" : "var(--ink-soft)",
                     }}
                   >
                     {rank}

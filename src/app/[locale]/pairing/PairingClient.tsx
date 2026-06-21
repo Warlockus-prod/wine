@@ -589,13 +589,13 @@ export default function PairingClient() {
                     onClick={() => selectDish(dish.id, "cards")}
                     className={`group flex w-full items-start gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all duration-300 ${
                       isActive
-                        ? "active-dish-glow -translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(209,21,52,0.20),0_18px_42px_rgba(209,21,52,0.32)]"
+                        ? "active-dish-glow -translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(199,159,105,0.20),0_18px_42px_rgba(199,159,105,0.32)]"
                         : "border-white/8 bg-black/18 opacity-80 hover:border-white/22 hover:opacity-100"
                     }`}
                   >
                     <span
                       className={`mt-5 h-3 w-3 shrink-0 rounded-full transition ${
-                        isActive ? "bg-primary shadow-[0_0_18px_rgba(209,21,52,0.85)]" : "bg-white/20"
+                        isActive ? "bg-primary shadow-[0_0_18px_rgba(199,159,105,0.85)]" : "bg-white/20"
                       }`}
                     />
 
@@ -695,7 +695,7 @@ export default function PairingClient() {
                 // badge below, not the whole-card colour.
                 const toneClass =
                   isSelected
-                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(197,160,89,0.30),0_18px_42px_rgba(197,160,89,0.22)] opacity-100"
+                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(199,159,105,0.30),0_18px_42px_rgba(199,159,105,0.22)] opacity-100"
                     : isMatch
                       ? "border-2 border-white/8 bg-black/18 opacity-90 hover:border-white/22 hover:opacity-100"
                       : "border-2 border-white/6 bg-black/14 opacity-70 grayscale-[0.4] hover:opacity-100 hover:grayscale-0";
@@ -769,7 +769,7 @@ export default function PairingClient() {
         </div>
 
         {selectedWine ? (
-          <section className="mt-6 rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(209,21,52,0.18),transparent_28%),rgba(0,0,0,0.18)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-6">
+          <section className="mt-6 rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(199,159,105,0.18),transparent_28%),rgba(0,0,0,0.18)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
@@ -882,7 +882,7 @@ export default function PairingClient() {
                   </div>
 
                   {(vinokompasLoading || vinokompasExplanation) ? (
-                    <div className="max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(197,160,89,0.32)] bg-[rgba(197,160,89,0.08)] px-4 py-3">
+                    <div className="max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(199,159,105,0.32)] bg-[rgba(199,159,105,0.08)] px-4 py-3">
                       <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                         Vinokompas
                       </p>

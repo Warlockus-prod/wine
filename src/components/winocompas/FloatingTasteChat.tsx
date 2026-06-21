@@ -108,13 +108,13 @@ export default function FloatingTasteChat({
           type="button"
           onClick={() => toggle(true)}
           aria-label="Otwórz przewodnika Vinokompasu"
-          className="group fixed right-4 bottom-[calc(var(--mobile-tabbar-h)+0.95rem)] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(209,21,52,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
+          className="group fixed right-4 bottom-[calc(var(--mobile-tabbar-h)+0.95rem)] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="text-white">
             <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
           </svg>
-          <span className="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#150a0c] bg-[var(--color-accent-gold)] text-[10px] font-bold text-[#150a0c]">
+          <span className="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#081634] bg-[var(--color-accent-gold)] text-[10px] font-bold text-[#081634]">
             ?
           </span>
         </button>

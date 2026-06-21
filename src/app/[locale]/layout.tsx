@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1a0f11",
+  themeColor: "#0b1f44",
   // Shrink the layout viewport when the on-screen keyboard opens so the
   // floating chat composer stays above it instead of being covered.
   interactiveWidget: "resizes-content",

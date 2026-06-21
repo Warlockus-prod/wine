@@ -53,7 +53,7 @@ function SignInForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-3xl border border-[rgba(197,160,89,0.32)] bg-[#150a0c] p-7">
+    <div className="w-full max-w-md rounded-3xl border border-[rgba(199,159,105,0.32)] bg-[#081634] p-7">
       <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
         Cellar Compass
       </p>
@@ -82,7 +82,7 @@ function SignInForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="ty@restauracja.pl"
-              className="mt-1 w-full rounded-xl border border-white/10 bg-[#1a0e10] px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none"
+              className="mt-1 w-full rounded-xl border border-white/10 bg-[#122446] px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none"
             />
           </label>
           <button

@@ -167,7 +167,7 @@ export default function TasteChat({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#150a0c] sm:min-h-[420px]">
+    <div className="flex h-full min-h-0 flex-col rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#081634] sm:min-h-[420px]">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3">
         <div className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export default function TasteChat({
                 type="button"
                 onClick={() => send(s)}
                 disabled={sending}
-                className="rounded-full border border-[rgba(197,160,89,0.28)] bg-black/20 px-3 py-1.5 text-[12px] text-gray-200 transition hover:border-[var(--color-accent-gold)] hover:text-white disabled:opacity-50"
+                className="rounded-full border border-[rgba(199,159,105,0.28)] bg-black/20 px-3 py-1.5 text-[12px] text-gray-200 transition hover:border-[var(--color-accent-gold)] hover:text-white disabled:opacity-50"
               >
                 {s}
               </button>
@@ -249,7 +249,7 @@ export default function TasteChat({
           e.preventDefault();
           send(input);
         }}
-        className="flex items-end gap-2 border-t border-white/8 bg-[#100608] p-3"
+        className="flex items-end gap-2 border-t border-white/8 bg-[#081634] p-3"
       >
         <textarea
           ref={composerRef}
@@ -264,13 +264,13 @@ export default function TasteChat({
           rows={1}
           maxLength={800}
           placeholder="Zapytaj o smaki, wrażenia, wino…"
-          className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-white/10 bg-[#1a0e10] px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none"
+          className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-white/10 bg-[#122446] px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none"
           aria-label="Twoje pytanie"
         />
         <button
           type="submit"
           disabled={sending || input.trim().length === 0}
-          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-[0_8px_20px_rgba(209,21,52,0.3)] transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-[0_8px_20px_rgba(199,159,105,0.3)] transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? "…" : "Wyślij"}
           <svg width="14" height="10" viewBox="0 0 18 10" fill="none" aria-hidden>

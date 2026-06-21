@@ -180,7 +180,7 @@ export default function RestaurantPageClient({
                     role="img"
                     aria-label={`QR code for ${t(restaurant.name, lng)}`}
                     bgColor="#ffffff"
-                    fgColor="#150a0c"
+                    fgColor="#081634"
                     level="M"
                     marginSize={0}
                     className="h-24 w-24 sm:h-36 sm:w-36 xl:h-48 xl:w-48"
@@ -214,7 +214,7 @@ export default function RestaurantPageClient({
         <section className="mt-8">
           <Link
             href={`/pairing?restaurant=${restaurant.slug}`}
-            className="group relative block overflow-hidden rounded-[28px] border border-[var(--color-accent-gold)]/45 bg-gradient-to-br from-[#1a0e10] via-[#1d0f12] to-[#170a0c] p-5 shadow-[0_18px_60px_rgba(209,21,52,0.20)] transition hover:border-[var(--color-accent-gold)]/85 sm:p-6"
+            className="group relative block overflow-hidden rounded-[28px] border border-[var(--color-accent-gold)]/45 bg-gradient-to-br from-[#122446] via-[#1d0f12] to-[#0b1f44] p-5 shadow-[0_18px_60px_rgba(199,159,105,0.20)] transition hover:border-[var(--color-accent-gold)]/85 sm:p-6"
           >
             <div className="grid items-center gap-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-6">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/12 text-[var(--color-accent-gold)] sm:h-16 sm:w-16">
@@ -286,7 +286,7 @@ export default function RestaurantPageClient({
                   >
                     {/* Real Unsplash photo + monogram fallback if it 404s.
                         72×72 (mobile) → 96×96 (desktop). */}
-                    <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border border-[rgba(197,160,89,0.32)] bg-black/30 sm:h-24 sm:w-24">
+                    <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl border border-[rgba(199,159,105,0.32)] bg-black/30 sm:h-24 sm:w-24">
                       <Image
                         src={photo}
                         alt={dishName}
@@ -371,7 +371,7 @@ export default function RestaurantPageClient({
                   >
                     {/* Real wine photo + tiny SVG bottle overlay (gold-foil
                         corner) so the silhouette identity is preserved. */}
-                    <div className="relative h-[88px] w-[60px] shrink-0 overflow-hidden rounded-2xl border border-[rgba(197,160,89,0.32)] bg-black/30 sm:h-[112px] sm:w-[76px]">
+                    <div className="relative h-[88px] w-[60px] shrink-0 overflow-hidden rounded-2xl border border-[rgba(199,159,105,0.32)] bg-black/30 sm:h-[112px] sm:w-[76px]">
                       <Image
                         src={photo}
                         alt={wineName}
@@ -410,7 +410,7 @@ export default function RestaurantPageClient({
         </section>
 
         {/* ─────────── SUGGESTED PAIRINGS - TASTING NOTEBOOK RIBBONS ─────────── */}
-        <section className="mt-8 rounded-[28px] border border-white/10 bg-[#150a0c] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-7">
+        <section className="mt-8 rounded-[28px] border border-white/10 bg-[#081634] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-7">
           <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-white/8 pb-4">
             <div>
               <p className="pitch-eyebrow pitch-eyebrow--start">{tx("suggestedPairings")}</p>

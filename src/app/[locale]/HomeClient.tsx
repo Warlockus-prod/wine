@@ -102,7 +102,7 @@ export default function HomeClient({
       <Navigation />
 
       <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-28 pb-16 sm:px-6 lg:px-8">
-        <section className="rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(209,21,52,0.18),transparent_35%),rgba(255,255,255,0.03)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] sm:p-7">
+        <section className="rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(199,159,105,0.18),transparent_35%),rgba(255,255,255,0.03)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold tracking-[0.32em] text-primary uppercase">
@@ -165,7 +165,7 @@ export default function HomeClient({
                   onChange={(event) => filter.onChange(event.target.value)}
                   // Theme-aware: var(--surface-elevated) flips to white on
                   // light theme, var(--ink) keeps text readable. Drops the
-                  // hardcoded #130b0df2 dark surface that punched a hole.
+                  // hardcoded #081634f2 dark surface that punched a hole.
                   className="rounded-2xl border px-4 py-3 text-sm"
                   style={{
                     background: "var(--surface-elevated)",
@@ -230,7 +230,7 @@ export default function HomeClient({
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-semibold tracking-[0.22em] uppercase sm:text-[11px] sm:tracking-[0.24em]" style={{ color: "#f4c1c8" }}>
+                      <p className="text-[10px] font-semibold tracking-[0.22em] uppercase sm:text-[11px] sm:tracking-[0.24em]" style={{ color: "#e1d3b5" }}>
                         {tx("selectedRestaurant")}
                       </p>
                       <h3 className="mt-0.5 text-lg font-bold sm:mt-1 sm:text-2xl" style={{ color: "#ffffff" }}>
@@ -257,7 +257,7 @@ export default function HomeClient({
                     <Link
                       href={`/restaurants/${selectedRestaurant.slug}`}
                       className="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm"
-                      style={{ background: "#ffffff", color: "#1a0f11" }}
+                      style={{ background: "#ffffff", color: "#0b1f44" }}
                     >
                       {tx("openRestaurant")}
                     </Link>
@@ -265,8 +265,8 @@ export default function HomeClient({
                       href={`/pairing?restaurant=${selectedRestaurant.slug}`}
                       className="rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm"
                       style={{
-                        borderColor: "rgba(209, 21, 52, 0.45)",
-                        background: "rgba(209, 21, 52, 0.15)",
+                        borderColor: "rgba(199, 159, 105, 0.45)",
+                        background: "rgba(199, 159, 105, 0.15)",
                         color: "#ff6680",
                       }}
                     >
@@ -311,7 +311,7 @@ export default function HomeClient({
                     style={{ scrollMarginTop: "6.5rem" }}
                     className={`relative rounded-[28px] border-2 p-4 transition ${
                       selected
-                        ? "border-primary/60 bg-primary/12 shadow-[0_18px_40px_rgba(209,21,52,0.18)]"
+                        ? "border-primary/60 bg-primary/12 shadow-[0_18px_40px_rgba(199,159,105,0.18)]"
                         : "border-white/8 bg-black/12 hover:border-white/20"
                     }`}
                   >
@@ -349,7 +349,7 @@ export default function HomeClient({
                           role="img"
                           aria-label={`QR code for ${t(restaurant.name, locale)}`}
                           bgColor="#ffffff"
-                          fgColor="#150a0c"
+                          fgColor="#081634"
                           level="M"
                           marginSize={0}
                           className="h-24 w-24 rounded-xl bg-white p-2"

@@ -47,7 +47,7 @@ export default function CompassExplorer({ externalSector, onSectorChange }: Prop
       aria-label="Trzy poziomy Vinokompasu - poznaj od ogółu do szczegółu"
       className="space-y-4"
     >
-      <header className="rounded-2xl border border-[rgba(197,160,89,0.22)] bg-[rgba(197,160,89,0.04)] p-5">
+      <header className="rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[rgba(199,159,105,0.04)] p-5">
         <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
           Trzy poziomy poznania
         </p>
@@ -95,8 +95,8 @@ function SectorCard({
     <article
       className={`relative overflow-hidden rounded-3xl border transition-colors duration-500 ${
         isOpen
-          ? "border-white/22 bg-[#1a0f12]"
-          : "border-white/10 bg-[#150a0c] hover:border-white/20"
+          ? "border-white/22 bg-[#0b1f44]"
+          : "border-white/10 bg-[#081634] hover:border-white/20"
       }`}
       style={{
         boxShadow: isOpen
@@ -129,7 +129,7 @@ function SectorCard({
         </div>
         <span
           aria-hidden
-          className="ml-2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(197,160,89,0.35)] text-[var(--color-accent-gold)] transition-transform duration-500"
+          className="ml-2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(199,159,105,0.35)] text-[var(--color-accent-gold)] transition-transform duration-500"
           style={{ transform: isOpen ? "rotate(45deg)" : "rotate(0deg)" }}
         >
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
@@ -243,7 +243,7 @@ function Detail({
     <div>
       <p
         className="text-[10px] font-bold tracking-[0.22em] uppercase"
-        style={{ color: accent ?? "rgba(197,160,89,0.85)" }}
+        style={{ color: accent ?? "rgba(199,159,105,0.85)" }}
       >
         {label}
       </p>

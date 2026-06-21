@@ -9,7 +9,7 @@ export function Faq({ items }: { items: Item[] }) {
   const idBase = useId();
 
   return (
-    <ul className="border-t border-[rgba(197,160,89,0.18)]">
+    <ul className="border-t border-[rgba(199,159,105,0.18)]">
       {items.map((item, i) => {
         const open = i === openIndex;
         const buttonId = `${idBase}-q-${i}`;
@@ -17,14 +17,14 @@ export function Faq({ items }: { items: Item[] }) {
         return (
           <li
             key={i}
-            className="border-b border-[rgba(197,160,89,0.18)] transition-colors duration-300"
+            className="border-b border-[rgba(199,159,105,0.18)] transition-colors duration-300"
           >
             <button
               id={buttonId}
               aria-expanded={open}
               aria-controls={panelId}
               onClick={() => setOpenIndex(open ? null : i)}
-              className="group flex w-full items-start gap-2 py-7 text-left transition-colors hover:bg-[rgba(197,160,89,0.04)]"
+              className="group flex w-full items-start gap-2 py-7 text-left transition-colors hover:bg-[rgba(199,159,105,0.04)]"
             >
               <span className="pitch-faq-marker pt-1">
                 {String(i + 1).padStart(2, "0")}.
@@ -32,7 +32,7 @@ export function Faq({ items }: { items: Item[] }) {
               <span className="pitch-faq-q">{item.q}</span>
               <span
                 aria-hidden
-                className="ml-4 mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[rgba(197,160,89,0.32)] text-[var(--color-accent-gold)] transition-transform duration-500"
+                className="ml-4 mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[rgba(199,159,105,0.32)] text-[var(--color-accent-gold)] transition-transform duration-500"
                 style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

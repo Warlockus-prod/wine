@@ -65,7 +65,7 @@ export default function Navigation() {
                   key={link.href}
                   className={`text-sm font-medium transition ${
                     active
-                      ? "text-white underline decoration-[#d11534] decoration-2 underline-offset-[6px]"
+                      ? "text-white underline decoration-[#c79f69] decoration-2 underline-offset-[6px]"
                       : "text-gray-300 hover:text-white"
                   }`}
                   href={link.href}
@@ -214,7 +214,7 @@ export default function Navigation() {
 
               {/* Phone frame */}
               <div
-                className="relative flex flex-col overflow-hidden rounded-[3rem] border-[6px] border-gray-700 bg-black shadow-[0_0_80px_rgba(209,21,52,0.15)]"
+                className="relative flex flex-col overflow-hidden rounded-[3rem] border-[6px] border-gray-700 bg-black shadow-[0_0_80px_rgba(199,159,105,0.15)]"
                 style={{
                   width: PHONE_WIDTH + 12,
                   height: PHONE_HEIGHT + 12,
@@ -231,7 +231,7 @@ export default function Navigation() {
                   style={{
                     width: PHONE_WIDTH,
                     height: PHONE_HEIGHT,
-                    background: "#1a0f11",
+                    background: "#0b1f44",
                   }}
                 />
 

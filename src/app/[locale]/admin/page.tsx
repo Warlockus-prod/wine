@@ -530,13 +530,13 @@ export default function AdminPage() {
             in-page RestaurantContentManager (localStorage) was removed: it
             duplicated /admin/restaurants/[slug] without persisting to the DB,
             and the public pages now read the DB read-path. */}
-        <section className="mb-6 flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-[rgba(197,160,89,0.3)] bg-gradient-to-r from-[#221014] to-[#150a0c] p-6 sm:p-7">
+        <section className="mb-6 flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-[rgba(199,159,105,0.3)] bg-gradient-to-r from-[#221014] to-[#081634] p-6 sm:p-7">
           <div className="max-w-xl">
             <p className="pitch-eyebrow">Edytor produkcyjny</p>
             <h2 className="pitch-display mt-2 text-2xl text-white sm:text-3xl">
               Edytuj <em className="italic text-[var(--color-accent-gold)]">restauracje w bazie</em>
             </h2>
-            <p className="mt-2 font-serif text-sm italic leading-relaxed text-[#e6dccd]">
+            <p className="mt-2 font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
               Dania, wina i łączenia konkretnej restauracji - zapis prosto do bazy
               danych. To jedyne miejsce, w którym zmiany są trwałe i widoczne dla gości.
             </p>
@@ -551,7 +551,7 @@ export default function AdminPage() {
 
         {/* ── Editorial header ────────────────────────────────────────── */}
         <section
-          className="editorial-frame pitch-grain relative mt-6 overflow-hidden rounded-2xl border border-[rgba(197,160,89,0.18)] bg-[#150a0c]/85 p-6 sm:p-8"
+          className="editorial-frame pitch-grain relative mt-6 overflow-hidden rounded-2xl border border-[rgba(199,159,105,0.18)] bg-[#081634]/85 p-6 sm:p-8"
         >
           <TendrilCorner side="right" />
 
@@ -562,7 +562,7 @@ export default function AdminPage() {
                 Sommelier&rsquo;s <em className="italic text-[var(--color-accent-gold)]">Atelier</em>
               </h1>
               <div className="pitch-rule pitch-rule--short mt-4" />
-              <p className="mt-4 max-w-xl font-serif text-base italic leading-relaxed text-[#e6dccd]">
+              <p className="mt-4 max-w-xl font-serif text-base italic leading-relaxed text-[#e6e1d6]">
                 Globalna pracownia łączeń - dodawaj dania i wina, kuruj rekomendacje,
                 testuj odpowiedzi modelu API.
               </p>
@@ -572,19 +572,19 @@ export default function AdminPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/70 px-4 py-3">
+              <div className="rounded-xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44]/70 px-4 py-3">
                 <p className="font-serif text-2xl italic text-[var(--color-accent-gold)]">
                   {dataset.dishes.length}
                 </p>
                 <p className="mt-1 text-[10px] tracking-[0.2em] text-gray-400 uppercase">Dishes</p>
               </div>
-              <div className="rounded-xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/70 px-4 py-3">
+              <div className="rounded-xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44]/70 px-4 py-3">
                 <p className="font-serif text-2xl italic text-[var(--color-accent-gold)]">
                   {dataset.wines.length}
                 </p>
                 <p className="mt-1 text-[10px] tracking-[0.2em] text-gray-400 uppercase">Wines</p>
               </div>
-              <div className="rounded-xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/70 px-4 py-3">
+              <div className="rounded-xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44]/70 px-4 py-3">
                 <p className="font-serif text-2xl italic text-[var(--color-accent-gold)]">
                   {dataset.pairings.length}
                 </p>
@@ -598,14 +598,14 @@ export default function AdminPage() {
             <button
               type="button"
               onClick={exportJson}
-              className="rounded-full border border-[rgba(197,160,89,0.35)] bg-[#1a0f12] px-4 py-2 text-xs font-semibold tracking-wider text-[#f4ede0] uppercase transition hover:bg-[#1f1316]"
+              className="rounded-full border border-[rgba(199,159,105,0.35)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#f4efe9] uppercase transition hover:bg-[#1f1316]"
             >
               Export JSON
             </button>
             <button
               type="button"
               onClick={importJson}
-              className="rounded-full border border-[rgba(197,160,89,0.55)] bg-[var(--color-accent-gold)]/15 px-4 py-2 text-xs font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/25"
+              className="rounded-full border border-[rgba(199,159,105,0.55)] bg-[var(--color-accent-gold)]/15 px-4 py-2 text-xs font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/25"
             >
               Import JSON
             </button>
@@ -658,18 +658,18 @@ export default function AdminPage() {
               mobileTab !== "dishes" ? "hidden xl:block" : ""
             }`}
           >
-            <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.18)] pb-3">
+            <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[rgba(199,159,105,0.18)] pb-3">
               <div>
                 <p className="pitch-eyebrow">Tasting Log · I</p>
                 <h2 className="pitch-display mt-1 text-2xl text-white">Dishes</h2>
               </div>
-              <p className="font-serif text-xs italic text-[#c5a059]/80">
+              <p className="font-serif text-xs italic text-[#c79f69]/80">
                 {dataset.dishes.length} entries
               </p>
             </header>
 
             {/* New entry */}
-            <div className="rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0f12]/55 p-4">
+            <div className="rounded-xl border border-[rgba(199,159,105,0.20)] bg-[#0b1f44]/55 p-4">
               <p className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)] uppercase">
                 ❦ New entry
               </p>
@@ -738,14 +738,14 @@ export default function AdminPage() {
               {dataset.dishes.map((dish, idx) => (
                 <div
                   key={dish.id}
-                  className="rounded-xl border border-[rgba(197,160,89,0.14)] bg-[#1a0f12]/40 p-4 transition hover:border-[rgba(197,160,89,0.30)]"
+                  className="rounded-xl border border-[rgba(199,159,105,0.14)] bg-[#0b1f44]/40 p-4 transition hover:border-[rgba(199,159,105,0.30)]"
                 >
-                  <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.12)] pb-2">
+                  <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-[rgba(199,159,105,0.12)] pb-2">
                     <div className="flex items-baseline gap-3">
                       <span className="font-serif text-sm italic text-[var(--color-accent-gold)]">
                         {toRoman(idx + 1)}.
                       </span>
-                      <span className="font-serif text-base italic text-[#f4ede0]">
+                      <span className="font-serif text-base italic text-[#f4efe9]">
                         {t(dish.name, locale) || "Untitled"}
                       </span>
                     </div>
@@ -829,18 +829,18 @@ export default function AdminPage() {
               mobileTab !== "wines" ? "hidden xl:block" : ""
             }`}
           >
-            <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.18)] pb-3">
+            <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[rgba(199,159,105,0.18)] pb-3">
               <div>
                 <p className="pitch-eyebrow">Cellar Log · II</p>
                 <h2 className="pitch-display mt-1 text-2xl text-white">Wines</h2>
               </div>
-              <p className="font-serif text-xs italic text-[#c5a059]/80">
+              <p className="font-serif text-xs italic text-[#c79f69]/80">
                 {dataset.wines.length} entries
               </p>
             </header>
 
             {/* New entry */}
-            <div className="rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0f12]/55 p-4">
+            <div className="rounded-xl border border-[rgba(199,159,105,0.20)] bg-[#0b1f44]/55 p-4">
               <p className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)] uppercase">
                 ❦ New entry
               </p>
@@ -1041,17 +1041,17 @@ export default function AdminPage() {
               {dataset.wines.map((wine, idx) => (
                 <div
                   key={wine.id}
-                  className="rounded-xl border border-[rgba(197,160,89,0.14)] bg-[#1a0f12]/40 p-4 transition hover:border-[rgba(197,160,89,0.30)]"
+                  className="rounded-xl border border-[rgba(199,159,105,0.14)] bg-[#0b1f44]/40 p-4 transition hover:border-[rgba(199,159,105,0.30)]"
                 >
-                  <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-[rgba(197,160,89,0.12)] pb-2">
+                  <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-[rgba(199,159,105,0.12)] pb-2">
                     <div className="flex items-baseline gap-3">
                       <span className="font-serif text-sm italic text-[var(--color-accent-gold)]">
                         {toRoman(idx + 1)}.
                       </span>
-                      <span className="font-serif text-base italic text-[#f4ede0]">
+                      <span className="font-serif text-base italic text-[#f4efe9]">
                         {t(wine.name, locale) || "Untitled"}
                       </span>
-                      <span className="font-serif text-[10px] italic tracking-wider text-[#c5a059]/70 uppercase">
+                      <span className="font-serif text-[10px] italic tracking-wider text-[#c79f69]/70 uppercase">
                         {wine.region} · {wine.year}
                       </span>
                     </div>
@@ -1255,11 +1255,11 @@ export default function AdminPage() {
         {/* ── Sommelier Notes (Curated Pairings) ──────────────────────── */}
         <section className="surface-parchment editorial-frame relative mt-6 overflow-hidden rounded-2xl p-5 sm:p-7">
           <TendrilCorner side="left" />
-          <header className="relative z-10 mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(197,160,89,0.18)] pb-3">
+          <header className="relative z-10 mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(199,159,105,0.18)] pb-3">
             <div>
               <p className="pitch-eyebrow">Sommelier&rsquo;s Notes · III</p>
               <h2 className="pitch-display mt-1 text-3xl text-white">{tx("curatedPairings.title")}</h2>
-              <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]/85">
+              <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]/85">
                 {tx("curatedPairings.subtitle")}
               </p>
             </div>
@@ -1280,7 +1280,7 @@ export default function AdminPage() {
           </header>
 
           {dataset.dishes.length === 0 ? (
-            <p className="rounded-xl border border-[rgba(197,160,89,0.18)] bg-[#1a0f12]/55 p-3 text-sm italic text-[#e6dccd]">
+            <p className="rounded-xl border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/55 p-3 text-sm italic text-[#e6e1d6]">
               {tx("curatedPairings.noDishes")}
             </p>
           ) : (
@@ -1293,8 +1293,8 @@ export default function AdminPage() {
                     key={wine.id}
                     className={`rounded-xl border p-3 transition ${
                       selected
-                        ? "border-[rgba(197,160,89,0.55)] bg-[var(--color-accent-gold)]/10"
-                        : "border-[rgba(197,160,89,0.16)] bg-[#1a0f12]/40 hover:border-[rgba(197,160,89,0.30)]"
+                        ? "border-[rgba(199,159,105,0.55)] bg-[var(--color-accent-gold)]/10"
+                        : "border-[rgba(199,159,105,0.16)] bg-[#0b1f44]/40 hover:border-[rgba(199,159,105,0.30)]"
                     }`}
                   >
                     <label className="flex cursor-pointer items-center gap-3 text-sm">
@@ -1306,12 +1306,12 @@ export default function AdminPage() {
                       />
                       <span
                         className={`font-serif italic ${
-                          selected ? "text-[#f4ede0]" : "text-[#e6dccd]/85"
+                          selected ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"
                         }`}
                       >
                         {t(wine.name, locale)}
                       </span>
-                      <span className="ml-auto font-serif text-[10px] italic tracking-[0.18em] text-[#c5a059]/70 uppercase">
+                      <span className="ml-auto font-serif text-[10px] italic tracking-[0.18em] text-[#c79f69]/70 uppercase">
                         {wine.region}
                       </span>
                     </label>
@@ -1335,7 +1335,7 @@ export default function AdminPage() {
                         />
                       </div>
                     ) : (
-                      <p className="mt-2 font-serif text-xs italic text-[#c5a059]/60">
+                      <p className="mt-2 font-serif text-xs italic text-[#c79f69]/60">
                         {tx("curatedPairings.notCurated")}
                       </p>
                     )}
@@ -1347,8 +1347,8 @@ export default function AdminPage() {
         </section>
 
         {/* ── API Playground (terminal-styled, de-emphasized) ─────────── */}
-        <section className="mt-8 rounded-2xl border border-[rgba(197,160,89,0.14)] bg-[#0a0506] p-5 sm:p-6">
-          <header className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(197,160,89,0.14)] pb-3">
+        <section className="mt-8 rounded-2xl border border-[rgba(199,159,105,0.14)] bg-[#060e22] p-5 sm:p-6">
+          <header className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-[rgba(199,159,105,0.14)] pb-3">
             <div>
               <p className="pitch-eyebrow">Workshop · IV</p>
               <h2 className="font-mono text-base text-[var(--color-accent-gold)]">
@@ -1373,7 +1373,7 @@ export default function AdminPage() {
                 <span className="prompt">›</span> dish
               </p>
               <select
-                className="mt-2 w-full rounded border border-[rgba(197,160,89,0.18)] bg-[#0d0809] px-3 py-2 font-mono text-xs text-[#d4cabc]"
+                className="mt-2 w-full rounded border border-[rgba(199,159,105,0.18)] bg-[#0d0809] px-3 py-2 font-mono text-xs text-[#d4cabc]"
                 value={effectiveDishId}
                 onChange={(event) => setApiDishId(event.target.value)}
               >
@@ -1430,7 +1430,7 @@ export default function AdminPage() {
                         key={item.wineId}
                         className="rounded border border-[var(--color-accent-gold)]/25 bg-[var(--color-accent-gold)]/5 p-2"
                       >
-                        <p className="font-mono text-xs text-[#f4ede0]">
+                        <p className="font-mono text-xs text-[#f4efe9]">
                           <span className="num">{item.score}%</span>{" "}
                           <span className="str">{wineName}</span>
                         </p>
@@ -1449,7 +1449,7 @@ export default function AdminPage() {
                 )}
               </div>
 
-              <pre className="mt-3 hidden max-h-40 w-full max-w-full overflow-auto whitespace-pre-wrap break-all rounded border border-[rgba(197,160,89,0.10)] bg-[#0d0809] p-2 font-mono text-[10px] text-gray-500 sm:block">
+              <pre className="mt-3 hidden max-h-40 w-full max-w-full overflow-auto whitespace-pre-wrap break-all rounded border border-[rgba(199,159,105,0.10)] bg-[#0d0809] p-2 font-mono text-[10px] text-gray-500 sm:block">
                 {JSON.stringify(
                   {
                     dish: selectedDish,

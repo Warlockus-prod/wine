@@ -102,14 +102,14 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
     typeof window !== "undefined" && window.self !== window.top ? "_top" : "_blank";
 
   return (
-    <div className="mt-6 rounded-2xl border border-[rgba(197,160,89,0.32)] bg-[#170d0f] p-5 sm:p-6">
+    <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#0b1f44] p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="pitch-eyebrow pitch-eyebrow--start">Twoje propozycje</p>
           <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
             {enough ? "Wina dopasowane do Twojego smaku" : "Zaznacz smak, a wina pojawią się tutaj"}
           </h3>
-          <p className="mt-1.5 font-serif text-sm italic text-[#e6dccd]">
+          <p className="mt-1.5 font-serif text-sm italic text-[#e6e1d6]">
             {enough
               ? `Etap ${stage} z 3 - profil opisany w ${filled} ${filled === 1 ? "parametrze" : "parametrach"}. Im więcej zaznaczysz, tym celniejsze dopasowanie.`
               : "Kliknij smaki, wrażenia lub tendencje powyżej - propozycje wyliczą się od razu pod spodem."}
@@ -134,7 +134,7 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
                 href={winnicaSearchUrl(wine.query)}
                 target={linkTarget}
                 rel="noopener noreferrer"
-                className="group flex h-full flex-col gap-3 rounded-xl border border-[rgba(197,160,89,0.20)] bg-[#1a0e10]/70 p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent-gold)]/60 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+                className="group flex h-full flex-col gap-3 rounded-xl border border-[rgba(199,159,105,0.20)] bg-[#122446]/70 p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent-gold)]/60 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
               >
                 <div className="flex items-start gap-3">
                   <span className="flex h-20 w-8 shrink-0 items-end justify-center" aria-hidden>
@@ -150,23 +150,23 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
                       <span className="rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/12 px-2 py-0.5 font-serif text-xs font-semibold text-[var(--color-accent-gold)] tabular-nums">
                         {matchPct}%
                       </span>
-                      <span className="text-[10px] tracking-[0.16em] text-[#c5a059]/70 uppercase">
+                      <span className="text-[10px] tracking-[0.16em] text-[#c79f69]/70 uppercase">
                         {STYLE_LABEL_PL[wine.style]}
                       </span>
                     </div>
-                    <p className="mt-2 font-serif text-base leading-tight text-[#f4ede0]">
+                    <p className="mt-2 font-serif text-base leading-tight text-[#f4efe9]">
                       {wine.name_pl}
                     </p>
-                    <p className="mt-0.5 text-[10px] tracking-[0.14em] text-[#c5a059]/70 uppercase">
+                    <p className="mt-0.5 text-[10px] tracking-[0.14em] text-[#c79f69]/70 uppercase">
                       {wine.region_pl}
                     </p>
                   </div>
                 </div>
-                <p className="font-serif text-[13px] leading-snug text-[#e6dccd] italic">
+                <p className="font-serif text-[13px] leading-snug text-[#e6e1d6] italic">
                   {wine.why_pl}
                 </p>
-                <div className="mt-auto flex items-center justify-between gap-2 border-t border-[rgba(197,160,89,0.16)] pt-3">
-                  <span className="font-serif text-sm text-[#f4ede0]">
+                <div className="mt-auto flex items-center justify-between gap-2 border-t border-[rgba(199,159,105,0.16)] pt-3">
+                  <span className="font-serif text-sm text-[#f4efe9]">
                     od {wine.priceFrom} zł
                   </span>
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.14em] text-[var(--color-accent-gold)] uppercase transition group-hover:gap-1.5">
@@ -185,16 +185,16 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="flex items-center gap-3 rounded-xl border border-dashed border-[rgba(197,160,89,0.20)] bg-[#1a0e10]/40 p-4"
+              className="flex items-center gap-3 rounded-xl border border-dashed border-[rgba(199,159,105,0.20)] bg-[#122446]/40 p-4"
             >
-              <span className="h-16 w-6 shrink-0 rounded-sm bg-gradient-to-b from-[#3a2a1c] to-[#1a0e10]" aria-hidden />
-              <span className="font-serif text-sm italic text-[#c5a059]/55">-</span>
+              <span className="h-16 w-6 shrink-0 rounded-sm bg-gradient-to-b from-[#3a2a1c] to-[#122446]" aria-hidden />
+              <span className="font-serif text-sm italic text-[#c79f69]/55">-</span>
             </div>
           ))}
         </div>
       )}
 
-      <p className="mt-4 text-[11px] leading-relaxed text-[#c5a059]/65">
+      <p className="mt-4 text-[11px] leading-relaxed text-[#c79f69]/65">
         Propozycje pochodzą z oferty{" "}
         <a
           href="https://winnica.pl/pl/"
@@ -237,17 +237,17 @@ function StageNav({
                 active
                   ? "border-[var(--color-accent-gold)] bg-[var(--color-accent-gold)]/10"
                   : done
-                    ? "border-[rgba(197,160,89,0.30)] bg-[#1a0f12]/50 hover:border-[var(--color-accent-gold)]/60"
-                    : "border-white/10 bg-[#1a0f12]/30 hover:border-white/25"
+                    ? "border-[rgba(199,159,105,0.30)] bg-[#0b1f44]/50 hover:border-[var(--color-accent-gold)]/60"
+                    : "border-white/10 bg-[#0b1f44]/30 hover:border-white/25"
               }`}
             >
               <span className="flex items-center gap-2">
                 <span
                   className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                     active
-                      ? "bg-[var(--color-accent-gold)] text-[#150a0c]"
+                      ? "bg-[var(--color-accent-gold)] text-[#081634]"
                       : done
-                        ? "bg-[rgba(197,160,89,0.30)] text-[var(--color-accent-gold)]"
+                        ? "bg-[rgba(199,159,105,0.30)] text-[var(--color-accent-gold)]"
                         : "bg-white/10 text-white/70"
                   }`}
                 >
@@ -259,14 +259,14 @@ function StageNav({
                     it.n
                   )}
                 </span>
-                <span className={`font-serif text-xs italic tracking-wider ${active ? "text-[var(--color-accent-gold)]" : "text-[#e6dccd]"}`}>
+                <span className={`font-serif text-xs italic tracking-wider ${active ? "text-[var(--color-accent-gold)]" : "text-[#e6e1d6]"}`}>
                   ETAP {it.n}
                 </span>
               </span>
-              <span className={`font-serif text-base italic ${active ? "text-white" : done ? "text-[#f4ede0]" : "text-[#e6dccd]/85"} sm:text-lg`}>
+              <span className={`font-serif text-base italic ${active ? "text-white" : done ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"} sm:text-lg`}>
                 {it.label}
               </span>
-              <span className="text-[10px] tracking-wider text-[#c5a059]/65 uppercase sm:text-[11px]">
+              <span className="text-[10px] tracking-wider text-[#c79f69]/65 uppercase sm:text-[11px]">
                 {it.sub}
               </span>
             </button>
@@ -329,7 +329,7 @@ export default function StagedTutorial({
       </div>
 
       {/* Body */}
-      <div className="mt-6 rounded-2xl border border-[rgba(197,160,89,0.22)] bg-[#150a0c] p-5 sm:p-7">
+      <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#081634] p-5 sm:p-7">
         {stage === 1 ? (
           <Stage1
             profile={profile}
@@ -343,13 +343,13 @@ export default function StagedTutorial({
         )}
 
         {/* Stage controls */}
-        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(197,160,89,0.20)] pt-5">
+        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(199,159,105,0.20)] pt-5">
           <div className="flex flex-wrap items-center gap-2">
             {stage > 1 ? (
               <button
                 type="button"
                 onClick={goPrev}
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6dccd] uppercase transition hover:bg-white/10"
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
               >
                 ← Poprzedni etap
               </button>
@@ -358,7 +358,7 @@ export default function StagedTutorial({
               <button
                 type="button"
                 onClick={goNext}
-                className="rounded-full border border-[rgba(197,160,89,0.30)] bg-[#1a0f12] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6dccd]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
+                className="rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
               >
                 Pomiń etap →
               </button>
@@ -412,10 +412,10 @@ function Stage1({
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
           Trzy smaki bazowe
         </h2>
-        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
-          Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4ede0]">Słodycz</strong>,{" "}
-          <strong className="not-italic font-semibold text-[#f4ede0]">Cierpkość</strong> lub{" "}
-          <strong className="not-italic font-semibold text-[#f4ede0]">Kwasowość</strong> - kilka razy, aby ustawić jej
+        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
+          Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong> lub{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> - kilka razy, aby ustawić jej
           siłę od 0 do 5. Wskaźnik u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
         </p>
       </header>
@@ -435,8 +435,8 @@ function Stage1({
       </div>
 
       {/* Sliders kept as a secondary input for users who prefer linear UI */}
-      <details className="mt-5 rounded-2xl border border-[rgba(197,160,89,0.18)] bg-[#1a0f12]/40 p-4">
-        <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4ede0]">
+      <details className="mt-5 rounded-2xl border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/40 p-4">
+        <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
           Wolisz suwaki? Otwórz precyzyjne sterowanie
         </summary>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -472,9 +472,9 @@ function BigBaseSlider({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="rounded-xl border border-[rgba(197,160,89,0.16)] bg-[#1a0f12]/60 p-4">
+    <div className="rounded-xl border border-[rgba(199,159,105,0.16)] bg-[#0b1f44]/60 p-4">
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={`bsm-${id}`} className="font-serif text-base italic text-[#f4ede0]">
+        <label htmlFor={`bsm-${id}`} className="font-serif text-base italic text-[#f4efe9]">
           {label}
         </label>
         <span className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)]">
@@ -492,7 +492,7 @@ function BigBaseSlider({
         className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-[var(--color-accent-gold)]"
         aria-label={`${label} 0..5`}
       />
-      <p className="mt-2 text-[11px] leading-snug text-[#c5a059]/70">{description}</p>
+      <p className="mt-2 text-[11px] leading-snug text-[#c79f69]/70">{description}</p>
     </div>
   );
 }
@@ -502,7 +502,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
   // rounded ends so the pin never hangs into empty space at the extremes.
   const pos = Math.max(3, Math.min(97, score));
   return (
-    <div className="mt-7 rounded-2xl border border-[rgba(197,160,89,0.22)] bg-[#1a0f12]/55 p-5">
+    <div className="mt-7 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44]/55 p-5">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
           Wytrawność wina
@@ -514,7 +514,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
 
       {/* Zone labels live in their own row so the marker can never collide
           with them. The centre is the dry/sweet boundary → "Półwytrawne". */}
-      <div className="mt-4 flex justify-between text-[9px] tracking-wider text-[#c5a059]/65 uppercase">
+      <div className="mt-4 flex justify-between text-[9px] tracking-wider text-[#c79f69]/65 uppercase">
         <span>Bardzo wytrawne</span>
         <span className="hidden sm:inline">Półwytrawne</span>
         <span>Bardzo słodkie</span>
@@ -523,7 +523,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
       {/* Rail + position pin */}
       <div className="relative mt-5 h-8 w-full">
         {/* Rail */}
-        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#a01024] via-[#c5a059] to-[#5b6b3a]" />
+        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#a01024] via-[#c79f69] to-[#5b6b3a]" />
 
         {/* Tick marks under the rail */}
         <div className="absolute inset-x-0 bottom-0 flex justify-between">
@@ -541,8 +541,8 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
           <svg width="19" height="24" viewBox="0 0 24 30" fill="none" aria-hidden>
             <path
               d="M12 1.5a8.5 8.5 0 0 1 8.5 8.5c0 6.2-8.5 18.5-8.5 18.5S3.5 16.2 3.5 10A8.5 8.5 0 0 1 12 1.5z"
-              fill="#f4ede0"
-              stroke="#c5a059"
+              fill="#f4efe9"
+              stroke="#c79f69"
               strokeWidth="2"
             />
             <circle cx="12" cy="10" r="3.1" fill="#7a1020" />
@@ -571,10 +571,10 @@ function Stage2({
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
           Sześć wrażeń
         </h2>
-        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
+        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
           Kliknij wybrane wrażenie na kole, aby zwiększyć jego siłę (0-5) - kropki pokażą poziom.
           Po prawej pojawi się opis tego wrażenia. Nie wiesz od czego zacząć? Włącz{" "}
-          <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnika</strong>, który oprowadzi Cię po wszystkich sześciu.
+          <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnika</strong>, który oprowadzi Cię po wszystkich sześciu.
         </p>
       </header>
 
@@ -605,10 +605,10 @@ function Stage3({
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
           Dwanaście tendencji
         </h2>
-        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6dccd]">
+        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
           Tryb dla zaawansowanych: każde wrażenie ma dwie tendencje. Kliknij konkretną
           tendencję na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
-          każdej z 12. <strong className="not-italic font-semibold text-[#f4ede0]">Auto-przewodnik</strong> pokaże je po kolei.
+          każdej z 12. <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>
 
