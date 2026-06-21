@@ -134,7 +134,7 @@ export default function FloatingTasteChat({
             style={{ pointerEvents: "auto" }}
           />
           <div
-            className="fixed inset-x-2 top-[14vh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
+            className="fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
             role="dialog"
             aria-label="Przewodnik Vinokompasu"
           >

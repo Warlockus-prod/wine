@@ -450,7 +450,7 @@ function PanelShell({
           When collapsed, shows a preview row (active dish photo + name + #1
           wine score) so the user knows the panel has content without
           having to expand it first. */}
-      <div className="fixed inset-x-0 bottom-16 z-30 lg:hidden">
+      <div className="fixed inset-x-0 bottom-[var(--mobile-tabbar-h)] z-30 lg:hidden">
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}

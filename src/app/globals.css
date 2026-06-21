@@ -521,6 +521,21 @@ body {
   }
 }
 
+/* Compass dial — guarantee responsive square sizing. These classes are
+   referenced in TasteCompass.tsx but were never defined (latent collapse to
+   the 300×150 replaced-element default). */
+.taste-compass-wrap { position: relative; width: 100%; margin-inline: auto; }
+.taste-compass-svg { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; }
+.taste-compass-touch { cursor: pointer; touch-action: manipulation; }
+
+/* iOS Safari force-zooms the page when a focused form field is < 16px. Pin
+   every control to 16px on phones (designed sizes still apply at >= md). */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select { font-size: 16px !important; }
+}
+
 @keyframes pulse-glow {
   0% {
     box-shadow: 0 0 15px rgba(209, 21, 52, 0.3), inset 0 0 10px rgba(209, 21, 52, 0.1);
