@@ -525,6 +525,15 @@ export default function PairingClient() {
               <p className="mt-2 max-w-3xl text-sm text-gray-400 sm:text-base">
                 {tx("subheading")}
               </p>
+              {/* Explicit numbered steps so the flow is obvious (feedback:
+                  "nie jest jasne jak przejść do win"). */}
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase">
+                <span className="rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/12 px-3 py-1.5 text-[var(--color-accent-gold)]">{tx("step1")}</span>
+                <span aria-hidden className="text-gray-500">→</span>
+                <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-gray-200">{tx("step2")}</span>
+                <span aria-hidden className="text-gray-500">→</span>
+                <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-gray-200">{tx("step3")}</span>
+              </div>
               {restaurantContext ? (
                 <p className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-gray-200 uppercase">
                   {tx("context", {

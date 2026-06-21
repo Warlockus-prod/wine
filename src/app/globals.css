@@ -87,7 +87,9 @@
   --paper-tint-strong: rgba(199, 159, 105, 0.07);
   --paper-glow: rgba(199, 159, 105, 0.14);
 
-  /* Gold — printed-foil bronze, a touch stronger so it reads on white. */
+  /* Camel — deepened on cream for accent-TEXT legibility (eyebrows etc.):
+     #c79f69 on cream is ~2.3:1, #9c7536 reads far better while staying camel. */
+  --color-accent-gold: #9c7536;
   --gold-hairline: rgba(156, 117, 54, 0.55);
   --gold-hairline-soft: rgba(156, 117, 54, 0.34);
 

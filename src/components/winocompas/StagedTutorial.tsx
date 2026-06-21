@@ -112,7 +112,7 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
           <p className="mt-1.5 font-serif text-sm italic text-[#e6e1d6]">
             {enough
               ? `Etap ${stage} z 3 - profil opisany w ${filled} ${filled === 1 ? "parametrze" : "parametrach"}. Im więcej zaznaczysz, tym celniejsze dopasowanie.`
-              : "Kliknij smaki, wrażenia lub tendencje powyżej - propozycje wyliczą się od razu pod spodem."}
+              : "Kliknij smaki, wrażenia lub aromaty powyżej - propozycje wyliczą się od razu pod spodem."}
           </p>
         </div>
         <Link
@@ -221,7 +221,7 @@ function StageNav({
   const items: { n: Stage; label: string; sub: string }[] = [
     { n: 1, label: "SMAK", sub: "3 podstawowe smaki" },
     { n: 2, label: "WRAŻENIA", sub: "6 wrażeń" },
-    { n: 3, label: "TENDENCJE", sub: "12 tendencji" },
+    { n: 3, label: "AROMATY", sub: "12 aromatów" },
   ];
   return (
     <ol className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -430,7 +430,7 @@ function Stage1({
           // "ja bym ją wręcz dała nad") - first thing visible, updates
           // live as the user adjusts the base tastes since `dr` is
           // recomputed each render in the parent.
-          aboveCompass={<DrynessMeter score={dr.score} label={dr.label} />}
+          belowCompass={<DrynessMeter score={dr.score} label={dr.label} />}
         />
       </div>
 
@@ -523,7 +523,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
       {/* Rail + position pin */}
       <div className="relative mt-5 h-8 w-full">
         {/* Rail */}
-        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#a01024] via-[#c79f69] to-[#5b6b3a]" />
+        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#2f4a6b] via-[#c79f69] to-[#5b6b3a]" />
 
         {/* Tick marks under the rail */}
         <div className="absolute inset-x-0 bottom-0 flex justify-between">
@@ -545,7 +545,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
               stroke="#c79f69"
               strokeWidth="2"
             />
-            <circle cx="12" cy="10" r="3.1" fill="#7a1020" />
+            <circle cx="12" cy="10" r="3.1" fill="#16294f" />
           </svg>
         </div>
       </div>
@@ -601,13 +601,13 @@ function Stage3({
   return (
     <div>
       <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap III · Tendencje</p>
+        <p className="pitch-eyebrow pitch-eyebrow--start">Etap III · Aromaty</p>
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
-          Dwanaście tendencji
+          Dwanaście aromatów
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Tryb dla zaawansowanych: każde wrażenie ma dwie tendencje. Kliknij konkretną
-          tendencję na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
+          Tryb dla zaawansowanych: każde wrażenie ma dwa aromaty. Kliknij konkretny
+          aromat na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
           każdej z 12. <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>

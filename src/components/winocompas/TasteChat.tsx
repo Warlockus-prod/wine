@@ -31,7 +31,7 @@ const SUGGESTIONS_PL = [
 ];
 
 const HELLO_PL =
-  "Cześć - jestem przewodnikiem Vinokompasu. Pytaj o smaki, wrażenia, podpowiem jak odczytać twój profil. Możesz też kliknąć propozycję pytania poniżej.";
+  "Cześć! Pomogę dobrać wino. Zrób tak: 1) kliknij danie z menu albo ustaw smak na kompasie, 2) a ja od razu pokażę dopasowane wino i wyjaśnię dlaczego. Nie wiesz od czego zacząć? Kliknij gotowe pytanie poniżej.";
 
 interface Props {
   profile?: CompassProfile;

@@ -98,7 +98,7 @@ export default function SamouczekClient() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#kompas" className="pitch-cta-primary">
-              Rozpocznij scenariusz
+              Rozpocznij test
               <svg width="14" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
                 <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>

@@ -40,12 +40,9 @@ interface Props {
    *  greets the user with a presentation instead of a static disc. */
   autoStartTour?: boolean;
   /** Optional content rendered in the LEFT column directly under the
-   *  compass + profile bar - on the SAME card. */
+   *  compass + profile bar - on the SAME card. Stage 1 uses this for the
+   *  live dryness meter (moved here per feedback: under the compass). */
   belowCompass?: React.ReactNode;
-  /** Optional content rendered in the LEFT column ABOVE the compass - on
-   *  the same card, first thing visible. Stage 1 uses this for the dryness
-   *  arrow (client request: put it on top, visible at a glance, live). */
-  aboveCompass?: React.ReactNode;
 }
 
 // Tour ID sets per level - what auto-tour cycles through.
@@ -103,7 +100,6 @@ export default function InteractiveCompass({
   level = 3,
   autoStartTour = false,
   belowCompass,
-  aboveCompass,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   // Pinned id stays selected after the user clicks (or hovers chip in the
@@ -289,9 +285,6 @@ export default function InteractiveCompass({
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-7">
       {/* ── Compass ─────────────────────────────────────────────────── */}
       <div className="flex flex-col items-center">
-        {/* Above-compass slot (e.g. live dryness arrow on stage 1) -
-            first thing visible on the card. */}
-        {aboveCompass ? <div className="mb-5 w-full max-w-[440px]">{aboveCompass}</div> : null}
         <div className="w-full max-w-[440px]">
           <TasteCompass
             profile={profile}
