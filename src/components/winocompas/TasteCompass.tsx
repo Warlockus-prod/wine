@@ -655,7 +655,7 @@ export default function TasteCompass({
           opacity={1}
           pointerEvents="none"
         >
-          Vinokompas
+          Vinocompas
         </text>
 
         {/* Outer labels - horizontal text, smart-anchored by quadrant.

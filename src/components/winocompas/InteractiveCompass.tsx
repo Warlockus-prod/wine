@@ -110,7 +110,7 @@ export default function InteractiveCompass({
   const tourActive = tourOn && !interrupt;
 
   // Effective interval: explicit prop wins, otherwise pick from preset.
-  const intervalMs = tourMs ?? 600;
+  const intervalMs = tourMs ?? 4000;
 
   // Tour cycles through level-specific id set (3 base / 6 sektor / 12 spoke).
   const tourIds = useMemo(() => tourIdsForLevel(level), [level]);
@@ -127,7 +127,7 @@ export default function InteractiveCompass({
     // Brief auto-presentation: play one pass then hand over to the user — no
     // manual controls (feedback: "просто пару секунд презентация анимация").
     const count = tourIdsForLevel(level).length;
-    const stop = window.setTimeout(() => setTourOn(false), count * 600 + 250);
+    const stop = window.setTimeout(() => setTourOn(false), count * 4000 + 250);
     return () => window.clearTimeout(stop);
   }, [level, autoStartTour]);
 
@@ -605,7 +605,7 @@ function FocusedCard({
           </dl>
           <details className="mt-4 group">
             <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
-              ❦ Pełny opis sektora
+              ❦ Pełny opis wrażenia
             </summary>
             <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
               {focused.sector.long_pl}
@@ -633,7 +633,7 @@ function FocusedCard({
           </dl>
           <details className="mt-4 group">
             <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
-              ❦ Pełny opis sektora
+              ❦ Pełny opis wrażenia
             </summary>
             <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">{focused.sector.long_pl}</p>
           </details>
@@ -649,7 +649,7 @@ function FocusedCard({
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
           </svg>
-          Zapytaj przewodnika
+          Zapytaj Vinovigatora
         </button>
       </div>
     </div>

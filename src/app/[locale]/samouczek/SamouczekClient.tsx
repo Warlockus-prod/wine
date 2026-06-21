@@ -117,22 +117,9 @@ export default function SamouczekClient() {
         {/* ───────── STAGED TUTORIAL ───────── */}
         <section
           id="kompas"
-          aria-labelledby="kompas-title"
+          aria-label="Winokompas"
           className="scroll-mt-[6.5rem]"
         >
-          <header className="mb-8 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">I.</span>
-            <div>
-              <h2 id="kompas-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
-                Twój scenariusz dopasowania
-              </h2>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Trzy etapy - każdy z własną rozdzielczością. Możesz przejść etap, pominąć
-                go i wrócić później. Profil zapisuje się automatycznie i pracuje dalej w widoku Pairing.
-              </p>
-            </div>
-          </header>
-
           <StagedTutorial
             profile={profile}
             onProfileChange={setProfile}

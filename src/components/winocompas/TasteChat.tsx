@@ -181,7 +181,7 @@ export default function TasteChat({
           </span>
           <div>
             <p className="text-[11px] font-bold tracking-[0.22em] text-primary uppercase">
-              Przewodnik Vinokompasu
+              Vinovigator
             </p>
             <p className="text-[11px] italic text-[var(--color-accent-gold)] opacity-80">
               {sending ? "pisze…" : "online"}

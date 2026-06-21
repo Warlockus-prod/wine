@@ -360,7 +360,7 @@ export default function StagedTutorial({
                 onClick={goNext}
                 className="rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
               >
-                Pomiń etap →
+                Pomiń etap, pokaż wina →
               </button>
             ) : null}
           </div>
@@ -380,7 +380,7 @@ export default function StagedTutorial({
               href="/pairing"
               className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
             >
-              Otwórz Pairing
+              Pokaż wina
               <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
                 <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -416,7 +416,7 @@ function Stage1({
           Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong> lub{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> - kilka razy, aby ustawić jej
-          siłę od 0 do 5. Wskaźnik pod kołem od razu pokaże, jak wytrawne wyjdzie Twoje wino.
+          siłę od 0 do 5. Wskaźnik pod kołem od razu pokazuje, jak wytrawne jest Twoje wino.
         </p>
       </header>
 
