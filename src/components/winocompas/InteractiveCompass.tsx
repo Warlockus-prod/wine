@@ -303,6 +303,8 @@ export default function InteractiveCompass({
             hideLegend
           />
         </div>
+        {/* Dryness meter — directly under the compass dial, above TWÓJ PROFIL. */}
+        {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
 
         {tourActive ? (
           <p className="mt-2 max-w-[440px] text-center text-[11px] leading-snug text-[var(--ink-soft)]">
@@ -416,9 +418,6 @@ export default function InteractiveCompass({
           onPickHover={setHovered}
         />
 
-        {/* Stage-specific slot under the compass (e.g. the live dryness
-            arrow on stage 1) - same card, always visible. */}
-        {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
       </div>
 
       {/* ── Side info panel ─────────────────────────────────────────── */}
