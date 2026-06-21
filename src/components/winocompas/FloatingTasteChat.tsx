@@ -51,11 +51,14 @@ export default function FloatingTasteChat({
   // component is loaded via next/dynamic ssr:false in callers).
   const [open, setOpen] = useState<boolean>(() => {
     if (typeof window === "undefined") return defaultOpen;
+    // First visit: honour defaultOpen on desktop, but never auto-cover a phone
+    // (the sheet would hide the page, e.g. on /pairing). >= 640px (sm) only.
+    const firstVisit = defaultOpen && window.innerWidth >= 640;
     try {
       const v = window.localStorage.getItem(STATE_KEY);
-      return v !== null ? v === "1" : defaultOpen;
+      return v !== null ? v === "1" : firstVisit;
     } catch {
-      return defaultOpen;
+      return firstVisit;
     }
   });
   const hydrated = typeof window !== "undefined";

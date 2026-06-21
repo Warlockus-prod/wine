@@ -707,7 +707,7 @@ export default function TasteCompass({
                   textAnchor={textAnchor}
                   dominantBaseline={baseline}
                   fontFamily="var(--font-display)"
-                  fontSize={9.2}
+                  fontSize={11}
                   fontWeight={600}
                   letterSpacing="0.04em"
                   fill="var(--ink)"
@@ -754,7 +754,7 @@ export default function TasteCompass({
               dominantBaseline="middle"
               fontFamily="var(--font-serif)"
               fontStyle="italic"
-              fontSize={level === 2 ? 13 : 11}
+              fontSize={level === 2 ? 14 : 12}
               fontWeight={600}
               fill="var(--ink)"
               stroke="var(--compass-halo)"

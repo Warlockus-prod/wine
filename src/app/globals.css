@@ -1346,3 +1346,7 @@ body {
 .mapboxgl-ctrl button .mapboxgl-ctrl-icon {
   filter: invert(0.92) hue-rotate(-15deg);
 }
+/* Touch: enlarge the on-map zoom/compass control hit-area toward 44px. */
+@media (max-width: 767px) {
+  .mapboxgl-ctrl button { width: 40px; height: 40px; }
+}

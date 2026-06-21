@@ -339,7 +339,7 @@ export default function InteractiveCompass({
               <button
                 type="button"
                 onClick={() => stepTour(-1)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
                 aria-label="Poprzednia tendencja"
               >
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
@@ -367,7 +367,7 @@ export default function InteractiveCompass({
               <button
                 type="button"
                 onClick={() => stepTour(1)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
                 aria-label="Następna tendencja"
               >
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
@@ -381,7 +381,7 @@ export default function InteractiveCompass({
                 {tourIdx + 1} / {tourIds.length}
               </span>
               {/* Speed picker - sits inline with tour controls. */}
-              <div className="ml-2 flex items-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#1a0f12]/55 p-0.5" role="radiogroup" aria-label="Tempo przewodnika">
+              <div className="mt-2 flex w-full items-center justify-center gap-0.5 rounded-full border border-[var(--gold-hairline-soft)] bg-[#1a0f12]/55 p-0.5 sm:mt-0 sm:ml-2 sm:w-auto" role="radiogroup" aria-label="Tempo przewodnika">
                 {TOUR_SPEEDS.map((s) => {
                   const active = s.id === tourSpeed;
                   return (

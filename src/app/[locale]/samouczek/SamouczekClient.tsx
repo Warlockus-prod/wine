@@ -118,7 +118,7 @@ export default function SamouczekClient() {
         <section
           id="kompas"
           aria-labelledby="kompas-title"
-          className="scroll-mt-24"
+          className="scroll-mt-[6.5rem]"
         >
           <header className="mb-8 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">I.</span>
@@ -144,7 +144,7 @@ export default function SamouczekClient() {
         <Ornament />
 
         {/* ───────── METODA - 6 STEPS ───────── */}
-        <section aria-labelledby="metoda-title" className="scroll-mt-24">
+        <section aria-labelledby="metoda-title" className="scroll-mt-[6.5rem]">
           <header className="mb-10 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">II.</span>
             <div>
@@ -178,7 +178,7 @@ export default function SamouczekClient() {
         <Ornament />
 
         {/* ───────── FAQ ───────── */}
-        <section aria-labelledby="faq-title" className="scroll-mt-24">
+        <section aria-labelledby="faq-title" className="scroll-mt-[6.5rem]">
           <header className="mb-10 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">III.</span>
             <div>

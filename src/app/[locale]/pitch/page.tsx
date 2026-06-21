@@ -285,7 +285,7 @@ export default async function PitchPage({
         </div>
 
         {/* ──────────────────────────  I. HOW IT WORKS  ────────────────────────── */}
-        <section id="how" aria-labelledby="how-title" className="scroll-mt-24">
+        <section id="how" aria-labelledby="how-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">{tx("how.eyebrow")}</span>
             <div>
@@ -324,7 +324,7 @@ export default async function PitchPage({
         </div>
 
         {/* ──────────────────────────  II. WHAT YOU GET  ────────────────────────── */}
-        <section aria-labelledby="what-title" className="scroll-mt-24">
+        <section aria-labelledby="what-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">{tx("what.eyebrow")}</span>
             <div>
@@ -364,7 +364,7 @@ export default async function PitchPage({
         </div>
 
         {/* ──────────────────────────  III. SCREENSHOTS  ────────────────────────── */}
-        <section aria-labelledby="screens-title" className="scroll-mt-24">
+        <section aria-labelledby="screens-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">{tx("screenshots.eyebrow")}</span>
             <div>
@@ -415,7 +415,7 @@ export default async function PitchPage({
         </div>
 
         {/* ──────────────────────────  IV. STATS  ────────────────────────── */}
-        <section aria-labelledby="stats-title" className="scroll-mt-24">
+        <section aria-labelledby="stats-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">{tx("stats.eyebrow")}</span>
             <div>
@@ -452,7 +452,7 @@ export default async function PitchPage({
         </div>
 
         {/* ──────────────────────────  V. PRICING  ────────────────────────── */}
-        <section aria-labelledby="price-title" className="scroll-mt-24">
+        <section aria-labelledby="price-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">{tx("pricing.eyebrow")}</span>
             <div>
@@ -542,7 +542,7 @@ export default async function PitchPage({
         </div>
 
         {/* ──────────────────────────  VI. FAQ  ────────────────────────── */}
-        <section aria-labelledby="faq-title" className="scroll-mt-24">
+        <section aria-labelledby="faq-title" className="scroll-mt-[6.5rem]">
           <header className="mb-12 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
             <span className="pitch-roman">{tx("faq.eyebrow")}</span>
             <div>
