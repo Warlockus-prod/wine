@@ -105,7 +105,7 @@ export default function FloatingTasteChat({
           type="button"
           onClick={() => toggle(true)}
           aria-label="Otwórz przewodnika Vinokompasu"
-          className="group fixed right-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(209,21,52,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
+          className="group fixed right-4 bottom-[calc(var(--mobile-tabbar-h)+0.95rem)] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(197,160,89,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(209,21,52,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="text-white">
@@ -117,10 +117,11 @@ export default function FloatingTasteChat({
         </button>
       ) : null}
 
-      {/* Expanded panel - viewport-pinned. Mobile: half-screen so the page
-          underneath stays visible (≈55vh, capped). Desktop: 380×~700 docked
-          bottom-right. The drag-handle pill at the top is decorative - taps
-          the chat title hides the panel for parity with the X button. */}
+      {/* Expanded panel - viewport-pinned. Mobile: a tall sheet from 14vh down
+          to just above the bottom tab-bar (var(--mobile-tabbar-h)) so the
+          composer never hides behind the tab-bar; messages scroll inside.
+          Desktop: 380×~700 docked bottom-right. The drag-handle pill at the
+          top is decorative - taps the chat title hides the panel. */}
       {open ? (
         <>
           {/* Mobile-only soft backdrop - not a hard scrim, just enough wash
@@ -133,7 +134,7 @@ export default function FloatingTasteChat({
             style={{ pointerEvents: "auto" }}
           />
           <div
-            className="fixed inset-x-2 bottom-2 z-40 flex max-h-[58dvh] flex-col sm:inset-x-auto sm:right-5 sm:bottom-5 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
+            className="fixed inset-x-2 top-[14vh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
             role="dialog"
             aria-label="Przewodnik Vinokompasu"
           >

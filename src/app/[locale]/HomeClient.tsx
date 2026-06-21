@@ -309,9 +309,9 @@ export default function HomeClient({
                     // sticky nav (h-20 = 5rem); without it the card hides
                     // under the navbar.
                     style={{ scrollMarginTop: "6.5rem" }}
-                    className={`relative rounded-[28px] border p-4 transition ${
+                    className={`relative rounded-[28px] border-2 p-4 transition ${
                       selected
-                        ? "border-primary/55 bg-primary/12 shadow-[0_0_0_2px_rgba(209,21,52,0.35),0_18px_40px_rgba(209,21,52,0.18)]"
+                        ? "border-primary/60 bg-primary/12 shadow-[0_18px_40px_rgba(209,21,52,0.18)]"
                         : "border-white/8 bg-black/12 hover:border-white/20"
                     }`}
                   >
@@ -324,7 +324,7 @@ export default function HomeClient({
                         <div className="flex flex-wrap items-center gap-2">
                           <RestaurantFormat
                             format={restaurant.format}
-                            typeClassName={`rounded-full bg-gradient-to-r px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-white uppercase ${restaurant.coverGradient}`}
+                            typeClassName="rounded-full border border-[var(--hairline-strong)] px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-[var(--ink-soft)] uppercase"
                           />
                           <span className="text-[11px] font-semibold tracking-[0.18em] text-gray-500 uppercase">
                             {restaurant.city}, {restaurant.country}
