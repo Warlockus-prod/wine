@@ -416,7 +416,7 @@ function Stage1({
           Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong> lub{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> - kilka razy, aby ustawić jej
-          siłę od 0 do 5. Wskaźnik u góry od razu pokaże, jak wytrawne wyjdzie Twoje wino.
+          siłę od 0 do 5. Wskaźnik pod kołem od razu pokaże, jak wytrawne wyjdzie Twoje wino.
         </p>
       </header>
 
