@@ -47,61 +47,39 @@ export interface CompassSector {
   tendencje: [Tendencja, Tendencja];
 }
 
+// Order matches the canonical Vinocompas wheel (clockwise from 12 o'clock):
+// TĘGIE → MIĘKKIE → OLEISTE → ŚWIEŻE → ZIEMISTE → SZORSTKIE, with each
+// sector's two tendencje in their on-wheel order. Verified against the
+// official vinocompas.pl calculator data (modules/Vinocompas/Client S1/S2).
+// The compass renders this array clockwise, so the array order IS the
+// visual order — do not re-sort without checking the wheel.
 export const COMPASS_SECTORS: CompassSector[] = [
   {
-    id: "swieze",
-    name_pl: "Świeże",
-    noun_pl: "Świeżość",
-    short_pl: "Wszystko co kwaśne, cierpkie, ale też odświeżające i rześkie. Łatwe skojarzenie to lemoniada albo zielony ogórek.",
+    id: "tegie",
+    name_pl: "Tęgie",
+    noun_pl: "Tęgość",
+    short_pl: "Orientalne, ciepłe, ciężkie, intensywne, gęste i słodkie.",
     long_pl:
-      "Świeżość to wszystko to co kwaśne, cierpkie, ale też odświeżające i rześkie. Łatwe skojarzenie to lemoniada, albo zielony ogórek. Mamy tu dwie tendencje: cytrusy oraz zielone warzywa i owoce.",
-    color: "#9bc24a",
+      "To co jest tęgie jest też w odczuciach orientalne, ciepłe, ciężkie, intensywne, gęste i słodkie. Dwie tendencje: czekolada/kawa/tytoń oraz suszone owoce.",
+    color: "#8a4b2a",
     tendencje: [
       {
-        id: "swieze.cytrusy",
-        name_pl: "Cytrusy",
-        shortLabel_pl: "Cytrusy",
-        associations_pl: "cytryny, grejpfruty, pomarańcze, mandarynki",
-        examples_pl: "Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
-        found_in_pl: "wina białe i czerwone",
+        id: "tegie.cigaro",
+        name_pl: "Czekolada, kawa, tytoń",
+        shortLabel_pl: "Czekolada",
+        associations_pl: "czekolada, kawa, tytoń, słodkie cygaro",
+        examples_pl:
+          "Ciężka tendencja, która przywodzi na myśl „klub gentelmena”, „klub golfowy”, „sklep ze słodyczami” czy „sklep z cygarami”. Zwykle w winach czerwonych.",
+        found_in_pl: "wina czerwone (głównie)",
       },
       {
-        id: "swieze.zielone",
-        name_pl: "Zielone warzywa i owoce",
-        shortLabel_pl: "Zielone",
-        associations_pl: "melon, winogrona, seler, ogórek, karczoch, szparagi",
-        examples_pl:
-          "Te doznania często odnajdziemy w białych winach, warzywne tendencje spotykamy też często w winach czerwonych.",
-        found_in_pl: "wina białe (głównie) i czerwone",
-      },
-    ],
-  },
-  {
-    id: "oleiste",
-    name_pl: "Oleiste",
-    noun_pl: "Oleistość",
-    short_pl: "Wszystko co gęste, lepkie, słodkie i żywiczne.",
-    long_pl:
-      "Znajdujemy tu wszystko co gęste, lepkie, słodkie i żywiczne. Mamy tu dwie tendencje: masłowość/tostowość/orzechy oraz owoce tropikalne.",
-    color: "#f4c84a",
-    tendencje: [
-      {
-        id: "oleiste.maslo",
-        name_pl: "Masłowość, tostowość, orzechy",
-        shortLabel_pl: "Masło",
-        associations_pl: "masło, orzechy, tosty, drożdże, ciasteczka maślane, pierniczki",
-        examples_pl:
-          "Różnego rodzaju produkty „tłuste”. Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
-        found_in_pl: "wina białe i czerwone",
-      },
-      {
-        id: "oleiste.tropikalne",
-        name_pl: "Owoce tropikalne",
-        shortLabel_pl: "Tropikalne",
-        associations_pl: "mango, ananas, papaja, marakuja, banan, liczi",
-        examples_pl:
-          "Oleistość żywiczna, pełnia słodyczy. Te doznania często odnajdziemy w białych winach.",
-        found_in_pl: "wina białe (głównie)",
+        id: "tegie.suszone",
+        name_pl: "Suszone owoce",
+        shortLabel_pl: "Suszone",
+        associations_pl:
+          "w czerwonych: wędzone śliwki, suszone śliwki, daktyle, żurawina. W białych: suszona morela, rodzynki, daktyle, jabłka, pomarańcze, banany, orientalne przyprawy",
+        examples_pl: "Intensywne wrażenie. To trochę skojarzenie z wigilijnym suszem.",
+        found_in_pl: "wina dojrzałe, mocne",
       },
     ],
   },
@@ -135,59 +113,59 @@ export const COMPASS_SECTORS: CompassSector[] = [
     ],
   },
   {
-    id: "tegie",
-    name_pl: "Tęgie",
-    noun_pl: "Tęgość",
-    short_pl: "Orientalne, ciepłe, ciężkie, intensywne, gęste i słodkie.",
+    id: "oleiste",
+    name_pl: "Oleiste",
+    noun_pl: "Oleistość",
+    short_pl: "Wszystko co gęste, lepkie, słodkie i żywiczne.",
     long_pl:
-      "To co jest tęgie jest też w odczuciach orientalne, ciepłe, ciężkie, intensywne, gęste i słodkie. Dwie tendencje: czekolada/kawa/tytoń oraz suszone owoce.",
-    color: "#8a4b2a",
+      "Znajdujemy tu wszystko co gęste, lepkie, słodkie i żywiczne. Mamy tu dwie tendencje: masłowość/tostowość/orzechy oraz owoce tropikalne.",
+    color: "#f4c84a",
     tendencje: [
       {
-        id: "tegie.cigaro",
-        name_pl: "Czekolada, kawa, tytoń",
-        shortLabel_pl: "Czekolada",
-        associations_pl: "czekolada, kawa, tytoń, słodkie cygaro",
+        id: "oleiste.maslo",
+        name_pl: "Masłowość, tostowość, orzechy",
+        shortLabel_pl: "Masło",
+        associations_pl: "masło, orzechy, tosty, drożdże, ciasteczka maślane, pierniczki",
         examples_pl:
-          "Ciężka tendencja, która przywodzi na myśl „klub gentelmena”, „klub golfowy”, „sklep ze słodyczami” czy „sklep z cygarami”. Zwykle w winach czerwonych.",
-        found_in_pl: "wina czerwone (głównie)",
+          "Różnego rodzaju produkty „tłuste”. Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
+        found_in_pl: "wina białe i czerwone",
       },
       {
-        id: "tegie.suszone",
-        name_pl: "Suszone owoce",
-        shortLabel_pl: "Suszone",
-        associations_pl:
-          "w czerwonych: wędzone śliwki, suszone śliwki, daktyle, żurawina. W białych: suszona morela, rodzynki, daktyle, jabłka, pomarańcze, banany, orientalne przyprawy",
-        examples_pl: "Intensywne wrażenie. To trochę skojarzenie z wigilijnym suszem.",
-        found_in_pl: "wina dojrzałe, mocne",
+        id: "oleiste.tropikalne",
+        name_pl: "Owoce tropikalne",
+        shortLabel_pl: "Tropikalne",
+        associations_pl: "mango, ananas, papaja, marakuja, banan, liczi",
+        examples_pl:
+          "Oleistość żywiczna, pełnia słodyczy. Te doznania często odnajdziemy w białych winach.",
+        found_in_pl: "wina białe (głównie)",
       },
     ],
   },
   {
-    id: "szorstkie",
-    name_pl: "Szorstkie",
-    noun_pl: "Szorstkość",
-    short_pl: "Uczucie cierpkości, suchości na języku. Powąchaj skórę albo kawałek deski.",
+    id: "swieze",
+    name_pl: "Świeże",
+    noun_pl: "Świeżość",
+    short_pl: "Wszystko co kwaśne, cierpkie, ale też odświeżające i rześkie. Łatwe skojarzenie to lemoniada albo zielony ogórek.",
     long_pl:
-      "Wrażenie szorstkości odpowiada za uczucie cierpkości, suchości na języku. Jak sobie je wyobrazić? Powąchajcie skórę, albo kawałek deski. Spróbujcie aronii albo cierpkiej, czarnej porzeczki, która aż ściąga całą buzię w dzióbek. Mamy tu dwie tendencje: piżmo/skóra oraz dąb/dym/garbniki.",
-    color: "#5a2c5e",
+      "Świeżość to wszystko to co kwaśne, cierpkie, ale też odświeżające i rześkie. Łatwe skojarzenie to lemoniada, albo zielony ogórek. Mamy tu dwie tendencje: zielone warzywa i owoce oraz cytrusy.",
+    color: "#9bc24a",
     tendencje: [
       {
-        id: "szorstkie.pizmo",
-        name_pl: "Piżmo, skóra",
-        shortLabel_pl: "Piżmo",
-        associations_pl: "skojarzenia zwierzęce - zapach mokrego psa, konia, stajni, skóry",
-        examples_pl: "Tego rodzaju wrażenia spotykamy w czerwonych winach.",
-        found_in_pl: "wina czerwone",
+        id: "swieze.zielone",
+        name_pl: "Zielone warzywa i owoce",
+        shortLabel_pl: "Zielone",
+        associations_pl: "melon, winogrona, seler, ogórek, karczoch, szparagi",
+        examples_pl:
+          "Te doznania często odnajdziemy w białych winach, warzywne tendencje spotykamy też często w winach czerwonych.",
+        found_in_pl: "wina białe (głównie) i czerwone",
       },
       {
-        id: "szorstkie.dab",
-        name_pl: "Dąb, dym, garbniki",
-        shortLabel_pl: "Dąb",
-        associations_pl:
-          "drewno, nieheblowana deska, zapach ogniska, tytoń z papierosa, ściąganie na języku przy cierpkich owocach",
-        examples_pl: "Szeroka rodzina wrażeń „szorstkich” i „cierpkich”.",
-        found_in_pl: "wina czerwone",
+        id: "swieze.cytrusy",
+        name_pl: "Cytrusy",
+        shortLabel_pl: "Cytrusy",
+        associations_pl: "cytryny, grejpfruty, pomarańcze, mandarynki",
+        examples_pl: "Tego rodzaju wrażenia spotykamy w wielu gatunkach win białych jak i czerwonych.",
+        found_in_pl: "wina białe i czerwone",
       },
     ],
   },
@@ -217,6 +195,34 @@ export const COMPASS_SECTORS: CompassSector[] = [
         examples_pl:
           "Wrażenia kojarzone z lasem, glebą zwykle znajdujemy w winach czerwonych; trawę mamy w białych jak Sauvignon Blanc.",
         found_in_pl: "wina czerwone (las/gleba), białe (trawa)",
+      },
+    ],
+  },
+  {
+    id: "szorstkie",
+    name_pl: "Szorstkie",
+    noun_pl: "Szorstkość",
+    short_pl: "Uczucie cierpkości, suchości na języku. Powąchaj skórę albo kawałek deski.",
+    long_pl:
+      "Wrażenie szorstkości odpowiada za uczucie cierpkości, suchości na języku. Jak sobie je wyobrazić? Powąchajcie skórę, albo kawałek deski. Spróbujcie aronii albo cierpkiej, czarnej porzeczki, która aż ściąga całą buzię w dzióbek. Mamy tu dwie tendencje: piżmo/skóra oraz dąb/dym/garbniki.",
+    color: "#5a2c5e",
+    tendencje: [
+      {
+        id: "szorstkie.pizmo",
+        name_pl: "Piżmo, skóra",
+        shortLabel_pl: "Piżmo",
+        associations_pl: "skojarzenia zwierzęce - zapach mokrego psa, konia, stajni, skóry",
+        examples_pl: "Tego rodzaju wrażenia spotykamy w czerwonych winach.",
+        found_in_pl: "wina czerwone",
+      },
+      {
+        id: "szorstkie.dab",
+        name_pl: "Dąb, dym, garbniki",
+        shortLabel_pl: "Dąb",
+        associations_pl:
+          "drewno, nieheblowana deska, zapach ogniska, tytoń z papierosa, ściąganie na języku przy cierpkich owocach",
+        examples_pl: "Szeroka rodzina wrażeń „szorstkich” i „cierpkich”.",
+        found_in_pl: "wina czerwone",
       },
     ],
   },

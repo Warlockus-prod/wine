@@ -32,17 +32,13 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Link } from "@/i18n/navigation";
-import { BASE_TASTES } from "@/data/wine-compass-kb";
 import WineBottleSVG from "@/components/v2/WineBottleSVG";
 import {
   winnicaSearchUrl,
   type SamouczekWine,
 } from "@/data/samouczek-wines";
 import { matchWines, filledDimensions } from "@/lib/samouczek-match";
-import type {
-  CompassProfile,
-  Intensity as IntensityLevel,
-} from "./TasteCompass";
+import type { CompassProfile } from "./TasteCompass";
 
 // Heavy SVG dial - single instance reused across all 3 stages, level
 // changes per stage to progressively reveal layers.
@@ -330,20 +326,11 @@ export default function StagedTutorial({
 
       {/* Body */}
       <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#081634] p-5 sm:p-7">
-        {stage === 1 ? (
-          <Stage1
-            profile={profile}
-            onProfileChange={onProfileChange}
-            dryness={dr}
-          />
-        ) : stage === 2 ? (
-          <Stage2 profile={profile} onProfileChange={onProfileChange} />
-        ) : (
-          <Stage3 profile={profile} onProfileChange={onProfileChange} />
-        )}
-
-        {/* Stage controls */}
-        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(199,159,105,0.20)] pt-5">
+        {/* Stage controls - pinned at the TOP of the card so "next etap /
+            skip to wines" is always reachable without scrolling past the
+            tall compass dial (client: "muszę zjechać do nich, ten guzik
+            powinien być wyżej"). */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(199,159,105,0.20)] pb-5">
           <div className="flex flex-wrap items-center gap-2">
             {stage > 1 ? (
               <button
@@ -387,6 +374,18 @@ export default function StagedTutorial({
             </Link>
           )}
         </div>
+
+        {stage === 1 ? (
+          <Stage1
+            profile={profile}
+            onProfileChange={onProfileChange}
+            dryness={dr}
+          />
+        ) : stage === 2 ? (
+          <Stage2 profile={profile} onProfileChange={onProfileChange} />
+        ) : (
+          <Stage3 profile={profile} onProfileChange={onProfileChange} />
+        )}
       </div>
 
       {/* Live wine proposals - appear right below, update as the profile changes */}
@@ -433,66 +432,6 @@ function Stage1({
           belowCompass={<DrynessMeter score={dr.score} label={dr.label} />}
         />
       </div>
-
-      {/* Sliders kept as a secondary input for users who prefer linear UI */}
-      <details className="mt-5 rounded-2xl border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/40 p-4">
-        <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
-          Wolisz suwaki? Otwórz precyzyjne sterowanie
-        </summary>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {BASE_TASTES.map((t) => (
-            <BigBaseSlider
-              key={t.id}
-              id={t.id}
-              label={t.name_pl}
-              description={t.description_pl}
-              value={(profile[`base.${t.id}`] ?? 0) as number}
-              onChange={(v) =>
-                onProfileChange({ ...profile, [`base.${t.id}`]: v as IntensityLevel })
-              }
-            />
-          ))}
-        </div>
-      </details>
-    </div>
-  );
-}
-
-function BigBaseSlider({
-  id,
-  label,
-  description,
-  value,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  description: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div className="rounded-xl border border-[rgba(199,159,105,0.16)] bg-[#0b1f44]/60 p-4">
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={`bsm-${id}`} className="font-serif text-base italic text-[#f4efe9]">
-          {label}
-        </label>
-        <span className="font-serif text-xs italic tracking-wider text-[var(--color-accent-gold)]">
-          {value}/5
-        </span>
-      </div>
-      <input
-        id={`bsm-${id}`}
-        type="range"
-        min={0}
-        max={5}
-        step={1}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-[var(--color-accent-gold)]"
-        aria-label={`${label} 0..5`}
-      />
-      <p className="mt-2 text-[11px] leading-snug text-[#c79f69]/70">{description}</p>
     </div>
   );
 }

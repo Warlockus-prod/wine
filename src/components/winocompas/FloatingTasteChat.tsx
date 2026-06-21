@@ -139,7 +139,7 @@ export default function FloatingTasteChat({
           <div
             className="fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
             role="dialog"
-            aria-label="Przewodnik Vinokompasu"
+            aria-label="Vinovigator"
           >
             <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
               {/* Drag-handle pill at the top edge - purely visual cue that
