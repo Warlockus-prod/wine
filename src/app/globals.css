@@ -167,6 +167,10 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 /* Dark (default): muted labels were cool gray-500 (#6a7282 → only 3.95:1 on
    dark). Map to the warm --ink-muted (#9c9080, ~5.5:1) — AA-clean and on-brand. */
 :root:not([data-theme="light"]) .text-gray-500 { color: var(--ink-muted); }
+/* Brand red as small TEXT fails AA in both themes (≈3.5:1 dark / 4.0:1 light).
+   Lift the text colour only — fills/borders keep --color-primary (#d11534). */
+:root:not([data-theme="light"]) .text-primary { color: #e8556b; }
+:root[data-theme="light"] .text-primary { color: #b3122b; }
 
 /* Status-pill / accent text that is light-tinted for the dark theme becomes
    invisible on cream in light mode (e.g. the "AI GOTOWE" badge uses

@@ -590,7 +590,7 @@ export default function PairingClient() {
                     className={`group flex w-full items-start gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all duration-300 ${
                       isActive
                         ? "active-dish-glow -translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(209,21,52,0.20),0_18px_42px_rgba(209,21,52,0.32)]"
-                        : "border-white/8 bg-black/18 opacity-60 hover:border-white/22 hover:opacity-100"
+                        : "border-white/8 bg-black/18 opacity-80 hover:border-white/22 hover:opacity-100"
                     }`}
                   >
                     <span
@@ -698,7 +698,7 @@ export default function PairingClient() {
                     ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(197,160,89,0.30),0_18px_42px_rgba(197,160,89,0.22)] opacity-100"
                     : isMatch
                       ? "border-2 border-white/8 bg-black/18 opacity-90 hover:border-white/22 hover:opacity-100"
-                      : "border-2 border-white/6 bg-black/14 opacity-40 grayscale hover:opacity-60";
+                      : "border-2 border-white/6 bg-black/14 opacity-70 grayscale-[0.4] hover:opacity-100 hover:grayscale-0";
 
                 return (
                   <button
