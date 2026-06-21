@@ -198,7 +198,7 @@ export default function RestaurantPageClient({
                   <p className="mt-2 text-xs leading-5 text-white/90 sm:text-sm sm:leading-6">
                     {tx("qrHint")}
                   </p>
-                  <p className="mt-2 truncate rounded-xl border border-white/10 bg-black/24 px-2 py-1.5 font-mono text-[10px] text-white/70 sm:mt-3 sm:rounded-2xl sm:px-3 sm:py-3 sm:text-xs">
+                  <p className="mt-2 break-all rounded-xl border border-white/10 bg-black/24 px-2 py-1.5 font-mono text-xs text-white/70 sm:mt-3 sm:rounded-2xl sm:px-3 sm:py-3 sm:text-xs">
                     {restaurant.restaurantUrl}
                   </p>
                 </div>

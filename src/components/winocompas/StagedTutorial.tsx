@@ -516,7 +516,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
           with them. The centre is the dry/sweet boundary → "Półwytrawne". */}
       <div className="mt-4 flex justify-between text-[9px] tracking-wider text-[#c5a059]/65 uppercase">
         <span>Bardzo wytrawne</span>
-        <span>Półwytrawne</span>
+        <span className="hidden sm:inline">Półwytrawne</span>
         <span>Bardzo słodkie</span>
       </div>
 

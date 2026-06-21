@@ -1449,7 +1449,7 @@ export default function AdminPage() {
                 )}
               </div>
 
-              <pre className="mt-3 max-h-40 w-full max-w-full overflow-auto whitespace-pre-wrap break-all rounded border border-[rgba(197,160,89,0.10)] bg-[#0d0809] p-2 font-mono text-[10px] text-gray-500">
+              <pre className="mt-3 hidden max-h-40 w-full max-w-full overflow-auto whitespace-pre-wrap break-all rounded border border-[rgba(197,160,89,0.10)] bg-[#0d0809] p-2 font-mono text-[10px] text-gray-500 sm:block">
                 {JSON.stringify(
                   {
                     dish: selectedDish,

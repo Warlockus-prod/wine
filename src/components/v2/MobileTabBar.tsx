@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
 import Icon, { type IconName } from "@/components/v2/Icon";
 
@@ -25,7 +25,7 @@ export default function MobileTabBar() {
             <li key={tab.href}>
               <Link
                 href={tab.href}
-                className={`flex flex-col items-center rounded-lg px-3 py-2.5 text-[11px] font-semibold ${
+                className={`flex min-h-[44px] flex-col items-center justify-center rounded-lg px-3 py-2.5 text-[11px] font-semibold ${
                   active ? "bg-primary/20 text-primary" : "text-gray-300"
                 }`}
               >

@@ -87,7 +87,7 @@ export default function Navigation() {
                   key={option}
                   type="button"
                   onClick={() => switchLocale(option as Locale)}
-                  className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
+                  className={`min-h-[40px] rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
                     option === locale
                       ? "bg-primary text-white"
                       : "text-gray-300 hover:text-white"
@@ -122,7 +122,7 @@ export default function Navigation() {
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileOpen((prev) => !prev)}
-              className="inline-flex rounded-lg border border-white/20 bg-white/10 p-2.5 text-white transition hover:bg-white/20 md:hidden"
+              className="inline-flex min-h-[44px] min-w-[44px] rounded-lg border border-white/20 bg-white/10 p-2.5 text-white transition hover:bg-white/20 md:hidden"
             >
               <Icon name={mobileOpen ? "close" : "menu"} className="text-base" />
             </button>
@@ -171,7 +171,7 @@ export default function Navigation() {
                       key={option}
                       type="button"
                       onClick={() => switchLocale(option as Locale)}
-                      className={`rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
+                      className={`min-h-[40px] rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
                         option === locale
                           ? "bg-primary text-white"
                           : "text-gray-300 hover:text-white"

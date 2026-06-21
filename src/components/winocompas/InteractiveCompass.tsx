@@ -339,7 +339,7 @@ export default function InteractiveCompass({
               <button
                 type="button"
                 onClick={() => stepTour(-1)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
                 aria-label="Poprzednia tendencja"
               >
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
@@ -367,7 +367,7 @@ export default function InteractiveCompass({
               <button
                 type="button"
                 onClick={() => stepTour(1)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e6dccd] transition hover:bg-white/10"
                 aria-label="Następna tendencja"
               >
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor">
@@ -391,7 +391,7 @@ export default function InteractiveCompass({
                       role="radio"
                       aria-checked={active}
                       onClick={() => setTourSpeed(s.id)}
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase transition ${
+                      className={`rounded-full px-2.5 py-1.5 text-[10px] font-bold tracking-wider uppercase transition ${
                         active
                           ? "bg-[var(--color-accent-gold)] text-[#150a0c]"
                           : "text-[#e6dccd]/70 hover:text-[#f4ede0]"
@@ -799,7 +799,7 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
         ▶ Uruchom przewodnika
       </button>
 
-      <ul className="mt-6 grid grid-cols-3 gap-2 text-[10px] tracking-wider uppercase">
+      <ul className="mt-6 grid grid-cols-2 gap-2 text-[10px] tracking-wider uppercase">
         {COMPASS_SECTORS.map((s) => (
           <li
             key={s.id}

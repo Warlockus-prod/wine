@@ -16,7 +16,7 @@
  * API, and emit vinokompas:add-to-cart instead of linking out.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
@@ -119,6 +119,7 @@ export default function EmbedSamouczekPage() {
     <div
       ref={rootRef}
       className="pitch-grain bg-background-dark px-4 py-6 text-[color:var(--ink)] sm:px-6 sm:py-8"
+      style={{ ["--mobile-tabbar-h"]: "0.5rem" } as CSSProperties}
     >
       <StagedTutorial
         profile={profile}

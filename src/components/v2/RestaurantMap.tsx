@@ -75,7 +75,7 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
         center,
         zoom: 4,
         attributionControl: false,
-        cooperativeGestures: false,
+        cooperativeGestures: true,
       });
     } catch (err) {
       console.warn("Mapbox init failed", err);

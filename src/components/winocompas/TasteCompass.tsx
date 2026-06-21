@@ -886,7 +886,7 @@ function CompassLegend({
   if (selected.length === 0) {
     return (
       <p className="mt-3 text-center font-serif text-xs italic text-[var(--color-accent-gold)] opacity-80">
-        Dotknij sektor i wskaż intensywność (od 0 do 4) - kompas zapamięta twój profil.
+        Dotknij sektor i wskaż intensywność (od 0 do 5) - kompas zapamięta twój profil.
       </p>
     );
   }

@@ -577,7 +577,7 @@ export default function PairingClient() {
               </span>
             </div>
 
-            <div className="hide-scrollbar -mx-1.5 flex max-h-[62vh] flex-col gap-3 overflow-y-auto px-1.5 py-1.5">
+            <div className="hide-scrollbar -mx-1.5 flex flex-col gap-3 px-1.5 py-1.5 lg:max-h-[62vh] lg:overflow-y-auto">
               {sortedDishes.map((dish) => {
                 const isActive = dish.id === activeDish.id;
                 const ranking = selectedWine ? dishRankings.get(dish.id) : null;
@@ -615,7 +615,7 @@ export default function PairingClient() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate text-base font-semibold text-white">{t(dish.name, locale)}</p>
+                          <p className="line-clamp-2 text-base font-semibold text-white">{t(dish.name, locale)}</p>
                           <p className="mt-1 line-clamp-2 text-xs text-gray-400 sm:text-sm">
                             {t(dish.description, locale)}
                           </p>
@@ -671,7 +671,7 @@ export default function PairingClient() {
               </div>
             </div>
 
-            <div className="hide-scrollbar -mx-1.5 flex max-h-[62vh] flex-col gap-3 overflow-y-auto px-1.5 py-1.5">
+            <div className="hide-scrollbar -mx-1.5 flex flex-col gap-3 px-1.5 py-1.5 lg:max-h-[62vh] lg:overflow-y-auto">
               {sortedWines.map((wine) => {
                 const match = matchMap.get(wine.id);
                 const isMatch = Boolean(match);
@@ -733,7 +733,7 @@ export default function PairingClient() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate text-base font-semibold text-white">{t(wine.name, locale)}</p>
+                          <p className="line-clamp-2 text-base font-semibold text-white">{t(wine.name, locale)}</p>
                           <p className="mt-1 text-xs text-gray-400 sm:text-sm">
                             {wine.region} • {wine.vintageLabel ?? wine.year}
                           </p>
@@ -949,7 +949,7 @@ export default function PairingClient() {
                 <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
                   {tx("winePassport")}
                 </p>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                   <div className="rounded-xl border border-white/10 bg-black/25 p-3">
                     <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.grape")}</p>
                     <p className="mt-1 text-white">{selectedWine.passport.grape}</p>

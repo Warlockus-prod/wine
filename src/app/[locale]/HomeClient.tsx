@@ -101,7 +101,7 @@ export default function HomeClient({
     <div className="min-h-screen bg-background-dark text-gray-100">
       <Navigation />
 
-      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-28 pb-16 sm:px-6 lg:px-8">
         <section className="rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(209,21,52,0.18),transparent_35%),rgba(255,255,255,0.03)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="max-w-3xl">
@@ -315,7 +315,7 @@ export default function HomeClient({
                         : "border-white/8 bg-black/12 hover:border-white/20"
                     }`}
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                       <button
                         type="button"
                         onClick={() => handlePick(restaurant.slug)}
@@ -380,7 +380,7 @@ export default function HomeClient({
                         <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
                           {tx("directUrl")}
                         </p>
-                        <p className="mt-1 truncate text-sm text-gray-300">{restaurant.restaurantUrl}</p>
+                        <p className="mt-1 break-all text-sm text-gray-300">{restaurant.restaurantUrl}</p>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <Link

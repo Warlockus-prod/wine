@@ -455,7 +455,7 @@ function PanelShell({
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-expanded={mobileOpen}
-          className="block w-full px-3 pb-1"
+          className="block w-full px-3 py-3"
         >
           <span
             className="mx-auto block h-1.5 w-12 rounded-full"
@@ -528,7 +528,7 @@ function PanelEmpty({
             <button
               type="button"
               onClick={() => onPick(d.id)}
-              className="flex w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-[11px] transition hover:border-[var(--gold-hairline)]"
+              className="flex min-h-[44px] w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-[11px] transition hover:border-[var(--gold-hairline)]"
               style={{ borderColor: "var(--hairline-strong)", color: "var(--ink-soft)" }}
             >
               <span className="font-serif italic">{t(d.name, lng)}</span>
