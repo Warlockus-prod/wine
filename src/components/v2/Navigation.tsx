@@ -89,7 +89,7 @@ export default function Navigation() {
                   onClick={() => switchLocale(option as Locale)}
                   className={`min-h-[40px] rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
                     option === locale
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-[color:var(--on-primary)]"
                       : "text-gray-300 hover:text-white"
                   }`}
                   aria-label={tx(option === "en" ? "english" : "polish")}
@@ -173,7 +173,7 @@ export default function Navigation() {
                       onClick={() => switchLocale(option as Locale)}
                       className={`min-h-[40px] rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
                         option === locale
-                          ? "bg-primary text-white"
+                          ? "bg-primary text-[color:var(--on-primary)]"
                           : "text-gray-300 hover:text-white"
                       }`}
                       aria-label={tx(option === "en" ? "english" : "polish")}
