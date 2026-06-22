@@ -149,7 +149,7 @@ export default function FloatingTasteChat({
                 type="button"
                 onClick={() => toggle(false)}
                 aria-label="Zwiń przewodnika"
-                className="absolute top-1.5 left-1/2 z-20 -translate-x-1/2 sm:hidden"
+                className="absolute top-0 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center px-10 py-3 sm:hidden"
               >
                 <span className="block h-1.5 w-12 rounded-full bg-white/35 transition hover:bg-white/55" />
               </button>

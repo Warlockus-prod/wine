@@ -596,7 +596,7 @@ function ChatToggle({
       type="button"
       onClick={() => onChange(!disabled)}
       aria-pressed={!disabled}
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition ${
+      className={`inline-flex min-h-[40px] items-center gap-2 rounded-full border px-3.5 py-2 text-[12px] font-semibold tracking-wider uppercase transition ${
         disabled
           ? "border-white/15 bg-white/5 text-[#cbc1b1]"
           : "border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 text-[var(--color-accent-gold)]"

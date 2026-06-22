@@ -256,14 +256,14 @@ export default function HomeClient({
                   <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
                     <Link
                       href={`/restaurants/${selectedRestaurant.slug}`}
-                      className="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm"
+                      className="rounded-full inline-flex min-h-[40px] items-center justify-center px-4 py-2 text-xs font-semibold transition sm:px-5 sm:text-sm"
                       style={{ background: "#ffffff", color: "#0b1f44" }}
                     >
                       {tx("openRestaurant")}
                     </Link>
                     <Link
                       href={`/pairing?restaurant=${selectedRestaurant.slug}`}
-                      className="rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:py-2 sm:text-sm"
+                      className="rounded-full border inline-flex min-h-[40px] items-center justify-center px-4 py-2 text-xs font-semibold transition sm:px-5 sm:text-sm"
                       style={{
                         borderColor: "rgba(199, 159, 105, 0.45)",
                         background: "rgba(199, 159, 105, 0.15)",

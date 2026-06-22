@@ -920,7 +920,7 @@ export default function PairingClient() {
                                 new CustomEvent("wn:open-chat", { detail: { prefill } }),
                               );
                             }}
-                            className="mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
+                            className="mt-3 inline-flex min-h-[40px] items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-3.5 py-2 text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
                           >
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                               <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />

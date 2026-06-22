@@ -66,7 +66,7 @@ export default function PerRestaurantEditor({
           <div>
             <Link
               href="/admin/restaurants"
-              className="text-[11px] font-semibold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase hover:text-white"
+              className="inline-flex min-h-[40px] items-center text-[12px] font-semibold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase hover:text-white"
             >
               ← Wszystkie restauracje
             </Link>

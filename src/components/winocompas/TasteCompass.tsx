@@ -569,7 +569,10 @@ export default function TasteCompass({
             // Rect half-width (halfW+6) matches the labelX clamp margin, so the
             // box can never clip the viewBox edge.
             const w = halfW * 2 + 12;
-            const h = 42;
+            // Taller hit-box for a comfier touch target (rim labels sit at
+            // radius 193, well outside rOuter=165, so a 50-unit box stays off
+            // the wheel and on-canvas for all three axes).
+            const h = 50;
             return (
               <rect
                 key={`basehit-${axis.id}`}

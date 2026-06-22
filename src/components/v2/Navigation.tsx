@@ -87,7 +87,7 @@ export default function Navigation() {
                   key={option}
                   type="button"
                   onClick={() => switchLocale(option as Locale)}
-                  className={`min-h-[40px] rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
+                  className={`min-h-[40px] rounded-md px-2 py-1 text-[12px] font-bold uppercase tracking-wide transition ${
                     option === locale
                       ? "bg-primary text-[color:var(--on-primary)]"
                       : "text-gray-300 hover:text-white"
@@ -171,7 +171,7 @@ export default function Navigation() {
                       key={option}
                       type="button"
                       onClick={() => switchLocale(option as Locale)}
-                      className={`min-h-[40px] rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide transition ${
+                      className={`min-h-[40px] rounded-md px-2 py-1 text-[12px] font-bold uppercase tracking-wide transition ${
                         option === locale
                           ? "bg-primary text-[color:var(--on-primary)]"
                           : "text-gray-300 hover:text-white"
