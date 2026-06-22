@@ -91,10 +91,18 @@ const STYLE_LABEL_PL: Record<SamouczekWine["style"], string> = {
   dessert: "deserowe",
 };
 
-function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: Stage }) {
+// Match guardrail - mirrors the original Vinokompas calculator's "Wybierz co
+// najmniej 7 skojarzeń": below MIN_FILLED set dimensions the cosine match is
+// mostly noise, so we withhold confident proposals and nudge for more.
+// TARGET_FILLED is a "rich enough" profile, used by the completeness meter.
+const MIN_FILLED = 4;
+const TARGET_FILLED = 9;
+
+function InlineProposals({ profile }: { profile: CompassProfile }) {
   const filled = filledDimensions(profile);
   const matches = matchWines(profile, 3);
-  const enough = matches.length > 0;
+  const enough = filled >= MIN_FILLED && matches.length > 0;
+  const completeness = Math.min(100, Math.round((filled / TARGET_FILLED) * 100));
   // When embedded in an iframe (shop integration) open the shop in the TOP
   // window so the buying flow stays in one tab/session; standalone → new tab.
   const linkTarget =
@@ -106,13 +114,31 @@ function InlineProposals({ profile, stage }: { profile: CompassProfile; stage: S
         <div className="min-w-0">
           <p className="pitch-eyebrow pitch-eyebrow--start">Twoje propozycje</p>
           <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
-            {enough ? "Wina dopasowane do Twojego smaku" : "Zaznacz smak, a wina pojawią się tutaj"}
+            {enough
+              ? "Wina dopasowane do Twojego smaku"
+              : filled === 0
+                ? "Ustaw Vinokompas, a wina pojawią się tutaj"
+                : "Jeszcze chwila - dobór się dostraja"}
           </h3>
           <p className="mt-1.5 font-serif text-sm italic text-[#e6e1d6]">
             {enough
-              ? `Etap ${stage} z 2 - profil opisany w ${filled} ${filled === 1 ? "parametrze" : "parametrach"}. Im więcej zaznaczysz, tym celniejsze dopasowanie.`
-              : "Kliknij smaki, wrażenia lub aromaty powyżej - propozycje wyliczą się od razu pod spodem."}
+              ? `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach - im pełniejszy, tym pewniejszy dobór.`
+              : `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`}
           </p>
+          {/* Profile-completeness meter - richness toward a confident match. */}
+          <div
+            className="mt-3 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={TARGET_FILLED}
+            aria-valuenow={filled}
+            aria-label="Kompletność profilu"
+          >
+            <div
+              className={`h-full rounded-full transition-[width] duration-500 ${enough ? "bg-[var(--color-accent-gold)]" : "bg-[var(--color-accent-gold)]/45"}`}
+              style={{ width: `${Math.max(5, completeness)}%` }}
+            />
+          </div>
         </div>
         <Link
           href="/pairing"
@@ -393,7 +419,7 @@ export default function StagedTutorial({
       </div>
 
       {/* Live wine proposals - appear right below, update as the profile changes */}
-      <InlineProposals profile={profile} stage={stage} />
+      <InlineProposals profile={profile} />
     </div>
   );
 }
@@ -424,6 +450,20 @@ function StageVinokompas({
           dostroić profil. Nie wiesz od czego zacząć? Auto-przewodnik oprowadzi Cię po wszystkich sześciu.
         </p>
       </header>
+
+      {/* Method cue: base smaki = taste (tongue), wrażenia = aroma (nose).
+          Keeps the Vinokompas tongue/nose distinction explicit even though
+          both now live on one wheel. */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-[#c79f69]/80">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-accent-gold)]" aria-hidden />
+          Podpisy wokół koła = <strong className="font-semibold text-[#e6e1d6]">smaki</strong> (język)
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-sm bg-[#8f9bb3]" aria-hidden />
+          Sektory koła = <strong className="font-semibold text-[#e6e1d6]">wrażenia</strong> (nos · aromaty)
+        </span>
+      </div>
 
       <div className="mt-6">
         <InteractiveCompass
@@ -495,6 +535,13 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
           </svg>
         </div>
       </div>
+
+      {/* Honest framing: the dryness score is a placeholder model derived from
+          the 3 base smaki until the real Vinokompas wytrawność algorithm lands
+          (see dryness() comment). Don't present it as authoritative. */}
+      <p className="mt-3 text-[10px] leading-snug text-[#c79f69]/55">
+        Szacunek na podstawie trzech smaków bazowych - model poglądowy; pełny algorytm wytrawności w przygotowaniu.
+      </p>
     </div>
   );
 }
