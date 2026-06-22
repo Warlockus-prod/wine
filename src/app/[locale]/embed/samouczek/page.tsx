@@ -3,7 +3,7 @@
 /**
  * /embed/samouczek - "naked" Vinokompas tutorial for iframe embedding in an
  * external site (e.g. the winnica.pl shop). No site nav / hero / FAQ - just
- * the interactive compass, the 3 stages and the live wine proposals.
+ * the interactive compass, the 2 stages and the live wine proposals.
  *
  * Talks to the embedding page via postMessage (origin-agnostic outward; the
  * PARENT must verify event.origin === our embed origin):

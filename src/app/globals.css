@@ -543,6 +543,10 @@ body {
 .taste-compass-wrap { position: relative; width: 100%; margin-inline: auto; }
 .taste-compass-svg { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; }
 .taste-compass-touch { cursor: pointer; touch-action: manipulation; }
+/* Merged-stage base-smak rim sliders: invisible by default, but a clear gold
+   ring on keyboard focus (these are now primary controls — WCAG 2.4.7). */
+.vk-base-hit { outline: none; }
+.vk-base-hit:focus-visible { outline: 2px solid var(--color-accent-gold); outline-offset: 2px; border-radius: 12px; }
 
 /* iOS Safari force-zooms the page when a focused form field is < 16px. Pin
    every control to 16px on phones (designed sizes still apply at >= md). */

@@ -43,6 +43,10 @@ interface Props {
    *  compass + profile bar - on the SAME card. Stage 1 uses this for the
    *  live dryness meter (moved here per feedback: under the compass). */
   belowCompass?: React.ReactNode;
+  /** Forwarded to TasteCompass - makes the 3 base-smak rim labels clickable
+   *  (used by the merged Vinokompas stage so base tastes + 6 wrażenia are
+   *  both settable on one wheel). */
+  baseInteractive?: boolean;
 }
 
 // Tour ID sets per level - what auto-tour cycles through.
@@ -93,6 +97,7 @@ export default function InteractiveCompass({
   level = 3,
   autoStartTour = false,
   belowCompass,
+  baseInteractive = false,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   // Pinned id stays selected after the user clicks (or hovers chip in the
@@ -275,6 +280,7 @@ export default function InteractiveCompass({
             profile={profile}
             onChange={handleCompassChange}
             level={level}
+            baseInteractive={baseInteractive}
             // Tour wins; pinned (last-clicked) wins over nothing - both are
             // bridged through this single prop so the spoke pulses as long
             // as that selection is "current".

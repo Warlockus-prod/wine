@@ -142,6 +142,12 @@ interface Props {
   /** Progressive-disclosure level (1=base only, 2=+sektor, 3=+tendencje).
    *  Defaults to 3 to keep all existing call-sites unchanged. */
   level?: CompassLevel;
+  /** When true (the merged "Vinokompas" stage uses it at level 2), the 3
+   *  base-smak labels around the rim become clickable - tap to cycle 0-5.
+   *  This lets base tastes (which drive the dryness meter) AND the 6
+   *  wrażenia be set on a single wheel. The base hit-areas sit OUTSIDE the
+   *  sector wedges, so the two click layers never fight. */
+  baseInteractive?: boolean;
 }
 
 // Sektor avg helper - fans the same value to both tendencje under a sektor.
@@ -164,6 +170,7 @@ export default function TasteCompass({
   demoFill,
   hideLegend = false,
   level = 3,
+  baseInteractive = false,
 }: Props) {
   const isControlled = profileProp !== undefined;
   const [internal, setInternal] = useState<CompassProfile>(() => defaultProfile ?? {});
@@ -543,6 +550,63 @@ export default function TasteCompass({
             return null;
           })()}
 
+        {/* Merged-stage base click targets - tap the rim label to cycle that
+            base smak 0→5. Rendered BEFORE the sector wedges: where a label's
+            box dips inside rOuter the sector wedge (painted later) wins the
+            click, while the visible label sits well outside rOuter so tapping
+            the label always sets the base smak. No click is stolen from the
+            6 wrażenia. */}
+        {baseInteractive &&
+          BASE_AXES.map((axis) => {
+            const xUnit = Math.sin(axis.angle);
+            const yUnit = -Math.cos(axis.angle);
+            const labelR = rOuter + 28;
+            const halfW = axis.label.length * 13 * 0.42;
+            const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
+            const labelY = cy + labelR * yUnit;
+            const id = `base.${axis.id}`;
+            const value = (profile[id] ?? 0) as number;
+            // Rect half-width (halfW+6) matches the labelX clamp margin, so the
+            // box can never clip the viewBox edge.
+            const w = halfW * 2 + 12;
+            const h = 42;
+            return (
+              <rect
+                key={`basehit-${axis.id}`}
+                x={labelX - w / 2}
+                y={labelY - h / 2}
+                width={w}
+                height={h}
+                rx={11}
+                fill="transparent"
+                tabIndex={0}
+                role="slider"
+                aria-label={axis.label}
+                aria-valuemin={0}
+                aria-valuemax={MAX_INTENSITY}
+                aria-valuenow={value}
+                aria-valuetext={`${value} z ${MAX_INTENSITY}`}
+                onClick={() => cycleIntensity(id)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+                    e.preventDefault();
+                    setIntensity(id, Math.min(MAX_INTENSITY, value + 1) as Intensity);
+                  } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    setIntensity(id, Math.max(0, value - 1) as Intensity);
+                  } else if (e.key === " " || e.key === "Enter") {
+                    e.preventDefault();
+                    cycleIntensity(id);
+                  }
+                }}
+                onMouseEnter={() => reportHover(id)}
+                onMouseLeave={() => reportHover(hovered === id ? null : hovered)}
+                style={{ cursor: "pointer" }}
+                className="taste-compass-touch vk-base-hit"
+              />
+            );
+          })}
+
         {/* Level-2 click overlay - one wedge per sektor (cycles avg) */}
         {level === 2 &&
           COMPASS_SECTORS.map((sector, sIdx) => {
@@ -786,10 +850,14 @@ export default function TasteCompass({
           // lower-left spoke) would clip the SVG edge on a ~390px viewport,
           // so clamp the centre inward to keep the whole text box on-canvas.
           const labelR = rOuter + 28;
-          const halfW = axis.label.length * (level === 1 ? 13 : 10.5) * 0.42;
+          // Bright (level-1 size, full opacity) when base axes are the focus:
+          // either at level 1, or in the merged stage where baseInteractive
+          // makes them tappable.
+          const labelBright = level === 1 || baseInteractive;
+          const halfW = axis.label.length * (labelBright ? 13 : 10.5) * 0.42;
           const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
           const labelY = cy + labelR * yUnit;
-          const dimWhenIrrelevant = level >= 2 ? 0.4 : 1;
+          const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
               {/* Faint axis line ALWAYS shown to anchor the geometry */}
@@ -834,7 +902,7 @@ export default function TasteCompass({
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fontFamily="var(--font-display)"
-                fontSize={level === 1 ? 13 : 10.5}
+                fontSize={labelBright ? 13 : 10.5}
                 fontWeight={700}
                 letterSpacing="0.16em"
                 fill="var(--ink)"
@@ -842,7 +910,7 @@ export default function TasteCompass({
               >
                 {axis.label}
               </text>
-              {level === 1 ? (
+              {labelBright ? (
                 <text
                   x={labelX}
                   y={labelY + 16}

@@ -8,7 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { METHOD_STEPS, FAQ_ITEMS } from "@/data/wine-compass-kb";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
-// 3-stage flow lives in this client component; load lazily - keeps the
+// 2-stage flow lives in this client component; load lazily - keeps the
 // hero static-renderable and the heavy SVG/dot pickers off the critical
 // path until the user scrolls.
 const StagedTutorial = dynamic(() => import("@/components/winocompas/StagedTutorial"), {
@@ -88,12 +88,12 @@ export default function SamouczekClient() {
             id="hero-title"
             className="pitch-display mt-6 text-[clamp(2.2rem,6vw,4.4rem)] text-white"
           >
-            3 etapy.{" "}
+            2 etapy.{" "}
             <em className="block">Każde wino dopasowane.</em>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
-            Vinokompas to system, w którym każdy znajdzie swoje wino w 3 prostych krokach.
-            Zaczynasz od smaku, dorzucasz wrażenia, a jeśli chcesz - zagłębiasz się w tendencje.
+            Vinokompas to system, w którym każdy znajdzie swoje wino w 2 prostych krokach.
+            Najpierw ustawiasz smak i sześć wrażeń na kole, a jeśli chcesz - dostrajasz dwanaście aromatów.
             Po każdym etapie zobaczysz wina dopasowane do twojego profilu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
