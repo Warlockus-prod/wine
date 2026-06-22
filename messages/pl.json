@@ -143,8 +143,8 @@
     }
   },
   "pitch": {
-    "metaTitle": "Cellar Compass - dla właścicieli restauracji",
-    "metaDescription": "Sommelier w kieszeni każdego gościa. Cellar Compass zamienia menu i piwnicę w cichą rozmowę z każdym gościem.",
+    "metaTitle": "Vinovigator - dla właścicieli restauracji",
+    "metaDescription": "Sommelier w kieszeni każdego gościa. Vinovigator zamienia menu i piwnicę w cichą rozmowę z każdym gościem.",
     "nav": {
       "menu": "Propozycja",
       "how": "Jak to działa",
@@ -155,10 +155,10 @@
       "openDemo": "Otwórz demo"
     },
     "hero": {
-      "eyebrow": "Cellar Compass - dla restauracji",
+      "eyebrow": "Vinovigator - dla restauracji",
       "title": "Sommelier",
       "titleAccent": "w każdej kieszeni.",
-      "lede": "Cellar Compass zamienia twoje menu i piwnicę w cichą rozmowę z każdym gościem. Bez szkolenia obsługi. Bez backendu. Działa w pięć minut.",
+      "lede": "Vinovigator zamienia twoje menu i piwnicę w cichą rozmowę z każdym gościem. Bez szkolenia obsługi. Bez backendu. Działa w pięć minut.",
       "ctaPrimary": "Otwórz demo",
       "ctaSecondary": "Jak to działa",
       "footnote": "To działający prototyp. Pilotaż jest naturalnym następnym krokiem."

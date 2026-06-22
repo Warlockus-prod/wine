@@ -202,6 +202,9 @@ export default function RestaurantPairingPanel({
     return () => {
       cancelled = true;
     };
+    // Keyed by activeDish.id on purpose - re-running on object identity would
+    // re-fetch the (client-cached) explanation needlessly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDish?.id, rankedTop3, lng]);
 
   // Auto-expand mobile sheet whenever the user picks a dish

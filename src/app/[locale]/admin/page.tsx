@@ -752,7 +752,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => removeDish(dish.id)}
-                      className="rounded-full border border-rose-500/30 bg-rose-900/15 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
+                      className="inline-flex min-h-[40px] items-center rounded-full border border-rose-500/30 bg-rose-900/15 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
                     >
                       Delete
                     </button>
@@ -1058,7 +1058,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => removeWine(wine.id)}
-                      className="rounded-full border border-rose-500/30 bg-rose-900/15 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
+                      className="inline-flex min-h-[40px] items-center rounded-full border border-rose-500/30 bg-rose-900/15 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/30"
                     >
                       Delete
                     </button>

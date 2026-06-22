@@ -42,12 +42,16 @@ interface Props {
    *  Restaurant: Atelier Amaro"). Sent to /api/chat as a system-level hint
    *  so the bot can ground its replies. NOT shown in the chat UI. */
   pageContext?: string;
+  /** When true (the floating panel passes this), reserve right padding in the
+   *  header so the panel's own absolute close-X doesn't overlap "Wyczyść". */
+  headerInsetRight?: boolean;
 }
 
 export default function TasteChat({
   profile,
   storageKey = "wn_taste_chat_v1",
   pageContext,
+  headerInsetRight = false,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: HELLO_PL },
@@ -169,7 +173,7 @@ export default function TasteChat({
   return (
     <div className="flex h-full min-h-0 flex-col rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#081634] sm:min-h-[420px]">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3">
+      <div className={`flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3 ${headerInsetRight ? "pr-14" : ""}`}>
         <div className="flex items-center gap-2">
           <span
             className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary"

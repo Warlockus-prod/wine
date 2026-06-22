@@ -143,8 +143,8 @@
     }
   },
   "pitch": {
-    "metaTitle": "Cellar Compass - for restaurant owners",
-    "metaDescription": "A sommelier in every guest's pocket. Cellar Compass turns your menu and cellar into a quiet conversation with every diner.",
+    "metaTitle": "Vinovigator - for restaurant owners",
+    "metaDescription": "A sommelier in every guest's pocket. Vinovigator turns your menu and cellar into a quiet conversation with every diner.",
     "nav": {
       "menu": "The proposition",
       "how": "How it works",
@@ -155,10 +155,10 @@
       "openDemo": "Open the demo"
     },
     "hero": {
-      "eyebrow": "Cellar Compass - for restaurants",
+      "eyebrow": "Vinovigator - for restaurants",
       "title": "A sommelier",
       "titleAccent": "in every pocket.",
-      "lede": "Cellar Compass turns your menu and cellar into a quiet conversation with every guest. No staff training. No backend. Live in five minutes.",
+      "lede": "Vinovigator turns your menu and cellar into a quiet conversation with every guest. No staff training. No backend. Live in five minutes.",
       "ctaPrimary": "Open the demo",
       "ctaSecondary": "How it works",
       "footnote": "This is a working prototype. A pilot programme is the next step."

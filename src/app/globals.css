@@ -1093,7 +1093,9 @@ body {
   width: 100%;
 }
 .field-refined::placeholder {
-  color: color-mix(in srgb, var(--ink) 35%, transparent);
+  /* 55% (was 35%) so empty-field hints are legible on the dark navy surface
+     without competing with real input text. */
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
   font-style: italic;
 }
 .field-refined:focus {

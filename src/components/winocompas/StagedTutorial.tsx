@@ -322,7 +322,6 @@ export default function StagedTutorial({
         setStage(Number(v) as Stage);
       } else if (v === "3") {
         // Legacy 3-stage value (AROMATY) → clamp to the new last stage.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setStage(2);
       }
     } catch {

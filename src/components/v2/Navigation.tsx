@@ -63,7 +63,7 @@ export default function Navigation() {
               return (
                 <Link
                   key={link.href}
-                  className={`text-sm font-medium transition ${
+                  className={`flex min-h-[40px] items-center text-sm font-medium transition ${
                     active
                       ? "text-white underline decoration-[#c79f69] decoration-2 underline-offset-[6px]"
                       : "text-gray-300 hover:text-white"

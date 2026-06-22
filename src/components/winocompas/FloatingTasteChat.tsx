@@ -164,7 +164,7 @@ export default function FloatingTasteChat({
                 </svg>
               </button>
               <div className="flex flex-1">
-                <TasteChat profile={profile} storageKey={storageKey} pageContext={pageContext} />
+                <TasteChat profile={profile} storageKey={storageKey} pageContext={pageContext} headerInsetRight />
               </div>
             </div>
           </div>

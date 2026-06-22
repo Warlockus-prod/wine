@@ -1,0 +1,97 @@
+import { test, expect, type Page } from "@playwright/test";
+
+/**
+ * Samouczek 2-stage flow (Vinokompas + Aromaty) — locks in the A1 merge so it
+ * can't silently regress:
+ *   1. exactly two stages (Vinokompas + Aromaty), no legacy third stage;
+ *   2. the compass renders the canonical Vinocompas sector set;
+ *   3. base-smak (rim) and wrażenie (sector) are settable INDEPENDENTLY on one
+ *      wheel — the option-3 click-layer fix (a base tap must not bleed into a
+ *      sector and vice-versa);
+ *   4. the Aromaty stage exposes the 12 tendencja sliders.
+ *
+ * Functional assertions only (no pixel snapshots) so it's stable against the
+ * AI/lazy-loaded content that makes visual snapshots flaky.
+ */
+
+test.use({ viewport: { width: 390, height: 844 } });
+
+const PROFILE_KEY = "wn_compass_profile_v1";
+
+async function openCompass(page: Page) {
+  await page.goto("/pl/samouczek", { waitUntil: "domcontentloaded" });
+  // Deterministic start: drop any persisted profile, then reload.
+  await page.evaluate((k) => localStorage.removeItem(k), PROFILE_KEY);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.evaluate(() =>
+    (document.querySelector('a[href="#kompas"]') as HTMLElement | null)?.click(),
+  );
+  await page.waitForSelector("#kompas svg.taste-compass-svg", { timeout: 20000 });
+  await page.waitForTimeout(1500);
+}
+
+const readProfile = (page: Page) =>
+  page.evaluate(
+    (k) => JSON.parse(localStorage.getItem(k) || "{}") as Record<string, number>,
+    PROFILE_KEY,
+  );
+
+test("exactly two stages: Vinokompas + Aromaty (no legacy third)", async ({ page }) => {
+  await page.goto("/pl/samouczek", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: /VINOKOMPAS/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /AROMATY/i })).toBeVisible();
+  // The two stage tabs are the only buttons carrying an "ETAP <n>" marker.
+  await expect(page.getByRole("button").filter({ hasText: /ETAP\s*\d/i })).toHaveCount(2);
+});
+
+test("compass renders the canonical Vinocompas sectors", async ({ page }) => {
+  await openCompass(page);
+  const labels = await page.evaluate(() =>
+    [...document.querySelectorAll('[role="slider"]')].map((s) => s.getAttribute("aria-label") || ""),
+  );
+  for (const s of ["Tęgie", "Miękkie", "Oleiste", "Świeże", "Ziemiste", "Szorstkie"]) {
+    expect(labels, `sector "${s}" present on the wheel`).toContain(s);
+  }
+});
+
+test("base smak and wrażenie sector are independent on one wheel", async ({ page }) => {
+  await openCompass(page);
+
+  // Tap the SŁODYCZ rim slider 3× → base.slodycz === 3, no sector bleed.
+  const slodycz = page.getByRole("slider", { name: "SŁODYCZ", exact: true });
+  for (let i = 0; i < 3; i++) {
+    await slodycz.click({ force: true });
+    await page.waitForTimeout(200);
+  }
+  await expect
+    .poll(async () => (await readProfile(page))["base.slodycz"])
+    .toBe(3);
+  const afterBase = await readProfile(page);
+  expect(
+    Object.keys(afterBase).some((k) => k.startsWith("swieze")),
+    "base taps must not set any wrażenie",
+  ).toBe(false);
+
+  // Tap the adjacent Świeże sector → wrażenie set, base.slodycz untouched.
+  await page.getByRole("slider", { name: "Świeże", exact: true }).click({ force: true });
+  await page.waitForTimeout(400);
+  const afterSector = await readProfile(page);
+  expect(afterSector["base.slodycz"], "sector tap must not change the base smak").toBe(3);
+  expect(
+    Object.keys(afterSector).some((k) => k.startsWith("swieze")),
+    "sector tap must set the wrażenie",
+  ).toBe(true);
+});
+
+test("Aromaty stage exposes the 12 tendencja sliders", async ({ page }) => {
+  await openCompass(page);
+  await page.getByRole("button", { name: /AROMATY/i }).click();
+  await page.waitForTimeout(1500);
+  const tendencjaSliders = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('[role="slider"]')].filter((s) =>
+        (s.getAttribute("aria-label") || "").includes(" - "),
+      ).length,
+  );
+  expect(tendencjaSliders, "12 sektor-tendencja sliders at level 3").toBeGreaterThanOrEqual(12);
+});
