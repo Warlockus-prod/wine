@@ -67,7 +67,9 @@ const getOpenAI = () => {
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY missing");
   }
-  openaiSingleton = new OpenAI({ apiKey });
+  // Bounded timeout + one retry so a hung upstream can't tie up the Node
+  // handler indefinitely (audit 2026-07).
+  openaiSingleton = new OpenAI({ apiKey, timeout: 20_000, maxRetries: 1 });
   return openaiSingleton;
 };
 

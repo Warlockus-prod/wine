@@ -317,7 +317,11 @@ export async function POST(request: Request) {
         if (curatedReason) {
           return {
             ...result,
-            score: clamp(Math.max(result.score, 88), 25, 99),
+            // Curated pairs are author-endorsed, so lift them above algo-only
+            // matches with a fixed BONUS that preserves the real score spread —
+            // flooring everything to 88 made the guest top-3 read 88/88/88
+            // (audit 2026-07).
+            score: clamp(result.score + 12, 70, 99),
             // Curated reasons are author-written, no translation map.
             reason: curatedReason,
           };
