@@ -24,9 +24,21 @@ const profileSchema = z.object({
 
 /** GET /api/profiles?anonymousId=... - restore on revisit. */
 export async function GET(request: Request) {
+  const rl = rateLimit(`profiles-get:${clientIp(request)}`, 60, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { data: null, error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
   const url = new URL(request.url);
-  const anonymousId = url.searchParams.get("anonymousId");
-  if (!anonymousId) return NextResponse.json({ error: "anonymousId required" }, { status: 400 });
+  // Validate as a UUID (not just non-empty) so arbitrary strings can't probe
+  // the profiles table (audit 2026-07).
+  const parsed = z.string().uuid().safeParse(url.searchParams.get("anonymousId"));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "valid anonymousId required" }, { status: 400 });
+  }
+  const anonymousId = parsed.data;
 
   try {
     const [row] = await db

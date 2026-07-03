@@ -244,10 +244,23 @@ const readInitialDataset = (): PairingDataset => {
 };
 
 export function usePairingDataset() {
-  const [dataset, setDataset] = useState<PairingDataset>(() => readInitialDataset());
+  // Seed on BOTH server and the first client render so hydration matches; swap
+  // in the localStorage dataset only AFTER mount. Reading localStorage in the
+  // useState initializer produced different HTML on the client's first render
+  // than the server → React #418 hydration mismatch on /admin (audit 2026-07).
+  const [dataset, setDataset] = useState<PairingDataset>(() => clone(seedPairingDataset));
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    setDataset(readInitialDataset());
+    setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Skip the pre-hydration seed write so we never clobber a returning user's
+    // saved dataset with the seed before the hydrate effect has run.
+    if (typeof window === "undefined" || !hydrated) {
       return;
     }
 
@@ -256,7 +269,7 @@ export function usePairingDataset() {
     } catch {
       // Ignore storage issues in restricted browser contexts.
     }
-  }, [dataset]);
+  }, [dataset, hydrated]);
 
   return {
     dataset,
