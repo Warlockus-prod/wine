@@ -252,8 +252,13 @@ export function usePairingDataset() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // External-store (localStorage) hydration after mount — the
+    // set-state-in-effect rule is a false positive here (same pattern as
+    // SamouczekClient), so scope-disable it for these two writes.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setDataset(readInitialDataset());
     setHydrated(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   useEffect(() => {
