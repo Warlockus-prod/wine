@@ -293,7 +293,6 @@ export default function RestaurantPageClient({
                         fill
                         sizes="(min-width: 640px) 96px, 72px"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        unoptimized
                         loading="lazy"
                       />
                       {/* Gold-foil corner monogram overlay - anchors the brand
@@ -378,7 +377,6 @@ export default function RestaurantPageClient({
                         fill
                         sizes="(min-width: 640px) 76px, 60px"
                         className="object-cover transition-transform duration-500 group-hover:-translate-y-0.5"
-                        unoptimized
                         loading="lazy"
                       />
                       <div className="absolute right-1 bottom-1 h-7 w-3 sm:h-9 sm:w-4">

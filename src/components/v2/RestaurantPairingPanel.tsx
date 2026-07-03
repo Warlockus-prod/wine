@@ -255,7 +255,6 @@ export default function RestaurantPairingPanel({
               alt=""
               fill
               sizes="36px"
-              unoptimized
               className="object-cover"
             />
           </span>
@@ -288,7 +287,7 @@ export default function RestaurantPairingPanel({
       <div className="border-b border-[var(--gold-hairline-soft)] p-4">
         <div className="flex items-start gap-3">
           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-            <Image src={dishImg} alt={t(activeDish.name, lng)} fill sizes="64px" unoptimized className="object-cover" />
+            <Image src={dishImg} alt={t(activeDish.name, lng)} fill sizes="64px" className="object-cover" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
@@ -365,7 +364,7 @@ export default function RestaurantPairingPanel({
                     {rank}
                   </span>
                   <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-lg">
-                    <Image src={wineImg} alt={t(m.wine.name, lng)} fill sizes="40px" unoptimized className="object-cover" />
+                    <Image src={wineImg} alt={t(m.wine.name, lng)} fill sizes="40px" className="object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-serif text-sm italic" style={{ color: "var(--ink)" }}>

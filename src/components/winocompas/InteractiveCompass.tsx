@@ -552,7 +552,6 @@ function FocusedCard({
             alt={title}
             fill
             sizes="(min-width: 1024px) 340px, 90vw"
-            unoptimized
             className="object-cover"
           />
           <span
