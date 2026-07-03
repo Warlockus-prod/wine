@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1f44",
+  themeColor: "#f4efe9",
   // Shrink the layout viewport when the on-screen keyboard opens so the
   // floating chat composer stays above it instead of being covered.
   interactiveWidget: "resizes-content",
@@ -67,7 +67,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} className="dark" suppressHydrationWarning>
+    <html lang={locale} data-theme="light" suppressHydrationWarning>
       <head>
         {/* Icons are now inline SVG (src/components/v2/Icon.tsx) - no external
             icon font, so no FOUC / ligature-text flash on slow networks, and no

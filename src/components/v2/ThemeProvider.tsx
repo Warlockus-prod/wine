@@ -27,8 +27,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <NextThemesProvider
       attribute="data-theme"
-      defaultTheme="dark"
-      enableSystem
+      defaultTheme="light"
+      enableSystem={false}
       themes={["light", "dark"]}
       storageKey="vinovigator-theme"
       disableTransitionOnChange={false}

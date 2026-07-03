@@ -61,9 +61,9 @@
   --color-primary: #0b1f44;      /* CTA/brand on cream = navy */
   --color-primary-dark: #16294f;
   --on-primary: #f4efe9;         /* cream text on the navy CTA */
-  --surface: #ffffff;            /* page bg — white */
-  --surface-elevated: #ffffff;   /* cards — same as page (use shadows for depth) */
-  --surface-deep: #f4efe9;       /* hero / ribbon — barely-there cream wash */
+  --surface: #f4efe9;            /* page bg — cream (winnica.pl canvas) */
+  --surface-elevated: #ffffff;   /* cards — white on the cream page for depth */
+  --surface-deep: #efe7db;       /* hero / ribbon — deeper cream wash */
   --surface-input: #fbfaf6;      /* forms — almost white */
   --surface-terminal: #0b1f44;   /* terminal — navy */
   /* Light theme: halo is cream so the dark ink text cuts out over pastel
@@ -107,7 +107,7 @@
   --bg-radials:
     radial-gradient(circle at 12% 8%, rgba(11, 31, 68, 0.05), transparent 40%),
     radial-gradient(circle at 90% 10%, rgba(199, 159, 105, 0.07), transparent 35%),
-    linear-gradient(180deg, #ffffff 0%, #f7f3ee 100%);
+    linear-gradient(180deg, #f6f1e9 0%, #f1e9dd 100%);
 
   /* Nav bar — frosted white with a hair of cream */
   --nav-bg: rgba(255, 255, 255, 0.92);
@@ -208,6 +208,16 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 :root[data-theme="light"] .bg-background-dark { background-color: var(--surface) !important; }
 :root[data-theme="light"] .bg-surface-dark,
 :root[data-theme="light"] [class*="bg-surface-dark"] { background-color: var(--surface-elevated) !important; }
+/* Hardcoded navy hex backgrounds (bg-[#081634] etc., incl. /NN opacity variants)
+   flip to the elevated (white) surface in light theme so cards/sections don't
+   stay dark on cream — matches winnica.pl's white-cards-on-cream look. The
+   colored terminal dots (#ff5f57…) and camel/slate accents are left untouched. */
+:root[data-theme="light"] [class*="bg-[#0b1f44]"],
+:root[data-theme="light"] [class*="bg-[#081634]"],
+:root[data-theme="light"] [class*="bg-[#122446]"],
+:root[data-theme="light"] [class*="bg-[#060e22]"],
+:root[data-theme="light"] [class*="bg-[#16294f]"],
+:root[data-theme="light"] [class*="bg-[#122a52]"] { background-color: var(--surface-elevated) !important; }
 :root[data-theme="light"] .bg-black\/20,
 :root[data-theme="light"] .bg-black\/22,
 :root[data-theme="light"] .bg-black\/55,
