@@ -160,7 +160,7 @@
       "eyebrow": "Vinovigator - dla restauracji",
       "title": "Sommelier",
       "titleAccent": "w każdej kieszeni.",
-      "lede": "Vinovigator zamienia twoje menu i piwnicę w cichą rozmowę z każdym gościem. Bez szkolenia obsługi. Bez backendu. Działa w pięć minut.",
+      "lede": "Vinovigator zamienia twoje menu i piwnicę w cichą rozmowę z każdym gościem. Bez szkolenia obsługi, bez aplikacji dla gościa. Działa w pięć minut.",
       "ctaPrimary": "Otwórz demo",
       "ctaSecondary": "Jak to działa",
       "footnote": "To działający prototyp. Pilotaż jest naturalnym następnym krokiem."
@@ -185,7 +185,7 @@
       "f1Title": "QR per lokal",
       "f1Body": "Bezpośredni URL i kod do druku dla każdej restauracji.",
       "f2Title": "Mapa Europy",
-      "f2Body": "Prawdziwa Leaflet+OSM. Goście was znajdują, agencje widzą sieć.",
+      "f2Body": "Interaktywna mapa Mapbox. Goście was znajdują, agencje widzą sieć.",
       "f3Title": "Ranking dwustronny",
       "f3Body": "Wybierz danie - wina się przegrupują. Wybierz wino - menu się przesortuje.",
       "f4Title": "Wpisy sommeliera",
@@ -194,8 +194,8 @@
       "f5Body": "Każde danie, każde wino, każde uzasadnienie - w obu językach.",
       "f6Title": "Mobile-first",
       "f6Body": "Zaprojektowane na telefon gościa, nie laptop kierownika.",
-      "f7Title": "Bez backendu",
-      "f7Body": "Edycje żyją w przeglądarce. Eksport JSON przenosi lokal na inne urządzenie.",
+      "f7Title": "Edycje na żywo",
+      "f7Body": "Zmiany w panelu trafiają do gości w około 60 sekund. Eksport JSON w każdej chwili.",
       "f8Title": "Wdrożenie w 5 minut",
       "f8Body": "Otwórz panel, wklej menu, wygeneruj QR. Gotowe."
     },
@@ -220,8 +220,8 @@
       "s2Label": "języki",
       "s3Number": "0",
       "s3Label": "konfiguracji backendu",
-      "s4Number": "100%",
-      "s4Label": "w przeglądarce"
+      "s4Number": "~60s",
+      "s4Label": "edycja u gości"
     },
     "pricing": {
       "eyebrow": "V.",
@@ -233,7 +233,7 @@
       "tier1F1": "Pięć przykładowych lokali",
       "tier1F2": "Pełen przepływ łączenia",
       "tier1F3": "Język EN + PL",
-      "tier1F4": "Tylko localStorage",
+      "tier1F4": "Piaskownica edytora",
       "tier1Cta": "Już działa",
       "tier2Name": "Pilotaż",
       "tier2Price": "Porozmawiajmy",
@@ -257,7 +257,7 @@
       "eyebrow": "VI.",
       "title": "Pytania właściciela restauracji",
       "q1": "Kto jest właścicielem danych?",
-      "a1": "Wy. Demo trzyma wszystko w waszej przeglądarce; wersja produkcyjna zapisuje do bazy pod waszą nazwą z czystym eksportem w dowolnym momencie.",
+      "a1": "Wy. Wersja produkcyjna zapisuje wszystko do bazy pod waszą nazwą, z czystym eksportem (JSON/CSV) w dowolnym momencie.",
       "q2": "Czy możemy zabrać dane i odejść?",
       "a2": "Tak. Panel ma już Eksport JSON. Produkcja dodaje CSV i kopię zapasową jednym kliknięciem do waszego Google Drive lub S3.",
       "q3": "Co ze zdjęciami i cenami win?",

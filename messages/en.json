@@ -160,7 +160,7 @@
       "eyebrow": "Vinovigator - for restaurants",
       "title": "A sommelier",
       "titleAccent": "in every pocket.",
-      "lede": "Vinovigator turns your menu and cellar into a quiet conversation with every guest. No staff training. No backend. Live in five minutes.",
+      "lede": "Vinovigator turns your menu and cellar into a quiet conversation with every guest. No staff training, no app for the guest. Live in five minutes.",
       "ctaPrimary": "Open the demo",
       "ctaSecondary": "How it works",
       "footnote": "This is a working prototype. A pilot programme is the next step."
@@ -185,7 +185,7 @@
       "f1Title": "Per-venue QR",
       "f1Body": "Direct URL and printable code for each location.",
       "f2Title": "European map",
-      "f2Body": "Real-world Leaflet+OSM. Guests find you, agencies find your network.",
+      "f2Body": "Interactive Mapbox map. Guests find you, agencies find your network.",
       "f3Title": "Two-way ranking",
       "f3Body": "Pick a dish - wines re-order. Pick a wine - the menu re-orders.",
       "f4Title": "Sommelier overrides",
@@ -194,8 +194,8 @@
       "f5Body": "Every dish, every wine, every rationale - in both languages.",
       "f6Title": "Mobile-first",
       "f6Body": "Designed for the phone in the diner's hand, not the manager's laptop.",
-      "f7Title": "No backend",
-      "f7Body": "All edits live in the browser. Export JSON to move venues between devices.",
+      "f7Title": "Live edits",
+      "f7Body": "Panel changes reach guests in about 60 seconds. Export JSON anytime.",
       "f8Title": "Five-minute onboarding",
       "f8Body": "Open the admin, paste your menu, generate the QR. Done."
     },
@@ -220,8 +220,8 @@
       "s2Label": "languages",
       "s3Number": "0",
       "s3Label": "backend setup",
-      "s4Number": "100%",
-      "s4Label": "in the browser"
+      "s4Number": "~60s",
+      "s4Label": "edit-to-guest"
     },
     "pricing": {
       "eyebrow": "V.",
@@ -233,7 +233,7 @@
       "tier1F1": "Five seeded venues",
       "tier1F2": "Full pairing flow",
       "tier1F3": "EN + PL language",
-      "tier1F4": "localStorage only",
+      "tier1F4": "Editor sandbox",
       "tier1Cta": "Already running",
       "tier2Name": "Pilot",
       "tier2Price": "Let's talk",
@@ -257,7 +257,7 @@
       "eyebrow": "VI.",
       "title": "Questions a restaurant owner asks",
       "q1": "Who owns the data?",
-      "a1": "You do. The demo keeps everything in your browser; the production tier writes to a database under your name with a clean export at any time.",
+      "a1": "You do. The production tier writes everything to a database under your name, with a clean export (JSON/CSV) at any time.",
       "q2": "Can we export and walk away?",
       "a2": "Yes. The admin has Export JSON today. Production adds CSV and a one-click backup to your Google Drive or S3 bucket.",
       "q3": "What about the wine photos and prices?",
