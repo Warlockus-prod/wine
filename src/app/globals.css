@@ -212,12 +212,15 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
    flip to the elevated (white) surface in light theme so cards/sections don't
    stay dark on cream — matches winnica.pl's white-cards-on-cream look. The
    colored terminal dots (#ff5f57…) and camel/slate accents are left untouched. */
-:root[data-theme="light"] [class*="bg-[#0b1f44]"],
-:root[data-theme="light"] [class*="bg-[#081634]"],
-:root[data-theme="light"] [class*="bg-[#122446]"],
-:root[data-theme="light"] [class*="bg-[#060e22]"],
-:root[data-theme="light"] [class*="bg-[#16294f]"],
-:root[data-theme="light"] [class*="bg-[#122a52]"] { background-color: var(--surface-elevated) !important; }
+/* Prefix match (no trailing ]) so alpha + /opacity variants — bg-[#0b1f44cc],
+   bg-[#081634]/40 — are caught too. Gradients (bg-[linear-gradient(…)]) do NOT
+   match because their arbitrary value starts with "linear-gradient", not "#". */
+:root[data-theme="light"] [class*="bg-[#0b1f44"],
+:root[data-theme="light"] [class*="bg-[#081634"],
+:root[data-theme="light"] [class*="bg-[#122446"],
+:root[data-theme="light"] [class*="bg-[#060e22"],
+:root[data-theme="light"] [class*="bg-[#16294f"],
+:root[data-theme="light"] [class*="bg-[#122a52"] { background-color: var(--surface-elevated) !important; }
 :root[data-theme="light"] .bg-black\/20,
 :root[data-theme="light"] .bg-black\/22,
 :root[data-theme="light"] .bg-black\/55,
