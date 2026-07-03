@@ -18,6 +18,8 @@
     "statsCities": "Cities",
     "statsQrReady": "QR ready",
     "directoryFootnote": "Five live restaurants in Poland - full menu, full wine card, ready to pair.",
+    "emptyTitle": "No restaurants match the current filters.",
+    "emptyBody": "Reset one of the filters and the list will repopulate.",
     "tagline": "AI sommelier for restaurant menus",
     "mapTitle": "On the map",
     "mapSubtitle": "Tap a marker to open the restaurant.",

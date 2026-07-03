@@ -18,6 +18,8 @@
     "statsCities": "Miasta",
     "statsQrReady": "QR gotowe",
     "directoryFootnote": "Pięć restauracji w Polsce - pełne menu, pełna karta win, gotowe do łączenia.",
+    "emptyTitle": "Żadna restauracja nie pasuje do wybranych filtrów.",
+    "emptyBody": "Wyzeruj jeden z filtrów, a lista znów się wypełni.",
     "tagline": "AI sommelier dla restauracyjnych menu",
     "mapTitle": "Na mapie",
     "mapSubtitle": "Stuknij marker, aby otworzyć restaurację.",

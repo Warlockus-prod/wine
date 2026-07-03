@@ -403,10 +403,8 @@ export default function HomeClient({
 
               {filteredRestaurants.length === 0 ? (
                 <div className="rounded-[28px] border border-dashed border-white/12 bg-black/10 px-5 py-10 text-center">
-                  <p className="text-lg font-semibold text-white">No restaurants match the current filters.</p>
-                  <p className="mt-2 text-sm text-gray-400">
-                    Reset one of the filters and the list will repopulate.
-                  </p>
+                  <p className="text-lg font-semibold text-white">{tx("emptyTitle")}</p>
+                  <p className="mt-2 text-sm text-gray-400">{tx("emptyBody")}</p>
                 </div>
               ) : null}
             </div>

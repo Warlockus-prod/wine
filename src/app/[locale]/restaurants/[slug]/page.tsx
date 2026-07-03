@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { catalogRestaurants } from "@/lib/restaurant-directory";
@@ -85,6 +86,9 @@ export default async function RestaurantPage({
   setRequestLocale(locale);
 
   const { data: restaurant } = await resolveRestaurantBySlug(slug);
+  // Unknown slug (e.g. a QR pointing at a deleted venue) → real 404 + the
+  // editorial not-found page, not a soft-404 that renders an empty shell.
+  if (!restaurant) notFound();
 
   return <RestaurantPageClient slug={slug} restaurant={restaurant} />;
 }
