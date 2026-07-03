@@ -221,6 +221,16 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 :root[data-theme="light"] [class*="bg-[#060e22"],
 :root[data-theme="light"] [class*="bg-[#16294f"],
 :root[data-theme="light"] [class*="bg-[#122a52"] { background-color: var(--surface-elevated) !important; }
+/* Dark-gradient BANNER cards (Tailwind bg-gradient-to-* with dark stops) can't
+   be caught by the bg-color rule above — they paint a background-IMAGE. Target
+   the two banners' unique stops (admin editor CTA: from-[#221014]; restaurant QR
+   card: via-[#1d0f12]) and flatten them to the light surface in light theme.
+   Dark theme keeps the gradient. */
+:root[data-theme="light"] [class*="from-[#221014]"],
+:root[data-theme="light"] [class*="via-[#1d0f12]"] {
+  background-image: none !important;
+  background-color: var(--surface-elevated) !important;
+}
 :root[data-theme="light"] .bg-black\/20,
 :root[data-theme="light"] .bg-black\/22,
 :root[data-theme="light"] .bg-black\/55,
