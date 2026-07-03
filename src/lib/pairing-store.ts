@@ -254,7 +254,6 @@ export function usePairingDataset() {
   useEffect(() => {
     setDataset(readInitialDataset());
     setHydrated(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
