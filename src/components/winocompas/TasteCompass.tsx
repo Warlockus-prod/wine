@@ -284,6 +284,46 @@ export default function TasteCompass({
     [profile, setIntensity, cycleIntensity],
   );
 
+  // Keyboard equivalents for the level-2 sektor wedges and level-1 base wedges
+  // (were click-only — WCAG 2.1.1 keyboard-operability). Arrow keys step ±1,
+  // Enter/Space cycles, digits 0-5 set directly.
+  const handleSektorKey = useCallback(
+    (e: React.KeyboardEvent<SVGElement>, sektorId: string) => {
+      const s = COMPASS_SECTORS.find((x) => x.id === sektorId);
+      if (!s) return;
+      const cur = sektorAvg(profile, sektorId);
+      let next: number | null = null;
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") next = Math.min(MAX_INTENSITY, cur + 1);
+      else if (e.key === "ArrowDown" || e.key === "ArrowLeft") next = Math.max(0, cur - 1);
+      else if (e.key === " " || e.key === "Enter") next = (cur + 1) % STATE_COUNT;
+      else if (/^[0-5]$/.test(e.key)) next = Number(e.key);
+      if (next === null) return;
+      e.preventDefault();
+      setProfile({
+        ...profile,
+        [s.tendencje[0].id]: next as Intensity,
+        [s.tendencje[1].id]: next as Intensity,
+      });
+    },
+    [profile, setProfile],
+  );
+
+  const handleBaseKey = useCallback(
+    (e: React.KeyboardEvent<SVGElement>, axisId: string) => {
+      const id = `base.${axisId}`;
+      const cur = (profile[id] ?? 0) as number;
+      let next: number | null = null;
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") next = Math.min(MAX_INTENSITY, cur + 1);
+      else if (e.key === "ArrowDown" || e.key === "ArrowLeft") next = Math.max(0, cur - 1);
+      else if (e.key === " " || e.key === "Enter") next = (cur + 1) % STATE_COUNT;
+      else if (/^[0-5]$/.test(e.key)) next = Number(e.key);
+      if (next === null) return;
+      e.preventDefault();
+      setIntensity(id, next as Intensity);
+    },
+    [profile, setIntensity],
+  );
+
   // Reset on Esc
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => {
@@ -632,6 +672,7 @@ export default function TasteCompass({
                 aria-valuenow={value}
                 aria-valuetext={`${value} z ${MAX_INTENSITY}`}
                 onClick={(e) => pickSektor(e, sector.id)}
+                onKeyDown={(e) => handleSektorKey(e, sector.id)}
                 onMouseEnter={() => reportHover(sector.id)}
                 onMouseLeave={() =>
                   reportHover(hovered === sector.id ? null : hovered)
@@ -666,6 +707,7 @@ export default function TasteCompass({
                 aria-valuenow={value}
                 aria-valuetext={`${value} z ${MAX_INTENSITY}`}
                 onClick={(e) => pickBase(e, axis.id)}
+                onKeyDown={(e) => handleBaseKey(e, axis.id)}
                 onMouseEnter={() => reportHover(id)}
                 onMouseLeave={() =>
                   reportHover(hovered === id ? null : hovered)

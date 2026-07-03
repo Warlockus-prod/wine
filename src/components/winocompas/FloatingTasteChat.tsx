@@ -20,7 +20,7 @@
  * yank the panel away from a user mid-conversation.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TasteChat from "./TasteChat";
 import type { CompassProfile } from "./TasteCompass";
 
@@ -92,6 +92,29 @@ export default function FloatingTasteChat({
     return () => window.removeEventListener("wn:open-chat", onOpen);
   }, [disabled]);
 
+  // Dialog a11y: when the panel opens, move focus into it (the composer) and
+  // let Escape dismiss it. Without this the FAB left focus on <body> and
+  // Escape did nothing (audit 2026-07).
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!open || typeof window === "undefined") return;
+    const focusTarget =
+      panelRef.current?.querySelector<HTMLElement>("textarea, button, [href], [tabindex]") ??
+      panelRef.current;
+    focusTarget?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      try {
+        window.localStorage.setItem(STATE_KEY, "0");
+      } catch {
+        /* ignore */
+      }
+      setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   if (!hydrated) {
     // SSR placeholder - render nothing to avoid layout shift on hydration.
     return null;
@@ -137,8 +160,10 @@ export default function FloatingTasteChat({
             style={{ pointerEvents: "auto" }}
           />
           <div
+            ref={panelRef}
             className="fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
             role="dialog"
+            aria-modal="true"
             aria-label="Vinovigator"
           >
             <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_28px_70px_rgba(0,0,0,0.55)]">

@@ -471,6 +471,7 @@ function PanelShell({
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-expanded={mobileOpen}
+          aria-label={mobileOpen ? "Zwiń dopasowania win" : "Rozwiń dopasowania win"}
           className="block w-full px-3 py-3"
         >
           <span

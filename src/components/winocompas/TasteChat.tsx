@@ -268,7 +268,7 @@ export default function TasteChat({
           rows={1}
           maxLength={800}
           placeholder="Zapytaj o smaki, wrażenia, wino…"
-          className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-white/10 bg-[#122446] px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus:outline-none"
+          className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-white/10 bg-[#122446] px-3 py-2.5 text-sm text-gray-100 outline-none placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent-gold)]"
           aria-label="Twoje pytanie"
         />
         <button
