@@ -202,14 +202,26 @@ export default function RestaurantPairingPanel({
     return () => {
       cancelled = true;
     };
-    // Keyed by activeDish.id on purpose - re-running on object identity would
-    // re-fetch the (client-cached) explanation needlessly.
+    // Key on the STABLE primitives (dish id + top-wine id + locale), not the
+    // rankedTop3 array reference. The array is recreated on every render, which
+    // fired this effect 3× within ~70ms before the cache populated → 3 duplicate
+    // OpenAI calls per dish selection (audit 2026-07). Keying on the top wine id
+    // collapses those to one fetch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDish?.id, rankedTop3, lng]);
+  }, [activeDish?.id, rankedTop3[0]?.wine.id, lng]);
 
-  // Auto-expand mobile sheet whenever the user picks a dish
+  // Auto-expand the mobile sheet when the user picks a dish — but NOT on the
+  // initial auto-selection (RestaurantPageClient auto-selects dishes[0] on
+  // mount), which otherwise threw the sheet over the whole menu on QR landing
+  // and blocked taps (audit 2026-07). Skip the first activeDishId set.
+  const didMountSelectRef = useRef(false);
   useEffect(() => {
-    if (activeDishId) setMobileOpen(true);
+    if (!activeDishId) return;
+    if (!didMountSelectRef.current) {
+      didMountSelectRef.current = true;
+      return;
+    }
+    setMobileOpen(true);
   }, [activeDishId]);
 
   // Empty state - no dish picked yet
@@ -327,7 +339,9 @@ export default function RestaurantPairingPanel({
             const wineImg =
               m.wine.image ??
               getWineImage(
-                { style: m.wine.style, grape: m.wine.grape, name: t(m.wine.name, lng), region: m.wine.region },
+                // Pass the id (= external_id for DB wines) FIRST so the generated
+                // local bottle photo (WINE_IMAGE_MAP) wins over Unsplash stock.
+                { id: m.wine.id, style: m.wine.style, grape: m.wine.grape, name: t(m.wine.name, lng), region: m.wine.region },
                 240,
               );
             const rank = i + 1;

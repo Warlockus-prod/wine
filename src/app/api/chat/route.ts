@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { buildChatSystemPrompt } from "@/data/wine-compass-kb";
 import { logEvent } from "@/lib/server-events";
+import { clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -53,17 +54,11 @@ const checkRate = (key: string): { ok: true } | { ok: false; retryAfter: number;
   return { ok: true };
 };
 
-// Anonymous-id key with a fallback so missing-id requests still get
-// rate-limited as a single shared bucket (worst case all such requests
-// share the limit, which is the right pessimism).
-const rateKeyFromBody = (body: ChatRequest, request: Request): string => {
-  const raw = body.anonymousId?.trim();
-  if (raw && /^[A-Za-z0-9_.\-]{6,128}$/.test(raw)) return `id:${raw}`;
-  // Fallback: client IP from common proxy headers (we sit behind nginx).
-  const fwd = request.headers.get("x-forwarded-for");
-  const ip = fwd?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "anon";
-  return `ip:${ip}`;
-};
+// Cost cap keyed ONLY on the trustworthy proxy IP (clientIp → X-Real-IP, which
+// nginx overwrites from the real TCP peer). The client-supplied anonymousId is
+// deliberately NOT used for the key — it's attacker-controlled, so keying on it
+// let anyone rotate the id to burn unlimited OpenAI tokens (audit 2026-07).
+const rateKeyFromRequest = (request: Request): string => `ip:${clientIp(request)}`;
 
 let openaiSingleton: OpenAI | null = null;
 const getOpenAI = () => {
@@ -121,7 +116,7 @@ export async function POST(request: Request) {
   // 4h rolling-window rate limit per anonymous id (or IP fallback).
   // Returns 429 with a friendly PL message + Retry-After header. Logs
   // the throttle event so we can spot abusive patterns later.
-  const rateKey = rateKeyFromBody(body, request);
+  const rateKey = rateKeyFromRequest(request);
   const rate = checkRate(rateKey);
   if (!rate.ok) {
     const minutes = Math.ceil(rate.retryAfter / 60);

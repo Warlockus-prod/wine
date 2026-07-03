@@ -73,7 +73,10 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    unoptimized: true,
+    // Optimizer ON: local /public masters are 1024px PNGs but the UI never
+    // renders above ~384px, so serving originals shipped multi-MB thumbnails.
+    // sharp is present in node_modules and .next/cache is writable by the
+    // non-root container user (Dockerfile.vps), so runtime optimization works.
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [

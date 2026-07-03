@@ -16,10 +16,25 @@ const store: Buckets =
   ((globalThis as unknown) as { __wn_rateBuckets?: Buckets }).__wn_rateBuckets ?? new Map();
 ((globalThis as unknown) as { __wn_rateBuckets?: Buckets }).__wn_rateBuckets = store;
 
-/** Best-effort client IP from the proxy headers nginx sets in front of us. */
+/**
+ * Trustworthy client IP from the proxy headers.
+ *
+ * Our nginx_server block for wine.icoffio.com sets `X-Real-IP $remote_addr`
+ * (overwriting any client-sent value) and, because MetroWeb passes 443 through
+ * at the TCP layer, `$remote_addr` is the REAL client IP. So X-Real-IP is
+ * authoritative and not client-spoofable — prefer it. The LEFTMOST
+ * X-Forwarded-For token is attacker-controlled (nginx APPENDS the true peer),
+ * so if we must fall back to XFF we take the LAST entry, never the first.
+ */
 export function clientIp(request: Request): string {
-  const fwd = request.headers.get("x-forwarded-for");
-  return fwd?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+  const real = request.headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  const parts = request.headers
+    .get("x-forwarded-for")
+    ?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return (parts && parts[parts.length - 1]) || "unknown";
 }
 
 export interface RateVerdict {

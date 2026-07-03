@@ -105,7 +105,10 @@ export async function requireRestaurantMember(
 /** Wrap an API handler so ApiError is converted to JSON+status. */
 export function apiHandler<T>(handler: () => Promise<T>): Promise<NextResponse> {
   return handler()
-    .then((data) => NextResponse.json(data))
+    // Handlers that already build their own NextResponse (all the write routes)
+    // pass through unchanged; handlers that return plain data get wrapped. The
+    // old unconditional wrap double-wrapped NextResponse into an empty {} body.
+    .then((data) => (data instanceof NextResponse ? data : NextResponse.json(data)))
     .catch((err: unknown) => {
       if (err instanceof ApiError) {
         return NextResponse.json(

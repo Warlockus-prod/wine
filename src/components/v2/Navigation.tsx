@@ -41,7 +41,7 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="glass-nav fixed top-0 z-50 w-full border-b border-white/10">
+      <nav aria-label={tx("primaryNav")} className="glass-nav fixed top-0 z-50 w-full border-b border-white/10">
         <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
