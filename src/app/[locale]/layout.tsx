@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Libre_Franklin, Libre_Baskerville } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -8,14 +8,18 @@ import { ThemeProvider } from "@/components/v2/ThemeProvider";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
+// Match winnica.pl typography: Libre Baskerville (serif headings + italic
+// accents) + Libre Franklin (body/UI). Libre Baskerville ships 400/700 only.
+const libreFranklin = Libre_Franklin({
+  variable: "--font-libre-franklin",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 
-const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair",
+const libreBaskerville = Libre_Baskerville({
+  variable: "--font-libre-baskerville",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
@@ -71,7 +75,7 @@ export default async function LocaleLayout({
             next/font. */}
       </head>
       <body
-        className={`${plusJakartaSans.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${libreFranklin.variable} ${libreBaskerville.variable} antialiased`}
       >
         <ThemeProvider>
           <NextIntlClientProvider>
