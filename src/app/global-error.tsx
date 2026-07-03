@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 /**
  * Root error boundary — only fires when the ROOT layout itself throws, so it
  * must render its own <html>/<body>. Inline styles (no Tailwind context is
@@ -12,6 +14,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    console.error("[global error]", error);
+  }, [error]);
+
   return (
     <html lang="pl">
       <body

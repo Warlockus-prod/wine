@@ -40,12 +40,17 @@ export default function LocaleError({
           >
             Spróbuj ponownie
           </button>
-          <a
-            href="/"
+          {/* Hard navigation on purpose: an error boundary should fully reload
+              out of the broken state, not soft-nav via the router. */}
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = "/";
+            }}
             className="inline-flex min-h-[44px] items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-[#f4efe9] transition hover:border-white/40"
           >
             Strona główna
-          </a>
+          </button>
         </div>
       </div>
     </div>
