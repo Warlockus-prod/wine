@@ -158,7 +158,10 @@ export default function RestaurantPairingPanel({
 
   // Vinokompas-vocab explanation for the #1 wine
   useEffect(() => {
-    if (!activeDish || rankedTop3.length === 0) {
+    // Wait until matches for the CURRENT dish have settled — explaining the
+    // interim (previous/fallback) top wine burned a second OpenAI call per
+    // dish tap before the real ranking arrived (audit 2026-07 follow-up).
+    if (!activeDish || loading || rankedTop3.length === 0) {
       setExplanation(null);
       return;
     }
@@ -208,7 +211,7 @@ export default function RestaurantPairingPanel({
     // OpenAI calls per dish selection (audit 2026-07). Keying on the top wine id
     // collapses those to one fetch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDish?.id, rankedTop3[0]?.wine.id, lng]);
+  }, [activeDish?.id, rankedTop3[0]?.wine.id, lng, loading]);
 
   // Auto-expand the mobile sheet when the user picks a dish — but NOT on the
   // initial auto-selection (RestaurantPageClient auto-selects dishes[0] on

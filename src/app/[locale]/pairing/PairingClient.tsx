@@ -84,11 +84,20 @@ const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[], locale: 
   return map;
 };
 
-export default function PairingClient() {
+export default function PairingClient({
+  initialRestaurantSlug = null,
+}: {
+  /** `?restaurant=` slug, read server-side by page.tsx. Prop (not a
+   *  post-mount window.location read) so the scoped view renders with the
+   *  right dataset from the very first client render. */
+  initialRestaurantSlug?: string | null;
+}) {
   const { dataset } = usePairingDataset();
   const locale = useLocale() as Locale;
   const tx = useTranslations("pairing");
-  const [restaurantContextSlug, setRestaurantContextSlug] = useState<string | null>(null);
+  // Derived straight from the server-resolved prop — no post-mount URL read,
+  // no sandbox-dataset flash while the slug "loads".
+  const restaurantContextSlug = initialRestaurantSlug;
   // Restaurant-scoped context now reads the DB→seed read-path via the API
   // (was the localStorage catalog). Global sandbox mode still uses
   // usePairingDataset. SWR resolves async; until then context is null and
@@ -128,14 +137,6 @@ export default function PairingClient() {
     trackEvent("pairing_page_open", { device: "mobile-first" });
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const nextSlug = new URLSearchParams(window.location.search).get("restaurant");
-    setRestaurantContextSlug(nextSlug);
-  }, []);
 
   const effectiveDishId =
     activeDishId && dishes.some((dish) => dish.id === activeDishId)

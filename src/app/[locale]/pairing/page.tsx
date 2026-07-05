@@ -35,10 +35,16 @@ export async function generateMetadata({
 
 export default async function PairingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ restaurant?: string }>;
 }) {
   const { locale } = await params;
+  const { restaurant } = await searchParams;
   setRequestLocale(locale);
-  return <PairingClient />;
+  // Resolve ?restaurant= SERVER-side so the client never boots on the
+  // localStorage sandbox and then swaps datasets after mount (that flash
+  // also fired a throwaway /api/pairing call — audit 2026-07).
+  return <PairingClient initialRestaurantSlug={restaurant ?? null} />;
 }
