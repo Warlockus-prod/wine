@@ -383,7 +383,10 @@ export default function TasteCompass({
               key={`bg-${sector.id}`}
               d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
               fill={sector.color}
-              fillOpacity={0.06}
+              // Theme-aware tint: 0.06 was tuned for the dark navy plate; on the
+              // cream default all six wedges read as identical beige, losing the
+              // canonical Vinocompas colour identity. Light theme raises it.
+              style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
               stroke="var(--hairline)"
               strokeWidth={0.5}
             />
@@ -756,7 +759,7 @@ export default function TasteCompass({
           fontStyle="italic"
           fontSize={12}
           fontWeight={500}
-          fill="var(--color-accent-gold)"
+          fill="var(--compass-center-ink, var(--color-accent-gold))"
           stroke="var(--compass-halo-center)"
           strokeWidth={2.2}
           strokeLinejoin="round"

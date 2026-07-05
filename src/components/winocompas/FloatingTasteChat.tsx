@@ -63,6 +63,12 @@ export default function FloatingTasteChat({
   });
   const hydrated = typeof window !== "undefined";
 
+  // Prefill buffered from `wn:open-chat` events. Held in state (not just
+  // dispatched onward) so a CTA fired while the panel is collapsed — i.e.
+  // TasteChat unmounted, always the case on mobile — still reaches the chat
+  // once it mounts (audit 2026-07: prefills were silently lost).
+  const [pendingPrefill, setPendingPrefill] = useState<string | null>(null);
+
   const toggle = (next?: boolean) => {
     setOpen((prev) => {
       const v = typeof next === "boolean" ? next : !prev;
@@ -80,7 +86,12 @@ export default function FloatingTasteChat({
   // any early returns to satisfy the rules-of-hooks ordering.
   useEffect(() => {
     if (disabled || typeof window === "undefined") return;
-    const onOpen = () => {
+    const onOpen = (event: Event) => {
+      const ce = event as CustomEvent<{ prefill?: string } | null>;
+      const text = ce.detail?.prefill;
+      if (text && typeof text === "string") {
+        setPendingPrefill(text);
+      }
       try {
         window.localStorage.setItem(STATE_KEY, "1");
       } catch {
@@ -189,7 +200,14 @@ export default function FloatingTasteChat({
                 </svg>
               </button>
               <div className="flex flex-1">
-                <TasteChat profile={profile} storageKey={storageKey} pageContext={pageContext} headerInsetRight />
+                <TasteChat
+                  profile={profile}
+                  storageKey={storageKey}
+                  pageContext={pageContext}
+                  headerInsetRight
+                  prefill={pendingPrefill}
+                  onPrefillConsumed={() => setPendingPrefill(null)}
+                />
               </div>
             </div>
           </div>

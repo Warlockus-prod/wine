@@ -45,6 +45,12 @@ interface Props {
   /** When true (the floating panel passes this), reserve right padding in the
    *  header so the panel's own absolute close-X doesn't overlap "Wyczyść". */
   headerInsetRight?: boolean;
+  /** Question to auto-send once on mount/arrival. FloatingTasteChat buffers
+   *  the `wn:open-chat` detail here so a prefill fired while this panel was
+   *  collapsed (unmounted) is not lost. */
+  prefill?: string | null;
+  /** Called after the prefill has been dispatched so the parent can clear it. */
+  onPrefillConsumed?: () => void;
 }
 
 export default function TasteChat({
@@ -52,6 +58,8 @@ export default function TasteChat({
   storageKey = "wn_taste_chat_v1",
   pageContext,
   headerInsetRight = false,
+  prefill = null,
+  onPrefillConsumed,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: HELLO_PL },
@@ -94,24 +102,28 @@ export default function TasteChat({
     el.scrollTop = el.scrollHeight;
   }, [messages]);
 
-  // Listen for prefill requests from "Talk to AI sommelier" CTAs around
-  // the app. Fire wn:open-chat with detail.prefill = "..." to send.
+  // Latest-`send` ref so deferred callers never capture a stale closure.
+  // (The old window-listener here was registered with [] deps and sent with
+  // the FIRST render's empty message list — wiping history — and missed the
+  // event entirely while the floating panel was collapsed. The listener now
+  // lives in FloatingTasteChat, which buffers the prefill into a prop.)
+  const sendRef = useRef<(text: string) => void>(() => {});
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handler = (event: Event) => {
-      const ce = event as CustomEvent<{ prefill?: string } | null>;
-      const text = ce.detail?.prefill;
-      if (text && typeof text === "string") {
-        // Defer to next tick so the chat has time to mount/scroll.
-        window.setTimeout(() => send(text), 60);
-      }
-    };
-    window.addEventListener("wn:open-chat", handler);
-    return () => window.removeEventListener("wn:open-chat", handler);
-    // `send` is stable enough - re-running on profile change isn't an issue
-    // because handler reads the latest `send` via closure of this render.
+    sendRef.current = send;
+  });
+
+  // Auto-send the buffered prefill once it arrives (defer a tick so the
+  // panel has time to mount/scroll first).
+  useEffect(() => {
+    if (!prefill) return;
+    const t = window.setTimeout(() => {
+      sendRef.current(prefill);
+      onPrefillConsumed?.();
+    }, 80);
+    return () => window.clearTimeout(t);
+    // Only the prefill text itself should re-trigger the send.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [prefill]);
 
   const send = async (text: string) => {
     const trimmed = text.trim();

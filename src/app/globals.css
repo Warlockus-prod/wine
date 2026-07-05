@@ -28,6 +28,11 @@
      theme so the light ink text cuts out cleanly over any wedge colour. */
   --compass-halo: rgba(8, 16, 36, 0.82);
   --compass-halo-center: rgba(4, 9, 24, 0.85);   /* camel medallion: near-opaque navy so camel pops in both themes */
+  /* Compass sector background tint + centre-label ink (theme-aware). Dark
+     plate wants a whisper of colour; the light/cream plate needs much more
+     so the six wrażenia keep their canonical colour identity. */
+  --compass-sector-tint: 0.06;
+  --compass-center-ink: var(--color-accent-gold);
   --ink: #f4efe9;                 /* primary text on dark — cream */
   --ink-strong: #ffffff;          /* bright headings on dark */
   --ink-soft: #cdd4df;            /* secondary text — light slate */
@@ -69,7 +74,13 @@
   /* Light theme: halo is cream so the dark ink text cuts out over pastel
      wedges; center medallion keeps a dark halo so the gold reads on cream. */
   --compass-halo: rgba(244, 239, 233, 0.92);
-  --compass-halo-center: rgba(11, 31, 68, 0.95);
+  /* Centre label on cream: navy ink with a cream (invisible) halo — the old
+     gold-on-navy-halo combo read as a muddy smudge at 12px (audit 2026-07). */
+  --compass-halo-center: rgba(244, 239, 233, 0.9);
+  --compass-center-ink: #0b1f44;
+  /* Vivid-enough wedges on cream so Świeże/Oleiste/… stay distinguishable —
+     matches the brightly coloured canonical vinocompas.pl wheel. */
+  --compass-sector-tint: 0.22;
 
   /* Type — navy-ink scale on cream. */
   --ink: #0b1f44;

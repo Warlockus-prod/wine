@@ -344,8 +344,17 @@ export default function InteractiveCompass({
             boxShadow: "var(--shadow-card)",
           };
         })()}
-        aria-live="polite"
       >
+        {/* SR announcement: the FULL description once per focus change. The
+            visible TourText types char-by-char — keeping aria-live on the whole
+            aside made screen readers spell out every character (audit 2026-07). */}
+        <span className="sr-only" role="status">
+          {focused
+            ? focused.kind === "base"
+              ? `${focused.name}. ${focused.description}`
+              : `${focused.sector.name_pl}. ${focused.sector.short_pl}`
+            : ""}
+        </span>
         {focused ? (
           <FocusedCard
             key={focusedId ?? "idle"}
@@ -363,6 +372,23 @@ export default function InteractiveCompass({
             }}
           />
         )}
+        {/* Restart entry point — the IdleCard's "Uruchom przewodnika" vanishes
+            forever after the first wheel tap pins a selection (audit 2026-07).
+            Small persistent control brings the auto-tour back. */}
+        {!tourOn && focused ? (
+          <button
+            type="button"
+            onClick={() => {
+              setInterrupt(false);
+              setTourIdx(0);
+              setTourOn(true);
+            }}
+            className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-[var(--gold-hairline-soft)] px-3.5 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition hover:border-[var(--color-accent-gold)]"
+            style={{ color: "var(--color-accent-gold)" }}
+          >
+            ▶ Przewodnik od nowa
+          </button>
+        ) : null}
       </aside>
     </div>
   );

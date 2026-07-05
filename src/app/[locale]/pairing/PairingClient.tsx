@@ -345,7 +345,16 @@ export default function PairingClient() {
           top_score: topScore,
           wines_count: wines.length,
         });
-      } catch {
+      } catch (err) {
+        // Deliberate aborts (dish switch / unmount) are NOT failures — the old
+        // bare catch flashed the fallback ranking and logged a spurious
+        // pairing_ai_fallback event on every dish change (audit 2026-07).
+        if (
+          controller.signal.aborted ||
+          (err instanceof DOMException && err.name === "AbortError")
+        ) {
+          return;
+        }
         const fallbackMap = applyRestaurantPairingOverrides(
           buildFallbackMatchMap(activeDish, wines, locale),
           restaurantContext,

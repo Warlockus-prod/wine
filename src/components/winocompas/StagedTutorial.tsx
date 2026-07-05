@@ -41,6 +41,7 @@ import {
   type SamouczekWine,
 } from "@/data/samouczek-wines";
 import { matchWines, filledDimensions } from "@/lib/samouczek-match";
+import { dryness } from "@/lib/dryness";
 import type { CompassProfile } from "./TasteCompass";
 
 // Heavy SVG dial - single instance reused across both stages, level
@@ -62,25 +63,7 @@ interface Props {
   onChatDisabledChange: (next: boolean) => void;
 }
 
-// ─── dryness algorithm placeholder ───────────────────────────────────────
-function dryness(profile: CompassProfile): {
-  score: number; // 0-100, higher = sweeter
-  label: string;
-} {
-  const s = (profile["base.slodycz"] ?? 0) as number;
-  const c = (profile["base.cierpkosc"] ?? 0) as number;
-  const k = (profile["base.kwasowosc"] ?? 0) as number;
-  const raw = s * 18 - c * 3 - k * 3 + 10;
-  const score = Math.max(0, Math.min(100, raw));
-  let label: string;
-  if (score < 8) label = "Bardzo wytrawne";
-  else if (score < 25) label = "Wytrawne";
-  else if (score < 45) label = "Półwytrawne";
-  else if (score < 65) label = "Półsłodkie";
-  else if (score < 85) label = "Słodkie";
-  else label = "Bardzo słodkie";
-  return { score, label };
-}
+// dryness algorithm lives in @/lib/dryness (extracted for unit tests).
 
 // ─── live wine proposals - real wines from winnica.pl ─────────────────────
 const STYLE_LABEL_PL: Record<SamouczekWine["style"], string> = {
@@ -112,6 +95,12 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
     <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#0b1f44] p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
+          {/* SR announcement when proposals arrive/refresh — the visible list
+              re-sorts silently otherwise. Text flips between 3 states only, so
+              it never spams per-click. */}
+          <span className="sr-only" role="status">
+            {enough ? `${matches.length} propozycje win dopasowane do Twojego profilu` : ""}
+          </span>
           <p className="pitch-eyebrow pitch-eyebrow--start">Twoje propozycje</p>
           <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
             {enough
@@ -207,13 +196,20 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
         </ul>
       ) : (
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          {[0, 1, 2].map((i) => (
+          {/* Intentional-looking placeholders: ghosted bottle silhouettes +
+              numbered captions. The old dark-gradient swatch with a lone "-"
+              read as broken cards on the cream theme (audit 2026-07). */}
+          {(["red", "white", "sparkling"] as const).map((style, i) => (
             <div
-              key={i}
-              className="flex items-center gap-3 rounded-xl border border-dashed border-[rgba(199,159,105,0.20)] bg-[#122446]/40 p-4"
+              key={style}
+              className="flex items-center gap-3 rounded-xl border border-dashed border-[rgba(199,159,105,0.35)] bg-[color:var(--paper-tint)] p-4"
             >
-              <span className="h-16 w-6 shrink-0 rounded-sm bg-gradient-to-b from-[#3a2a1c] to-[#122446]" aria-hidden />
-              <span className="font-serif text-sm italic text-[#c79f69]/55">-</span>
+              <span className="flex h-16 w-8 shrink-0 items-end justify-center opacity-30" aria-hidden>
+                <WineBottleSVG style={style} className="h-16 w-auto" />
+              </span>
+              <span className="font-serif text-sm italic text-[color:var(--ink-muted)]">
+                Propozycja {i + 1}
+              </span>
             </div>
           ))}
         </div>
