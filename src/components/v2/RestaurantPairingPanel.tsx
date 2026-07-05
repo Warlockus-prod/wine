@@ -41,6 +41,10 @@ interface ApiMatch {
   reason: string;
 }
 
+// Stable empty list so the derived `matches` keeps referential identity while
+// the current dish's matches are still in flight (avoids memo churn).
+const EMPTY_MATCHES: ApiMatch[] = [];
+
 interface Props {
   restaurant: Restaurant;
   /** Currently selected dish id, controlled by parent. */
@@ -56,7 +60,14 @@ export default function RestaurantPairingPanel({
 }: Props) {
   const lng = useLocale() as Locale;
   const tx = useTranslations("restaurant");
-  const [matches, setMatches] = useState<ApiMatch[]>([]);
+  // Matches TAGGED with the dish they were computed for. rankedTop3 keeps
+  // showing the instant curated fallback while unsettled, but the explain
+  // effect waits for dishId to settle — the interim top wine was burning a
+  // second OpenAI call on every dish tap (audit 2026-07 follow-up).
+  const [matchState, setMatchState] = useState<{ dishId: string | null; list: ApiMatch[] }>({
+    dishId: null,
+    list: [],
+  });
   const [loading, setLoading] = useState(false);
   const [explanation, setExplanation] = useState<string | null>(null);
   const [explainLoading, setExplainLoading] = useState(false);
@@ -70,6 +81,9 @@ export default function RestaurantPairingPanel({
     () => restaurant.dishes.find((d) => d.id === activeDishId) ?? null,
     [restaurant.dishes, activeDishId],
   );
+
+  const matchesSettled = matchState.dishId === activeDishId;
+  const matches = matchesSettled ? matchState.list : EMPTY_MATCHES;
 
   // Top-3 ranked wines (full Wine objects in current locale)
   const rankedTop3 = useMemo(() => {
@@ -101,17 +115,17 @@ export default function RestaurantPairingPanel({
   // Fetch pairing matches when active dish changes
   useEffect(() => {
     if (!activeDish) {
-      setMatches([]);
+      setMatchState({ dishId: null, list: [] });
       return;
     }
     const cached = matchCacheRef.current.get(activeDish.id);
     if (cached) {
-      setMatches(cached);
+      setMatchState({ dishId: activeDish.id, list: cached });
       return;
     }
     let cancelled = false;
     setLoading(true);
-    setMatches([]);
+    setMatchState({ dishId: null, list: [] });
     fetch("/api/pairing", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -141,10 +155,12 @@ export default function RestaurantPairingPanel({
         if (cancelled) return;
         const m = data.matches ?? [];
         matchCacheRef.current.set(activeDish.id, m);
-        setMatches(m);
+        setMatchState({ dishId: activeDish.id, list: m });
       })
       .catch(() => {
-        // Silent fail - fallback ranking from `dish.pairings` already in place.
+        // Silent fail - the curated fallback ranking stays. Mark the dish as
+        // SETTLED (empty list) so the explain effect can proceed with it.
+        if (!cancelled) setMatchState({ dishId: activeDish.id, list: [] });
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -161,7 +177,7 @@ export default function RestaurantPairingPanel({
     // Wait until matches for the CURRENT dish have settled — explaining the
     // interim (previous/fallback) top wine burned a second OpenAI call per
     // dish tap before the real ranking arrived (audit 2026-07 follow-up).
-    if (!activeDish || loading || rankedTop3.length === 0) {
+    if (!activeDish || !matchesSettled || rankedTop3.length === 0) {
       setExplanation(null);
       return;
     }
@@ -211,7 +227,7 @@ export default function RestaurantPairingPanel({
     // OpenAI calls per dish selection (audit 2026-07). Keying on the top wine id
     // collapses those to one fetch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDish?.id, rankedTop3[0]?.wine.id, lng, loading]);
+  }, [activeDish?.id, rankedTop3[0]?.wine.id, lng, matchesSettled]);
 
   // Auto-expand the mobile sheet when the user picks a dish — but NOT on the
   // initial auto-selection (RestaurantPageClient auto-selects dishes[0] on

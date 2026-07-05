@@ -27,6 +27,13 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+# next.config.ts MUST ship with the runtime: `next start` re-reads it for the
+# runtime-config surface (images.remotePatterns/qualities, redirects, …).
+# Without it the server booted on DEFAULTS — every remote image 400'd with
+# '"url" parameter is not allowed' (found 2026-07). src/i18n comes along for
+# the next-intl plugin the config imports.
+COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/src/i18n ./src/i18n
 # Drizzle migration assets + seed script — needed by `drizzle-kit migrate`
 # and `node scripts/db-seed.mjs` invoked from update_wine_web.sh before the
 # new app container takes over. Source TS files are copied so the seed

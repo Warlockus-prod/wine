@@ -107,9 +107,19 @@ export default function PairingClient({
     swrFetcher,
   );
   const restaurantContext = ctxResp?.data ?? null;
+  // While the scoped restaurant is still loading, render an EMPTY dataset —
+  // never the localStorage sandbox. The sandbox flash showed a stranger's
+  // wines for ~300ms and fired their (remote) images + a throwaway /api/pairing
+  // call on every scoped visit (audit 2026-07).
+  const scopedLoading = Boolean(restaurantContextSlug) && !restaurantContext;
   const activeDataset = useMemo(
-    () => (restaurantContext ? buildPairingDatasetFromRestaurant(restaurantContext) : dataset),
-    [dataset, restaurantContext],
+    () =>
+      restaurantContext
+        ? buildPairingDatasetFromRestaurant(restaurantContext)
+        : scopedLoading
+          ? { dishes: [], wines: [], pairings: [] }
+          : dataset,
+    [dataset, restaurantContext, scopedLoading],
   );
   const dishes = activeDataset.dishes;
   const wines = activeDataset.wines;
@@ -622,7 +632,6 @@ export default function PairingClient({
                       <Image
                         alt={t(dish.name, locale)}
                         fill
-                        quality={66}
                         placeholder="blur"
                         blurDataURL={GENERIC_BLUR_DATA_URL}
                         sizes="64px"
@@ -740,7 +749,6 @@ export default function PairingClient({
                       <Image
                         alt={t(wine.name, locale)}
                         fill
-                        quality={64}
                         placeholder="blur"
                         blurDataURL={GENERIC_BLUR_DATA_URL}
                         sizes="48px"
@@ -823,7 +831,6 @@ export default function PairingClient({
                       src={activeDish.image}
                       alt={t(activeDish.name, locale)}
                       fill
-                      quality={68}
                       placeholder="blur"
                       blurDataURL={GENERIC_BLUR_DATA_URL}
                       sizes="96px"
@@ -848,7 +855,6 @@ export default function PairingClient({
                       src={selectedWine.image}
                       alt={t(selectedWine.name, locale)}
                       fill
-                      quality={64}
                       placeholder="blur"
                       blurDataURL={GENERIC_BLUR_DATA_URL}
                       sizes="64px"
