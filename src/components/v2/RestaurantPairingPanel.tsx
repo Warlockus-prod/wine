@@ -386,7 +386,9 @@ export default function RestaurantPairingPanel({
                     <Image src={wineImg} alt={t(m.wine.name, lng)} fill sizes="40px" className="object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-serif text-sm italic" style={{ color: "var(--ink)" }}>
+                    {/* Wrap to 2 lines instead of truncating — every top-3 name
+                        ellipsized in the narrow desktop sidebar (audit 2026-07). */}
+                    <p className="line-clamp-2 font-serif text-sm italic leading-snug" style={{ color: "var(--ink)" }}>
                       {t(m.wine.name, lng)}
                     </p>
                     <p className="mt-0.5 text-[10px] tracking-wider uppercase" style={{ color: "var(--color-accent-gold)" }}>

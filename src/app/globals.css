@@ -189,11 +189,14 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 :root [class~="from-primary"], :root [class~="from-primary"] * {
   color: var(--on-primary) !important;
 }
-:root[data-theme="light"] .text-gray-100,
-:root[data-theme="light"] .text-gray-200 { color: var(--ink) !important; }
-:root[data-theme="light"] .text-gray-300,
-:root[data-theme="light"] .text-gray-400 { color: var(--ink-soft) !important; }
-:root[data-theme="light"] .text-gray-500 { color: var(--ink-muted) !important; }
+/* SUBSTRING matches so opacity variants (text-gray-300/95 etc.) flip too —
+   the exact-class rules missed them and dish descriptions / wine notes
+   rendered ~1.2:1 light-gray-on-cream (audit 2026-07 "razjezd"). */
+:root[data-theme="light"] [class*="text-gray-100"],
+:root[data-theme="light"] [class*="text-gray-200"] { color: var(--ink) !important; }
+:root[data-theme="light"] [class*="text-gray-300"],
+:root[data-theme="light"] [class*="text-gray-400"] { color: var(--ink-soft) !important; }
+:root[data-theme="light"] [class*="text-gray-500"] { color: var(--ink-muted) !important; }
 /* Dark (default): muted labels were cool gray-500 (#6a7282 → only 3.95:1 on
    dark). Map to the warm --ink-muted (#9c9080, ~5.5:1) — AA-clean and on-brand. */
 :root:not([data-theme="light"]) .text-gray-500 { color: var(--ink-muted); }
@@ -206,14 +209,14 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
    invisible on cream in light mode (e.g. the "AI GOTOWE" badge uses
    text-emerald-300 on a faint green bg). Remap to readable 700-weight inks so
    the pills stay legible in BOTH themes. */
-:root[data-theme="light"] .text-emerald-300,
-:root[data-theme="light"] .text-emerald-200 { color: #047857 !important; }
-:root[data-theme="light"] .text-amber-300,
-:root[data-theme="light"] .text-amber-200 { color: #b45309 !important; }
-:root[data-theme="light"] .text-sky-300,
-:root[data-theme="light"] .text-sky-200 { color: #0369a1 !important; }
-:root[data-theme="light"] .text-rose-300,
-:root[data-theme="light"] .text-rose-200 { color: #be123c !important; }
+:root[data-theme="light"] [class*="text-emerald-300"],
+:root[data-theme="light"] [class*="text-emerald-200"] { color: #047857 !important; }
+:root[data-theme="light"] [class*="text-amber-300"],
+:root[data-theme="light"] [class*="text-amber-200"] { color: #b45309 !important; }
+:root[data-theme="light"] [class*="text-sky-300"],
+:root[data-theme="light"] [class*="text-sky-200"] { color: #0369a1 !important; }
+:root[data-theme="light"] [class*="text-rose-300"],
+:root[data-theme="light"] [class*="text-rose-200"] { color: #be123c !important; }
 
 /* Surfaces */
 :root[data-theme="light"] .bg-background-dark { background-color: var(--surface) !important; }
@@ -548,7 +551,11 @@ body {
    referenced in TasteCompass.tsx but were never defined (latent collapse to
    the 300×150 replaced-element default). */
 .taste-compass-wrap { position: relative; width: 100%; margin-inline: auto; }
-.taste-compass-svg { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; }
+/* overflow visible: the 3/9-o'clock aroma labels (Czekolada, Tropikalne)
+   extend 13-20px past the 440 viewBox with the wider Libre metrics — hidden
+   overflow clipped them to "ekolada"/"Tropika" (audit 2026-07). The parent
+   card's padding absorbs the spill. */
+.taste-compass-svg { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; overflow: visible; }
 .taste-compass-touch { cursor: pointer; touch-action: manipulation; }
 /* Merged-stage base-smak rim sliders: invisible by default, but a clear gold
    ring on keyboard focus (these are now primary controls — WCAG 2.4.7). */

@@ -315,7 +315,10 @@ export default function HomeClient({
                         : "border-white/8 bg-black/12 hover:border-white/20"
                     }`}
                   >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+                    {/* Column layout at ALL widths: in the 2/3-column desktop
+                        grid the side-by-side QR squeezed descriptions to a
+                        ~122px one-word-per-line strip (audit 2026-07). */}
+                    <div className="flex flex-col gap-4">
                       <button
                         type="button"
                         onClick={() => handlePick(restaurant.slug)}

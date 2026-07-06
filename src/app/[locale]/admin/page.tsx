@@ -627,6 +627,7 @@ export default function AdminPage() {
           <textarea
             className="field-refined relative z-10 mt-4 min-h-28 w-full"
             placeholder='Paste JSON like { "dishes": [...], "wines": [...] }'
+            aria-label="Import JSON"
             value={importText}
             onChange={(event) => setImportText(event.target.value)}
           />
@@ -780,6 +781,7 @@ export default function AdminPage() {
                       className="field-refined w-full"
                       type="number"
                       min={1}
+                      aria-label="Dish price"
                       value={dish.price}
                       onChange={(event) =>
                         updateDish(dish.id, { price: Math.max(1, Number(event.target.value) || 1) })
@@ -787,12 +789,14 @@ export default function AdminPage() {
                     />
                     <input
                       className="field-refined w-full"
+                      aria-label="Dish tags (comma separated)"
                       value={toTagInput(dish.tags)}
                       onChange={(event) => updateDish(dish.id, { tags: parseTags(event.target.value) })}
                     />
                   </div>
                   <input
                     className="field-refined mb-2 w-full"
+                    aria-label="Dish image URL"
                     value={dish.image}
                     onChange={(event) => updateDish(dish.id, { image: event.target.value })}
                   />
@@ -950,6 +954,7 @@ export default function AdminPage() {
                     <label className="field-label">Body</label>
                     <select
                       className="field-refined w-full"
+                      aria-label="Wine body"
                       value={wineForm.body}
                       onChange={(event) =>
                         setWineForm({ ...wineForm, body: event.target.value as WineBody })
@@ -966,6 +971,7 @@ export default function AdminPage() {
                     <label className="field-label">Acidity</label>
                     <select
                       className="field-refined w-full"
+                      aria-label="Wine acidity"
                       value={wineForm.acidity}
                       onChange={(event) =>
                         setWineForm({ ...wineForm, acidity: event.target.value as WineAcidity })
@@ -982,6 +988,7 @@ export default function AdminPage() {
                     <label className="field-label">Tannin</label>
                     <select
                       className="field-refined w-full"
+                      aria-label="Wine tannin"
                       value={wineForm.tannin}
                       onChange={(event) =>
                         setWineForm({ ...wineForm, tannin: event.target.value as WineTannin })
@@ -1085,6 +1092,7 @@ export default function AdminPage() {
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="field-refined w-full"
+                      aria-label="Wine region"
                       value={wine.region}
                       onChange={(event) => updateWine(wine.id, { region: event.target.value })}
                     />
@@ -1093,6 +1101,7 @@ export default function AdminPage() {
                       type="number"
                       min={1900}
                       max={2100}
+                      aria-label="Vintage year"
                       value={wine.year}
                       onChange={(event) => updateWine(wine.id, { year: Number(event.target.value) || 2021 })}
                     />
@@ -1102,6 +1111,7 @@ export default function AdminPage() {
                       className="field-refined w-full"
                       type="number"
                       min={1}
+                      aria-label="Wine price"
                       value={wine.price}
                       onChange={(event) => updateWine(wine.id, { price: Math.max(1, Number(event.target.value) || 1) })}
                     />
@@ -1111,6 +1121,7 @@ export default function AdminPage() {
                       min={1}
                       max={5}
                       step={0.1}
+                      aria-label="Wine rating (1-5)"
                       value={wine.rating}
                       onChange={(event) =>
                         updateWine(wine.id, { rating: Math.min(5, Math.max(1, Number(event.target.value) || 4)) })
@@ -1119,17 +1130,20 @@ export default function AdminPage() {
                   </div>
                   <input
                     className="field-refined mb-2 w-full min-w-0"
+                    aria-label="Wine image URL"
                     value={wine.image}
                     onChange={(event) => updateWine(wine.id, { image: event.target.value })}
                   />
                   <input
                     className="field-refined mb-2 w-full"
+                    aria-label="Wine tags (comma separated)"
                     value={toTagInput(wine.tags)}
                     onChange={(event) => updateWine(wine.id, { tags: parseTags(event.target.value) })}
                   />
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="field-refined w-full"
+                      aria-label="Grape variety"
                       value={wine.passport.grape}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -1143,6 +1157,7 @@ export default function AdminPage() {
                       min={5}
                       max={20}
                       step={0.1}
+                      aria-label="ABV %"
                       value={wine.passport.abv}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -1158,6 +1173,7 @@ export default function AdminPage() {
                     <select
                       className="field-refined w-full"
                       value={wine.passport.body}
+                      aria-label="Passport body"
                       onChange={(event) =>
                         updateWine(wine.id, {
                           passport: { ...wine.passport, body: event.target.value as WineBody },
@@ -1172,6 +1188,7 @@ export default function AdminPage() {
                     </select>
                     <select
                       className="field-refined w-full"
+                      aria-label="Passport acidity"
                       value={wine.passport.acidity}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -1187,6 +1204,7 @@ export default function AdminPage() {
                     </select>
                     <select
                       className="field-refined w-full"
+                      aria-label="Passport tannin"
                       value={wine.passport.tannin}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -1204,6 +1222,7 @@ export default function AdminPage() {
                   <div className="mb-2 grid grid-cols-2 gap-2">
                     <input
                       className="field-refined w-full"
+                      aria-label="Serving temperature °C"
                       value={wine.passport.servingTempC}
                       onChange={(event) =>
                         updateWine(wine.id, {
@@ -1216,6 +1235,7 @@ export default function AdminPage() {
                     />
                     <input
                       className="field-refined w-full"
+                      aria-label="Decanting note"
                       value={wine.passport.decant}
                       onChange={(event) =>
                         updateWine(wine.id, {

@@ -253,7 +253,7 @@ function StageNav({
             <button
               type="button"
               onClick={() => setStage(it.n)}
-              className={`group flex w-full flex-col items-start gap-1 rounded-xl border px-3 py-3 text-left transition sm:px-4 ${
+              className={`group flex h-full w-full min-w-0 flex-col items-start gap-1 rounded-xl border px-3 py-3 text-left transition sm:px-4 ${
                 active
                   ? "border-[var(--color-accent-gold)] bg-[var(--color-accent-gold)]/10"
                   : done
@@ -283,7 +283,10 @@ function StageNav({
                   ETAP {it.n}
                 </span>
               </span>
-              <span className={`font-serif text-base italic ${active ? "text-white" : done ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"} sm:text-lg`}>
+              {/* 13px on phones: Libre Baskerville "VINOKOMPAS" at 16px is
+                  118px wide and collided with the ETAP-2 tab at 360-390px
+                  (audit 2026-07 font-swap regression). */}
+              <span className={`font-serif text-[13px] italic whitespace-nowrap ${active ? "text-white" : done ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"} sm:text-lg`}>
                 {it.label}
               </span>
               <span className="text-[10px] tracking-wider text-[#c79f69]/65 uppercase sm:text-[11px]">

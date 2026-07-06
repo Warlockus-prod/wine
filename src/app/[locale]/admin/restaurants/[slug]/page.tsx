@@ -86,7 +86,7 @@ export default function PerRestaurantEditor({
                   onClick={() => setTab(id)}
                   className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
                     tab === id
-                      ? "bg-primary text-white shadow-[0_4px_18px_rgba(199,159,105,0.32)]"
+                      ? "bg-primary text-[color:var(--on-primary)] shadow-[0_4px_18px_rgba(199,159,105,0.32)]"
                       : "text-gray-300 hover:text-white"
                   }`}
                 >
@@ -204,7 +204,7 @@ function DishesTab({
           <input className={inputCls} placeholder="Kategoria" aria-label="Kategoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
           <input className={inputCls} type="number" placeholder="Cena" aria-label="Cena" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
         </div>
-        <button type="button" onClick={submit} disabled={creating} className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60">
+        <button type="button" onClick={submit} disabled={creating} className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-[color:var(--on-primary)] transition hover:bg-primary-dark disabled:opacity-60">
           {creating ? "Tworzę…" : "+ Dodaj danie"}
         </button>
       </article>
@@ -288,7 +288,7 @@ function DishRow({
             <input className={inputCls} type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={save} disabled={busy} className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-white disabled:opacity-60">
+            <button type="button" onClick={save} disabled={busy} className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-[color:var(--on-primary)] disabled:opacity-60">
               {busy ? "…" : "Zapisz"}
             </button>
             <button type="button" onClick={remove} disabled={busy} className="inline-flex h-9 items-center rounded-lg border border-rose-500/30 bg-rose-900/20 px-3 text-xs font-semibold text-rose-200">
@@ -367,7 +367,7 @@ function WinesTab({
           <input className={inputCls} placeholder="Rocznik" aria-label="Rocznik" value={form.vintage} onChange={(e) => setForm({ ...form, vintage: e.target.value })} />
           <input className={inputCls} type="number" placeholder="Cena" aria-label="Cena" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
         </div>
-        <button type="button" onClick={submit} disabled={creating} className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60">
+        <button type="button" onClick={submit} disabled={creating} className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-[color:var(--on-primary)] transition hover:bg-primary-dark disabled:opacity-60">
           {creating ? "Tworzę…" : "+ Dodaj wino"}
         </button>
       </article>
@@ -453,7 +453,7 @@ function WineRow({
             <input className={inputCls} type="number" value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={save} disabled={busy} className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-white disabled:opacity-60">
+            <button type="button" onClick={save} disabled={busy} className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-[color:var(--on-primary)] disabled:opacity-60">
               {busy ? "…" : "Zapisz"}
             </button>
             <button type="button" onClick={remove} disabled={busy} className="inline-flex h-9 items-center rounded-lg border border-rose-500/30 bg-rose-900/20 px-3 text-xs font-semibold text-rose-200">

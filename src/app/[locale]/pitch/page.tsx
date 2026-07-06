@@ -168,7 +168,7 @@ export default async function PitchPage({
           <p className="text-[9px] tracking-[0.22em] text-gray-500 uppercase">Curated</p>
           {["Riesling", "Pinot", "Champagne"].map((name) => (
             <div key={name} className="flex items-start gap-2 rounded-lg border border-primary/24 bg-primary/8 p-2">
-              <span className="mt-0.5 inline-flex h-3 w-3 items-center justify-center rounded-sm border border-primary/60 bg-primary text-[8px] text-white">
+              <span className="mt-0.5 inline-flex h-3 w-3 items-center justify-center rounded-sm border border-primary/60 bg-primary text-[8px] text-[color:var(--on-primary)]">
                 ✓
               </span>
               <div className="flex-1">

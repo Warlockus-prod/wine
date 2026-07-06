@@ -10,7 +10,7 @@ export default function OfflinePage() {
       <p className="max-w-md text-sm text-gray-300">
         The app shell is still available. Reconnect to continue syncing menus and pairings.
       </p>
-      <Link href="/" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white">
+      <Link href="/" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-[color:var(--on-primary)]">
         Back to Home
       </Link>
     </main>

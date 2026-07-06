@@ -286,7 +286,7 @@ export default function TasteChat({
         <button
           type="submit"
           disabled={sending || input.trim().length === 0}
-          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-[0_8px_20px_rgba(199,159,105,0.3)] transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-[color:var(--on-primary)] shadow-[0_8px_20px_rgba(199,159,105,0.3)] transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? "…" : "Wyślij"}
           <svg width="14" height="10" viewBox="0 0 18 10" fill="none" aria-hidden>
