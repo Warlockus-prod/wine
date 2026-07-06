@@ -102,6 +102,13 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      // winnica.pl product photos — the samouczek proposal cards show the
+      // real bottle shots from the generated catalogue.
+      {
+        protocol: "https",
+        hostname: "winnica.pl",
+        pathname: "/**",
+      },
     ],
   },
 };

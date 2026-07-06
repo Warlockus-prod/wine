@@ -34,10 +34,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import WineBottleSVG from "@/components/v2/WineBottleSVG";
 import {
-  winnicaSearchUrl,
+  winnicaWineUrl,
   type SamouczekWine,
 } from "@/data/samouczek-wines";
 import { matchWines, filledDimensions } from "@/lib/samouczek-match";
@@ -145,19 +146,34 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
           {matches.map(({ wine, matchPct }, i) => (
             <li key={wine.id} className="vk-rise" style={{ animationDelay: `${i * 80}ms` }}>
               <a
-                href={winnicaSearchUrl(wine.query)}
+                href={winnicaWineUrl(wine)}
                 target={linkTarget}
                 rel="noopener noreferrer"
                 className="group flex h-full flex-col gap-3 rounded-xl border border-[rgba(199,159,105,0.20)] bg-[#122446]/70 p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent-gold)]/60 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
               >
                 <div className="flex items-start gap-3">
-                  <span className="flex h-20 w-8 shrink-0 items-end justify-center" aria-hidden>
-                    <WineBottleSVG
-                      hint={wine.style}
-                      style={wine.style}
-                      grape={wine.grape}
-                      className="h-20 w-auto drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)]"
-                    />
+                  <span
+                    className="relative flex h-20 w-12 shrink-0 items-end justify-center overflow-hidden rounded-md"
+                    aria-hidden
+                  >
+                    {wine.imageUrl ? (
+                      // Real bottle shot from winnica.pl (generated catalogue);
+                      // silhouette stays as the fallback for legacy entries.
+                      <Image
+                        src={wine.imageUrl}
+                        alt=""
+                        fill
+                        sizes="48px"
+                        className="object-contain"
+                      />
+                    ) : (
+                      <WineBottleSVG
+                        hint={wine.style}
+                        style={wine.style}
+                        grape={wine.grape}
+                        className="h-20 w-auto drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)]"
+                      />
+                    )}
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">

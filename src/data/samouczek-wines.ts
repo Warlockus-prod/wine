@@ -16,6 +16,8 @@
  * {sektor}.{tendencja} (e.g. "swieze.cytrusy").
  */
 
+import { WINNICA_CATALOG } from "./winnica-catalog.generated";
+
 export type SamouczekWineStyle =
   | "white"
   | "red"
@@ -36,13 +38,22 @@ export interface SamouczekWine {
   priceFrom: number;
   /** One-line "why it fits your profile", PL. */
   why_pl: string;
-  /** CompassProfile key → strength 0..4. */
+  /** CompassProfile key → strength (0..5, winnica data-sheet scale; the
+   *  cosine matcher is scale-invariant so legacy 0..4 entries mix fine). */
   fingerprint: Record<string, number>;
-  /** winnica.pl search term. */
+  /** winnica.pl search term (fallback link when no direct url). */
   query: string;
+  /** Direct winnica.pl product page (generated catalogue entries). */
+  url?: string;
+  /** Product photo from winnica.pl (og:image). */
+  imageUrl?: string | null;
 }
 
-export const SAMOUCZEK_WINES: SamouczekWine[] = [
+// Legacy hand-tuned grape ARCHETYPES — superseded by the generated
+// winnica.pl catalogue (real SKUs with the shop's own Vinocompas
+// fingerprints). Kept only as a fallback if the generated file is ever
+// empty (parser failure on a theme change).
+const LEGACY_ARCHETYPES: SamouczekWine[] = [
   // ── ŚWIEŻE - crisp, citrus, green ─────────────────────────────────────
   {
     id: "riesling-wytrawny",
@@ -257,3 +268,16 @@ export const SAMOUCZEK_WINES: SamouczekWine[] = [
 /** Build a winnica.pl search URL for a grape/style query. */
 export const winnicaSearchUrl = (query: string): string =>
   `https://winnica.pl/pl/szukaj?controller=search&s=${encodeURIComponent(query)}`;
+
+/** Buy-link: direct product page when we have one, search fallback otherwise. */
+export const winnicaWineUrl = (wine: Pick<SamouczekWine, "url" | "query">): string =>
+  wine.url ?? winnicaSearchUrl(wine.query);
+
+/**
+ * The live tutorial catalogue: REAL winnica.pl wines (prices, photos, and the
+ * shop's own per-wine Vinocompas fingerprints), parsed by
+ * scripts/parse-winnica.mjs. Legacy archetypes only kick in if the generated
+ * catalogue is unexpectedly empty.
+ */
+export const SAMOUCZEK_WINES: SamouczekWine[] =
+  WINNICA_CATALOG.length >= 20 ? WINNICA_CATALOG : LEGACY_ARCHETYPES;
