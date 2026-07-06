@@ -15,7 +15,8 @@ import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import RestaurantFormat from "@/components/v2/RestaurantFormat";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import DishMonogramSVG from "@/components/v2/DishMonogramSVG";
@@ -36,13 +37,24 @@ export default function RestaurantPageClient({
 }) {
   const tx = useTranslations("restaurant");
   const lng = useLocale() as Locale;
-  void slug; // slug retained for future client-side actions; data now arrives server-side (DB→seed)
   // Pairing panel is integrated; track which dish the user clicked from
   // the menu list. Default to the first dish so the panel has data on
   // first paint instead of an empty state.
   const [activeDishId, setActiveDishId] = useState<string | null>(
     restaurant?.dishes[0]?.id ?? null,
   );
+
+  // Owner-dashboard signal: a guest opened this restaurant's page (the QR
+  // landing). Once per mount; slug resolves to restaurant_id server-side.
+  useEffect(() => {
+    if (!restaurant) return;
+    trackEvent("restaurant_view", { restaurant_slug: slug });
+  }, [slug, restaurant]);
+
+  const pickDish = (dishId: string) => {
+    setActiveDishId(dishId);
+    trackEvent("dish_select", { restaurant_slug: slug, dish_ext_id: dishId });
+  };
 
   if (!restaurant) {
     return (
@@ -268,11 +280,11 @@ export default function RestaurantPageClient({
                 return (
                   <li
                     key={dish.id}
-                    onClick={() => setActiveDishId(dish.id)}
+                    onClick={() => pickDish(dish.id)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        setActiveDishId(dish.id);
+                        pickDish(dish.id);
                       }
                     }}
                     role="button"
@@ -449,7 +461,7 @@ export default function RestaurantPageClient({
       <RestaurantPairingPanel
         restaurant={restaurant}
         activeDishId={activeDishId}
-        onActiveDishChange={setActiveDishId}
+        onActiveDishChange={pickDish}
       />
 
       <MobileTabBar />

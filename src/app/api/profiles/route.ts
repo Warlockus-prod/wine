@@ -86,37 +86,25 @@ export async function POST(request: Request) {
   }
 
   try {
-    // App-level upsert keyed on anonymousId. The table has no unique constraint
-    // on anonymous_id (adding one needs a dedup migration), so we update-if-
-    // exists here to stop unbounded duplicate-row growth (audit M2).
-    const [existing] = await db
-      .select({ id: schema.tasteProfiles.id })
-      .from(schema.tasteProfiles)
-      .where(eq(schema.tasteProfiles.anonymousId, parsed.data.anonymousId))
-      .limit(1);
-
-    let id: string;
-    if (existing) {
-      await db
-        .update(schema.tasteProfiles)
-        .set({
+    // Real upsert: anonymous_id is UNIQUE since migration 0002, so ON CONFLICT
+    // replaces the old racy select-then-insert (audit M2 closed).
+    const [row] = await db
+      .insert(schema.tasteProfiles)
+      .values({
+        anonymousId: parsed.data.anonymousId,
+        compass: parsed.data.compass,
+        baseTastes: parsed.data.baseTastes,
+      })
+      .onConflictDoUpdate({
+        target: schema.tasteProfiles.anonymousId,
+        set: {
           compass: parsed.data.compass,
           baseTastes: parsed.data.baseTastes,
           updatedAt: new Date(),
-        })
-        .where(eq(schema.tasteProfiles.id, existing.id));
-      id = existing.id;
-    } else {
-      const [row] = await db
-        .insert(schema.tasteProfiles)
-        .values({
-          anonymousId: parsed.data.anonymousId,
-          compass: parsed.data.compass,
-          baseTastes: parsed.data.baseTastes,
-        })
-        .returning({ id: schema.tasteProfiles.id });
-      id = row.id;
-    }
+        },
+      })
+      .returning({ id: schema.tasteProfiles.id });
+    const id = row.id;
 
     await logEvent({
       type: "profile_save",

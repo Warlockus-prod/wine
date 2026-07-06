@@ -258,7 +258,10 @@ export const tasteProfiles = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    anonIdx: index("taste_profiles_anon_idx").on(t.anonymousId),
+    // UNIQUE: one profile per anonymous browser id — makes the POST upsert a
+    // real ON CONFLICT target instead of a racy select-then-insert (audit
+    // 2026-07 M2; table was empty when the constraint landed).
+    anonIdx: uniqueIndex("taste_profiles_anon_idx").on(t.anonymousId),
     userIdx: index("taste_profiles_user_idx").on(t.userId),
   }),
 );

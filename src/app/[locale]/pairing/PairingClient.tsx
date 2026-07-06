@@ -144,7 +144,11 @@ export default function PairingClient({
 
   useEffect(() => {
     openTimestamp.current = performance.now();
-    trackEvent("pairing_page_open", { device: "mobile-first" });
+    trackEvent("pairing_page_open", {
+      device: "mobile-first",
+      restaurant_slug: initialRestaurantSlug ?? undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -355,6 +359,7 @@ export default function PairingClient({
           dish_id: activeDish.id,
           top_score: topScore,
           wines_count: wines.length,
+          restaurant_slug: restaurantContextSlug ?? undefined,
         });
       } catch (err) {
         // Deliberate aborts (dish switch / unmount) are NOT failures — the old
@@ -378,6 +383,7 @@ export default function PairingClient({
         trackEvent("pairing_ai_fallback", {
           dish_id: activeDish.id,
           wines_count: wines.length,
+          restaurant_slug: restaurantContextSlug ?? undefined,
         });
       }
     };
@@ -387,7 +393,7 @@ export default function PairingClient({
     return () => {
       controller.abort();
     };
-  }, [activeDish, restaurantContext, wines, curatedPairings, locale]);
+  }, [activeDish, restaurantContext, restaurantContextSlug, wines, curatedPairings, locale]);
 
   // Fetch Vinokompas-vocabulary 2-sentence explanation whenever the user
   // settles on a (dish, wine) pair. Cached per pair to avoid token spend
@@ -447,7 +453,11 @@ export default function PairingClient({
     userPickedDishRef.current = true;
     setActiveDishId(dishId);
     setSelectedWineId(null);
-    trackEvent("pairing_dish_selected", { dish_id: dishId, source });
+    trackEvent("pairing_dish_selected", {
+      dish_id: dishId,
+      source,
+      restaurant_slug: restaurantContextSlug ?? undefined,
+    });
 
     if (!firstClickTracked.current && openTimestamp.current > 0) {
       firstClickTracked.current = true;
@@ -470,6 +480,7 @@ export default function PairingClient({
         dish_id: activeDish.id,
         wine_id: wineId,
         source,
+        restaurant_slug: restaurantContextSlug ?? undefined,
       });
     }
   };
