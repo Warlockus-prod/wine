@@ -77,6 +77,10 @@ async function rehydrate(row: typeof schema.restaurants.$inferSelect): Promise<R
     style: w.style,
     vintage: w.vintage ?? undefined,
     notes: w.notes as Wine["notes"],
+    // Editor-entered price reaches guests (audit 2026-07: the column was
+    // write-only). Seed rows carry 0 → undefined → the UI hides the price
+    // instead of showing a fabricated one.
+    price: Number(w.price) > 0 ? Number(w.price) : undefined,
   }));
 
   return {

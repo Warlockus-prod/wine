@@ -11,6 +11,9 @@ export type Wine = {
   /** Optional hero photo URL (Wikimedia, Unsplash, or generated/local).
    *  When absent, lib/food-photos.ts returns a category-keyed fallback. */
   image?: string;
+  /** Bottle price in PLN, entered by the operator in the DB editor.
+   *  Absent/0 → the guest UI hides the price (no fabricated numbers). */
+  price?: number;
 };
 
 export type DishPairing = {

@@ -417,6 +417,13 @@ export default function RestaurantPageClient({
                         {wine.region}{wine.vintage ? ` · ${wine.vintage}` : ""}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-gray-300/90">{t(wine.notes, lng)}</p>
+                      {/* Operator-entered bottle price (DB editor). Hidden when
+                          unset — we never show a fabricated number. */}
+                      {wine.price ? (
+                        <p className="mt-2 font-serif text-sm text-[var(--color-accent-gold)] tabular-nums">
+                          {wine.price} zł
+                        </p>
+                      ) : null}
                     </div>
                   </li>
                 );
