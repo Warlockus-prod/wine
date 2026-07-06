@@ -38,7 +38,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Cortese",
         style: "White",
         vintage: "2023",
-        notes: { en: "Citrus peel, white flowers, and mineral finish.", pl: "Skórka cytrusów, białe kwiaty i mineralne wykończenie." },
+        notes: { en: "Citrus peel, white flowers, and mineral finish.", pl: "Skórka cytrusów, białe kwiaty i mineralny finisz." },
       },
       {
         id: "r1-w4",
@@ -56,7 +56,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Chardonnay",
         style: "Sparkling",
         vintage: "NV",
-        notes: { en: "Fine bubbles, green apple, brioche, and crisp finish.", pl: "Drobne bąbelki, zielone jabłko, brioszka i świeże wykończenie." },
+        notes: { en: "Fine bubbles, green apple, brioche, and crisp finish.", pl: "Drobny perlaż, zielone jabłko, brioszka i rześki finisz." },
       },
       {
         id: "r1-w6",
@@ -121,7 +121,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r1-w1",
-            reason: { en: "Tignanello's polished tannins frame the raw venison without overpowering it.", pl: "Wypolerowane taniny Tignanello obramowują surową dziczyznę nie przytłaczając jej." },
+            reason: { en: "Tignanello's polished tannins frame the raw venison without overpowering it.", pl: "Wypolerowane taniny Tignanello dopełniają surową dziczyznę, nie przytłaczając jej." },
           },
         ],
       },
@@ -172,7 +172,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r1-w3",
-            reason: { en: "Gavi's chalky finish balances the fennel ash and pine oil.", pl: "Kredowe wykończenie Gavi równoważy popiół koprowy i olej iglasty." },
+            reason: { en: "Gavi's chalky finish balances the fennel ash and pine oil.", pl: "Kredowy finisz Gavi równoważy popiół koprowy i olej iglasty." },
           },
         ],
       },
@@ -206,7 +206,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r1-w7",
-            reason: { en: "Brunello's tannins frame the smoked celeriac without crushing the deer.", pl: "Taniny Brunello obramowują wędzony seler nie miażdżąc sarny." },
+            reason: { en: "Brunello's tannins frame the smoked celeriac without crushing the deer.", pl: "Taniny Brunello dopełniają wędzony seler, nie przytłaczając delikatnej sarny." },
           },
         ],
       },
@@ -214,7 +214,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r1-d8",
         name: { en: "Lamb with Buckwheat", pl: "Jagnięcina z kaszą gryczaną" },
         category: "Main",
-        description: { en: "Slow-roasted Podhale lamb shoulder, toasted buckwheat, fermented cabbage and goat cheese foam.", pl: "Wolno pieczony bark jagnięcia podhalańskiego, prażona gryka, kiszona kapusta i pianka z koziego sera." },
+        description: { en: "Slow-roasted Podhale lamb shoulder, toasted buckwheat, fermented cabbage and goat cheese foam.", pl: "Wolno pieczona łopatka jagnięcia podhalańskiego, prażona gryka, kiszona kapusta i pianka z koziego sera." },
         price: 52,
         pairings: [
           {
@@ -240,7 +240,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r1-w5",
-            reason: { en: "A dry brut keeps the curd cheesecake from feeling heavy.", pl: "Wytrawny brut nie pozwala sernikowi zaciężyć." },
+            reason: { en: "A dry brut keeps the curd cheesecake from feeling heavy.", pl: "Wytrawny brut sprawia, że sernik nie wydaje się ciężki." },
           },
         ],
       },
@@ -265,15 +265,16 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r2",
-    // slug kept for URL/QR stability; brand re-cast as Sukiyabashi Jiro
-    // (Tokyo) - fits the existing Japanese dish content (sushi/sashimi/
-    // ramen) much better than the previous abstract "Tasting Menu" label.
+    // slug kept for URL/QR stability. Re-branded 2026-07 (audit): the menu is
+    // a MIX of sushi, yakitori, ramen and dessert — an omakase sushi-ya brand
+    // contradicted it. An upscale izakaya covers the whole card, and Warszawa
+    // matches the slug again.
     slug: "senses-warsaw",
-    name: { en: "Sukiyabashi Jiro", pl: "Sukiyabashi Jiro" },
+    name: { en: "Izakaya Senses", pl: "Izakaya Senses" },
     cuisine: "Japanese",
-    city: "Tokyo",
+    city: "Warszawa",
     description:
-      { en: "Three-Michelin-star sushi-ya in Ginza - single-service omakase counter, day-fresh fish from Toyosu, decades of practiced rice technique.", pl: "Trzygwiazdkowa sushi-ya w Ginzie - pojedyncza zmiana, omakase przy ladzie, ryby z porannego targu Toyosu i lata praktyki w gotowaniu ryżu." },
+      { en: "Modern izakaya in the heart of Warsaw - day-fresh sashimi, binchotan yakitori, slow-simmered ramen and a precise sake-and-wine cellar.", pl: "Nowoczesna izakaya w sercu Warszawy - sashimi z dziennego połowu, yakitori z węgla binchotan, wolno gotowany ramen i precyzyjnie dobrana piwnica sake i win." },
     coverGradient: "from-[#1a1a24] via-[#3a3a52] to-[#a8a8c0]",
     wines: [
       {
@@ -346,7 +347,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Grenache Blend",
         style: "Rose",
         vintage: "2023",
-        notes: { en: "Red berries, melon, and dry floral finish.", pl: "Czerwone owoce, melon i wytrawne kwiatowe wykończenie." },
+        notes: { en: "Red berries, melon, and dry floral finish.", pl: "Czerwone owoce, melon i wytrawny, kwiatowy finisz." },
       },
     ],
     dishes: [
@@ -414,7 +415,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r2-w7",
-            reason: { en: "Peppery red blend handles caramelized glaze intensity.", pl: "Pieprzowy red blend radzi sobie z intensywnością karmelizowanej glazury." },
+            reason: { en: "Peppery red blend handles caramelized glaze intensity.", pl: "Pieprzowy kupaż czerwonych szczepów udźwignie intensywność karmelizowanej glazury." },
           },
         ],
       },
@@ -524,17 +525,16 @@ export const seedRestaurants: Restaurant[] = [
   },
   {
     id: "r3",
-    // Rebranded to Osteria Francescana (Modena) - Massimo Bottura's
-    // 3-star avant-garde Italian. Existing pasta+seafood menu fits
-    // because both kitchens are Italian; deeper Bottura signatures
-    // (5 ages of Parmigiano, oops dropped lemon tart) come in the
-    // next menu rewrite pass.
+    // slug kept for URL/QR stability. Re-branded 2026-07 (audit): the menu +
+    // wine list are 100% SPANISH (tapas, Rioja, sherry) but the venue was
+    // branded as Bottura's Italian Osteria Francescana — a guest-visible
+    // mismatch. Now a Spanish bodega; "1881" stays true to the slug.
     slug: "bottiglieria-1881",
-    name: { en: "Osteria Francescana", pl: "Osteria Francescana" },
-    cuisine: "Italian",
-    city: "Modena",
+    name: { en: "Bodega 1881", pl: "Bodega 1881" },
+    cuisine: "Spanish",
+    city: "Kraków",
     description:
-      { en: "Three-Michelin-star avant-garde Italian on Via Stella - Bottura's irreverent dialogue with Modena's tradition: aged balsamico, Parmigiano-Reggiano, slow-cooked pasta, and the cellars of Emilia-Romagna.", pl: "Trzygwiazdkowa awangardowa włoska kuchnia przy Via Stella - bezczelny dialog Bottury z tradycją Modeny: leżakowany ocet balsamiczny, Parmigiano-Reggiano, wolno gotowana pasta i piwnice Emilii-Romanii." },
+      { en: "Spanish wine house in an 1881 Kraków townhouse cellar - modern tapas, wood-fired meats, and a deep list of Rioja, Ribera del Duero and sherry.", pl: "Hiszpański dom wina w piwnicy krakowskiej kamienicy z 1881 roku - nowoczesne tapas, mięsa z ognia i głęboka karta Riojy, Ribera del Duero i sherry." },
     coverGradient: "from-[#5f2f23] via-[#a04d2b] to-[#e1a65b]",
     wines: [
       {
@@ -562,7 +562,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Tempranillo Blend",
         style: "Red",
         vintage: "2018",
-        notes: { en: "Dark berries, graphite, and long savory finish.", pl: "Ciemne owoce, grafit i długie wytrawne wykończenie." },
+        notes: { en: "Dark berries, graphite, and long savory finish.", pl: "Ciemne owoce, grafit i długi, pikantny finisz." },
       },
       {
         id: "r3-w4",
@@ -580,7 +580,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Viura Blend",
         style: "White",
         vintage: "2023",
-        notes: { en: "Citrus, stone fruit, subtle oak, and crisp finish.", pl: "Cytrusy, owoce pestkowe, subtelny dąb i świeże wykończenie." },
+        notes: { en: "Citrus, stone fruit, subtle oak, and crisp finish.", pl: "Cytrusy, owoce pestkowe, subtelna nuta dębu i rześki finisz." },
       },
       {
         id: "r3-w6",
@@ -589,7 +589,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Cava Blend",
         style: "Sparkling",
         vintage: "2019",
-        notes: { en: "Baked apple, brioche, and persistent bubbles.", pl: "Pieczone jabłko, brioszka i wytrwałe bąbelki." },
+        notes: { en: "Baked apple, brioche, and persistent bubbles.", pl: "Pieczone jabłko, brioszka i trwały, drobny perlaż." },
       },
       {
         id: "r3-w7",
@@ -756,7 +756,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w3",
-            reason: { en: "Dense tannic frame is ideal for charred beef.", pl: "Gęsta tanniczna struktura jest idealna dla wołowiny z grilla." },
+            reason: { en: "Dense tannic frame is ideal for charred beef.", pl: "Gęsta, taninowa struktura idealnie pasuje do wołowiny z grilla." },
           },
           {
             wineId: "r3-w7",
@@ -831,7 +831,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Grenache Blend",
         style: "Red",
         vintage: "2020",
-        notes: { en: "Black fruit, garrigue herbs, and structured finish.", pl: "Czarne owoce, zioła garrigue i strukturalne wykończenie." },
+        notes: { en: "Black fruit, garrigue herbs, and structured finish.", pl: "Czarne owoce, zioła garrigue i długi finisz o mocnej strukturze." },
       },
       {
         id: "r4-w5",
@@ -840,7 +840,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Grenache Blend",
         style: "Rose",
         vintage: "2024",
-        notes: { en: "Strawberry, peach, and dry mineral finish.", pl: "Truskawka, brzoskwinia i wytrawne mineralne wykończenie." },
+        notes: { en: "Strawberry, peach, and dry mineral finish.", pl: "Truskawka, brzoskwinia i wytrawny, mineralny finisz." },
       },
       {
         id: "r4-w6",
@@ -875,7 +875,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d1",
         name: { en: "French Onion Soup", pl: "Francuska zupa cebulowa" },
         category: "Starter",
-        description: { en: "Caramelized onion broth, crouton, and gruyere gratin.", pl: "Bulion z karmelizowanej cebuli, grzanka i zapiekanka z gruyère." },
+        description: { en: "Caramelized onion broth, crouton, and gruyere gratin.", pl: "Bulion z karmelizowanej cebuli i grzanka zapiekana z serem gruyère." },
         price: 16,
         pairings: [
           {
@@ -977,12 +977,12 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d7",
         name: { en: "Sole Meuniere", pl: "Sola meunière" },
         category: "Seafood",
-        description: { en: "Pan-seared sole, browned butter, lemon, and parsley.", pl: "Smażona sola, masło orzechowe, cytryna i pietruszka." },
+        description: { en: "Pan-seared sole, browned butter, lemon, and parsley.", pl: "Smażona sola, masło palone (beurre noisette), cytryna i natka pietruszki." },
         price: 36,
         pairings: [
           {
             wineId: "r4-w2",
-            reason: { en: "Precise acidity balances beurre noisette richness.", pl: "Precyzyjna kwasowość równoważy bogactwo masła orzechowego." },
+            reason: { en: "Precise acidity balances beurre noisette richness.", pl: "Precyzyjna kwasowość równoważy bogactwo masła palonego." },
           },
           {
             wineId: "r4-w1",
@@ -1064,7 +1064,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Malbec",
         style: "Red",
         vintage: "2021",
-        notes: { en: "Black plum, violet, and smooth dense finish.", pl: "Czarna śliwka, fiołek i gładkie, gęste wykończenie." },
+        notes: { en: "Black plum, violet, and smooth dense finish.", pl: "Czarna śliwka, fiołek i gładki, gęsty finisz." },
       },
       {
         id: "r5-w2",
@@ -1073,7 +1073,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Cabernet Sauvignon",
         style: "Red",
         vintage: "2021",
-        notes: { en: "Cassis, cedar, and firm tannin backbone.", pl: "Cassis, cedr i mocna tanniczna struktura." },
+        notes: { en: "Cassis, cedar, and firm tannin backbone.", pl: "Cassis, cedr i mocna, taninowa struktura." },
       },
       {
         id: "r5-w3",
@@ -1091,7 +1091,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Carmenere",
         style: "Red",
         vintage: "2021",
-        notes: { en: "Blackberries, pepper, and smoky herbal finish.", pl: "Jeżyny, pieprz i dymne ziołowe wykończenie." },
+        notes: { en: "Blackberries, pepper, and smoky herbal finish.", pl: "Jeżyny, pieprz i dymny, ziołowy finisz." },
       },
       {
         id: "r5-w5",
@@ -1263,7 +1263,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r5-w1",
-            reason: { en: "Classic Malbec plushness fits tender slow-cooked meat.", pl: "Klasyczna pluszowość Malbeca pasuje do delikatnego, wolno duszonego mięsa." },
+            reason: { en: "Classic Malbec plushness fits tender slow-cooked meat.", pl: "Klasyczna, aksamitna miękkość malbeca pasuje do delikatnego, wolno duszonego mięsa." },
           },
         ],
       },

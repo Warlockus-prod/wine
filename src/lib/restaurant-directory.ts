@@ -40,25 +40,27 @@ const restaurantMetaBySlug: Record<string, RestaurantMeta> = {
     coverImage:
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80&auto=format",
   },
-  // slug "senses-warsaw" repurposed for Sukiyabashi Jiro (Tokyo, Japanese).
+  // Izakaya Senses (re-brand 2026-07): upscale izakaya in Warsaw — matches
+  // the slug and the mixed sushi/yakitori/ramen menu.
   "senses-warsaw": {
-    country: "Japan",
-    format: "Sushi-ya · 3⭐ Michelin",
-    district: "Ginza",
-    city: "Tokyo",
-    lat: 35.6717,
-    lng: 139.7639,
+    country: "Polska",
+    format: "Izakaya · Fine dining",
+    district: "Śródmieście",
+    city: "Warszawa",
+    lat: 52.2319,
+    lng: 21.0067,
     coverImage:
       "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1200&q=80&auto=format",
   },
-  // slug "bottiglieria-1881" repurposed for Osteria Francescana (Modena).
+  // Bodega 1881 (re-brand 2026-07): Spanish wine house in Kraków — the menu
+  // and wine list are Spanish; "1881" stays true to the slug.
   "bottiglieria-1881": {
-    country: "Italia",
-    format: "Avant-garde · 3⭐ Michelin",
-    district: "Centro Storico",
-    city: "Modena",
-    lat: 44.6471,
-    lng: 10.9252,
+    country: "Polska",
+    format: "Bodega · Tapas & wino",
+    district: "Stare Miasto",
+    city: "Kraków",
+    lat: 50.0619,
+    lng: 19.9369,
     coverImage:
       "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=1200&q=80&auto=format",
   },

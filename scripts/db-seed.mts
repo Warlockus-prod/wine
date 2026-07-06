@@ -198,10 +198,11 @@ for (let rIdx = 0; rIdx < seedRestaurants.length; rIdx++) {
             ${wineDbId},
             ${JSON.stringify(p.reason)}::jsonb
           )
-          ON CONFLICT (restaurant_id, dish_id, wine_id) DO NOTHING
-          RETURNING id
+          ON CONFLICT (restaurant_id, dish_id, wine_id) DO UPDATE
+            SET reason = EXCLUDED.reason
+          RETURNING (xmax = 0) AS inserted
         `;
-        if (inserted.length > 0) stats.pairings++;
+        if (inserted.length > 0 && inserted[0].inserted) stats.pairings++;
       }
     }
   });

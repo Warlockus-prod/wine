@@ -169,7 +169,7 @@ export const seedPairingDataset: PairingDataset = {
       rating: 4.6,
       description: {
         en: "Fine mousse, apple and brioche notes, with crisp finish.",
-        pl: "Drobny mus, nuty jabłka i brioszki, świeże wykończenie.",
+        pl: "Drobny perlaż, nuty jabłka i brioszki, rześki finisz.",
       },
       image:
         "https://upload.wikimedia.org/wikipedia/commons/5/58/Veuve_Clicquot_-_bottle.jpg",
