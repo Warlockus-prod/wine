@@ -214,7 +214,14 @@ import type { SamouczekWine } from "./samouczek-wines";
 export const WINNICA_CATALOG: SamouczekWine[] = `;
 
 const body = JSON.stringify(
-  wines.map(({ producer, vivino, ...w }) => w),
+  wines.map((wine) => {
+    // producer/vivino are crawl-internal (diversity cap, ranking) — not part
+    // of the SamouczekWine contract.
+    const w = { ...wine };
+    delete w.producer;
+    delete w.vivino;
+    return w;
+  }),
   null,
   2,
 );
