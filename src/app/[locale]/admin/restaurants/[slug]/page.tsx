@@ -75,6 +75,19 @@ export default function PerRestaurantEditor({
             </h1>
             <p className="mt-1 text-xs text-gray-400">DB-canonical · zmiany trafiają od razu na produkcję</p>
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/admin/restaurants/${slug}/stats`}
+              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-3 text-xs font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20"
+            >
+              📊 Statystyki
+            </Link>
+            <Link
+              href={`/admin/restaurants/${slug}/qr`}
+              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-3 text-xs font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20"
+            >
+              🖨 QR
+            </Link>
           <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
             {(["dishes", "wines", "pairings"] as TabId[]).map((id) => {
               const labels = { dishes: "Dania", wines: "Wina", pairings: "Połączenia" } as const;
@@ -94,6 +107,7 @@ export default function PerRestaurantEditor({
                 </button>
               );
             })}
+          </div>
           </div>
         </header>
 

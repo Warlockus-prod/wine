@@ -48,7 +48,13 @@ export default function RestaurantPageClient({
   // landing). Once per mount; slug resolves to restaurant_id server-side.
   useEffect(() => {
     if (!restaurant) return;
-    trackEvent("restaurant_view", { restaurant_slug: slug });
+    // ?table=N comes from the printed per-table QR codes — lets the owner
+    // dashboard attribute scans to tables.
+    const table = new URLSearchParams(window.location.search).get("table");
+    trackEvent("restaurant_view", {
+      restaurant_slug: slug,
+      ...(table ? { table } : {}),
+    });
   }, [slug, restaurant]);
 
   const pickDish = (dishId: string) => {
