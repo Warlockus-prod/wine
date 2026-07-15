@@ -38,11 +38,11 @@ export default function RestaurantPageClient({
   const tx = useTranslations("restaurant");
   const lng = useLocale() as Locale;
   // Pairing panel is integrated; track which dish the user clicked from
-  // the menu list. Default to the first dish so the panel has data on
-  // first paint instead of an empty state.
-  const [activeDishId, setActiveDishId] = useState<string | null>(
-    restaurant?.dishes[0]?.id ?? null,
-  );
+  // the menu list. Starts EMPTY on purpose: auto-selecting dishes[0] kept
+  // the mobile peek chip permanently stacked on the tab bar (~23% of a
+  // 390px viewport before any interaction — audit 2026-07). The panel's
+  // empty state invites the first pick instead.
+  const [activeDishId, setActiveDishId] = useState<string | null>(null);
 
   // Owner-dashboard signal: a guest opened this restaurant's page (the QR
   // landing). Once per mount; slug resolves to restaurant_id server-side.
@@ -98,14 +98,25 @@ export default function RestaurantPageClient({
     };
   });
 
+  // The drop cap (first-cap) decorates the first menu row's description -
+  // but under ~120 chars the text wraps only 1-2 lines and the floated
+  // capital breaks it apart ("C/hrupiące…" — audit 2026-07). Only opt the
+  // list in when the intro is long enough to flow around the cap.
+  const firstDishDescription = restaurant.dishes[0]
+    ? t(restaurant.dishes[0].description, lng)
+    : "";
+  const showDropCap = firstDishDescription.length >= 120;
+
   return (
     <div className="pitch-grain min-h-screen bg-background-dark text-gray-100">
       <Navigation />
 
       {/* lg:pr-[400px] reserves room for the always-visible pairing panel
-          docked to the right edge. mobile-safe-bottom + extra pb space
-          on mobile so the bottom-sheet doesn't hide the last menu rows. */}
-      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-24 pb-32 sm:px-6 sm:pt-28 lg:px-8 lg:pr-[400px] lg:pb-16">
+          docked to the right edge. Bottom padding = tab bar height + the
+          collapsed peek-chip stack, so the last menu rows always scroll
+          clear of BOTH fixed layers (mobile-safe-bottom alone left them
+          covered by the chip — audit 2026-07). */}
+      <main className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-24 pb-[calc(var(--mobile-tabbar-h)+8rem)] sm:px-6 sm:pt-28 lg:px-8 lg:pr-[400px] lg:pb-16">
         {/* ─────────── HERO ─────────── */}
         <section
           className={`editorial-frame relative overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br p-5 shadow-[0_28px_100px_rgba(0,0,0,0.32)] sm:rounded-[36px] sm:p-10 lg:p-14 ${restaurant.coverGradient}`}
@@ -161,9 +172,10 @@ export default function RestaurantPageClient({
               </div>
 
               {/* Stat strip - sits over the dark cover gradient in BOTH
-                  themes, so we keep explicit white text + dark backdrop
-                  via inline styles (escapes the light-mode text-white shim
-                  that would otherwise turn this ink-on-black). */}
+                  themes. keep-dark + inline navy background (the shim
+                  contract for stay-dark panels): the old translucent-taupe
+                  tiles with 78%-white 11px labels read ~2.2:1 / disabled
+                  (audit 2026-07). Gold eyebrow + solid navy ≥ 4.5:1. */}
               <div className="mt-7 grid grid-cols-3 gap-2 sm:mt-9 sm:gap-3">
                 {[
                   { label: tx("district"), value: restaurant.district },
@@ -172,13 +184,13 @@ export default function RestaurantPageClient({
                 ].map((s) => (
                   <div
                     key={s.label}
-                    className="rounded-[18px] border p-3 backdrop-blur-sm sm:rounded-[24px] sm:p-4"
+                    className="keep-dark rounded-[18px] border p-3 backdrop-blur-sm sm:rounded-[24px] sm:p-4"
                     style={{
-                      background: "rgba(20, 11, 13, 0.42)",
-                      borderColor: "rgba(255, 255, 255, 0.18)",
+                      background: "rgba(11, 31, 68, 0.88)",
+                      borderColor: "rgba(199, 159, 105, 0.4)",
                     }}
                   >
-                    <p className="text-[10px] tracking-[0.18em] uppercase sm:text-[11px] sm:tracking-[0.2em]" style={{ color: "rgba(255, 255, 255, 0.78)" }}>
+                    <p className="text-[10px] font-semibold tracking-[0.18em] uppercase sm:text-[11px] sm:tracking-[0.2em]" style={{ color: "#c79f69" }}>
                       {s.label}
                     </p>
                     <p className="mt-1 font-serif text-base italic sm:text-xl" style={{ color: "#ffffff" }}>
@@ -216,8 +228,19 @@ export default function RestaurantPageClient({
                   <p className="mt-2 text-xs leading-5 text-white/90 sm:text-sm sm:leading-6">
                     {tx("qrHint")}
                   </p>
-                  <p className="mt-2 break-all rounded-xl border border-white/10 bg-black/24 px-2 py-1.5 font-mono text-xs text-white/70 sm:mt-3 sm:rounded-2xl sm:px-3 sm:py-3 sm:text-xs">
-                    {restaurant.restaurantUrl}
+                  {/* Host-only small-caps caption instead of the raw URL
+                      (the full monospace URL broke mid-token in the narrow
+                      aside — audit 2026-07). Full URL stays available to
+                      tooltips + screen readers. */}
+                  <p className="mt-2 text-sm sm:mt-3" title={restaurant.restaurantUrl}>
+                    <span
+                      aria-hidden
+                      className="tracking-[0.08em]"
+                      style={{ color: "#c79f69", fontVariantCaps: "small-caps" }}
+                    >
+                      {restaurant.restaurantUrl.replace(/^https?:\/\//, "").split("/")[0]}
+                    </span>
+                    <span className="sr-only">{restaurant.restaurantUrl}</span>
                   </p>
                 </div>
               </div>
@@ -261,8 +284,11 @@ export default function RestaurantPageClient({
 
         {/* ─────────── MENU + WINE LIST ─────────── */}
         <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          {/* Menu - editorial list with monograms + drop-cap */}
-          <article className="surface-parchment rounded-[28px] border border-white/10 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
+          {/* Menu - editorial list with monograms + drop-cap.
+              self-start on both columns: the default equal-height stretch
+              left a ~350px blank well under the shorter card at 1440px
+              (audit 2026-07). */}
+          <article className="surface-parchment self-start rounded-[28px] border border-white/10 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
             <header className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
                 <p className="pitch-eyebrow pitch-eyebrow--start">{tx("menu")}</p>
@@ -273,7 +299,7 @@ export default function RestaurantPageClient({
               </span>
             </header>
 
-            <ul className="first-cap divide-y divide-white/5">
+            <ul className={`${showDropCap ? "first-cap " : ""}divide-y divide-white/5`}>
               {restaurant.dishes.map((dish) => {
                 const photo =
                   dish.image ??
@@ -320,12 +346,18 @@ export default function RestaurantPageClient({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <h3 className="font-serif text-lg leading-snug text-white sm:text-xl">
+                      {/* Non-wrapping two-column header: a 2-line dish name
+                          used to push the price below the title, flush-left
+                          (audit 2026-07). Price stays pinned to the right
+                          column, baseline-aligned with the first title line,
+                          and renders "N zł" to match the wine card (dishes
+                          showed "$" on a Polish page for a Kraków venue). */}
+                      <div className="flex items-baseline gap-3">
+                        <h3 className="min-w-0 flex-1 font-serif text-lg leading-snug text-white sm:text-xl">
                           {dishName}
                         </h3>
-                        <span className="font-mono text-sm font-bold text-primary tabular-nums">
-                          ${dish.price}
+                        <span className="flex-none font-serif text-sm whitespace-nowrap text-[var(--color-accent-gold)] tabular-nums">
+                          {dish.price} zł
                         </span>
                       </div>
                       <p className="mt-0.5 text-[10px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
@@ -343,8 +375,14 @@ export default function RestaurantPageClient({
                           {tx("activeDishHint")}
                         </p>
                       ) : (
-                        <p className="mt-2 inline-flex items-center gap-1.5 text-[10px] tracking-[0.18em] text-[var(--ink-muted)] uppercase opacity-70 group-hover:opacity-100">
+                        /* Tap affordance: navy ink at 12px + gold arrow. The
+                           old 10px muted-grey caps read ~2.2:1 on parchment,
+                           i.e. disabled (audit 2026-07). */
+                        <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.14em] text-[var(--ink)] uppercase">
                           {tx("tapToPair")}
+                          <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden className="text-[var(--color-accent-gold)]">
+                            <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
                         </p>
                       )}
                     </div>
@@ -355,7 +393,7 @@ export default function RestaurantPageClient({
           </article>
 
           {/* Wines - bottle silhouettes + region/grape eyebrow */}
-          <article className="surface-parchment-strong rounded-[28px] border border-white/10 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
+          <article className="surface-parchment-strong self-start rounded-[28px] border border-white/10 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-6">
             <header className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
                 <p className="pitch-eyebrow pitch-eyebrow--start">{tx("wineList")}</p>
@@ -436,7 +474,10 @@ export default function RestaurantPageClient({
         <section className="mt-8 rounded-[28px] border border-white/10 bg-[#081634] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-7">
           <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-white/8 pb-4">
             <div>
-              <p className="pitch-eyebrow pitch-eyebrow--start">{tx("suggestedPairings")}</p>
+              {/* max-[420px]:after:hidden — the eyebrow wraps to 2 lines on
+                  narrow phones and the trailing gold hairline detached to
+                  its own row (audit 2026-07). */}
+              <p className="pitch-eyebrow pitch-eyebrow--start max-[420px]:after:hidden">{tx("suggestedPairings")}</p>
               <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">{tx("recommendedCombinations")}</h2>
             </div>
             <Link
@@ -450,7 +491,11 @@ export default function RestaurantPageClient({
           <div className="grid gap-5 lg:grid-cols-2">
             {highlightedPairings.map((item) => (
               <article key={item.dish.id} className="ribbon-card pl-7">
-                <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
+                {/* pl-7 clears the gold bookmark notch (ribbon-card::before,
+                    ~16px wide at the top-left) — it overlapped the category
+                    eyebrow text (audit 2026-07). Only this first line sits
+                    at ribbon height; title + reason below stay flush. */}
+                <p className="pl-7 text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                   {item.dish.category}
                 </p>
                 <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">

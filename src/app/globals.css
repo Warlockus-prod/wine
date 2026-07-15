@@ -120,8 +120,9 @@
     radial-gradient(circle at 90% 10%, rgba(199, 159, 105, 0.07), transparent 35%),
     linear-gradient(180deg, #f6f1e9 0%, #f1e9dd 100%);
 
-  /* Nav bar — frosted white with a hair of cream */
-  --nav-bg: rgba(255, 255, 255, 0.92);
+  /* Nav bar — frosted white. 0.97: at 0.92 dark map/wheel content ghosted
+     through the blur and the header read as a rendering bug (audit 2026-07). */
+  --nav-bg: rgba(255, 255, 255, 0.97);
   --nav-border: rgba(11, 31, 68, 0.08);
 }
 
@@ -149,6 +150,17 @@
   --color-ink-soft: var(--ink-soft);
   --color-ink-muted: var(--ink-muted);
 
+  --font-display: var(--font-libre-franklin), "Libre Franklin", sans-serif;
+  --font-serif: var(--font-libre-baskerville), "Libre Baskerville", Georgia, serif;
+}
+
+/* Runtime copies of the font tokens. `@theme inline` inlines values into
+   GENERATED utilities but never emits the custom properties themselves, so
+   every hand-authored `font-family: var(--font-serif)` rule below (pitch-display,
+   pitch-eyebrow, pitch-roman, …) silently resolved to nothing and inherited the
+   Franklin body font (audit 2026-07: "serif headings render as sans"). Declared
+   here, outside @theme, so authored CSS gets the real stacks at runtime. */
+:root {
   --font-display: var(--font-libre-franklin), "Libre Franklin", sans-serif;
   --font-serif: var(--font-libre-baskerville), "Libre Baskerville", Georgia, serif;
 }
@@ -330,6 +342,37 @@ input, textarea, select { transition: border-color 220ms ease, box-shadow 220ms 
 :root[data-theme="light"] .terminal-block [class*="bg-[#0d0809]"],
 :root[data-theme="light"] .terminal-block [class*="bg-[#060e22]"],
 :root[data-theme="light"] .terminal-block [class*="text-[#d4cabc]"] {
+  background-color: revert !important;
+  color: revert !important;
+}
+
+/* ── .keep-dark: opt-out container for panels that STAY navy in light theme
+   (hero bands, "W liczbach" stats, step cards). The global light-theme shims
+   above remap text-white/gray/border-white to ink — which turned dark-panel
+   text invisible (audit 2026-07 P1: /pitch stats ~1.1:1). Inside .keep-dark we
+   restore the on-dark palette. Contract: the container paints its own dark
+   background via a gradient class or inline style (the bg-[#…] remaps still
+   apply; child dark-hex backgrounds are reverted to transparent below, like
+   .terminal-block). */
+:root[data-theme="light"] .keep-dark { color: #f4efe9; --color-accent-gold: #c79f69; --gold-hairline: rgba(199, 159, 105, 0.45); --gold-hairline-soft: rgba(199, 159, 105, 0.28); }
+:root[data-theme="light"] .keep-dark [class*="text-white"],
+:root[data-theme="light"] .keep-dark[class*="text-white"] { color: #f4efe9 !important; }
+:root[data-theme="light"] .keep-dark [class*="text-gray-100"],
+:root[data-theme="light"] .keep-dark [class*="text-gray-200"] { color: rgba(244, 239, 233, 0.92) !important; }
+:root[data-theme="light"] .keep-dark [class*="text-gray-300"],
+:root[data-theme="light"] .keep-dark [class*="text-gray-400"] { color: rgba(244, 239, 233, 0.74) !important; }
+:root[data-theme="light"] .keep-dark [class*="text-gray-500"] { color: rgba(244, 239, 233, 0.58) !important; }
+:root[data-theme="light"] .keep-dark [class*="text-[#f4efe9]"],
+:root[data-theme="light"] .keep-dark [class*="text-[#e6e1d6]"],
+:root[data-theme="light"] .keep-dark [class*="text-[#cbc1b1]"],
+:root[data-theme="light"] .keep-dark [class*="text-[#d4cabc]"] { color: #f4efe9 !important; }
+:root[data-theme="light"] .keep-dark [class*="border-white/"] { border-color: rgba(255, 255, 255, 0.14) !important; }
+:root[data-theme="light"] .keep-dark [class*="bg-white/"] { background-color: rgba(255, 255, 255, 0.06) !important; }
+:root[data-theme="light"] .keep-dark [class*="bg-[#081634]"],
+:root[data-theme="light"] .keep-dark [class*="bg-[#0b1f44]"],
+:root[data-theme="light"] .keep-dark [class*="bg-[#122446]"],
+:root[data-theme="light"] .keep-dark [class*="bg-[#122a52]"],
+:root[data-theme="light"] .keep-dark [class*="bg-[#060e22]"] {
   background-color: revert !important;
   color: revert !important;
 }
@@ -733,6 +776,9 @@ body {
   text-transform: uppercase;
   font-size: 0.78rem;
   border: 1px solid rgba(199, 159, 105, 0.35);
+  /* Pill radius — one primary-button language site-wide (the tutorial CTAs
+     are rounded-full; the old square corners read as a second system). */
+  border-radius: 999px;
   box-shadow: 0 12px 36px rgba(199, 159, 105, 0.35), inset 0 1px 0 rgba(255, 230, 200, 0.18);
   transition:
     transform 250ms ease,
@@ -770,6 +816,7 @@ body {
   align-items: center;
   gap: 0.6rem;
   padding: 0.95rem 1.4rem;
+  border-radius: 999px; /* match .pitch-cta-primary pill */
   border: 1px solid var(--hairline-strong);
   color: var(--ink);
   font-family: var(--font-display);
@@ -1385,4 +1432,22 @@ body {
 /* Touch: enlarge the on-map zoom/compass control hit-area toward 44px. */
 @media (max-width: 767px) {
   .mapboxgl-ctrl button { width: 40px; height: 40px; }
+}
+
+/* ── Compass image-ring medallions (level-2 wheel) ─────────────────────
+   Staggered fade+scale entrance when stage 2 activates; index via --mi.
+   transform-box: fill-box so the SVG <g> scales around its own centre. */
+@keyframes medallion-in {
+  from { opacity: 0; transform: scale(0.55); }
+  to { opacity: 1; transform: scale(1); }
+}
+.compass-medallion {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: medallion-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: calc(var(--mi, 0) * 55ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .compass-medallion { animation: none; opacity: 1; }
 }

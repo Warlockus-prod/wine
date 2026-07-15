@@ -29,6 +29,10 @@ interface Props {
   storageKey?: string;
   /** Default expanded state on first visit. */
   defaultOpen?: boolean;
+  /** When true and no expand-state is persisted yet, start collapsed even if
+   *  defaultOpen is set. /pairing passes this so the panel never auto-covers
+   *  the top of the wine column on desktop (audit 2026-07 P1). */
+  defaultCollapsed?: boolean;
   /** When true, hide the floating launcher AND collapse any open panel.
    *  Used by /samouczek's "Wyłącz czat" toggle so users who don't want a
    *  guide are not nagged. */
@@ -43,6 +47,7 @@ export default function FloatingTasteChat({
   profile,
   storageKey,
   defaultOpen = false,
+  defaultCollapsed = false,
   disabled = false,
   pageContext,
 }: Props) {
@@ -50,10 +55,12 @@ export default function FloatingTasteChat({
   // thrash, no setState-in-effect lint, no SSR mismatch (this whole
   // component is loaded via next/dynamic ssr:false in callers).
   const [open, setOpen] = useState<boolean>(() => {
-    if (typeof window === "undefined") return defaultOpen;
+    if (typeof window === "undefined") return defaultOpen && !defaultCollapsed;
     // First visit: honour defaultOpen on desktop, but never auto-cover a phone
     // (the sheet would hide the page, e.g. on /pairing). >= 640px (sm) only.
-    const firstVisit = defaultOpen && window.innerWidth >= 640;
+    // defaultCollapsed wins over defaultOpen — a persisted expand-state (the
+    // user's own choice) still wins over both.
+    const firstVisit = defaultOpen && !defaultCollapsed && window.innerWidth >= 640;
     try {
       const v = window.localStorage.getItem(STATE_KEY);
       return v !== null ? v === "1" : firstVisit;
@@ -142,7 +149,7 @@ export default function FloatingTasteChat({
           type="button"
           onClick={() => toggle(true)}
           aria-label="Otwórz przewodnika Vinokompasu"
-          className="group fixed right-4 bottom-[calc(var(--mobile-tabbar-h)+0.95rem)] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:bottom-6"
+          className="group fixed right-3 bottom-[calc(var(--mobile-tabbar-h)+12px)] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:right-4 sm:bottom-6"
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="text-white">
@@ -157,7 +164,9 @@ export default function FloatingTasteChat({
       {/* Expanded panel - viewport-pinned. Mobile: a tall sheet from 14vh down
           to just above the bottom tab-bar (var(--mobile-tabbar-h)) so the
           composer never hides behind the tab-bar; messages scroll inside.
-          Desktop: 380×~700 docked bottom-right. The drag-handle pill at the
+          Desktop: 380px docked bottom-right, capped at 60vh so the panel can
+          never reach the top of the page columns (audit 2026-07 P1: it cut
+          the "#1" badge + prices on /pairing). The drag-handle pill at the
           top is decorative - taps the chat title hides the panel. */}
       {open ? (
         <>
@@ -172,7 +181,7 @@ export default function FloatingTasteChat({
           />
           <div
             ref={panelRef}
-            className="fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[calc(100dvh-6rem)] sm:w-[380px]"
+            className="fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[60vh] sm:w-[380px]"
             role="dialog"
             aria-modal="true"
             aria-label="Vinovigator"

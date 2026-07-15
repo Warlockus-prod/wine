@@ -93,11 +93,13 @@ export default function SamouczekClient() {
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
             Vinokompas to system, w którym każdy znajdzie swoje wino w 3 prostych krokach.
-            Zaczynasz od smaku, dorzucasz sześć wrażeń, a jeśli chcesz - dostrajasz dwanaście aromatów.
+            Zaczynasz od smaku, dorzucasz sześć wrażeń, a jeśli chcesz — dostrajasz dwanaście aromatów.
             Po każdym etapie zobaczysz wina dopasowane do twojego profilu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#kompas" className="pitch-cta-primary">
+            {/* rounded-full: the atom is square-cornered; the tutorial CTAs
+                below are pills, so this one matches them. */}
+            <a href="#kompas" className="pitch-cta-primary rounded-full">
               Rozpocznij test
               <svg width="14" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
                 <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -173,7 +175,7 @@ export default function SamouczekClient() {
                 Pytania i odpowiedzi
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Najczęstsze wątpliwości. Jeśli czegoś brakuje - włącz czat przy scenariuszu i zapytaj przewodnika.
+                Najczęstsze wątpliwości. Jeśli czegoś brakuje — włącz czat przy scenariuszu i zapytaj przewodnika.
               </p>
             </div>
           </header>
@@ -232,7 +234,7 @@ export default function SamouczekClient() {
             Twój profil jest zapisany. Czas znaleźć wina.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-            Otwórz widok Pairing i wybierz danie - zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
+            Otwórz widok Pairing i wybierz danie — zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/pairing" className="pitch-cta-primary">
@@ -256,7 +258,7 @@ export default function SamouczekClient() {
 
 function Ornament() {
   return (
-    <div className="my-16 flex items-center justify-center sm:my-20" aria-hidden>
+    <div className="my-10 flex items-center justify-center sm:my-20" aria-hidden>
       <span className="pitch-ornament">· · ·</span>
     </div>
   );

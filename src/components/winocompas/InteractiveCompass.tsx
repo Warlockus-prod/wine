@@ -214,7 +214,7 @@ export default function InteractiveCompass({
     window.dispatchEvent(
       new CustomEvent("wn:open-chat", {
         detail: {
-          prefill: `Opowiedz mi więcej o wrażeniu „${label}" - czego szukać w winie?`,
+          prefill: `Opowiedz mi więcej o wrażeniu „${label}" — czego szukać w winie?`,
         },
       }),
     );
@@ -308,8 +308,8 @@ export default function InteractiveCompass({
         {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
 
         {tourActive ? (
-          <p className="mt-2 max-w-[440px] text-center text-[11px] leading-snug text-[var(--ink-soft)]">
-            Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) -
+          <p className="mt-2 max-w-[440px] text-center text-xs leading-snug text-[var(--ink-soft)]">
+            Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) —
             kliknij koło, aby wybrać siłę.
           </p>
         ) : null}
@@ -376,9 +376,11 @@ export default function InteractiveCompass({
 
       {/* ── Side info panel — desktop only (mobile uses the "?" sheet).
           Chrome is BRAND GOLD regardless of the focused sector (client
-          review 2026-07: drop the red accent). */}
+          review 2026-07: drop the red accent). self-start keeps the card
+          content-height (it used to stretch to the wheel column, ~60%
+          empty); sticky keeps it in view alongside the tall wheel. */}
       <aside
-        className="hidden rounded-2xl border p-5 transition lg:block"
+        className="hidden self-start rounded-2xl border p-5 transition lg:sticky lg:top-24 lg:block"
         style={{
           background: focused
             ? "linear-gradient(180deg, rgba(199,159,105,0.12), transparent 70%), var(--surface-elevated)"
@@ -485,12 +487,12 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
  * do" feel instead of static description text.
  */
 const INTENSITY_COMMENTS: Record<number, string> = {
-  0: "Jeszcze nie zaznaczone - kliknij koło, aby ustawić siłę (0-5).",
-  1: "Ledwo wyczuwalne - subtelny akcent w tle.",
-  2: "Delikatne - lekko zaznaczone.",
-  3: "Umiarkowane - wyraźnie obecne, ale nie dominuje.",
-  4: "Mocne - jeden z głównych charakterów Twojego wina.",
-  5: "Dominujące - definiuje styl, którego szukasz.",
+  0: "Jeszcze nie zaznaczone — kliknij koło, aby ustawić siłę (0-5).",
+  1: "Ledwo wyczuwalne — subtelny akcent w tle.",
+  2: "Delikatne — lekko zaznaczone.",
+  3: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
+  4: "Mocne — jeden z głównych charakterów Twojego wina.",
+  5: "Dominujące — definiuje styl, którego szukasz.",
 };
 
 function SelectionComment({
@@ -654,7 +656,7 @@ function FocusedCard({
             <TourText key={`${isTour}:${focused.description}`} text={focused.description} typing={isTour} />
           </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
-            Trzy smaki bazowe - cierpkość, słodycz, kwasowość - to
+            Trzy smaki bazowe — cierpkość, słodycz, kwasowość — to
             podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym
             wyraźniej dominują w twoim ulubionym profilu.
           </p>
@@ -745,7 +747,7 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
       </h3>
       <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
         Tarcza Vinokompasu pokaże opis każdego elementu. Możesz też pozwolić,
-        by przewodnik przeszedł przez {what.plural} automatycznie - wystarczy nacisnąć przycisk poniżej.
+        by przewodnik przeszedł przez {what.plural} automatycznie — wystarczy nacisnąć przycisk poniżej.
       </p>
       <button
         type="button"

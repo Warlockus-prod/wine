@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 import { hasLocale } from "next-intl";
@@ -43,7 +42,7 @@ export default async function PitchPage({
       <div className="rounded-[26px] bg-[#081634] p-3">
         {/* Header pill */}
         <div className="mb-3 flex items-center justify-between">
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-semibold tracking-[0.22em] text-[#e1d3b5] uppercase">
+          <span className="rounded-full border border-[rgba(199,159,105,0.32)] bg-[rgba(199,159,105,0.08)] px-2 py-1 text-[9px] font-semibold tracking-[0.22em] text-[#e1d3b5] uppercase">
             Pairing
           </span>
           <span className="text-[9px] tracking-[0.22em] text-emerald-300/80 uppercase">
@@ -64,7 +63,7 @@ export default async function PitchPage({
 
         {/* Sommelier Bot panel */}
         <div className="rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44] p-3">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-3">
+          <div className="mb-3 flex items-center gap-2 border-b border-[rgba(199,159,105,0.22)] pb-3">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" /></svg>
             </span>
@@ -74,7 +73,7 @@ export default async function PitchPage({
           </div>
 
           <div className="space-y-2">
-            <div className="max-w-[88%] rounded-2xl rounded-bl-md border border-white/10 bg-black/30 px-3 py-2">
+            <div className="max-w-[88%] rounded-2xl rounded-bl-md border border-[rgba(199,159,105,0.22)] bg-black/30 px-3 py-2">
               <p className="text-[10px] leading-snug text-gray-100">
                 Comparing <span className="font-semibold text-white">Escargots</span> with <span className="font-semibold text-white">Riesling</span>.
               </p>
@@ -84,7 +83,7 @@ export default async function PitchPage({
                 Crisp Alsace acidity cuts garlic herb butter with citrus drive.
               </p>
             </div>
-            <div className="max-w-[80%] rounded-2xl rounded-bl-md border border-white/10 bg-black/30 px-3 py-2">
+            <div className="max-w-[80%] rounded-2xl rounded-bl-md border border-[rgba(199,159,105,0.22)] bg-black/30 px-3 py-2">
               <p className="text-[10px] leading-snug text-gray-200">Serve at 8-10°C. No decant.</p>
             </div>
           </div>
@@ -94,7 +93,7 @@ export default async function PitchPage({
   );
 
   const MapMockup = (
-    <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#060e22] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
+    <div className="overflow-hidden rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#060e22] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
       <div className="pitch-browser-bar">
         <span className="pitch-browser-dot bg-[#ff5f57]" />
         <span className="pitch-browser-dot bg-[#febc2e]" />
@@ -126,7 +125,7 @@ export default async function PitchPage({
           </span>
         ))}
         {/* Floating venue card */}
-        <div className="absolute right-3 bottom-3 left-3 rounded-xl border border-white/10 bg-[#0b1f44ec] p-3 backdrop-blur">
+        <div className="absolute right-3 bottom-3 left-3 rounded-xl border border-[rgba(199,159,105,0.32)] bg-[#0b1f44ec] p-3 backdrop-blur">
           <p className="text-[8px] font-bold tracking-[0.24em] text-primary uppercase">
             Selected
           </p>
@@ -138,8 +137,8 @@ export default async function PitchPage({
   );
 
   const AdminMockup = (
-    <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#081634] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
-      <div className="border-b border-white/6 bg-[#122446] px-4 py-3">
+    <div className="overflow-hidden rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#081634] shadow-[0_28px_70px_rgba(0,0,0,0.42)]">
+      <div className="border-b border-[rgba(199,159,105,0.22)] bg-[#122446] px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <span className="text-[10px] font-bold tracking-[0.22em] text-primary uppercase">
             V2 Admin Studio
@@ -149,17 +148,17 @@ export default async function PitchPage({
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-2 divide-x divide-white/6">
+      <div className="grid grid-cols-2 divide-x divide-[rgba(199,159,105,0.22)]">
         {/* Dishes pane */}
         <div className="space-y-2 p-3">
           <p className="text-[9px] tracking-[0.22em] text-gray-500 uppercase">Dishes</p>
           {["Escargots", "Duck Confit", "Beef Tartare"].map((name) => (
-            <div key={name} className="rounded-lg border border-white/8 bg-black/30 p-2">
+            <div key={name} className="rounded-lg border border-[rgba(199,159,105,0.22)] bg-black/30 p-2">
               <div className="grid grid-cols-2 gap-1">
-                <div className="rounded bg-white/4 px-2 py-1 text-[10px] text-gray-200">{name}</div>
-                <div className="rounded bg-white/4 px-2 py-1 text-[10px] italic text-[#e1d3b5]">{name === "Escargots" ? "Ślimaki" : name === "Duck Confit" ? "Konfitowana kaczka" : "Tatar"}</div>
+                <div className="rounded bg-[rgba(199,159,105,0.10)] px-2 py-1 text-[10px] text-gray-200">{name}</div>
+                <div className="rounded bg-[rgba(199,159,105,0.10)] px-2 py-1 text-[10px] italic text-[#e1d3b5]">{name === "Escargots" ? "Ślimaki" : name === "Duck Confit" ? "Konfitowana kaczka" : "Tatar"}</div>
               </div>
-              <div className="mt-1 h-2 rounded bg-white/4" />
+              <div className="mt-1 h-2 rounded bg-[rgba(199,159,105,0.10)]" />
             </div>
           ))}
         </div>
@@ -173,8 +172,8 @@ export default async function PitchPage({
               </span>
               <div className="flex-1">
                 <p className="text-[10px] font-semibold text-white">{name}</p>
-                <div className="mt-1 h-1.5 rounded bg-white/8" />
-                <div className="mt-1 h-1.5 w-2/3 rounded bg-white/8" />
+                <div className="mt-1 h-1.5 rounded bg-[rgba(199,159,105,0.16)]" />
+                <div className="mt-1 h-1.5 w-2/3 rounded bg-[rgba(199,159,105,0.16)]" />
               </div>
             </div>
           ))}
@@ -214,14 +213,28 @@ export default async function PitchPage({
   }));
 
   return (
-    <div className="pitch-grain mobile-safe-bottom min-h-screen bg-background-dark text-[#f4efe9]">
+    <div className="pitch-grain min-h-screen bg-background-dark text-[#f4efe9]">
       <Navigation />
+      {/* Page-scoped restyle of the nav's grey "Mobile" viewport chip — the only
+          neutral-grey element on this cream page (audit 2026-07 P3). Navigation.tsx
+          is shared chrome, so we override here instead of editing the component. */}
+      <style>{`
+        .pitch-grain nav button[class*="bg-primary/15"] {
+          background-color: #faf5ea !important;
+          color: #0b1f44 !important;
+          border-color: rgba(199, 159, 105, 0.45) !important;
+          box-shadow: none !important;
+        }
+        .pitch-grain nav button[class*="bg-primary/15"]:hover {
+          background-color: #f0e6d2 !important;
+        }
+      `}</style>
 
       <main className="mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-8">
         {/* ──────────────────────────  HERO  ────────────────────────── */}
         <section
           aria-labelledby="hero-title"
-          className="relative overflow-hidden rounded-[40px] border border-white/8 bg-[radial-gradient(circle_at_8%_18%,rgba(199,159,105,0.22),transparent_42%),radial-gradient(circle_at_92%_82%,rgba(199,159,105,0.18),transparent_46%),linear-gradient(180deg,#122a52_0%,#081634_100%)] px-6 py-14 sm:px-12 sm:py-20 lg:px-16 lg:py-28"
+          className="relative overflow-hidden rounded-[40px] border border-[rgba(199,159,105,0.32)] bg-[radial-gradient(circle_at_8%_18%,rgba(199,159,105,0.22),transparent_42%),radial-gradient(circle_at_92%_82%,rgba(199,159,105,0.18),transparent_46%),linear-gradient(180deg,#122a52_0%,#081634_100%)] px-6 py-14 sm:px-12 sm:py-20 lg:px-16 lg:py-28"
         >
           <div className="pitch-corner pitch-corner--tl hidden lg:block" aria-hidden />
           <div className="pitch-corner pitch-corner--br hidden lg:block" aria-hidden />
@@ -272,22 +285,37 @@ export default async function PitchPage({
                   </span>
                 </div>
                 {PhoneMockup}
-                <div className="absolute -right-8 -bottom-6 hidden lg:block">
-                  <span className="pitch-stamp">96 %</span>
+                {/* 96 % stamp — pushed clear of the phone silhouette, tilted and
+                    shadowed so the remaining corner overlap reads deliberate
+                    (audit 2026-07 P3). keep-dark + inline navy fill keep the gold
+                    legible on the light hero. */}
+                <div className="keep-dark absolute -right-14 -bottom-10 hidden rotate-[-7deg] lg:block">
+                  <span
+                    className="pitch-stamp"
+                    style={{
+                      background: "linear-gradient(180deg, #122a52, #081634)",
+                      boxShadow: "0 14px 34px rgba(6, 14, 34, 0.45)",
+                    }}
+                  >
+                    96 %
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="my-20 flex items-center justify-center" aria-hidden>
+        <div className="my-12 md:my-20 flex items-center justify-center" aria-hidden>
           <span className="pitch-ornament">{tx("ornament")}</span>
         </div>
 
         {/* ──────────────────────────  I. HOW IT WORKS  ────────────────────────── */}
         <section id="how" aria-labelledby="how-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">{tx("how.eyebrow")}</span>
+            {/* Chapter numerals read too small at 390px — bump below md. The `!`
+                is load-bearing: .pitch-roman is unlayered CSS, so a plain text-*
+                utility (layered) would lose the cascade (audit 2026-07 P3). */}
+            <span className="pitch-roman text-[18px]! md:text-[0.95rem]!">{tx("how.eyebrow")}</span>
             <div>
               <h2 id="how-title" className="pitch-display text-[clamp(2rem,4.6vw,3.4rem)] text-white">
                 {tx("how.title")}
@@ -299,12 +327,16 @@ export default async function PitchPage({
           </header>
 
           <ol className="space-y-6">
+            {/* keep-dark + opaque navy painted inline: the old 70%-alpha near-black
+                gradients composited to muddy taupe over cream with unreadable text
+                (audit 2026-07 P1). */}
             {steps.map((step, i) => {
               const isEven = i % 2 === 1;
               return (
                 <li
                   key={i}
-                  className={`grid gap-6 rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(34,18,22,0.7),rgba(20,11,13,0.7))] p-6 transition-colors duration-500 hover:border-[rgba(199,159,105,0.35)] sm:p-8 lg:grid-cols-[8rem_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-12 ${isEven ? "lg:rounded-tl-[60px]" : "lg:rounded-tr-[60px]"}`}
+                  className={`keep-dark grid gap-6 rounded-3xl border border-[rgba(199,159,105,0.28)] p-6 transition-colors duration-500 hover:border-[rgba(199,159,105,0.5)] sm:p-8 lg:grid-cols-[8rem_minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start lg:gap-12 ${isEven ? "lg:rounded-tl-[60px]" : "lg:rounded-tr-[60px]"}`}
+                  style={{ background: "linear-gradient(180deg, #0b1f44, #0a1a3a)" }}
                 >
                   <span className="pitch-display text-5xl text-[var(--color-accent-gold)]">
                     {String(i + 1).padStart(2, "0")}
@@ -319,14 +351,14 @@ export default async function PitchPage({
           </ol>
         </section>
 
-        <div className="my-24 flex items-center justify-center" aria-hidden>
+        <div className="my-14 md:my-24 flex items-center justify-center" aria-hidden>
           <span className="pitch-rule pitch-rule--short" />
         </div>
 
         {/* ──────────────────────────  II. WHAT YOU GET  ────────────────────────── */}
         <section aria-labelledby="what-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">{tx("what.eyebrow")}</span>
+            <span className="pitch-roman text-[18px]! md:text-[0.95rem]!">{tx("what.eyebrow")}</span>
             <div>
               <h2 id="what-title" className="pitch-display text-[clamp(2rem,4.6vw,3.4rem)] text-white">
                 {tx("what.title")}
@@ -359,14 +391,14 @@ export default async function PitchPage({
           </div>
         </section>
 
-        <div className="my-24 flex items-center justify-center" aria-hidden>
+        <div className="my-14 md:my-24 flex items-center justify-center" aria-hidden>
           <span className="pitch-ornament">{tx("ornament")}</span>
         </div>
 
         {/* ──────────────────────────  III. SCREENSHOTS  ────────────────────────── */}
         <section aria-labelledby="screens-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">{tx("screenshots.eyebrow")}</span>
+            <span className="pitch-roman text-[18px]! md:text-[0.95rem]!">{tx("screenshots.eyebrow")}</span>
             <div>
               <h2 id="screens-title" className="pitch-display text-[clamp(2rem,4.6vw,3.4rem)] text-white">
                 {tx("screenshots.title")}
@@ -410,14 +442,14 @@ export default async function PitchPage({
           </div>
         </section>
 
-        <div className="my-24 flex items-center justify-center" aria-hidden>
+        <div className="my-14 md:my-24 flex items-center justify-center" aria-hidden>
           <span className="pitch-rule pitch-rule--short" />
         </div>
 
         {/* ──────────────────────────  IV. STATS  ────────────────────────── */}
         <section aria-labelledby="stats-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">{tx("stats.eyebrow")}</span>
+            <span className="pitch-roman text-[18px]! md:text-[0.95rem]!">{tx("stats.eyebrow")}</span>
             <div>
               <h2 id="stats-title" className="pitch-display text-[clamp(2rem,4.6vw,3.4rem)] text-white">
                 {tx("stats.title")}
@@ -428,7 +460,14 @@ export default async function PitchPage({
             </div>
           </header>
 
-          <div className="relative grid gap-8 rounded-3xl border border-[rgba(199,159,105,0.22)] bg-gradient-to-br from-[#081634] to-[#0d0506] p-10 sm:grid-cols-2 sm:p-14 lg:grid-cols-4">
+          {/* keep-dark: this panel stays navy in light theme — without it the
+              text-white remap turned the proof numbers navy-on-near-black
+              (~1.1:1, audit 2026-07 P1). Background painted inline so the
+              light-theme surface shims can't flatten it. */}
+          <div
+            className="keep-dark relative grid gap-8 rounded-3xl border border-[rgba(199,159,105,0.22)] p-10 sm:grid-cols-2 sm:p-14 lg:grid-cols-4"
+            style={{ background: "linear-gradient(160deg, #0b1f44 0%, #081634 55%, #060e22 100%)" }}
+          >
             <div className="pitch-corner pitch-corner--tl" aria-hidden />
             <div className="pitch-corner pitch-corner--tr" aria-hidden />
             <div className="pitch-corner pitch-corner--bl" aria-hidden />
@@ -447,14 +486,14 @@ export default async function PitchPage({
           </div>
         </section>
 
-        <div className="my-24 flex items-center justify-center" aria-hidden>
+        <div className="my-14 md:my-24 flex items-center justify-center" aria-hidden>
           <span className="pitch-ornament">{tx("ornament")}</span>
         </div>
 
         {/* ──────────────────────────  V. PRICING  ────────────────────────── */}
         <section aria-labelledby="price-title" className="scroll-mt-[6.5rem]">
           <header className="mb-14 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">{tx("pricing.eyebrow")}</span>
+            <span className="pitch-roman text-[18px]! md:text-[0.95rem]!">{tx("pricing.eyebrow")}</span>
             <div>
               <h2 id="price-title" className="pitch-display text-[clamp(2rem,4.6vw,3.4rem)] text-white">
                 {tx("pricing.title")}
@@ -474,7 +513,7 @@ export default async function PitchPage({
                   className={`relative flex flex-col rounded-3xl border p-8 transition-colors duration-500 ${
                     featured
                       ? "lg:-translate-y-4 border-[rgba(199,159,105,0.55)] bg-[radial-gradient(circle_at_50%_0%,rgba(199,159,105,0.16),transparent_55%),linear-gradient(180deg,#1f1115,#081634)] shadow-[0_28px_70px_rgba(0,0,0,0.4)]"
-                      : "border-white/10 bg-[#081634] hover:border-white/20"
+                      : "border-[rgba(199,159,105,0.32)] bg-[#081634] hover:border-[rgba(199,159,105,0.5)]"
                   }`}
                 >
                   {featured ? (
@@ -483,7 +522,9 @@ export default async function PitchPage({
                     </span>
                   ) : null}
 
-                  <span className="pitch-roman">{["I.", "II.", "III."][i]}</span>
+                  {/* Arabic 01/02/03 like the feature grid — Roman numerals here
+                      clashed with the chapter markers (audit 2026-07 P3). */}
+                  <span className="pitch-roman text-[0.72rem]">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="pitch-display mt-3 text-3xl text-white">{tier.name}</h3>
 
                   <div className="mt-6 flex items-end gap-2">
@@ -537,14 +578,14 @@ export default async function PitchPage({
           </div>
         </section>
 
-        <div className="my-24 flex items-center justify-center" aria-hidden>
+        <div className="my-14 md:my-24 flex items-center justify-center" aria-hidden>
           <span className="pitch-rule pitch-rule--short" />
         </div>
 
         {/* ──────────────────────────  VI. FAQ  ────────────────────────── */}
         <section aria-labelledby="faq-title" className="scroll-mt-[6.5rem]">
           <header className="mb-12 grid gap-6 lg:grid-cols-[10rem_minmax(0,1fr)] lg:gap-12">
-            <span className="pitch-roman">{tx("faq.eyebrow")}</span>
+            <span className="pitch-roman text-[18px]! md:text-[0.95rem]!">{tx("faq.eyebrow")}</span>
             <div>
               <h2 id="faq-title" className="pitch-display text-[clamp(2rem,4.6vw,3.4rem)] text-white">
                 {tx("faq.title")}
@@ -555,7 +596,7 @@ export default async function PitchPage({
           <Faq items={faqItems} />
         </section>
 
-        <div className="my-24 flex items-center justify-center" aria-hidden>
+        <div className="my-14 md:my-24 flex items-center justify-center" aria-hidden>
           <span className="pitch-ornament">{tx("ornament")}</span>
         </div>
 
@@ -599,8 +640,8 @@ export default async function PitchPage({
           </p>
         </section>
       </main>
-
-      <MobileTabBar />
+      {/* No MobileTabBar here — guest chrome has no business on an owner-facing
+          pitch, and it ate mobile viewport (audit 2026-07 P3). */}
     </div>
   );
 }

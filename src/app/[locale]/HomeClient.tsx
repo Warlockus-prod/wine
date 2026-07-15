@@ -27,6 +27,19 @@ const RestaurantMap = dynamic(() => import("@/components/v2/RestaurantMap"), {
 
 type FilterValue = "All" | string;
 
+// Cuisine values live in EN in the seed/DB and double as filter values, so
+// they must stay raw internally; guest-facing labels localize at render time.
+// Unknown values fall back to the raw string so new DB entries never blank out.
+const CUISINE_PL: Record<string, string> = {
+  Spanish: "Hiszpańska",
+  Japanese: "Japońska",
+  "French Classic": "Francuska klasyka",
+  Italian: "Włoska",
+  Polish: "Polska",
+  "Polish Modern": "Polska nowoczesna",
+  "Peruvian Nikkei": "Peruwiańska Nikkei",
+};
+
 // Data arrives server-side from the DB→seed read-path (resolveRestaurants).
 export default function HomeClient({
   initialRestaurants,
@@ -53,6 +66,10 @@ export default function HomeClient({
   const [cityFilter, setCityFilter] = useState<FilterValue>("All");
   const [formatFilter, setFormatFilter] = useState<FilterValue>("All");
   const [selectedSlug, setSelectedSlug] = useState<string>(catalogRestaurants[0]?.slug ?? "");
+  // Which card shows its full-size scannable QR; null = all thumbnails.
+  const [expandedQrSlug, setExpandedQrSlug] = useState<string | null>(null);
+
+  const cuisineLabel = (value: string) => (locale === "pl" ? (CUISINE_PL[value] ?? value) : value);
 
   const filteredRestaurants = useMemo(
     () =>
@@ -108,26 +125,36 @@ export default function HomeClient({
               <p className="text-xs font-semibold tracking-[0.32em] text-primary uppercase">
                 {tx("directoryEyebrow")}
               </p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              {/* pitch-display owns weight + tracking (Baskerville 400/700).
+                  No <em> accent here: directoryTitle also feeds the metadata
+                  <title>, so markup in the string would leak into the tab. */}
+              <h1 className="pitch-display mt-3 text-4xl text-white sm:text-5xl">
                 {tx("directoryTitle")}
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">
                 {tx("directorySubtitle")}
               </p>
+              {/* Primary funnel: the tutorial converts curious guests better
+                  than the raw directory, so it gets the one gold CTA. */}
+              <Link href="/samouczek" className="pitch-cta-primary mt-6">
+                {tx("tutorialCta")}
+              </Link>
             </div>
 
             <div className="grid w-full gap-3 rounded-[24px] border border-white/10 bg-black/15 p-4 sm:min-w-[280px] sm:w-auto">
-              <div className="grid grid-cols-3 gap-3 text-center">
+              {/* items-end + nowrap labels: a wrapping label ("QR GOTOWE")
+                  must not push its numeral off the shared baseline. */}
+              <div className="grid grid-cols-3 items-end gap-3 text-center">
                 <div>
-                  <p className="text-[11px] tracking-[0.2em] text-gray-500 uppercase">{tx("statsRestaurants")}</p>
+                  <p className="text-[11px] tracking-[0.2em] whitespace-nowrap text-gray-500 uppercase">{tx("statsRestaurants")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">{catalogRestaurants.length}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] tracking-[0.2em] text-gray-500 uppercase">{tx("statsCities")}</p>
+                  <p className="text-[11px] tracking-[0.2em] whitespace-nowrap text-gray-500 uppercase">{tx("statsCities")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">{cityOptions.length - 1}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] tracking-[0.2em] text-gray-500 uppercase">{tx("statsQrReady")}</p>
+                  <p className="text-[11px] tracking-[0.2em] whitespace-nowrap text-gray-500 uppercase">{tx("statsQrReady")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">100%</p>
                 </div>
               </div>
@@ -142,18 +169,22 @@ export default function HomeClient({
                 value: cuisineFilter,
                 onChange: setCuisineFilter,
                 options: cuisineOptions,
+                // Options double as filter values, so only the LABEL localizes.
+                localize: cuisineLabel,
               },
               {
                 label: tx("filters.city"),
                 value: cityFilter,
                 onChange: setCityFilter,
                 options: cityOptions,
+                localize: (value: string) => value,
               },
               {
                 label: tx("filters.format"),
                 value: formatFilter,
                 onChange: setFormatFilter,
                 options: formatOptions,
+                localize: (value: string) => value,
               },
             ].map((filter) => (
               <label key={filter.label} className="grid gap-2">
@@ -173,9 +204,11 @@ export default function HomeClient({
                     color: "var(--ink)",
                   }}
                 >
+                  {/* "All" stays the internal sentinel value; only the
+                      visible label is translated. */}
                   {filter.options.map((option) => (
                     <option key={option} value={option}>
-                      {option}
+                      {option === "All" ? tx("filters.all") : filter.localize(option)}
                     </option>
                   ))}
                 </select>
@@ -187,41 +220,52 @@ export default function HomeClient({
         {/* Map gets a full-width row at the top so the user can actually see
             restaurant placement across Europe. The catalogue list lives in
             its own section below - the previous side-by-side cramming hid
-            most map markers behind the catalog column. */}
-        <section className="mt-6">
+            most map markers behind the catalog column. `isolate z-0` gives
+            the section its own stacking context so the z-[400] map chrome
+            can never paint over the fixed z-50 nav while scrolling. */}
+        <section className="relative isolate z-0 mt-6">
           <article className="rounded-[34px] border border-white/10 bg-black/15 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)]">
             <div className="mb-5 flex items-end justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold tracking-[0.26em] text-gray-500 uppercase">
                   {tx("mapEyebrow")}
                 </p>
-                <h2 className="mt-1 text-2xl font-bold text-white">{tx("mapTitle")}</h2>
+                <h2 className="pitch-display mt-1 text-2xl text-white">{tx("mapTitle")}</h2>
               </div>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-gray-300">
                 {tx("visible", { count: filteredRestaurants.length })}
               </span>
             </div>
 
-            <div
-              className="relative h-[520px] overflow-hidden rounded-[30px] border sm:h-[620px] lg:h-[700px]"
-              style={{ background: "var(--surface-deep)", borderColor: "var(--hairline-strong)" }}
-            >
-              <RestaurantMap
-                restaurants={filteredRestaurants}
-                selectedSlug={effectiveSelectedSlug}
-                onSelect={handlePick}
-              />
+            {/* Canvas + selected card share a relative wrapper so the card
+                can anchor to the canvas on desktop while sitting in normal
+                flow on mobile. */}
+            <div className="relative">
+              {/* <768px the canvas caps at 340px - the previous ~950px column
+                  buried the catalogue a full screen below the fold. */}
+              <div
+                className="relative h-[340px] overflow-hidden rounded-[30px] border md:h-[620px] lg:h-[700px]"
+                style={{ background: "var(--surface-deep)", borderColor: "var(--hairline-strong)" }}
+              >
+                <RestaurantMap
+                  restaurants={filteredRestaurants}
+                  selectedSlug={effectiveSelectedSlug}
+                  onSelect={handlePick}
+                />
 
-              <div className="pointer-events-none absolute top-3 left-3 z-[400] rounded-full border border-white/10 bg-black/55 px-2.5 py-0.5 text-[10px] font-semibold tracking-[0.22em] text-gray-200 uppercase backdrop-blur sm:top-4 sm:left-4 sm:px-3 sm:py-1 sm:text-[11px]">
-                {tx("europe")}
+                <div className="pointer-events-none absolute top-3 left-3 z-[400] rounded-full border border-white/10 bg-black/55 px-2.5 py-0.5 text-[10px] font-semibold tracking-[0.22em] text-gray-200 uppercase backdrop-blur sm:top-4 sm:left-4 sm:px-3 sm:py-1 sm:text-[11px]">
+                  {tx("europe")}
+                </div>
               </div>
 
               {selectedRestaurant ? (
-                // Selected-restaurant overlay sits on the always-dark Mapbox
-                // satellite layer. Inline styles bypass the light-theme
-                // text-white shim so the card stays readable in both themes.
+                // Selected-restaurant card: normal flow under the canvas on
+                // mobile (an overlay would eat most of the 340px map), on the
+                // always-dark Mapbox satellite layer from md up. Inline styles
+                // bypass the light-theme text-white shim so the card stays
+                // readable in both themes.
                 <div
-                  className="absolute right-2 bottom-2 left-2 z-[400] rounded-[20px] border p-3 shadow-2xl backdrop-blur-md sm:right-3 sm:bottom-3 sm:left-3 sm:rounded-[26px] sm:p-4"
+                  className="z-[400] mt-3 rounded-[20px] border p-3 shadow-2xl backdrop-blur-md sm:rounded-[26px] sm:p-4 md:absolute md:right-3 md:bottom-3 md:left-3 md:mt-0"
                   style={{
                     background: "rgba(22, 13, 15, 0.94)",
                     borderColor: "rgba(255, 255, 255, 0.10)",
@@ -233,7 +277,7 @@ export default function HomeClient({
                       <p className="text-[10px] font-semibold tracking-[0.22em] uppercase sm:text-[11px] sm:tracking-[0.24em]" style={{ color: "#e1d3b5" }}>
                         {tx("selectedRestaurant")}
                       </p>
-                      <h3 className="mt-0.5 text-lg font-bold sm:mt-1 sm:text-2xl" style={{ color: "#ffffff" }}>
+                      <h3 className="pitch-display mt-0.5 text-lg sm:mt-1 sm:text-2xl" style={{ color: "#ffffff" }}>
                         {t(selectedRestaurant.name, locale)}
                       </h3>
                       <p className="mt-0.5 text-[11px] sm:text-sm" style={{ color: "rgba(244, 237, 224, 0.75)" }}>
@@ -245,7 +289,7 @@ export default function HomeClient({
                       className={`shrink-0 rounded-xl bg-gradient-to-r px-2.5 py-1 text-[11px] font-semibold sm:rounded-2xl sm:px-4 sm:py-2 sm:text-sm ${selectedRestaurant.coverGradient}`}
                       style={{ color: "#ffffff" }}
                     >
-                      {selectedRestaurant.cuisine}
+                      {cuisineLabel(selectedRestaurant.cuisine)}
                     </div>
                   </div>
 
@@ -287,7 +331,7 @@ export default function HomeClient({
                 <p className="text-xs font-semibold tracking-[0.26em] text-gray-500 uppercase">
                   {tx("filteredListEyebrow")}
                 </p>
-                <h2 className="mt-1 text-2xl font-bold text-white">{tx("filteredListTitle")}</h2>
+                <h2 className="pitch-display mt-1 text-2xl text-white">{tx("filteredListTitle")}</h2>
               </div>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-gray-300">
                 {tx("filteredListSubtitle")}
@@ -333,14 +377,22 @@ export default function HomeClient({
                             {restaurant.city}, {restaurant.country}
                           </span>
                         </div>
-                        <h3 className="mt-3 text-2xl font-bold text-white">{t(restaurant.name, locale)}</h3>
+                        <h3 className="pitch-display mt-3 text-2xl text-white">{t(restaurant.name, locale)}</h3>
                         <p className="mt-2 text-sm leading-6 text-gray-300">
                           {t(restaurant.description, locale)}
                         </p>
                       </button>
 
-                      <div
-                        className="grid shrink-0 gap-2 rounded-[22px] border p-3 text-center"
+                      {/* Compact QR row: the full-size QR + raw URL read as an
+                          admin console inside a guest card (audit 2026-07).
+                          Tapping the thumbnail toggles the scannable size. */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedQrSlug((current) => (current === restaurant.slug ? null : restaurant.slug))
+                        }
+                        aria-expanded={expandedQrSlug === restaurant.slug}
+                        className="flex shrink-0 items-center gap-3 rounded-[22px] border p-3 text-left"
                         style={{
                           background: "var(--surface-deep)",
                           borderColor: "var(--gold-hairline-soft)",
@@ -355,17 +407,19 @@ export default function HomeClient({
                           fgColor="#081634"
                           level="M"
                           marginSize={0}
-                          className="h-24 w-24 rounded-xl bg-white p-2"
+                          className={`shrink-0 rounded-xl bg-white transition-all ${
+                            expandedQrSlug === restaurant.slug ? "h-40 w-40 p-2" : "h-[72px] w-[72px] p-1.5"
+                          }`}
                         />
                         <span className="text-[10px] font-semibold tracking-[0.18em] text-gray-400 uppercase">
                           {tx("scanToOpen")}
                         </span>
-                      </div>
+                      </button>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2">
                       <span className="rounded-full border border-white/10 bg-white/4 px-3 py-1 text-xs text-gray-300">
-                        {restaurant.cuisine}
+                        {cuisineLabel(restaurant.cuisine)}
                       </span>
                       <span className="rounded-full border border-white/10 bg-white/4 px-3 py-1 text-xs text-gray-300">
                         {restaurant.district}
@@ -378,27 +432,23 @@ export default function HomeClient({
                       </span>
                     </div>
 
-                    <div className="mt-4 flex flex-col gap-3 rounded-[24px] border border-white/8 bg-black/16 p-3">
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold tracking-[0.22em] text-gray-500 uppercase">
-                          {tx("directUrl")}
-                        </p>
-                        <p className="mt-1 break-all text-sm text-gray-300">{restaurant.restaurantUrl}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Link
-                          href={`/restaurants/${restaurant.slug}`}
-                          className="inline-flex min-h-[40px] items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gray-200"
-                        >
-                          {tx("restaurantPageBtn")}
-                        </Link>
-                        <Link
-                          href={`/pairing?restaurant=${restaurant.slug}`}
-                          className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/18"
-                        >
-                          {tx("pairingBtn")}
-                        </Link>
-                      </div>
+                    {/* Raw-URL panel removed: guests scan or tap, they never
+                        retype a URL (audit 2026-07). Secondary action is a
+                        gold-hairline outline - the old tinted fill read as a
+                        disabled button on the cream theme. */}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Link
+                        href={`/restaurants/${restaurant.slug}`}
+                        className="inline-flex min-h-[40px] items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-gray-200"
+                      >
+                        {tx("restaurantPageBtn")}
+                      </Link>
+                      <Link
+                        href={`/pairing?restaurant=${restaurant.slug}`}
+                        className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[#c79f69] bg-transparent px-4 py-2 text-sm font-semibold text-ink transition hover:bg-[#c79f69]/10"
+                      >
+                        {tx("pairingBtn")}
+                      </Link>
                     </div>
                   </article>
                 );
@@ -414,6 +464,30 @@ export default function HomeClient({
           </article>
         </section>
       </main>
+
+      {/* Site footer stays navy in BOTH themes: keep-dark opts out of the
+          light-theme surface shims (and restores text-gray-* to cream), the
+          inline gradient paints the navy that class-based backgrounds would
+          lose to the bg remap. mobile-safe-bottom clears the fixed tab bar. */}
+      <footer
+        className="keep-dark border-t border-[#c79f69]/40"
+        style={{ background: "linear-gradient(180deg, #0b1f44, #081634)" }}
+      >
+        <div className="mobile-safe-bottom mx-auto flex min-h-[120px] w-full max-w-7xl flex-col justify-center gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p className="pitch-display text-2xl text-white">Vinovigator AI</p>
+          <nav aria-label={tx("footer.navLabel")} className="flex flex-wrap gap-x-7 gap-y-2 text-sm">
+            <Link href="/samouczek" className="text-gray-300 underline-offset-4 transition hover:underline">
+              {tx("footer.tutorial")}
+            </Link>
+            <Link href="/pairing" className="text-gray-300 underline-offset-4 transition hover:underline">
+              {tx("footer.pairing")}
+            </Link>
+            <Link href="/pitch" className="text-gray-300 underline-offset-4 transition hover:underline">
+              {tx("footer.forRestaurants")}
+            </Link>
+          </nav>
+        </div>
+      </footer>
 
       <MobileTabBar />
     </div>

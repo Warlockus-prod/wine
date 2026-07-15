@@ -103,12 +103,12 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
               ? "Wina dopasowane do Twojego smaku"
               : filled === 0
                 ? "Ustaw Vinokompas, a wina pojawią się tutaj"
-                : "Jeszcze chwila - dobór się dostraja"}
+                : "Jeszcze chwila — dobór się dostraja"}
           </h3>
           <p className="mt-1.5 font-serif text-sm italic text-[#e6e1d6]">
             {enough
-              ? `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach - im pełniejszy, tym pewniejszy dobór.`
-              : `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`}
+              ? `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach — im pełniejszy, tym pewniejszy dobór.`
+              : `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) — masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`}
           </p>
           {/* Profile-completeness meter - richness toward a confident match. */}
           <div
@@ -138,7 +138,12 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
 
       {enough ? (
         <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-          {matches.map(({ wine, matchPct }, i) => (
+          {matches.map(({ wine, matchPct }, i) => {
+            // Two grape entries can share a verbatim why_pl — showing the
+            // identical italic blurb twice reads templated, so suppress a
+            // card's blurb when it string-matches the previous card's.
+            const showWhy = i === 0 || wine.why_pl !== matches[i - 1].wine.why_pl;
+            return (
             <li key={wine.id} className="vk-rise" style={{ animationDelay: `${i * 80}ms` }}>
               <a
                 href={winnicaWineUrl(wine)}
@@ -187,9 +192,11 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
                     </p>
                   </div>
                 </div>
-                <p className="font-serif text-[13px] leading-snug text-[#e6e1d6] italic">
-                  {wine.why_pl}
-                </p>
+                {showWhy ? (
+                  <p className="font-serif text-[13px] leading-snug text-[#e6e1d6] italic">
+                    {wine.why_pl}
+                  </p>
+                ) : null}
                 <div className="mt-auto flex items-center justify-between gap-2 border-t border-[rgba(199,159,105,0.16)] pt-3">
                   <span className="font-serif text-sm text-[#f4efe9]">
                     od {wine.priceFrom} zł
@@ -203,7 +210,8 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
                 </div>
               </a>
             </li>
-          ))}
+            );
+          })}
         </ul>
       ) : (
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -226,7 +234,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
         </div>
       )}
 
-      <p className="mt-4 text-[11px] leading-relaxed text-[#c79f69]/65">
+      <p className="mt-4 text-xs leading-relaxed text-[color:var(--color-accent-gold)]">
         Propozycje pochodzą z oferty{" "}
         <a
           href="https://winnica.pl/pl/"
@@ -236,7 +244,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
         >
           winnica.pl
         </a>{" "}
-        - twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
+        — twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
       </p>
     </div>
   );
@@ -261,11 +269,11 @@ function StageNav({
         const active = it.n === stage;
         const done = it.n < stage;
         return (
-          <li key={it.n}>
+          <li key={it.n} className="min-w-0">
             <button
               type="button"
               onClick={() => setStage(it.n)}
-              className={`group flex h-full w-full min-w-0 flex-col items-start gap-1 rounded-xl border px-3 py-3 text-left transition sm:px-4 ${
+              className={`group flex h-full w-full min-w-0 flex-col items-start gap-1 overflow-hidden rounded-xl border px-3 py-3 text-left transition sm:px-4 ${
                 active
                   ? "border-[var(--color-accent-gold)] bg-[var(--color-accent-gold)]/10"
                   : done
@@ -273,9 +281,11 @@ function StageNav({
                     : "border-white/10 bg-[#0b1f44]/30 hover:border-white/25"
               }`}
             >
-              <span className="flex items-center gap-2">
+              {/* Row 1: chip + "ETAP n" on ONE nowrap line — at 360-390px the
+                  digit used to wrap under "ETAP" (audit 2026-07). */}
+              <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap sm:gap-2">
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
                     active
                       ? "bg-[var(--color-accent-gold)] text-[#081634]"
                       : done
@@ -291,17 +301,18 @@ function StageNav({
                     it.n
                   )}
                 </span>
-                <span className={`font-serif text-xs italic tracking-wider ${active ? "text-[var(--color-accent-gold)]" : "text-[#e6e1d6]"}`}>
+                <span className={`text-[11px] tracking-wide sm:font-serif sm:text-xs sm:italic sm:tracking-wider ${active ? "text-[var(--color-accent-gold)]" : "text-[#e6e1d6]"}`}>
                   ETAP {it.n}
                 </span>
               </span>
-              {/* 13px on phones: Libre Baskerville "VINOKOMPAS" at 16px is
-                  118px wide and collided with the ETAP-2 tab at 360-390px
-                  (audit 2026-07 font-swap regression). */}
-              <span className={`font-serif text-[13px] italic whitespace-nowrap ${active ? "text-white" : done ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"} sm:text-lg`}>
+              {/* Row 2: plain sans 12px on phones — the serif italic + wide
+                  tracking made "WRAŻENIA" 90px wide inside a 73px tab and it
+                  clipped to "WRAŻENL" (audit 2026-07). Fancy styling returns
+                  from sm: up where the tabs have room. */}
+              <span className={`max-w-full truncate text-[12px] font-medium sm:font-serif sm:text-lg sm:font-normal sm:italic ${active ? "text-white" : done ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"}`}>
                 {it.label}
               </span>
-              <span className="text-[10px] tracking-wider text-[#c79f69]/65 uppercase sm:text-[11px]">
+              <span className="max-w-full truncate text-[10px] tracking-wider text-[#c79f69]/65 uppercase sm:text-[11px]">
                 {it.sub}
               </span>
             </button>
@@ -354,9 +365,11 @@ export default function StagedTutorial({
 
   return (
     <div>
-      {/* Top: stage tabs + chat toggle */}
+      {/* Top: stage tabs + chat toggle. On phones the tab strip takes the
+          whole row (basis-full) so labels stop bleeding across tab borders;
+          the Czat toggle wraps underneath. */}
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-full sm:basis-0">
           <StageNav stage={stage} setStage={setStage} />
         </div>
         <ChatToggle
@@ -370,12 +383,14 @@ export default function StagedTutorial({
         {/* Stage controls — rendered at the TOP and BOTTOM of the card
             (client review 2026-07: "przejście do kolejnych etapów powinno
             być i na górze i na dole"). Includes the profile reset that used
-            to live in the removed TWÓJ PROFIL chip bar. */}
+            to live in the removed TWÓJ PROFIL chip bar. The top strip is
+            desktop-only — on phones the pair doubled up within one screen. */}
         <StageControls
           stage={stage}
           goPrev={goPrev}
           goNext={goNext}
           onReset={() => onProfileChange({})}
+          placement="top"
           className="mb-6 border-b border-[rgba(199,159,105,0.20)] pb-5"
         />
 
@@ -407,22 +422,34 @@ export default function StagedTutorial({
 }
 
 // ─── stage controls strip (rendered top AND bottom of the card) ───────────
+// On phones only the BOTTOM strip renders (the doubled 4-button block ate a
+// screenful, audit 2026-07); desktop keeps both since they sit a viewport
+// apart. The bottom strip becomes a tidy 2-col grid on mobile: secondary
+// pair on one row, full-width primary below.
 function StageControls({
   stage,
   goPrev,
   goNext,
   onReset,
   className,
+  placement = "bottom",
 }: {
   stage: Stage;
   goPrev: () => void;
   goNext: () => void;
   onReset: () => void;
   className?: string;
+  placement?: "top" | "bottom";
 }) {
+  const rootDisplay =
+    placement === "top"
+      ? "hidden lg:flex"
+      : "grid grid-cols-2 lg:flex";
   return (
-    <div className={`flex flex-wrap items-center justify-between gap-3 ${className ?? ""}`}>
-      <div className="flex flex-wrap items-center gap-2">
+    <div className={`${rootDisplay} flex-wrap items-center justify-between gap-2 lg:gap-3 ${className ?? ""}`}>
+      {/* `contents` on mobile dissolves the group so each button becomes a
+          grid cell; from lg: the wrapper reforms the left-hand flex cluster. */}
+      <div className="contents lg:flex lg:flex-wrap lg:items-center lg:gap-2">
         {stage > 1 ? (
           <button
             type="button"
@@ -441,10 +468,12 @@ function StageControls({
             Pomiń etap, pokaż wina →
           </button>
         ) : null}
+        {/* At stage 2 all three secondary buttons exist — Wyzeruj drops to a
+            full-width row under the primary; at stages 1/3 it pairs up. */}
         <button
           type="button"
           onClick={onReset}
-          className="min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6]"
+          className={`min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 2 ? "order-last col-span-2 lg:order-none lg:col-auto" : ""}`}
         >
           Wyzeruj
         </button>
@@ -453,7 +482,7 @@ function StageControls({
         <button
           type="button"
           onClick={goNext}
-          className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
+          className="pitch-cta-primary col-span-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs lg:col-auto"
         >
           Następny etap
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
@@ -463,7 +492,7 @@ function StageControls({
       ) : (
         <Link
           href="/pairing"
-          className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
+          className="pitch-cta-primary col-span-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs lg:col-auto"
         >
           Pokaż wina
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
@@ -492,9 +521,9 @@ function StageSmak({
             as redundant chrome; the eyebrow + description carry the stage. */}
         <p className="pitch-eyebrow pitch-eyebrow--start">Etap I · Smak</p>
         <p className="mt-3 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
+          Kliknij jedną z trzech osi — <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong> lub{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> - im dalej od środka klikniesz,
+          <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> — im dalej od środka klikniesz,
           tym mocniejszy smak (0-5). Wskaźnik pod kołem od razu pokazuje, jak wytrawne jest Twoje wino.
         </p>
       </header>
@@ -531,7 +560,7 @@ function StageWrazenia({
           Sześć wrażeń
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Kliknij wybrane wrażenie na kole, aby ustawić jego siłę (0-5) - im dalej od środka, tym mocniej.
+          Kliknij wybrane wrażenie na kole, aby ustawić jego siłę (0-5) — im dalej od środka, tym mocniej.
           Obok pojawi się opis tego wrażenia. Nie wiesz od czego zacząć?{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> oprowadzi Cię po wszystkich sześciu.
         </p>
@@ -566,7 +595,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
 
       {/* Zone labels live in their own row so the marker can never collide
           with them. The centre is the dry/sweet boundary → "Półwytrawne". */}
-      <div className="mt-4 flex justify-between text-[9px] tracking-wider text-[#c79f69]/65 uppercase">
+      <div className="mt-4 flex justify-between text-xs tracking-wider text-[color:var(--color-accent-gold)] uppercase">
         <span>Bardzo wytrawne</span>
         <span className="hidden sm:inline">Półwytrawne</span>
         <span>Bardzo słodkie</span>
@@ -605,8 +634,8 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
       {/* Honest framing: the dryness score is a placeholder model derived from
           the 3 base smaki until the real Vinokompas wytrawność algorithm lands
           (see dryness() comment). Don't present it as authoritative. */}
-      <p className="mt-3 text-[10px] leading-snug text-[#c79f69]/55">
-        Szacunek na podstawie trzech smaków bazowych - model poglądowy; pełny algorytm wytrawności w przygotowaniu.
+      <p className="mt-3 text-xs leading-snug text-[color:var(--color-accent-gold)]">
+        Szacunek na podstawie trzech smaków bazowych — model poglądowy; pełny algorytm wytrawności w przygotowaniu.
       </p>
     </div>
   );
@@ -632,7 +661,7 @@ function StageAromaty({
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
           Tryb dla zaawansowanych: każde wrażenie ma dwa aromaty. Kliknij konkretny
-          aromat na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
+          aromat na kole, aby dostroić profil (0-5). Po prawej — pełny opis i skojarzenia
           każdej z 12. <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>

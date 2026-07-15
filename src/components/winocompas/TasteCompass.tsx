@@ -857,9 +857,13 @@ export default function TasteCompass({
             tendencji" (2026-07): one still-life photo per tendencja, orbiting
             just outside the dial at the tendencja's centre angle. Decorative
             (pointer-events none) so it never steals wedge clicks; images go
-            through /_next/image so 12 thumbs cost ~5KB each, not 300KB. */}
+            through /_next/image so 12 thumbs cost ~5KB each, not 300KB.
+            Each photo is framed as an inlaid medallion (parchment ring +
+            gold hairline + warm tint) and enters with a staggered fade+scale
+            via the .compass-medallion atom — keyed by level so re-entering
+            stage 2 retriggers the entrance. */}
         {level === 2 &&
-          SPOKES.map((s) => {
+          SPOKES.map((s, i) => {
             const img = SENSE_IMAGE_MAP[s.tendencja.id];
             if (!img) return null;
             const ringR = rOuter + 27;
@@ -868,10 +872,19 @@ export default function TasteCompass({
             const iy = cy - ringR * Math.cos(s.angle);
             const href = `/_next/image?url=${encodeURIComponent(img)}&w=96&q=75`;
             return (
-              <g key={`ring-${s.tendencja.id}`} pointerEvents="none" aria-hidden>
+              <g
+                key={`med-${i}-${level}`}
+                className="compass-medallion"
+                style={{ ["--mi" as string]: i }}
+                pointerEvents="none"
+                aria-hidden
+              >
                 <clipPath id={`${baseId}-ring-${s.tendencja.id.replace(".", "-")}`}>
                   <circle cx={ix} cy={iy} r={size / 2} />
                 </clipPath>
+                {/* Parchment backing ring — the "inlay" the photo sits in.
+                    Literal #f4efe9 (paper tone) so it reads on both themes. */}
+                <circle cx={ix} cy={iy} r={size / 2 + 3} fill="#f4efe9" />
                 <image
                   href={href}
                   x={ix - size / 2}
@@ -881,6 +894,8 @@ export default function TasteCompass({
                   preserveAspectRatio="xMidYMid slice"
                   clipPath={`url(#${baseId}-ring-${s.tendencja.id.replace(".", "-")})`}
                 />
+                {/* Warm gold tint unifies the mixed-palette photos. */}
+                <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.14)" />
                 <circle
                   cx={ix}
                   cy={iy}
@@ -888,6 +903,15 @@ export default function TasteCompass({
                   fill="none"
                   stroke="var(--gold-hairline)"
                   strokeWidth={1.2}
+                />
+                {/* Gold hairline sealing the parchment ring's outer edge. */}
+                <circle
+                  cx={ix}
+                  cy={iy}
+                  r={size / 2 + 3}
+                  fill="none"
+                  stroke="rgba(199,159,105,0.8)"
+                  strokeWidth={1}
                 />
               </g>
             );

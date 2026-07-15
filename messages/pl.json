@@ -44,7 +44,14 @@
     },
     "visible": "{count} widoczne",
     "loadingMap": "Ładowanie mapy…",
-    "europe": "Europa"
+    "europe": "Europa",
+    "tutorialCta": "Samouczek smaku",
+    "footer": {
+      "navLabel": "Stopka",
+      "tutorial": "Samouczek smaku",
+      "pairing": "Łączenie",
+      "forRestaurants": "Dla restauracji"
+    }
   },
   "restaurant": {
     "menuTitle": "Dania popisowe",
@@ -77,6 +84,7 @@
   "pairing": {
     "workspace": "Przestrzeń łączenia",
     "headline": "Wybierz danie. Wybierz wino. Przeczytaj uzasadnienie poniżej.",
+    "headlineShort": "Wybierz danie. Dopasuj wino.",
     "subheading": "Ekran ułożony jest jako dwie listy obok siebie. Wybór dania zmienia ranking win, wybór wina zmienia kolejność menu, a dolny panel działa jak czat bota - bez pola tekstowego.",
     "step1": "1 · Wybierz danie",
     "step2": "2 · Dopasuj wino",
@@ -100,10 +108,11 @@
     "budgetPick": "Wybór ekonomiczny",
     "noRankedWine": "Brak rankingu",
     "matchPercent": "{score}% dopasowania",
-    "fitPercent": "{score}% pasuje",
     "exploratory": "Do rozważenia",
     "manualSelection": "Wybór ręczny",
-    "matched": "{score}% trafione",
+    "matched": "{score}% dopasowania",
+    "resultBarCta": "Zobacz",
+    "resultBarDismiss": "Ukryj",
     "explanationKicker": "Uzasadnienie",
     "explanationLine": "Uzasadnienie pojawia się jako odpowiedź bota wyłącznie na podstawie zaznaczonych rekordów.",
     "menuItem": "Pozycja menu",

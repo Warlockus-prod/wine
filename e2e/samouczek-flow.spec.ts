@@ -36,6 +36,19 @@ const readProfile = (page: Page) =>
     PROFILE_KEY,
   );
 
+/** Switching stages changes the layout height above the wheel, which can
+ *  leave a wedge's bbox centre under the fixed mobile tab bar — a force
+ *  click would then land on the bar, not the wheel. Re-centre the dial
+ *  before interacting with sliders. */
+async function centerWheel(page: Page) {
+  await page.evaluate(() =>
+    document
+      .querySelector("#kompas svg.taste-compass-svg")
+      ?.scrollIntoView({ block: "center" }),
+  );
+  await page.waitForTimeout(300);
+}
+
 test("exactly three stages: Smak + Wrażenia + Aromaty", async ({ page }) => {
   await page.goto("/pl/samouczek", { waitUntil: "domcontentloaded" });
   // Tab accessible names include the whole label+sub text — match substrings.
@@ -63,6 +76,7 @@ test("base smak (stage 1) and wrażenie sector (stage 2) are independent", async
   await openCompass(page);
 
   // Stage 1 (SMAK): tap the SŁODYCZ wedge → base.slodycz set, no sector bleed.
+  await centerWheel(page);
   await page.getByRole("slider", { name: "SŁODYCZ", exact: true }).click({ force: true });
   await expect
     .poll(async () => (await readProfile(page))["base.slodycz"] ?? 0)
@@ -77,6 +91,7 @@ test("base smak (stage 1) and wrażenie sector (stage 2) are independent", async
   // Stage 2 (WRAŻENIA): tap the Świeże sector → wrażenie set, smak untouched.
   await page.getByRole("button", { name: /WRAŻENIA/i }).first().click();
   await page.waitForTimeout(1200);
+  await centerWheel(page);
   await page.getByRole("slider", { name: "Świeże", exact: true }).click({ force: true });
   await page.waitForTimeout(400);
   const afterSector = await readProfile(page);

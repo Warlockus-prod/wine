@@ -8,9 +8,10 @@ import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 
-// Page-aware sommelier chat - opens by default on /pairing so the user
-// can converse about whatever dish/wine they're inspecting. The
-// pageContext prop tells the bot what's on screen.
+// Page-aware sommelier chat - docked as a collapsed FAB on /pairing so it
+// never covers the wine ranking; the user expands it to converse about
+// whatever dish/wine they're inspecting. The pageContext prop tells the
+// bot what's on screen.
 const FloatingTasteChat = dynamic(() => import("@/components/winocompas/FloatingTasteChat"), {
   ssr: false,
 });
@@ -33,6 +34,61 @@ import type { PairingDish, PairingWine } from "@/types/pairing";
 type MatchDetails = {
   score: number;
   reason: string;
+};
+
+// Dish/wine tags are raw English vocabulary (wine.style, dish.category,
+// restaurant.cuisine and the sandbox seed tags) rendered straight onto the
+// cards — WHITE/CITRUS/TAPAS read as untranslated debris in the PL locale
+// (audit 2026-07 P2). Render-time dictionary; unknown DB-authored tags fall
+// back to the raw value rather than hiding the chip.
+const TAG_PL: Record<string, string> = {
+  // wine styles + adapter-derived aroma tags
+  white: "białe",
+  red: "czerwone",
+  rose: "różowe",
+  "rosé": "różowe",
+  sparkling: "musujące",
+  citrus: "cytrusowe",
+  mineral: "mineralne",
+  "red fruit": "czerwone owoce",
+  dry: "wytrawne",
+  "high acid": "wysoka kwasowość",
+  tannic: "taniczne",
+  bold: "wyraziste",
+  classic: "klasyczne",
+  delicate: "delikatne",
+  rich: "treściwe",
+  savory: "wytrawne",
+  peppery: "pieprzne",
+  // dish categories (sandbox seed + restaurant adapter)
+  starter: "przystawka",
+  main: "danie główne",
+  salad: "sałatka",
+  soup: "zupa",
+  grill: "z grilla",
+  fried: "smażone",
+  cold: "na zimno",
+  game: "dziczyzna",
+  raw: "na surowo",
+  garlic: "czosnek",
+  seafood: "owoce morza",
+  pasta: "makaron",
+  rice: "ryż",
+  vegetarian: "wegetariańskie",
+  // cuisines (restaurant adapter appends restaurant.cuisine to dish tags)
+  spanish: "kuchnia hiszpańska",
+  japanese: "kuchnia japońska",
+  "french classic": "kuchnia francuska",
+  "polish modern": "polska nowoczesna",
+  "peruvian nikkei": "peruwiańska nikkei",
+};
+
+const localizeTag = (tag: string, locale: Locale, kind: "dish" | "wine" = "dish") => {
+  if (locale !== "pl") return tag;
+  const key = tag.trim().toLowerCase();
+  // "Dessert" is both a wine style and a dish category — different PL words.
+  if (key === "dessert") return kind === "wine" ? "deserowe" : "deser";
+  return TAG_PL[key] ?? tag;
 };
 
 const buildFallbackMatchMap = (dish: PairingDish, wines: PairingWine[], locale: Locale) => {
@@ -141,6 +197,13 @@ export default function PairingClient({
   const firstClickTracked = useRef(false);
   const openTimestamp = useRef<number>(0);
   const wineListRef = useRef<HTMLDivElement | null>(null);
+  // Mobile feedback loop (audit 2026-07 P3): on a phone, tapping a dish
+  // re-ranks a wine list ~2200px below the thumb with zero feedback nearby.
+  // Tracks the LAST selection gesture so a sticky result bar above the
+  // tab-bar can answer immediately — dish tap → jump to the #1 wine card,
+  // wine tap → jump to the rationale panel. Null until the user acts (the
+  // auto-select effects below don't set it), null again when dismissed.
+  const [mobileResultSource, setMobileResultSource] = useState<"dish" | "wine" | null>(null);
 
   useEffect(() => {
     openTimestamp.current = performance.now();
@@ -453,6 +516,7 @@ export default function PairingClient({
     userPickedDishRef.current = true;
     setActiveDishId(dishId);
     setSelectedWineId(null);
+    setMobileResultSource("dish");
     trackEvent("pairing_dish_selected", {
       dish_id: dishId,
       source,
@@ -473,8 +537,16 @@ export default function PairingClient({
     }
   };
 
+  // "Zobacz →" on the mobile result bar. Dish gesture → the #1 wine card;
+  // wine gesture → the rationale section (both carry an id anchor below).
+  const scrollToMobileResult = () => {
+    const targetId = mobileResultSource === "wine" ? "pairing-explanation" : "pairing-top-wine";
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const selectWine = (wineId: string, source: "list" | "top-3") => {
     setSelectedWineId(wineId);
+    setMobileResultSource("wine");
     if (activeDish) {
       trackEvent("pairing_wine_selected", {
         dish_id: activeDish.id,
@@ -548,48 +620,59 @@ export default function PairingClient({
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-x-hidden px-4 pt-24 pb-8 sm:px-6 lg:px-8">
         <header className="mb-6 rounded-[28px] border border-white/10 bg-black/15 px-4 py-5 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-sm sm:px-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
                 {tx("workspace")}
               </p>
-              <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{tx("headline")}</h1>
-              <p className="mt-2 max-w-3xl text-sm text-gray-400 sm:text-base">
+              {/* Mobile gets the short headline; the full three-sentence form
+                  is desktop-only (audit 2026-07 P3: the hero ate ~1.5
+                  viewports at 390px before the first dish). */}
+              <h1 className="pitch-display mt-2 text-3xl text-white sm:text-4xl">
+                <span className="md:hidden">{tx("headlineShort")}</span>
+                <span className="hidden md:inline">{tx("headline")}</span>
+              </h1>
+              <p className="mt-2 hidden max-w-3xl text-sm text-gray-400 sm:text-base md:block">
                 {tx("subheading")}
               </p>
               {/* Explicit numbered steps so the flow is obvious (feedback:
-                  "nie jest jasne jak przejść do win"). */}
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase">
-                <span className="rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/12 px-3 py-1.5 text-[var(--color-accent-gold)]">{tx("step1")}</span>
-                <span aria-hidden className="text-gray-500">→</span>
-                <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-gray-200">{tx("step2")}</span>
-                <span aria-hidden className="text-gray-500">→</span>
-                <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-gray-200">{tx("step3")}</span>
+                  "nie jest jasne jak przejść do win"). Mobile: one compact
+                  horizontal row, no arrows; desktop wraps with arrows. */}
+              <div className="hide-scrollbar mt-4 flex items-center gap-2 overflow-x-auto text-[11px] font-semibold tracking-[0.14em] uppercase md:flex-wrap md:overflow-x-visible">
+                <span className="shrink-0 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/12 px-3 py-1.5 whitespace-nowrap text-[var(--color-accent-gold)]">{tx("step1")}</span>
+                <span aria-hidden className="hidden text-gray-500 md:inline">→</span>
+                <span className="shrink-0 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 whitespace-nowrap text-gray-200">{tx("step2")}</span>
+                <span aria-hidden className="hidden text-gray-500 md:inline">→</span>
+                <span className="shrink-0 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 whitespace-nowrap text-gray-200">{tx("step3")}</span>
               </div>
-              {restaurantContext ? (
-                <p className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-gray-200 uppercase">
-                  {tx("context", {
-                    name: t(restaurantContext.name, locale),
-                    city: restaurantContext.city,
-                  })}
-                </p>
-              ) : null}
+              {/* KONTEKST + AI status merged into a single meta line — they
+                  used to stack as two rows on mobile. */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {restaurantContext ? (
+                  <p className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-gray-200 uppercase">
+                    {tx("context", {
+                      name: t(restaurantContext.name, locale),
+                      city: restaurantContext.city,
+                    })}
+                  </p>
+                ) : null}
+                <span
+                  className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
+                    aiStatus === "loading"
+                      ? "bg-white/10 text-gray-300"
+                      : aiStatus === "fallback"
+                        ? "bg-amber-900/35 text-amber-300"
+                        : "bg-emerald-900/30 text-emerald-300"
+                  }`}
+                >
+                  {aiStatus === "loading"
+                    ? tx("aiAnalyzing")
+                    : aiStatus === "fallback"
+                      ? tx("fallbackMode")
+                      : tx("aiReady")}
+                </span>
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
-                  aiStatus === "loading"
-                    ? "bg-white/10 text-gray-300"
-                    : aiStatus === "fallback"
-                      ? "bg-amber-900/35 text-amber-300"
-                      : "bg-emerald-900/30 text-emerald-300"
-                }`}
-              >
-                {aiStatus === "loading"
-                  ? tx("aiAnalyzing")
-                  : aiStatus === "fallback"
-                    ? tx("fallbackMode")
-                    : tx("aiReady")}
-              </span>
               <button
                 type="button"
                 onClick={scrollToWineList}
@@ -605,14 +688,14 @@ export default function PairingClient({
           <section className="min-w-0 rounded-[30px] border border-white/10 bg-black/15 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-5">
             <div className="mb-4 flex items-end justify-between gap-3 border-b border-white/8 pb-4">
               <div>
-                <h2 className="text-2xl font-bold text-white">{tx("menu")}</h2>
+                <h2 className="pitch-display text-2xl text-white">{tx("menu")}</h2>
                 <p className="mt-1 text-sm text-gray-400">
                   {tx("reorderedFor", {
                     name: selectedWine ? t(selectedWine.name, locale) : tx("selectedWine"),
                   })}
                 </p>
               </div>
-              <span className="rounded-full bg-white/6 px-3 py-1 text-[11px] font-semibold text-gray-300">
+              <span className="rounded-full bg-white/6 px-3 py-1 text-[11px] font-semibold whitespace-nowrap text-gray-300">
                 {tx("dishesCount", { count: dishes.length })}
               </span>
             </div>
@@ -629,13 +712,17 @@ export default function PairingClient({
                     onClick={() => selectDish(dish.id, "cards")}
                     className={`group flex w-full items-start gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all duration-300 ${
                       isActive
-                        ? "active-dish-glow -translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_0_0_3px_rgba(199,159,105,0.20),0_18px_42px_rgba(199,159,105,0.32)]"
+                        ? "-translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_2px_0_rgba(156,117,54,0.15)]"
                         : "border-white/8 bg-black/18 opacity-80 hover:border-white/22 hover:opacity-100"
                     }`}
                   >
+                    {/* Radio grammar shared with the wine column: idle = ink
+                        outline, selected = gold fill + tiny scale-in. */}
                     <span
-                      className={`mt-5 h-3 w-3 shrink-0 rounded-full transition ${
-                        isActive ? "bg-primary shadow-[0_0_18px_rgba(199,159,105,0.85)]" : "bg-white/20"
+                      className={`mt-5 h-3 w-3 shrink-0 rounded-full transition-all duration-200 ${
+                        isActive
+                          ? "scale-110 border border-[#c79f69] bg-[#c79f69]"
+                          : "border-[1.5px] border-[color:var(--ink-muted)] bg-transparent"
                       }`}
                     />
 
@@ -665,7 +752,7 @@ export default function PairingClient({
                           </span>
                           {ranking ? (
                             <span className="mt-1 block text-[10px] font-semibold tracking-wide text-white/70 uppercase">
-                              {ranking.score}% fit
+                              {tx("matchPercent", { score: ranking.score })}
                             </span>
                           ) : null}
                         </div>
@@ -677,11 +764,11 @@ export default function PairingClient({
                             key={tag}
                             className={`rounded-full px-2 py-1 text-[10px] tracking-wide uppercase ${
                               isActive
-                                ? "border border-primary/35 bg-primary/12 text-primary"
+                                ? "border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/10 text-primary"
                                 : "border border-white/10 bg-white/4 text-gray-400"
                             }`}
                           >
-                            {tag}
+                            {localizeTag(tag, locale, "dish")}
                           </span>
                         ))}
                       </div>
@@ -699,18 +786,20 @@ export default function PairingClient({
             <div className="mb-4 border-b border-white/8 pb-4">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">{tx("wineList")}</h2>
+                  <h2 className="pitch-display text-2xl text-white">{tx("wineList")}</h2>
                   <p className="mt-1 text-sm text-gray-400">
                     {tx("rankedFor", { name: t(activeDish.name, locale) })}
                   </p>
                 </div>
-                <span className="rounded-full bg-primary/12 px-3 py-1 text-[11px] font-semibold text-primary">
+                <span className="rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/10 px-3 py-1 text-[11px] font-semibold whitespace-nowrap text-primary">
                   {tx("winesCount", { count: sortedWines.length })}
                 </span>
               </div>
             </div>
 
-            <div className="hide-scrollbar -mx-1.5 flex flex-col gap-3 px-1.5 py-1.5 lg:max-h-[62vh] lg:overflow-y-auto">
+            {/* pb-24 (mobile only): breathing room below the last card so the
+                floating chat FAB never parks on top of its price. */}
+            <div className="hide-scrollbar -mx-1.5 flex flex-col gap-3 px-1.5 pt-1.5 pb-24 lg:max-h-[62vh] lg:overflow-y-auto lg:pb-1.5">
               {sortedWines.map((wine) => {
                 const match = matchMap.get(wine.id);
                 const isMatch = Boolean(match);
@@ -729,12 +818,13 @@ export default function PairingClient({
                 // read as one consistent surface (the wine column used to be a
                 // dark panel with per-rank gold/blue/green tints that clashed
                 // with the light Menu column and hurt readability). Only the
-                // selected/best wine gets the gold highlight; the rest are
-                // neutral and theme-aware; rank is conveyed by the #1/#2/#3
-                // badge below, not the whole-card colour.
+                // selected/best wine gets the gold highlight (crisp hairline
+                // ring — the blurred glow smudged on parchment, audit 2026-07);
+                // the rest are neutral and theme-aware; rank is conveyed by
+                // the #1/#2/#3 badge below, not the whole-card colour.
                 const toneClass =
                   isSelected
-                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(199,159,105,0.30),0_18px_42px_rgba(199,159,105,0.22)] opacity-100"
+                    ? "-translate-y-0.5 border-2 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(156,117,54,0.12),0_2px_0_rgba(156,117,54,0.15)] opacity-100"
                     : isMatch
                       ? "border-2 border-white/8 bg-black/18 opacity-90 hover:border-white/22 hover:opacity-100"
                       : "border-2 border-white/6 bg-black/14 opacity-70 grayscale-[0.4] hover:opacity-100 hover:grayscale-0";
@@ -743,16 +833,19 @@ export default function PairingClient({
                   <button
                     key={wine.id}
                     type="button"
+                    // Anchor for the mobile result bar's "Zobacz →" jump.
+                    id={topRank === 1 ? "pairing-top-wine" : undefined}
                     onClick={() => selectWine(wine.id, "list")}
-                    className={`relative flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${toneClass}`}
+                    className={`relative flex w-full scroll-mt-24 items-start gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${toneClass}`}
                   >
+                    {/* Same radio grammar as the dish column: idle = ink
+                        outline, selected = gold fill + tiny scale-in (dots
+                        used to be inverted between the columns). */}
                     <span
-                      className={`mt-5 h-2.5 w-2.5 shrink-0 rounded-full transition ${
+                      className={`mt-5 h-3 w-3 shrink-0 rounded-full transition-all duration-200 ${
                         isSelected
-                          ? "bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]"
-                          : isMatch
-                            ? "bg-primary"
-                            : "bg-white/18"
+                          ? "scale-110 border border-[#c79f69] bg-[#c79f69]"
+                          : "border-[1.5px] border-[color:var(--ink-muted)] bg-transparent"
                       }`}
                     />
 
@@ -783,7 +876,7 @@ export default function PairingClient({
 
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         {match ? (
-                          <span className="rounded-full border border-primary/30 bg-primary/12 px-2 py-1 text-[10px] font-semibold tracking-wide text-primary uppercase">
+                          <span className="rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/10 px-2 py-1 text-[10px] font-semibold tracking-wide text-primary uppercase shadow-[0_2px_0_rgba(156,117,54,0.15)]">
                             {tx("matchPercent", { score: match.score })}
                           </span>
                         ) : (
@@ -807,21 +900,26 @@ export default function PairingClient({
         </div>
 
         {selectedWine ? (
-          <section className="mt-6 rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(199,159,105,0.18),transparent_28%),rgba(0,0,0,0.18)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-6">
+          <section
+            id="pairing-explanation"
+            className="mt-6 scroll-mt-24 rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(199,159,105,0.18),transparent_28%),rgba(0,0,0,0.18)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-6"
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
                   {tx("explanationKicker")}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-                  {t(activeDish.name, locale)} × {t(selectedWine.name, locale)}
+                {/* pitch-display styles the <em> as gold italic — the "× wine"
+                    half reads as the editorial counterpoint to the dish. */}
+                <h2 className="pitch-display mt-2 text-2xl text-white sm:text-3xl">
+                  {t(activeDish.name, locale)} <em>× {t(selectedWine.name, locale)}</em>
                 </h2>
                 <p className="mt-2 text-sm text-gray-400">{tx("explanationLine")}</p>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
                   resolvedSelectedWineMatch
-                    ? "bg-primary/15 text-primary"
+                    ? "border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/10 text-primary shadow-[0_2px_0_rgba(156,117,54,0.15)]"
                     : "bg-white/8 text-gray-300"
                 }`}
               >
@@ -887,7 +985,7 @@ export default function PairingClient({
             <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
               <article className="rounded-[28px] border border-primary/16 bg-black/15 p-5 backdrop-blur-sm">
                 <div className="flex items-center gap-3 border-b border-white/8 pb-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/18 text-primary">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/15 text-primary">
                     <Icon name="smart_toy" className="text-lg" />
                   </div>
                   <div>
@@ -898,8 +996,13 @@ export default function PairingClient({
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-3">
-                  <div className="max-w-[88%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
+                {/* Keyed on the pair so the four bubbles replay their staggered
+                    fade-up (~120ms apart, vk-rise handles reduced-motion) on
+                    every new dish×wine — the panel used to snap in as one
+                    static block. Presentation only: the explain fetch/cache
+                    above is untouched. */}
+                <div key={`${activeDish.id}|${selectedWine.id}`} className="mt-4 space-y-3">
+                  <div className="vk-rise max-w-[88%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
                     <p className="text-sm leading-6 text-gray-100">
                       {tx.rich("botCompare", {
                         dish: t(activeDish.name, locale),
@@ -909,7 +1012,7 @@ export default function PairingClient({
                     </p>
                   </div>
 
-                  <div className="max-w-[92%] rounded-[22px] rounded-bl-md border border-primary/20 bg-primary/10 px-4 py-3">
+                  <div className="vk-rise max-w-[92%] rounded-[22px] rounded-bl-md border border-[color:var(--gold-hairline-soft)] bg-[var(--color-accent-gold)]/8 px-4 py-3 [animation-delay:120ms]">
                     <p className="text-sm leading-6 text-gray-100">
                       {resolvedSelectedWineMatch
                         ? resolvedSelectedWineMatch.reason
@@ -918,14 +1021,22 @@ export default function PairingClient({
                   </div>
 
                   {(vinokompasLoading || vinokompasExplanation) ? (
-                    <div className="max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(199,159,105,0.32)] bg-[rgba(199,159,105,0.08)] px-4 py-3">
+                    <div className="vk-rise max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(199,159,105,0.32)] bg-[rgba(199,159,105,0.08)] px-4 py-3 [animation-delay:240ms]">
                       <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                         Vinokompas
                       </p>
                       {vinokompasLoading && !vinokompasExplanation ? (
-                        <p className="animate-pulse text-sm leading-6 text-gray-300">
-                          {locale === "pl" ? "Tłumaczę słownikiem Vinokompasu…" : "Translating into Vinokompas vocabulary…"}
-                        </p>
+                        /* Typing indicator - the AI text swaps in place inside
+                           this same bubble, so nothing below shifts. */
+                        <span
+                          role="status"
+                          aria-label={locale === "pl" ? "Bot pisze…" : "Bot is typing…"}
+                          className="inline-flex items-center gap-1.5 py-1.5"
+                        >
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--color-accent-gold)] motion-reduce:animate-none" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--color-accent-gold)] [animation-delay:150ms] motion-reduce:animate-none" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--color-accent-gold)] [animation-delay:300ms] motion-reduce:animate-none" />
+                        </span>
                       ) : (
                         <>
                           <p className="text-sm leading-6 text-gray-100">{vinokompasExplanation}</p>
@@ -959,7 +1070,7 @@ export default function PairingClient({
                     </div>
                   ) : null}
 
-                  <div className="max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3">
+                  <div className="vk-rise max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3 [animation-delay:360ms]">
                     <p className="text-sm leading-6 text-gray-100">
                       {tx("botServiceNote", {
                         temp: selectedWine.passport.servingTempC,
@@ -975,7 +1086,7 @@ export default function PairingClient({
                       key={tag}
                       className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[10px] tracking-wide text-gray-300 uppercase"
                     >
-                      {tag}
+                      {localizeTag(tag, locale, "wine")}
                     </span>
                   ))}
                 </div>
@@ -986,35 +1097,35 @@ export default function PairingClient({
                   {tx("winePassport")}
                 </p>
                 <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.grape")}</p>
-                    <p className="mt-1 text-white">{selectedWine.passport.grape}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.grape")}</p>
+                    <p className="mt-1 font-serif italic text-[#0b1f44]">{selectedWine.passport.grape}</p>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.abv")}</p>
-                    <p className="mt-1 text-white">{selectedWine.passport.abv}%</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.abv")}</p>
+                    <p className="mt-1 font-serif italic text-[#0b1f44]">{selectedWine.passport.abv}%</p>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.body")}</p>
-                    <p className="mt-1 text-white">{tx(`body.${selectedWine.passport.body}`)}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.body")}</p>
+                    <p className="mt-1 font-serif italic text-[#0b1f44]">{tx(`body.${selectedWine.passport.body}`)}</p>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.acidity")}</p>
-                    <p className="mt-1 text-white">{tx(`acidity.${selectedWine.passport.acidity}`)}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.acidity")}</p>
+                    <p className="mt-1 font-serif italic text-[#0b1f44]">{tx(`acidity.${selectedWine.passport.acidity}`)}</p>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.tannin")}</p>
-                    <p className="mt-1 text-white">{tx(`tannin.${selectedWine.passport.tannin}`)}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.tannin")}</p>
+                    <p className="mt-1 font-serif italic text-[#0b1f44]">{tx(`tannin.${selectedWine.passport.tannin}`)}</p>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-                    <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.serve")}</p>
-                    <p className="mt-1 text-white">{selectedWine.passport.servingTempC}°C</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.serve")}</p>
+                    <p className="mt-1 font-serif italic text-[#0b1f44]">{selectedWine.passport.servingTempC}°C</p>
                   </div>
                 </div>
 
-                <div className="mt-3 rounded-xl border border-white/10 bg-black/25 p-3">
-                  <p className="text-[10px] tracking-wider text-gray-400 uppercase">{tx("passport.decant")}</p>
-                  <p className="mt-1 text-sm text-gray-100">{localizeDecant(selectedWine.passport.decant, locale)}</p>
+                <div className="mt-3 rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
+                  <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.decant")}</p>
+                  <p className="mt-1 font-serif text-sm italic text-[#0b1f44]">{localizeDecant(selectedWine.passport.decant, locale)}</p>
                 </div>
               </article>
             </div>
@@ -1022,15 +1133,67 @@ export default function PairingClient({
         ) : null}
       </main>
 
+      {/* Mobile result bar — instant feedback next to the thumb after a
+          selection (the re-ranked list lives ~2200px lower at 390px). Navy
+          keep-dark strip pinned above the tab-bar; "Zobacz →" jumps to the
+          #1 wine card (dish tap) or the rationale panel (wine tap). Right
+          padding clears the chat FAB parked in the same corner. */}
+      {mobileResultSource && rankedMatches.best ? (
+        <div
+          className="keep-dark fixed inset-x-0 z-[35] border-t border-[color:var(--gold-hairline)] md:hidden"
+          style={{ bottom: "var(--mobile-tabbar-h)", background: "#0b1f44" }}
+        >
+          <div className="flex items-center gap-2 py-2 pr-[4.75rem] pl-4">
+            <p className="min-w-0 flex-1 truncate text-sm text-white">
+              <span aria-hidden className="text-[var(--color-accent-gold)]">★ </span>
+              <span className="font-semibold">
+                {t(
+                  (mobileResultSource === "wine" && selectedWine
+                    ? selectedWine
+                    : rankedMatches.best.wine
+                  ).name,
+                  locale,
+                )}
+              </span>
+              <span className="text-gray-300">
+                {" · "}
+                {mobileResultSource === "wine" && selectedWine
+                  ? (resolvedSelectedWineMatch?.score ?? rankedMatches.best.match.score)
+                  : rankedMatches.best.match.score}
+                %
+              </span>
+            </p>
+            <button
+              type="button"
+              onClick={scrollToMobileResult}
+              className="inline-flex min-h-[36px] shrink-0 items-center gap-1 rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/12 px-3 text-[11px] font-semibold tracking-[0.14em] whitespace-nowrap text-[var(--color-accent-gold)] uppercase"
+            >
+              {tx("resultBarCta")} →
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileResultSource(null)}
+              aria-label={tx("resultBarDismiss")}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:text-white"
+            >
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
+                <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <MobileTabBar />
 
-      {/* Page-aware sommelier chat - opens by default on /pairing. The
-          pageContext string is rebuilt every render so the bot always
-          knows the currently focused dish + wine + restaurant. Stored
+      {/* Page-aware sommelier chat - starts as a docked FAB (defaultCollapsed;
+          the auto-expanded panel used to cover the top of the wine column on
+          desktop). The pageContext string is rebuilt every render so the bot
+          always knows the currently focused dish + wine + restaurant. Stored
           conversation key is shared with the rest of the app so the
           history follows the user. */}
       <FloatingTasteChat
-        defaultOpen
+        defaultCollapsed
         pageContext={[
           restaurantContext
             ? `Restauracja: ${t(restaurantContext.name, locale)} (${restaurantContext.city}, ${restaurantContext.country}).`

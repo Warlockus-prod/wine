@@ -14,6 +14,10 @@ export function Faq({ items }: { items: Item[] }) {
         const open = i === openIndex;
         const buttonId = `${idBase}-q-${i}`;
         const panelId = `${idBase}-a-${i}`;
+        // Drop cap only when the opening word can carry it — a short opener
+        // like "Wy." left a giant "W" with an orphaned "y." (audit 2026-07 P3).
+        const dropcap =
+          (item.a.trim().split(/\s+/)[0] ?? "").replace(/[^\p{L}\p{N}]/gu, "").length >= 4;
         return (
           <li
             key={i}
@@ -49,7 +53,7 @@ export function Faq({ items }: { items: Item[] }) {
             >
               <div className="min-h-0 overflow-hidden">
                 <div className="pb-7 pl-[3.65rem] pr-12">
-                  <p className="pitch-dropcap text-base leading-relaxed text-[#d4cabc] sm:text-lg">
+                  <p className={`${dropcap ? "pitch-dropcap " : ""}text-base leading-relaxed text-[#d4cabc] sm:text-lg`}>
                     {item.a}
                   </p>
                 </div>
