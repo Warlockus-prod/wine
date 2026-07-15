@@ -39,7 +39,7 @@ const readProfile = (page: Page) =>
 test("exactly three stages: Smak + Wrażenia + Aromaty", async ({ page }) => {
   await page.goto("/pl/samouczek", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("button", { name: /^SMAK$/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: /WRAŻENIA/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /WRAŻENIA/i }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: /AROMATY/i })).toBeVisible();
   // The three stage tabs are the only buttons carrying an "ETAP <n>" marker.
   await expect(page.getByRole("button").filter({ hasText: /ETAP\s*\d/i })).toHaveCount(3);
@@ -71,7 +71,7 @@ test("base smak (stage 1) and wrażenie sector (stage 2) are independent", async
   ).toBe(false);
 
   // Stage 2 (WRAŻENIA): tap the Świeże sector → wrażenie set, smak untouched.
-  await page.getByRole("button", { name: /WRAŻENIA/i }).click();
+  await page.getByRole("button", { name: /WRAŻENIA/i }).first().click();
   await page.waitForTimeout(1200);
   await page.getByRole("slider", { name: "Świeże", exact: true }).click({ force: true });
   await page.waitForTimeout(400);
