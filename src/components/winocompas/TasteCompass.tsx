@@ -17,6 +17,7 @@
 
 import { useId, useMemo, useState, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 import { COMPASS_SECTORS, type CompassSector, type Tendencja } from "@/data/wine-compass-kb";
+import { SENSE_IMAGE_MAP } from "@/data/sense-images";
 
 export type Intensity = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-5
@@ -849,6 +850,46 @@ export default function TasteCompass({
                     ))
                   )}
                 </text>
+              </g>
+            );
+          })}
+
+        {/* Image ring — the client's "ramka wypełniona obrazkami wrażeń i
+            tendencji" (2026-07): one still-life photo per tendencja, orbiting
+            just outside the dial at the tendencja's centre angle. Decorative
+            (pointer-events none) so it never steals wedge clicks; images go
+            through /_next/image so 12 thumbs cost ~5KB each, not 300KB. */}
+        {level === 2 &&
+          SPOKES.map((s) => {
+            const img = SENSE_IMAGE_MAP[s.tendencja.id];
+            if (!img) return null;
+            const ringR = rOuter + 27;
+            const size = 40;
+            const ix = cx + ringR * Math.sin(s.angle);
+            const iy = cy - ringR * Math.cos(s.angle);
+            const href = `/_next/image?url=${encodeURIComponent(img)}&w=96&q=75`;
+            return (
+              <g key={`ring-${s.tendencja.id}`} pointerEvents="none" aria-hidden>
+                <clipPath id={`${baseId}-ring-${s.tendencja.id.replace(".", "-")}`}>
+                  <circle cx={ix} cy={iy} r={size / 2} />
+                </clipPath>
+                <image
+                  href={href}
+                  x={ix - size / 2}
+                  y={iy - size / 2}
+                  width={size}
+                  height={size}
+                  preserveAspectRatio="xMidYMid slice"
+                  clipPath={`url(#${baseId}-ring-${s.tendencja.id.replace(".", "-")})`}
+                />
+                <circle
+                  cx={ix}
+                  cy={iy}
+                  r={size / 2}
+                  fill="none"
+                  stroke="var(--gold-hairline)"
+                  strokeWidth={1.2}
+                />
               </g>
             );
           })}

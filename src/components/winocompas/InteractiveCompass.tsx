@@ -158,12 +158,22 @@ export default function InteractiveCompass({
     if (resumeRef.current) clearTimeout(resumeRef.current);
   }, []);
 
+  // Mobile "?" bottom-sheet with the focused item's description.
+  const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
+
   const tourId = tourActive ? tourIds[tourIdx] : null;
   // Priority: tour > hover > pinned. Tour wraps the others while playing;
   // outside of tour the pinned selection is baseline and hover provides
   // the live preview.
   const focusedId = tourId ?? hovered ?? pinnedId;
   const focused = useMemo(() => findFocus(focusedId), [focusedId]);
+  const focusedTitle = focused
+    ? focused.kind === "base"
+      ? focused.name
+      : focused.kind === "sektor"
+        ? focused.sector.name_pl
+        : focused.tendencja.name_pl
+    : "";
 
   // Pin whenever profile changes (i.e. user clicked a spoke / sektor / base).
   // Listens to ALL profile keys, including base.* and the per-tendencja ids,
@@ -304,46 +314,79 @@ export default function InteractiveCompass({
           </p>
         ) : null}
 
-        <p className="mt-3 text-center text-[11px] tracking-wider text-[#c79f69]/55 uppercase">
-          Najedź lub kliknij, aby ustawić intensywność
-        </p>
+        {/* "Najedź lub kliknij" hint + the TWÓJ PROFIL chip bar removed
+            2026-07 per client review — the wheel itself carries the state
+            and the chips duplicated it below the fold. */}
 
-        {/* Selected-profile bar - animated chips appear as the user clicks
-            spokes. Replaces TasteCompass's default legend (we hideLegend
-            because this is more on-brand and uses sektor colour swatches). */}
-        <SelectedProfileBar
-          profile={profile}
-          onClear={() => onProfileChange({})}
-          onPickHover={setHovered}
-        />
-
+        {/* Mobile: the always-on side panel is gone (client review) — a "?"
+            disclosure opens the description as a bottom sheet instead. */}
+        <div className="mt-3 w-full max-w-[440px] lg:hidden">
+          {focused ? (
+            <button
+              type="button"
+              onClick={() => setMobileInfoOpen(true)}
+              className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-[var(--gold-hairline)] px-4 py-2 text-[12px] font-semibold tracking-wider uppercase text-[var(--color-accent-gold)] transition hover:border-[var(--color-accent-gold)]"
+            >
+              <span
+                aria-hidden
+                className="flex h-5 w-5 items-center justify-center rounded-full border border-current text-[11px]"
+              >
+                ?
+              </span>
+              Co oznacza „{focusedTitle}”?
+            </button>
+          ) : null}
+        </div>
       </div>
 
-      {/* ── Side info panel ─────────────────────────────────────────── */}
+      {/* Mobile bottom-sheet with the focused description (replaces the
+          always-visible panel on phones). */}
+      {mobileInfoOpen && focused ? (
+        <div className="fixed inset-0 z-[80] flex items-end lg:hidden">
+          <button
+            type="button"
+            aria-label="Zamknij opis"
+            onClick={() => setMobileInfoOpen(false)}
+            className="absolute inset-0 bg-black/45"
+          />
+          <div
+            role="dialog"
+            aria-label={`Opis: ${focusedTitle}`}
+            className="relative max-h-[75dvh] w-full overflow-y-auto rounded-t-3xl border-t border-[var(--gold-hairline)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
+            style={{ background: "var(--surface-elevated)", color: "var(--ink)" }}
+          >
+            <button
+              type="button"
+              onClick={() => setMobileInfoOpen(false)}
+              aria-label="Zamknij"
+              className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--hairline-strong)] text-[var(--ink-soft)]"
+            >
+              ✕
+            </button>
+            <FocusedCard
+              key={`m-${focusedId ?? "idle"}`}
+              focused={focused}
+              profile={profile}
+              isTour={false}
+              onAskGuide={onAskGuide}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Side info panel — desktop only (mobile uses the "?" sheet).
+          Chrome is BRAND GOLD regardless of the focused sector (client
+          review 2026-07: drop the red accent). */}
       <aside
-        className="rounded-2xl border p-5 transition"
-        style={(() => {
-          const accent =
-            focused?.kind === "tendencja" || focused?.kind === "sektor"
-              ? focused.sector.color
-              : "var(--color-accent-gold)";
-          // Use the semantic surface vars so the panel flips dark/cream
-          // with the page. The accent overlay (sektor color at 0x1f) reads
-          // on both backgrounds; border tint stays themed.
-          return {
-            background: focused
-              ? `linear-gradient(180deg, ${
-                  focused.kind === "base" ? "rgba(199,159,105,0.12)" : accent + "1f"
-                }, transparent 70%), var(--surface-elevated)`
-              : "var(--surface-elevated)",
-            borderColor:
-              focused?.kind === "tendencja" || focused?.kind === "sektor"
-                ? `${focused.sector.color}55`
-                : "var(--gold-hairline)",
-            color: "var(--ink)",
-            boxShadow: "var(--shadow-card)",
-          };
-        })()}
+        className="hidden rounded-2xl border p-5 transition lg:block"
+        style={{
+          background: focused
+            ? "linear-gradient(180deg, rgba(199,159,105,0.12), transparent 70%), var(--surface-elevated)"
+            : "var(--surface-elevated)",
+          borderColor: "var(--gold-hairline)",
+          color: "var(--ink)",
+          boxShadow: "var(--shadow-card)",
+        }}
       >
         {/* SR announcement: the FULL description once per focus change. The
             visible TourText types char-by-char — keeping aria-live on the whole
@@ -503,10 +546,10 @@ function FocusedCard({
 }) {
   // Branch the visible content per focus kind so the same panel reads
   // sensibly at level 1 (base smaki), level 2 (sektor), or level 3 (full).
-  const accent =
-    focused.kind === "tendencja" || focused.kind === "sektor"
-      ? focused.sector.color
-      : "#c79f69";
+  // Panel chrome stays BRAND CAMEL for every sector — the client asked to
+  // drop the sector-coloured (esp. red) accent from this card (2026-07);
+  // sector colours live on the wheel only.
+  const accent = "#c79f69";
 
   // Title + subtitle vary per kind
   const eyebrow =
@@ -734,112 +777,6 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
   );
 }
 
-// ─── selected profile bar ────────────────────────────────────────────────
-// Sits under the compass; surfaces the user's accumulated picks as a chip
-// row. Mirrors what TasteCompass's old `<CompassLegend>` did but uses
-// editorial typography and includes base smaki (slodycz/cierpkosc/
-// kwasowosc) when set. Hovering a chip rebroadcasts hover to the compass
-// via the parent (so the spoke pulses).
-function SelectedProfileBar({
-  profile,
-  onClear,
-  onPickHover,
-}: {
-  profile: CompassProfile;
-  onClear: () => void;
-  onPickHover: (id: string | null) => void;
-}) {
-  const tendencjaPicks = COMPASS_SECTORS.flatMap((s) =>
-    s.tendencje
-      .map((t) => ({
-        id: t.id,
-        label: t.shortLabel_pl ?? t.name_pl,
-        color: s.color,
-        intensity: (profile[t.id] ?? 0) as number,
-      }))
-      .filter((p) => p.intensity > 0),
-  ).sort((a, b) => b.intensity - a.intensity);
-
-  const basePicks = BASE_TASTES.map((b) => ({
-    id: `base.${b.id}`,
-    label: b.name_pl,
-    intensity: (profile[`base.${b.id}`] ?? 0) as number,
-  })).filter((p) => p.intensity > 0);
-
-  const total = tendencjaPicks.length + basePicks.length;
-
-  if (total === 0) {
-    return (
-      <p className="mt-5 text-center font-serif text-xs italic text-[var(--color-accent-gold)] opacity-75">
-        Twój profil pojawi się tutaj - wskaż intensywność dotykiem koła.
-      </p>
-    );
-  }
-
-  return (
-    <div className="mt-5 w-full max-w-[440px] rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#0b1f44]/55 p-3">
-      <div className="mb-2 flex items-baseline justify-between gap-2 px-1">
-        <p className="text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
-          Twój profil · {total}
-        </p>
-        <button
-          type="button"
-          onClick={onClear}
-          className="rounded-full border border-rose-500/30 bg-rose-900/20 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-rose-300 uppercase transition hover:bg-rose-900/35"
-        >
-          Wyzeruj
-        </button>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-1.5">
-        {tendencjaPicks.map((p) => (
-          <span
-            key={p.id}
-            onMouseEnter={() => onPickHover(p.id)}
-            onMouseLeave={() => onPickHover(null)}
-            className="profile-chip inline-flex items-center gap-1.5 rounded-full border bg-[#122446]/70 px-2.5 py-1 text-[11px] text-[#f4efe9] transition hover:scale-105"
-            style={{ borderColor: `${p.color}66` }}
-          >
-            <span
-              aria-hidden
-              className="inline-block h-2 w-2 rounded-full"
-              style={{ background: p.color, boxShadow: `0 0 6px ${p.color}88` }}
-            />
-            <span className="font-serif italic">{p.label}</span>
-            <span className="ml-0.5 inline-flex gap-0.5" aria-hidden>
-              {[0, 1, 2, 3, 4].map((i) => (
-                <span
-                  key={i}
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: i < p.intensity ? p.color : "rgba(199,159,105,0.18)" }}
-                />
-              ))}
-            </span>
-          </span>
-        ))}
-
-        {basePicks.length > 0 ? (
-          <span className="mx-1 h-3 w-px bg-[var(--color-accent-gold)]/35" aria-hidden />
-        ) : null}
-
-        {basePicks.map((p) => (
-          <span
-            key={p.id}
-            className="profile-chip inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-2.5 py-1 text-[11px] text-[var(--color-accent-gold)]"
-          >
-            <span className="font-serif italic">{p.label}</span>
-            <span className="ml-0.5 inline-flex gap-0.5" aria-hidden>
-              {[0, 1, 2, 3, 4].map((i) => (
-                <span
-                  key={i}
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: i < p.intensity ? "var(--color-accent-gold)" : "rgba(199,159,105,0.20)" }}
-                />
-              ))}
-            </span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
+// (SelectedProfileBar removed 2026-07 per client review — the chip row
+// duplicated the wheel state below the fold; reset now lives in the stage
+// controls strip.)

@@ -367,54 +367,17 @@ export default function StagedTutorial({
 
       {/* Body */}
       <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#081634] p-5 sm:p-7">
-        {/* Stage controls - pinned at the TOP of the card so "next etap /
-            skip to wines" is always reachable without scrolling past the
-            tall compass dial (client: "muszę zjechać do nich, ten guzik
-            powinien być wyżej"). */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(199,159,105,0.20)] pb-5">
-          <div className="flex flex-wrap items-center gap-2">
-            {stage > 1 ? (
-              <button
-                type="button"
-                onClick={goPrev}
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
-              >
-                ← Poprzedni etap
-              </button>
-            ) : null}
-            {stage < 3 ? (
-              <button
-                type="button"
-                onClick={goNext}
-                className="rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
-              >
-                Pomiń etap, pokaż wina →
-              </button>
-            ) : null}
-          </div>
-          {stage < 3 ? (
-            <button
-              type="button"
-              onClick={goNext}
-              className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
-            >
-              Następny etap
-              <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
-                <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          ) : (
-            <Link
-              href="/pairing"
-              className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
-            >
-              Pokaż wina
-              <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
-                <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          )}
-        </div>
+        {/* Stage controls — rendered at the TOP and BOTTOM of the card
+            (client review 2026-07: "przejście do kolejnych etapów powinno
+            być i na górze i na dole"). Includes the profile reset that used
+            to live in the removed TWÓJ PROFIL chip bar. */}
+        <StageControls
+          stage={stage}
+          goPrev={goPrev}
+          goNext={goNext}
+          onReset={() => onProfileChange({})}
+          className="mb-6 border-b border-[rgba(199,159,105,0.20)] pb-5"
+        />
 
         {stage === 1 ? (
           <StageSmak
@@ -427,10 +390,87 @@ export default function StagedTutorial({
         ) : (
           <StageAromaty profile={profile} onProfileChange={onProfileChange} />
         )}
+
+        <StageControls
+          stage={stage}
+          goPrev={goPrev}
+          goNext={goNext}
+          onReset={() => onProfileChange({})}
+          className="mt-7 border-t border-[rgba(199,159,105,0.20)] pt-5"
+        />
       </div>
 
       {/* Live wine proposals - appear right below, update as the profile changes */}
       <InlineProposals profile={profile} />
+    </div>
+  );
+}
+
+// ─── stage controls strip (rendered top AND bottom of the card) ───────────
+function StageControls({
+  stage,
+  goPrev,
+  goNext,
+  onReset,
+  className,
+}: {
+  stage: Stage;
+  goPrev: () => void;
+  goNext: () => void;
+  onReset: () => void;
+  className?: string;
+}) {
+  return (
+    <div className={`flex flex-wrap items-center justify-between gap-3 ${className ?? ""}`}>
+      <div className="flex flex-wrap items-center gap-2">
+        {stage > 1 ? (
+          <button
+            type="button"
+            onClick={goPrev}
+            className="min-h-[40px] rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
+          >
+            ← Poprzedni etap
+          </button>
+        ) : null}
+        {stage < 3 ? (
+          <button
+            type="button"
+            onClick={goNext}
+            className="min-h-[40px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
+          >
+            Pomiń etap, pokaż wina →
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={onReset}
+          className="min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6]"
+        >
+          Wyzeruj
+        </button>
+      </div>
+      {stage < 3 ? (
+        <button
+          type="button"
+          onClick={goNext}
+          className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
+        >
+          Następny etap
+          <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
+            <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      ) : (
+        <Link
+          href="/pairing"
+          className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
+        >
+          Pokaż wina
+          <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
+            <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
+      )}
     </div>
   );
 }
