@@ -15,6 +15,13 @@ Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 - Seed templates live in `src/data/seed-restaurants.ts` and `src/data/seed-pairing.ts`; **canonical runtime data is Postgres**, seed runs idempotently on every deploy via `tsx scripts/db-seed.mts`.
 - Wine Compass methodology KB: `src/data/wine-compass-kb.ts` — used by `<TasteCompass>`, `/samouczek`, and as system prompt for the AI bots.
 
+## Design-system invariants (2026-07 pass — details in `docs/design-pass-2026-07.md`)
+
+- **Light cream theme is the shipped default** (`data-theme="light"` static on `<html>`). Global shims in `globals.css` remap `text-white`/`text-gray-*`/dark hex backgrounds/`border-white/*` for light mode. **Panels that stay navy** must use the `.keep-dark` class AND paint their background via inline style (shims can't match inline styles); inside `.keep-dark` the cream text/white-alpha borders/bright gold are restored automatically.
+- **`@theme inline` does NOT emit custom properties at runtime.** Hand-authored CSS that uses `var(--font-serif)`/`var(--font-display)` works only because runtime copies are declared on `:root` right after the `@theme` block — don't remove them, and don't reference new `@theme`-only tokens from authored CSS without adding a runtime copy.
+- `.pitch-cta-primary`/`.pitch-cta-ghost` are pill-shaped (one CTA language site-wide). Serif display = `.pitch-display` (Libre Baskerville); Franklin is body/UI only.
+- e2e `samouczek-flow` re-centres the wheel (`centerWheel`) after stage switches — stage-tab layout changes can put wedge bbox-centres under the fixed mobile tab bar and force-clicks then hit the bar.
+
 ## Validation gate
 
 Before any commit/push that will be deployed:
