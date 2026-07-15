@@ -463,24 +463,26 @@ function StageControls({
             ← Poprzedni etap
           </button>
         ) : null}
+        {/* Wyczyść BEFORE the long skip button: on the mobile 2-col grid the
+            short pair (Poprzedni/Wyczyść) shares one row and the long "Pokaż
+            dopasowane wina" gets its own full row — no 3-line wrap (audit
+            2026-07). At stage 1 Wyczyść has no partner, so it goes full-width. */}
+        <button
+          type="button"
+          onClick={onReset}
+          className={`min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 1 ? "col-span-2 lg:col-auto" : ""}`}
+        >
+          Wyczyść
+        </button>
         {stage < 3 ? (
           <button
             type="button"
             onClick={goNext}
-            className="min-h-[40px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
+            className="col-span-2 min-h-[40px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
           >
             Pokaż dopasowane wina →
           </button>
         ) : null}
-        {/* At stage 2 all three secondary buttons exist — Wyzeruj drops to a
-            full-width row under the primary; at stages 1/3 it pairs up. */}
-        <button
-          type="button"
-          onClick={onReset}
-          className={`min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 2 ? "order-last col-span-2 lg:order-none lg:col-auto" : ""}`}
-        >
-          Wyczyść
-        </button>
       </div>
       {stage < 3 ? (
         <button
@@ -542,7 +544,18 @@ function StageSmak({
           // Dryness meter directly under the compass on the same card — first
           // thing visible, updates live since `dr` is recomputed each render
           // in the parent.
-          belowCompass={<DrynessMeter score={dr.score} label={dr.label} />}
+          belowCompass={
+            <DrynessMeter
+              score={dr.score}
+              label={dr.label}
+              // No verdict before the user touches an axis — an all-zero
+              // profile scored "Wytrawne", contradicting the caption's
+              // "na podstawie WYBRANYCH proporcji" (audit 2026-07).
+              empty={!["base.slodycz", "base.cierpkosc", "base.kwasowosc"].some(
+                (k) => ((profile[k] ?? 0) as number) > 0,
+              )}
+            />
+          }
         />
       </div>
     </div>
@@ -593,7 +606,16 @@ function StageWrazenia({
   );
 }
 
-function DrynessMeter({ score, label }: { score: number; label: string }) {
+function DrynessMeter({
+  score,
+  label,
+  empty = false,
+}: {
+  score: number;
+  label: string;
+  /** True while no base smak is set — show a neutral prompt, hide the pin. */
+  empty?: boolean;
+}) {
   // Score 0..100 → marker position along the rail, clamped a touch off the
   // rounded ends so the pin never hangs into empty space at the extremes.
   const pos = Math.max(3, Math.min(97, score));
@@ -604,7 +626,11 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
           Twój profil wytrawności
         </p>
         <p className="font-serif text-base italic text-white" aria-live="polite">
-          {label}
+          {empty ? (
+            <span className="text-sm text-[#e6e1d6]/70">Zaznacz osie, aby zobaczyć profil</span>
+          ) : (
+            label
+          )}
         </p>
       </div>
 
@@ -631,7 +657,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
         {/* Position pin - a teardrop whose tip rests on the rail, marking
             the exact point. Reads as "you are here", not a button. */}
         <div
-          className="absolute top-1/2 transition-[left] duration-500 ease-out"
+          className={`absolute top-1/2 transition-[left,opacity] duration-500 ease-out ${empty ? "opacity-0" : "opacity-100"}`}
           style={{ left: `${pos}%`, transform: "translate(-50%, -100%)" }}
         >
           <svg width="19" height="24" viewBox="0 0 24 30" fill="none" aria-hidden>

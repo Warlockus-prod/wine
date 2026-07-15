@@ -308,9 +308,14 @@ export default function InteractiveCompass({
         {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
 
         {tourActive ? (
+          /* Level-aware vocabulary: etap 1 talks only about the 3 smaki —
+             "tendencja" is stage-3 jargon (client's guiding principle). */
           <p className="mt-2 max-w-[440px] text-center text-xs leading-snug text-[var(--ink-soft)]">
-            Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) —
-            kliknij koło, aby wybrać siłę.
+            {level === 1
+              ? "Każdy smak ustawiasz od 1 (ledwo wyczuwalny) do 5 (dominujący) — kliknij oś, aby wybrać siłę."
+              : level === 2
+                ? "Każde wrażenie ustawiasz od 1 (ledwo wyczuwalne) do 5 (dominujące) — kliknij koło, aby wybrać siłę."
+                : "Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) — kliknij koło, aby wybrać siłę."}
           </p>
         ) : null}
 
