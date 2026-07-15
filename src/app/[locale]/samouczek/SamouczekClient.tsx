@@ -83,31 +83,30 @@ export default function SamouczekClient() {
           aria-labelledby="hero-title"
           className="editorial-hero relative overflow-hidden rounded-[36px] border border-white/8 bg-[radial-gradient(circle_at_10%_20%,rgba(199,159,105,0.18),transparent_45%),radial-gradient(circle_at_90%_85%,rgba(199,159,105,0.18),transparent_45%),linear-gradient(180deg,#122a52_0%,#081634_100%)] px-5 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20"
         >
-          <span className="pitch-eyebrow pitch-eyebrow--start">Samouczek Vinokompas</span>
+          {/* Hero copy is the client's own (round-3 review, 2026-07) — keep
+              verbatim, incl. the "Vinocompas" brand spelling. The secondary
+              "Otwórz Pairing" button was explicitly dropped ("pomijamy"). */}
+          <span className="pitch-eyebrow pitch-eyebrow--start">Vinocompas AI</span>
           <h1
             id="hero-title"
             className="pitch-display mt-6 text-[clamp(2.2rem,6vw,4.4rem)] text-white"
           >
-            3 etapy.{" "}
-            <em className="block">Każde wino dopasowane.</em>
+            Poznaj swój <em className="block">winiarski gust.</em>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
-            Vinokompas to system, w którym każdy znajdzie swoje wino w 3 prostych krokach.
-            Zaczynasz od smaku, dorzucasz sześć wrażeń, a jeśli chcesz — dostrajasz dwanaście aromatów.
-            Po każdym etapie zobaczysz wina dopasowane do twojego profilu.
+            Nie musisz znać szczepów, regionów ani języka sommelierów.
+          </p>
+          <p className="mt-3 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
+            Vinocompas pomoże Ci odkryć, jakie wina naprawdę lubisz. W trzech prostych
+            krokach poznasz swój profil smakowy i otrzymasz wina dopasowane do Twojego gustu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            {/* rounded-full: the atom is square-cornered; the tutorial CTAs
-                below are pills, so this one matches them. */}
-            <a href="#kompas" className="pitch-cta-primary rounded-full">
-              Rozpocznij test
+            <a href="#kompas" className="pitch-cta-primary">
+              Rozpocznij
               <svg width="14" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
                 <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
-            <Link href="/pairing" className="pitch-cta-ghost">
-              Otwórz Pairing
-            </Link>
           </div>
           <p className="mt-8 max-w-md font-serif text-xs italic tracking-wide text-[var(--color-accent-gold)] opacity-80">
             Metoda za zgodą i w hołdzie Magdalenie Surgiel-Czyż / parfumealavin / vinocompas.pl

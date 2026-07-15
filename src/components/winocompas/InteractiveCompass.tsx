@@ -491,7 +491,7 @@ const INTENSITY_COMMENTS: Record<number, string> = {
   1: "Ledwo wyczuwalne — subtelny akcent w tle.",
   2: "Delikatne — lekko zaznaczone.",
   3: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
-  4: "Mocne — jeden z głównych charakterów Twojego wina.",
+  4: "Mocne — jedno z głównych wrażeń Twojego wina.",
   5: "Dominujące — definiuje styl, którego szukasz.",
 };
 
@@ -733,22 +733,37 @@ function FocusedCard({
 }
 
 function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: () => void }) {
-  const what =
-    level === 1
-      ? { count: 3, plural: "trzy smaki bazowe" }
-      : level === 2
-        ? { count: 6, plural: "sześć wrażeń" }
-        : { count: 12, plural: "dwanaście tendencji" };
+  // Client round-3 copy, per level: stage 1 = help framing + the "Smak"
+  // concept text; stage 2 = "Poznaj sześć wrażeń" concept text; stage 3
+  // keeps the generic help framing.
+  const isLevel2 = level === 2;
   return (
     <div>
-      <p className="pitch-eyebrow pitch-eyebrow--start">Vinokompas</p>
+      <p className="pitch-eyebrow pitch-eyebrow--start">Vinocompas</p>
       <h3 className="pitch-display mt-3 text-2xl text-white">
-        Najedź na koło lub<br />uruchom przewodnika
+        {isLevel2 ? "Poznaj sześć wrażeń" : "Potrzebujesz pomocy?"}
       </h3>
-      <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
-        Tarcza Vinokompasu pokaże opis każdego elementu. Możesz też pozwolić,
-        by przewodnik przeszedł przez {what.plural} automatycznie — wystarczy nacisnąć przycisk poniżej.
-      </p>
+      {isLevel2 ? (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
+            Wrażenie to sposób, w jaki nasz mózg interpretuje smak, zapach, strukturę
+            i skojarzenia powstające podczas kontaktu z winem.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
+            Najedź kursorem na wybrane wrażenie, aby zobaczyć jego opis. Możesz również
+            uruchomić przewodnik, który krok po kroku wyjaśni znaczenie wszystkich sześciu wrażeń.
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
+            Najedź kursorem na element Vinocompasu, aby poznać jego znaczenie.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
+            Lub uruchom przewodnik, który przeprowadzi Cię przez ten etap krok po kroku.
+          </p>
+        </>
+      )}
       <button
         type="button"
         onClick={onStartTour}
@@ -757,24 +772,43 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
         <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
           <path d="M3 2 L10 6 L3 10 Z" />
         </svg>
-        ▶ Uruchom przewodnika
+        Uruchom przewodnik
       </button>
+      {level === 1 ? (
+        <div className="mt-6 border-t border-[rgba(199,159,105,0.22)] pt-4">
+          <p className="text-sm leading-relaxed text-[#e6e1d6]">
+            Smak to punkt wyjścia w Vinocompasie. Większość z nas opisuje wino jako
+            wytrawne, półwytrawne czy słodkie. To dobry początek, ale trzy podstawowe
+            smaki nie wystarczą, aby opisać charakter wina ani odkryć Twój winiarski gust.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
+            Dlatego w Vinocompasie zaczynamy od trzech podstawowych smaków: słodyczy,
+            kwasowości i cierpkości. Ich wzajemne proporcje wpływają na to, jak
+            odbieramy wytrawność wina.
+          </p>
+        </div>
+      ) : null}
 
-      <ul className="mt-6 grid grid-cols-2 gap-2 text-[10px] tracking-wider uppercase">
-        {COMPASS_SECTORS.map((s) => (
-          <li
-            key={s.id}
-            className="flex items-center gap-1.5 rounded-md border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/60 px-2 py-1.5"
-          >
-            <span
-              aria-hidden
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ background: s.color }}
-            />
-            <span className="truncate text-[#e6e1d6]">{s.name_pl}</span>
-          </li>
-        ))}
-      </ul>
+      {/* Sector legend only where sectors are on the wheel — at level 1 the
+          six wrażenia haven't been introduced yet (etap 1 uczy wytrawności,
+          nie terminologii). */}
+      {level >= 2 ? (
+        <ul className="mt-6 grid grid-cols-2 gap-2 text-[10px] tracking-wider uppercase">
+          {COMPASS_SECTORS.map((s) => (
+            <li
+              key={s.id}
+              className="flex items-center gap-1.5 rounded-md border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/60 px-2 py-1.5"
+            >
+              <span
+                aria-hidden
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: s.color }}
+              />
+              <span className="truncate text-[#e6e1d6]">{s.name_pl}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

@@ -96,6 +96,33 @@ the stragglers, fixed in the follow-up commit:
 - Homepage map: explicit "Mapa jest niedostępna…" fallback when WebGL/token
   is unavailable (was a silent blank panel). Nav alpha 0.97 → 0.99.
 
+## Client copy round 3 (2026-07-16) — "Vinocompas AI teksty na stronę"
+
+The client delivered final Polish copy for /samouczek plus a guiding
+principle: *etap 1 uczy, że wytrawność to coś więcej niż cukier; etap 2 uczy
+rozpoznawania charakteru wina; etap 3 uczy zapamiętywania charakteru poprzez
+obrazy i skojarzenia* — the tutorial assumes NO wine knowledge, only taste,
+emotion and imagination. All texts below are the client's, verbatim
+(including the "Vinocompas" brand spelling on these surfaces):
+
+- Hero: eyebrow "Vinocompas AI", H1 "Poznaj swój winiarski gust", new lede,
+  CTA "Rozpocznij"; the secondary "Otwórz Pairing" hero button was dropped
+  ("pomijamy"). (`SamouczekClient.tsx`)
+- Stage 1: tab sub "3 osie smaku"; question-heading "Jak odbierasz smak wina,
+  które lubisz?" + short instruction; dryness meter renamed "Twój profil
+  wytrawności" with the client's caption. Stage 2: heading "Jaki charakter ma
+  wino, które lubisz?" + the "wrażenia opisują wino jako całość" intro.
+  Buttons: "Pokaż dopasowane wina", "Wyczyść". (`StagedTutorial.tsx`)
+- Right panel (IdleCard): level 1 = "Potrzebujesz pomocy?" + hover/guide
+  lines + the "Smak to punkt wyjścia…" concept block; level 2 = "Poznaj
+  sześć wrażeń" + concept text; button "Uruchom przewodnik"; sector legend
+  hidden at level 1; intensity 4/5 comment → "Mocne — jedno z głównych
+  wrażeń Twojego wina". (`InteractiveCompass.tsx`)
+- KB: the 3 axis descriptions (proportion-based wytrawność framing) and all
+  6 sector `long_pl` ("X to wrażenie kojarzące się z …") — these feed the
+  hover cards, the "PEŁNY OPIS WRAŻENIA" expandable AND the AI system
+  prompt, so the bot speaks the same language. (`wine-compass-kb.ts`)
+
 ## Guardrails honored
 
 - e2e contract kept: 3 stage tabs (/ETAP \d/i ×3), slider aria-labels,

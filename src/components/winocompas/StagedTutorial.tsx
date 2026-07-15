@@ -262,7 +262,7 @@ function StageNav({
   // smaki" truncated to "3 PODSTAWO…" next to tabs 2-3 that fit (audit
   // 2026-07). Full string returns from sm: up.
   const items: { n: Stage; label: string; sub: string; subShort: string }[] = [
-    { n: 1, label: "SMAK", sub: "3 podstawowe smaki", subShort: "3 smaki" },
+    { n: 1, label: "SMAK", sub: "3 osie smaku", subShort: "3 osie" },
     { n: 2, label: "WRAŻENIA", sub: "6 wrażeń", subShort: "6 wrażeń" },
     { n: 3, label: "AROMATY", sub: "12 aromatów", subShort: "12 aromatów" },
   ];
@@ -469,7 +469,7 @@ function StageControls({
             onClick={goNext}
             className="min-h-[40px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)]"
           >
-            Pomiń etap, pokaż wina →
+            Pokaż dopasowane wina →
           </button>
         ) : null}
         {/* At stage 2 all three secondary buttons exist — Wyzeruj drops to a
@@ -479,7 +479,7 @@ function StageControls({
           onClick={onReset}
           className={`min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 2 ? "order-last col-span-2 lg:order-none lg:col-auto" : ""}`}
         >
-          Wyzeruj
+          Wyczyść
         </button>
       </div>
       {stage < 3 ? (
@@ -521,14 +521,15 @@ function StageSmak({
   return (
     <div>
       <header>
-        {/* No standalone heading here — the client flagged "Trzy smaki bazowe"
-            as redundant chrome; the eyebrow + description carry the stage. */}
+        {/* Stage copy = the client's round-3 texts, verbatim. The question
+            heading replaces the old mechanics-first instruction ("etap 1 uczy,
+            że wytrawność to coś więcej niż cukier"). */}
         <p className="pitch-eyebrow pitch-eyebrow--start">Etap I · Smak</p>
-        <p className="mt-3 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Kliknij jedną z trzech osi — <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong> lub{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> — im dalej od środka klikniesz,
-          tym mocniejszy smak (0-5). Wskaźnik pod kołem od razu pokazuje, jak wytrawne jest Twoje wino.
+        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+          Jak odbierasz smak wina, które lubisz?
+        </h2>
+        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
+          Kliknij na każdej z trzech osi. Im dalej od środka, tym mocniej odczuwasz daną cechę.
         </p>
       </header>
 
@@ -560,13 +561,23 @@ function StageWrazenia({
     <div>
       <header>
         <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Wrażenia</p>
+        {/* Client round-3 copy, verbatim ("etap 2 uczy rozpoznawania
+            charakteru wina", not terminology). */}
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
-          Sześć wrażeń
+          Jaki charakter ma wino, które lubisz?
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Kliknij wybrane wrażenie na kole, aby ustawić jego siłę (0-5) — im dalej od środka, tym mocniej.
-          Obok pojawi się opis tego wrażenia. Nie wiesz od czego zacząć?{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> oprowadzi Cię po wszystkich sześciu.
+          Smak to dopiero początek.{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">
+            Wrażenia opisują, jak odbierasz wino jako całość.
+          </strong>{" "}
+          Dzięki nim łatwiej nazwać to, co czujesz podczas degustacji i znaleźć wina o podobnym charakterze.
+        </p>
+        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
+          Ustaw siłę każdego z sześciu wrażeń. Im dalej od środka, tym bardziej dane wrażenie
+          opisuje wino, które lubisz. Nie wiesz od czego zacząć?{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">Uruchom przewodnik</strong>{" "}
+          lub najedź kursorem na wybrane wrażenie.
         </p>
       </header>
 
@@ -590,7 +601,7 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
     <div className="mt-7 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44]/55 p-5">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
-          Wytrawność wina
+          Twój profil wytrawności
         </p>
         <p className="font-serif text-base italic text-white" aria-live="polite">
           {label}
@@ -635,11 +646,12 @@ function DrynessMeter({ score, label }: { score: number; label: string }) {
         </div>
       </div>
 
-      {/* Honest framing: the dryness score is a placeholder model derived from
-          the 3 base smaki until the real Vinokompas wytrawność algorithm lands
-          (see dryness() comment). Don't present it as authoritative. */}
+      {/* Client round-3 caption. The underlying score is still the 3-base-smak
+          placeholder model (see dryness() comment) — the copy frames it as a
+          profile readout, which is exactly what it is. */}
       <p className="mt-3 text-xs leading-snug text-[color:var(--color-accent-gold)]">
-        Szacunek na podstawie trzech smaków bazowych — model poglądowy; pełny algorytm wytrawności w przygotowaniu.
+        Na podstawie wybranych proporcji słodyczy, kwasowości i cierpkości Vinocompas pokazuje,
+        jak wytrawne jest wino o takim profilu.
       </p>
     </div>
   );

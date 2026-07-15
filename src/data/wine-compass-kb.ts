@@ -60,7 +60,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
     noun_pl: "Tęgość",
     short_pl: "Orientalne, ciepłe, ciężkie, intensywne, gęste i słodkie.",
     long_pl:
-      "To co jest tęgie jest też w odczuciach orientalne, ciepłe, ciężkie, intensywne, gęste i słodkie. Dwie tendencje: czekolada/kawa/tytoń oraz suszone owoce.",
+      "Tęgość to wrażenie kojarzące się z cierpkością wzbogaconą słodyczą. Przywodzi na myśl wszystko, co ciężkie, ciepłe i intensywne — kawę, czekoladę, tytoń i suszone owoce.",
     color: "#8a4b2a",
     tendencje: [
       {
@@ -89,7 +89,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
     noun_pl: "Miękkość",
     short_pl: "Skojarzenie z latem i przyjemnościami. Dojrzałe owoce i konfitury.",
     long_pl:
-      "Myślę, że z tym wrażeniem nie będziecie mieć problemów. To skojarzenie z latem i przyjemnościami. Tendencje: dojrzałe owoce i konfitury.",
+      "Miękkość to wrażenie kojarzące się ze słodyczą dopełnioną cierpkością. Przywodzi na myśl dojrzałe owoce, konfitury i wszystko, co łagodne, przyjemne i harmonijne.",
     color: "#e74c3c",
     tendencje: [
       {
@@ -118,7 +118,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
     noun_pl: "Oleistość",
     short_pl: "Wszystko co gęste, lepkie, słodkie i żywiczne.",
     long_pl:
-      "Znajdujemy tu wszystko co gęste, lepkie, słodkie i żywiczne. Mamy tu dwie tendencje: masłowość/tostowość/orzechy oraz owoce tropikalne.",
+      "Oleistość to wrażenie kojarzące się ze słodyczą wzbogaconą cierpkością. Kojarzy się z gęstością, kremowością, masłem, orzechami i owocami tropikalnymi.",
     color: "#f4c84a",
     tendencje: [
       {
@@ -147,7 +147,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
     noun_pl: "Świeżość",
     short_pl: "Wszystko co kwaśne, cierpkie, ale też odświeżające i rześkie. Łatwe skojarzenie to lemoniada albo zielony ogórek.",
     long_pl:
-      "Świeżość to wszystko to co kwaśne, cierpkie, ale też odświeżające i rześkie. Łatwe skojarzenie to lemoniada, albo zielony ogórek. Mamy tu dwie tendencje: zielone warzywa i owoce oraz cytrusy.",
+      "Świeżość to wrażenie kojarzące się z kwasowością złagodzoną słodyczą. Przywodzi na myśl cytrusy, lemoniadę, zielony ogórek i wszystko, co rześkie oraz soczyste.",
     color: "#9bc24a",
     tendencje: [
       {
@@ -175,7 +175,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
     noun_pl: "Ziemistość",
     short_pl: "Wyobraź sobie, że kładziesz się na ziemi: las, łąka, rzeka, świeża ziemia.",
     long_pl:
-      "Wrażenie ziemistości najłatwiej pojąć gdy wyobrazimy sobie, że kładziemy się na ziemi. Może to być las, łąka, okolice rzeki, trawnik, pole czy też świeżo wysypana ziemia. Mamy tu dwie tendencje: minerały oraz ściółka leśna.",
+      "Ziemistość to wrażenie kojarzące się z kwasowością pogłębioną cierpkością. Kojarzy się z minerałami, lasem, mokrą ziemią i ściółką leśną.",
     color: "#2c5d8e",
     tendencje: [
       {
@@ -204,7 +204,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
     noun_pl: "Szorstkość",
     short_pl: "Uczucie cierpkości, suchości na języku. Powąchaj skórę albo kawałek deski.",
     long_pl:
-      "Wrażenie szorstkości odpowiada za uczucie cierpkości, suchości na języku. Jak sobie je wyobrazić? Powąchajcie skórę, albo kawałek deski. Spróbujcie aronii albo cierpkiej, czarnej porzeczki, która aż ściąga całą buzię w dzióbek. Mamy tu dwie tendencje: piżmo/skóra oraz dąb/dym/garbniki.",
+      "Szorstkość to wrażenie kojarzące się z cierpkością podkreśloną kwasowością. Kojarzy się z uczuciem suchości i ściągania oraz skórą, drewnem i cierpkimi owocami.",
     color: "#5a2c5e",
     tendencje: [
       {
@@ -234,24 +234,26 @@ export interface BaseTasteInfo {
   description_pl: string;
 }
 
+// Axis descriptions are the client's round-3 texts (2026-07), verbatim —
+// they carry the "wytrawność to proporcje, nie cukier" framing of etap 1.
 export const BASE_TASTES: BaseTasteInfo[] = [
   {
     id: "slodycz",
     name_pl: "Słodycz",
     description_pl:
-      "Naturalny cukier resztkowy w winie. Od wytrawnych (brak słodyczy) po słodkie wina deserowe.",
+      "Słodycz odpowiada za wrażenie łagodności i pełni. Nie zawsze oznacza dużą ilość cukru — często sprawia po prostu, że wino wydaje się bardziej miękkie i mniej wytrawne. Jej proporcje względem kwasowości i cierpkości wpływają na odbiór wytrawności wina i pomagają budować jego profil smakowy.",
   },
   {
     id: "cierpkosc",
     name_pl: "Cierpkość",
     description_pl:
-      "Wrażenie ściągania na języku. W czerwonych winach pochodzi głównie od garbników (tanin), w białych może pochodzić od młodych owoców.",
+      "Cierpkość to uczucie delikatnego ściągania i suchości w ustach. Im jest wyższa, tym wino wydaje się bardziej wyraziste, zdecydowane i wytrawne. W połączeniu ze słodyczą i kwasowością buduje profil smakowy wina — to wzajemne proporcje tych trzech smaków decydują o jego charakterze.",
   },
   {
     id: "kwasowosc",
     name_pl: "Kwasowość",
     description_pl:
-      "„Świeżość”, ślinienie podniebienia. Wina o wysokiej kwasowości pijemy z radością — odświeżają jak lemoniada.",
+      "Kwasowość nadaje winu świeżość, lekkość i energię. To dzięki niej wino wydaje się bardziej rześkie, soczyste, a często również bardziej wytrawne. W połączeniu ze słodyczą i cierpkością wpływa na profil smakowy wina, nadając mu charakter i równowagę.",
   },
 ];
 
