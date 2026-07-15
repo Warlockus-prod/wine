@@ -123,6 +123,14 @@ emotion and imagination. All texts below are the client's, verbatim
   hover cards, the "PEŁNY OPIS WRAŻENIA" expandable AND the AI system
   prompt, so the bot speaks the same language. (`wine-compass-kb.ts`)
 
+A dedicated verification agent then confirmed all 8 round-3 checklist areas
+verbatim on production (both viewports) and flagged three polish items, fixed
+same-day: level-aware tour hint vocabulary (smak/wrażenie/tendencja — no
+stage-3 jargon at etap 1), a neutral "Zaznacz osie…" empty state for the
+dryness meter (an all-zero profile used to assert "Wytrawne"), and a
+full-width row for the long "Pokaż dopasowane wina" button on the mobile
+control grid (was wrapping to 3 lines).
+
 ## Guardrails honored
 
 - e2e contract kept: 3 stage tabs (/ETAP \d/i ×3), slider aria-labels,
