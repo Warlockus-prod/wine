@@ -66,5 +66,24 @@ export function matchWines(
   });
 
   scored.sort((a, b) => b.matchPct - a.matchPct);
-  return scored.slice(0, limit).filter((s) => s.matchPct > 0);
+
+  // The shop catalog lists the same label in several bottle formats
+  // ("Portillo Malbec" + "Portillo Malbec 37,5 cl") with identical
+  // fingerprints — two of three proposal slots went to one wine
+  // (audit 2026-07). Keep only the best-ranked entry per normalized label
+  // (volume suffixes stripped) so every slot is a distinct recommendation.
+  const seen = new Set<string>();
+  const distinct: ScoredWine[] = [];
+  for (const s of scored) {
+    const label = s.wine.name_pl
+      .toLowerCase()
+      .replace(/\b\d+([.,]\d+)?\s*(cl|ml|l)\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (seen.has(label)) continue;
+    seen.add(label);
+    distinct.push(s);
+    if (distinct.length === limit) break;
+  }
+  return distinct.filter((s) => s.matchPct > 0);
 }

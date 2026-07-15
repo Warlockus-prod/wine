@@ -120,9 +120,11 @@
     radial-gradient(circle at 90% 10%, rgba(199, 159, 105, 0.07), transparent 35%),
     linear-gradient(180deg, #f6f1e9 0%, #f1e9dd 100%);
 
-  /* Nav bar — frosted white. 0.97: at 0.92 dark map/wheel content ghosted
-     through the blur and the header read as a rendering bug (audit 2026-07). */
-  --nav-bg: rgba(255, 255, 255, 0.97);
+  /* Nav bar — frosted white. Near-opaque: at 0.92 dark map/wheel content
+     ghosted through the blur and the header read as a rendering bug; at 0.97
+     the samouczek hero credit line still showed through on mobile (audits
+     2026-07). 0.99 keeps a hint of frost without legible bleed-through. */
+  --nav-bg: rgba(255, 255, 255, 0.99);
   --nav-border: rgba(11, 31, 68, 0.08);
 }
 
@@ -685,9 +687,12 @@ body {
 
 .pitch-display {
   font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 0.96;
+  /* Libre Baskerville ships 400/700 only — an explicit 400 avoids the
+     synthetic-bold the old 500 could trigger now that the serif actually
+     applies (the var-scoping fix made these rules live for real). */
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
 }
 .pitch-display em {
   font-style: italic;
@@ -863,7 +868,13 @@ body {
 .vk-swap { animation: vk-swap-in 180ms ease-out both; }
 /* Gentle staggered rise — for wine-proposal cards appearing. */
 @keyframes vk-rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.vk-rise { animation: vk-rise-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+/* Delay via --vk-delay: the animation SHORTHAND resets animation-delay to 0s,
+   and this un-layered rule beats layered [animation-delay:…] utilities — so
+   per-element delays must come through the custom property, not a utility. */
+.vk-rise {
+  animation: vk-rise-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--vk-delay, 0ms);
+}
 @media (prefers-reduced-motion: reduce) {
   .vk-swap, .vk-rise { animation: none; }
 }

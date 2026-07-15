@@ -258,10 +258,13 @@ function StageNav({
   stage: Stage;
   setStage: (s: Stage) => void;
 }) {
-  const items: { n: Stage; label: string; sub: string }[] = [
-    { n: 1, label: "SMAK", sub: "3 podstawowe smaki" },
-    { n: 2, label: "WRAŻENIA", sub: "6 wrażeń" },
-    { n: 3, label: "AROMATY", sub: "12 aromatów" },
+  // subShort: the mobile slot is ~88px of tracked uppercase — "3 podstawowe
+  // smaki" truncated to "3 PODSTAWO…" next to tabs 2-3 that fit (audit
+  // 2026-07). Full string returns from sm: up.
+  const items: { n: Stage; label: string; sub: string; subShort: string }[] = [
+    { n: 1, label: "SMAK", sub: "3 podstawowe smaki", subShort: "3 smaki" },
+    { n: 2, label: "WRAŻENIA", sub: "6 wrażeń", subShort: "6 wrażeń" },
+    { n: 3, label: "AROMATY", sub: "12 aromatów", subShort: "12 aromatów" },
   ];
   return (
     <ol className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -313,7 +316,8 @@ function StageNav({
                 {it.label}
               </span>
               <span className="max-w-full truncate text-[10px] tracking-wider text-[#c79f69]/65 uppercase sm:text-[11px]">
-                {it.sub}
+                <span className="sm:hidden">{it.subShort}</span>
+                <span className="hidden sm:inline">{it.sub}</span>
               </span>
             </button>
           </li>

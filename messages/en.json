@@ -74,6 +74,7 @@
     "topThreeWines": "Top 3 wines from the cellar",
     "matchingWines": "Matching wines…",
     "activeDishHint": "wines on the right",
+    "activeDishHintMobile": "wines in the panel below",
     "tapToPair": "tap to pair",
     "district": "District",
     "menuStat": "Menu",

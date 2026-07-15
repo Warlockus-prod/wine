@@ -61,6 +61,41 @@ what changed and why, so the next pass doesn't re-litigate it.
   " - " untouched — e2e counts them), top control strip desktop-only,
   guide panel `self-start lg:sticky`.
 
+## Verification round (same day)
+
+A second 5-agent audit verified 39/43 checklist items fixed on live and caught
+the stragglers, fixed in the follow-up commit:
+
+- **Serif STILL broken after the runtime-copy fix**: custom properties
+  substitute their inner `var()`s at the element where they are *declared* —
+  the copies sat on `:root` (html) while next/font put
+  `--font-libre-baskerville` on `<body>`. Fix: the font variable classes moved
+  from `<body>` to `<html>` in `[locale]/layout.tsx`. `.pitch-display` now
+  explicitly `font-weight: 400` (Baskerville ships 400/700 only) with
+  re-tuned tracking/line-height for real serif glyphs.
+- **`.vk-rise` stagger was dead CSS**: the un-layered atom's `animation`
+  shorthand resets `animation-delay`, and un-layered beats the layered
+  `[animation-delay:…]` utilities. The atom now reads
+  `animation-delay: var(--vk-delay, 0ms)`; bubbles pass `--vk-delay` inline.
+- **/api/pairing/explain 401 → bubble unmounted**: now soft-fails IN PLACE
+  with a friendly PL/EN sentence (not cached). Root cause of the 401: the
+  production **OpenAI key is revoked at the provider** (verified: same
+  sk-proj… key 401s from container, VPS host and local dev). Rotating needs
+  a new key from the OpenAI dashboard → `.env.local` (local + VPS) + docker
+  container re-create (env is read at create).
+- Mobile result bar: score moved out of the truncating wine-name span.
+- Restaurant: mobile cue now says "wina w panelu poniżej" (the right rail is
+  lg-only); empty-state pairing panel renders nothing on mobile and hugs its
+  content on desktop.
+- Samouczek: proposal matcher dedupes bottle formats of the same label
+  (Portillo Malbec 37,5 cl); stage-1 tab shows "3 smaki" below sm;
+  wine-compass-kb display strings use em-dashes (20 strings).
+- Pitch: tier numerals `text-[0.72rem]!` (unlayered `.pitch-roman` beat the
+  plain utility), maroon `#1f1115` remnants → navy, curated tiles off the
+  `bg-primary/N` classes that picked up the light-shim's reddish glow.
+- Homepage map: explicit "Mapa jest niedostępna…" fallback when WebGL/token
+  is unavailable (was a silent blank panel). Nav alpha 0.97 → 0.99.
+
 ## Guardrails honored
 
 - e2e contract kept: 3 stage tabs (/ETAP \d/i ×3), slider aria-labels,

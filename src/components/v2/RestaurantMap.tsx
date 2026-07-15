@@ -5,7 +5,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { useLocale } from "next-intl";
 import { useTheme } from "next-themes";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { t } from "@/lib/localized";
 import type { Locale } from "@/i18n/routing";
 import type { CatalogRestaurant } from "@/lib/restaurant-directory";
@@ -34,6 +34,10 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
   const { resolvedTheme } = useTheme();
   const isLight = resolvedTheme === "light";
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // True when Mapbox can't start (no WebGL, missing/blocked token, init
+  // throw) - instead of a silent blank beige panel the guest gets a note
+  // and keeps the selected-restaurant card as the functional path.
+  const [mapUnavailable, setMapUnavailable] = useState(false);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const onSelectRef = useRef(onSelect);
@@ -58,10 +62,12 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
     if (!containerRef.current || mapRef.current) return;
     if (!TOKEN) {
       console.warn("Mapbox token missing - set NEXT_PUBLIC_MAPBOX_TOKEN");
+      setMapUnavailable(true);
       return;
     }
     if (!mapboxgl.supported || !mapboxgl.supported()) {
       console.warn("Mapbox-gl not supported in this environment (no WebGL).");
+      setMapUnavailable(true);
       return;
     }
 
@@ -79,6 +85,7 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
       });
     } catch (err) {
       console.warn("Mapbox init failed", err);
+      setMapUnavailable(true);
       return;
     }
 
@@ -211,7 +218,15 @@ export default function RestaurantMap({ restaurants, selectedSlug, onSelect }: P
       ref={containerRef}
       className="relative h-full w-full overflow-hidden rounded-[30px] border border-white/10"
       data-testid="restaurant-map"
-    />
+    >
+      {mapUnavailable ? (
+        <p className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm italic text-[color:var(--ink-soft)]">
+          {locale === "pl"
+            ? "Mapa jest niedostępna w tej przeglądarce — wybierz restaurację z listy poniżej."
+            : "The map is unavailable in this browser — pick a restaurant from the list below."}
+        </p>
+      ) : null}
+    </div>
   );
 }
 

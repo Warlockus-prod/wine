@@ -372,7 +372,10 @@ export default function RestaurantPageClient({
                       {isActive ? (
                         <p className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
                           <span aria-hidden>→</span>
-                          {tx("activeDishHint")}
+                          {/* The right rail is lg-only — on phones the wines
+                              live in the bottom sheet, so point there. */}
+                          <span className="lg:hidden">{tx("activeDishHintMobile")}</span>
+                          <span className="hidden lg:inline">{tx("activeDishHint")}</span>
                         </p>
                       ) : (
                         /* Tap affordance: navy ink at 12px + gold arrow. The

@@ -67,16 +67,24 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} data-theme="light" suppressHydrationWarning>
+    // Font variable classes live on <html>, NOT <body>: the runtime copies of
+    // --font-serif/--font-display in globals.css are declared on :root, and a
+    // custom property substitutes its inner var()s at the element where it is
+    // DECLARED — on <body> the tokens were invisible to :root and the whole
+    // serif display layer silently fell back to Franklin (audit 2026-07).
+    <html
+      lang={locale}
+      data-theme="light"
+      suppressHydrationWarning
+      className={`${libreFranklin.variable} ${libreBaskerville.variable}`}
+    >
       <head>
         {/* Icons are now inline SVG (src/components/v2/Icon.tsx) - no external
             icon font, so no FOUC / ligature-text flash on slow networks, and no
             Google-Fonts dependency. The display fonts are self-hosted via
             next/font. */}
       </head>
-      <body
-        className={`${libreFranklin.variable} ${libreBaskerville.variable} antialiased`}
-      >
+      <body className="antialiased">
         <ThemeProvider>
           <NextIntlClientProvider>
             <PwaRegister />

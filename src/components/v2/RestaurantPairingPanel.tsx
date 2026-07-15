@@ -243,10 +243,12 @@ export default function RestaurantPairingPanel({
     setMobileOpen(true);
   }, [activeDishId]);
 
-  // Empty state - no dish picked yet
+  // Empty state - no dish picked yet. Mobile renders nothing (the teaser bar
+  // ate ~86px next to the tab bar before the guest did anything); desktop
+  // keeps the quick-pick rail but hugs its content instead of 100dvh.
   if (!activeDish) {
     return (
-      <PanelShell mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}>
+      <PanelShell mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} hideMobile desktopFit>
         <PanelEmpty restaurantName={t(restaurant.name, lng)} dishes={restaurant.dishes} onPick={onActiveDishChange ?? (() => {})} lng={lng} />
       </PanelShell>
     );
@@ -460,6 +462,8 @@ function PanelShell({
   mobileOpen,
   setMobileOpen,
   peek,
+  hideMobile = false,
+  desktopFit = false,
 }: {
   children: React.ReactNode;
   mobileOpen: boolean;
@@ -467,12 +471,20 @@ function PanelShell({
   /** Tiny preview row shown in the collapsed mobile state - typically
    *  active dish thumb + #1 wine score. Click expands the sheet. */
   peek?: React.ReactNode;
+  /** Empty state: don't render the mobile sheet at all — before a dish is
+   *  picked the teaser bar just ate viewport next to the tab bar. */
+  hideMobile?: boolean;
+  /** Empty state: let the desktop rail hug its content instead of the fixed
+   *  100dvh height (which left a ~35% dead well under the quick-picks). */
+  desktopFit?: boolean;
 }) {
   return (
     <>
       {/* Desktop: fixed right column (lg+) */}
       <aside
-        className="fixed right-4 top-24 z-30 hidden h-[calc(100dvh-7rem)] w-[360px] flex-col overflow-hidden rounded-2xl border shadow-2xl lg:flex"
+        className={`fixed right-4 top-24 z-30 hidden w-[360px] flex-col overflow-hidden rounded-2xl border shadow-2xl lg:flex ${
+          desktopFit ? "max-h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-7rem)]"
+        }`}
         style={{
           background: "var(--surface-elevated)",
           borderColor: "var(--gold-hairline)",
@@ -486,7 +498,9 @@ function PanelShell({
       {/* Mobile: bottom sheet (peek + expand). Anchored above MobileTabBar.
           When collapsed, shows a preview row (active dish photo + name + #1
           wine score) so the user knows the panel has content without
-          having to expand it first. */}
+          having to expand it first. Not rendered at all in the empty state
+          (hideMobile) — see prop docs. */}
+      {hideMobile ? null : (
       <div className="fixed inset-x-0 bottom-[var(--mobile-tabbar-h)] z-30 lg:hidden">
         <button
           type="button"
@@ -531,6 +545,7 @@ function PanelShell({
           {children}
         </div>
       </div>
+      )}
     </>
   );
 }

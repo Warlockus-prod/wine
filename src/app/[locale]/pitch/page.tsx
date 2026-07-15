@@ -166,7 +166,7 @@ export default async function PitchPage({
         <div className="space-y-2 p-3">
           <p className="text-[9px] tracking-[0.22em] text-gray-500 uppercase">Curated</p>
           {["Riesling", "Pinot", "Champagne"].map((name) => (
-            <div key={name} className="flex items-start gap-2 rounded-lg border border-primary/24 bg-primary/8 p-2">
+            <div key={name} className="flex items-start gap-2 rounded-lg border border-[rgba(199,159,105,0.4)] bg-[rgba(199,159,105,0.10)] p-2">
               <span className="mt-0.5 inline-flex h-3 w-3 items-center justify-center rounded-sm border border-primary/60 bg-primary text-[8px] text-[color:var(--on-primary)]">
                 ✓
               </span>
@@ -375,7 +375,7 @@ export default async function PitchPage({
                 key={i}
                 className="group relative bg-[#081634] p-7 transition-colors duration-500 hover:bg-[#1c1014]"
               >
-                <span className="pitch-roman text-[0.72rem]">{String(i + 1).padStart(2, "0")}</span>
+                <span className="pitch-roman text-[0.72rem]!">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="pitch-display mt-4 text-xl text-white sm:text-2xl">{f.title}</h3>
                 <p className="mt-3 text-sm leading-[1.65] text-[#cbc1b1]">{f.body}</p>
                 <span
@@ -512,19 +512,19 @@ export default async function PitchPage({
                   key={i}
                   className={`relative flex flex-col rounded-3xl border p-8 transition-colors duration-500 ${
                     featured
-                      ? "lg:-translate-y-4 border-[rgba(199,159,105,0.55)] bg-[radial-gradient(circle_at_50%_0%,rgba(199,159,105,0.16),transparent_55%),linear-gradient(180deg,#1f1115,#081634)] shadow-[0_28px_70px_rgba(0,0,0,0.4)]"
+                      ? "lg:-translate-y-4 border-[rgba(199,159,105,0.55)] bg-[radial-gradient(circle_at_50%_0%,rgba(199,159,105,0.16),transparent_55%),linear-gradient(180deg,#0b1f44,#081634)] shadow-[0_28px_70px_rgba(0,0,0,0.4)]"
                       : "border-[rgba(199,159,105,0.32)] bg-[#081634] hover:border-[rgba(199,159,105,0.5)]"
                   }`}
                 >
                   {featured ? (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-[rgba(199,159,105,0.6)] bg-[#1f1115] px-3 py-1 text-[10px] font-semibold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-[rgba(199,159,105,0.6)] bg-[#0a1a3a] px-3 py-1 text-[10px] font-semibold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                       {tx("pricing.tier2Featured")}
                     </span>
                   ) : null}
 
                   {/* Arabic 01/02/03 like the feature grid — Roman numerals here
                       clashed with the chapter markers (audit 2026-07 P3). */}
-                  <span className="pitch-roman text-[0.72rem]">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="pitch-roman text-[0.72rem]!">{String(i + 1).padStart(2, "0")}</span>
                   <h3 className="pitch-display mt-3 text-3xl text-white">{tier.name}</h3>
 
                   <div className="mt-6 flex items-end gap-2">

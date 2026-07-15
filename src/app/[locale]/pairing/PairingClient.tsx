@@ -502,7 +502,16 @@ export default function PairingClient({
           setVinokompasExplanation(data.explanation);
         }
       } catch {
-        /* soft-fail: bubble doesn't render, regular reasons still shown */
+        // Soft-fail IN PLACE: unmounting the bubble mid-typing made the
+        // service note jump up (audit 2026-07). Render a graceful fallback
+        // sentence instead — not cached, so a later retry can still succeed.
+        if (!controller.signal.aborted) {
+          setVinokompasExplanation(
+            locale === "pl"
+              ? "Sommelier AI chwilowo odpoczywa — pełne uzasadnienie w języku Vinokompasu pojawi się przy następnej próbie."
+              : "The AI sommelier is taking a short break — the Vinokompas rationale will appear on the next try.",
+          );
+        }
       } finally {
         setVinokompasLoading(false);
       }
@@ -1012,7 +1021,10 @@ export default function PairingClient({
                     </p>
                   </div>
 
-                  <div className="vk-rise max-w-[92%] rounded-[22px] rounded-bl-md border border-[color:var(--gold-hairline-soft)] bg-[var(--color-accent-gold)]/8 px-4 py-3 [animation-delay:120ms]">
+                  <div
+                    className="vk-rise max-w-[92%] rounded-[22px] rounded-bl-md border border-[color:var(--gold-hairline-soft)] bg-[var(--color-accent-gold)]/8 px-4 py-3"
+                    style={{ ["--vk-delay" as string]: "120ms" }}
+                  >
                     <p className="text-sm leading-6 text-gray-100">
                       {resolvedSelectedWineMatch
                         ? resolvedSelectedWineMatch.reason
@@ -1021,7 +1033,10 @@ export default function PairingClient({
                   </div>
 
                   {(vinokompasLoading || vinokompasExplanation) ? (
-                    <div className="vk-rise max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(199,159,105,0.32)] bg-[rgba(199,159,105,0.08)] px-4 py-3 [animation-delay:240ms]">
+                    <div
+                      className="vk-rise max-w-[92%] rounded-[22px] rounded-bl-md border border-[rgba(199,159,105,0.32)] bg-[rgba(199,159,105,0.08)] px-4 py-3"
+                      style={{ ["--vk-delay" as string]: "240ms" }}
+                    >
                       <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
                         Vinokompas
                       </p>
@@ -1070,7 +1085,10 @@ export default function PairingClient({
                     </div>
                   ) : null}
 
-                  <div className="vk-rise max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3 [animation-delay:360ms]">
+                  <div
+                    className="vk-rise max-w-[84%] rounded-[22px] rounded-bl-md border border-white/10 bg-black/22 px-4 py-3"
+                    style={{ ["--vk-delay" as string]: "360ms" }}
+                  >
                     <p className="text-sm leading-6 text-gray-100">
                       {tx("botServiceNote", {
                         temp: selectedWine.passport.servingTempC,
@@ -1144,6 +1162,8 @@ export default function PairingClient({
           style={{ bottom: "var(--mobile-tabbar-h)", background: "#0b1f44" }}
         >
           <div className="flex items-center gap-2 py-2 pr-[4.75rem] pl-4">
+            {/* Score sits OUTSIDE the truncating name — long wine names were
+                swallowing the "· NN%" entirely (audit 2026-07). */}
             <p className="min-w-0 flex-1 truncate text-sm text-white">
               <span aria-hidden className="text-[var(--color-accent-gold)]">★ </span>
               <span className="font-semibold">
@@ -1155,14 +1175,13 @@ export default function PairingClient({
                   locale,
                 )}
               </span>
-              <span className="text-gray-300">
-                {" · "}
-                {mobileResultSource === "wine" && selectedWine
-                  ? (resolvedSelectedWineMatch?.score ?? rankedMatches.best.match.score)
-                  : rankedMatches.best.match.score}
-                %
-              </span>
             </p>
+            <span className="shrink-0 text-sm whitespace-nowrap text-gray-300">
+              {mobileResultSource === "wine" && selectedWine
+                ? (resolvedSelectedWineMatch?.score ?? rankedMatches.best.match.score)
+                : rankedMatches.best.match.score}
+              %
+            </span>
             <button
               type="button"
               onClick={scrollToMobileResult}
