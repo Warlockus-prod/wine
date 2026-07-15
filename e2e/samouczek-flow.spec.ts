@@ -38,7 +38,8 @@ const readProfile = (page: Page) =>
 
 test("exactly three stages: Smak + Wrażenia + Aromaty", async ({ page }) => {
   await page.goto("/pl/samouczek", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("button", { name: /^SMAK$/ })).toBeVisible();
+  // Tab accessible names include the whole label+sub text — match substrings.
+  await expect(page.getByRole("button", { name: /ETAP 1/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /WRAŻENIA/i }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: /AROMATY/i })).toBeVisible();
   // The three stage tabs are the only buttons carrying an "ETAP <n>" marker.
@@ -47,6 +48,9 @@ test("exactly three stages: Smak + Wrażenia + Aromaty", async ({ page }) => {
 
 test("compass renders the canonical Vinocompas sectors", async ({ page }) => {
   await openCompass(page);
+  // Sector sliders live on the level-2 wheel — stage 2 (WRAŻENIA).
+  await page.getByRole("button", { name: /WRAŻENIA/i }).first().click();
+  await page.waitForTimeout(1200);
   const labels = await page.evaluate(() =>
     [...document.querySelectorAll('[role="slider"]')].map((s) => s.getAttribute("aria-label") || ""),
   );
