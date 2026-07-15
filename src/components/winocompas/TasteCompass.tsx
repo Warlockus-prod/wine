@@ -208,11 +208,10 @@ export default function TasteCompass({
     [profile, setIntensity],
   );
 
-  // Geometry - viewBox 440 gives 20px breathing room on each side so the
-  // outermost labels (text-anchor=start at the east point) never clip out
-  // of the parent container at 390px viewport. Compass disc itself stays
-  // visually unchanged - only the SVG canvas is wider.
-  const VIEW = 440;
+  // Geometry - viewBox 480 gives breathing room for the level-2 image ring
+  // (rOuter+47) AND the base-axis labels pushed outside it (rOuter+58); all
+  // coordinates derive from VIEW so the whole dial recentres automatically.
+  const VIEW = 480;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;
@@ -943,7 +942,9 @@ export default function TasteCompass({
           // Labels sit just past the rim. Long ones (KWASOWOŚĆ at the
           // lower-left spoke) would clip the SVG edge on a ~390px viewport,
           // so clamp the centre inward to keep the whole text box on-canvas.
-          const labelR = rOuter + 28;
+          // At level 2 the image ring occupies rOuter+27±20, so the labels
+          // move outside it (rOuter+58) to avoid the CIERPKOŚĆ collision.
+          const labelR = level === 2 ? rOuter + 58 : rOuter + 28;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
