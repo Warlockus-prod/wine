@@ -88,12 +88,12 @@ export default function SamouczekClient() {
             id="hero-title"
             className="pitch-display mt-6 text-[clamp(2.2rem,6vw,4.4rem)] text-white"
           >
-            2 etapy.{" "}
+            3 etapy.{" "}
             <em className="block">Każde wino dopasowane.</em>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
-            Vinokompas to system, w którym każdy znajdzie swoje wino w 2 prostych krokach.
-            Najpierw ustawiasz smak i sześć wrażeń na kole, a jeśli chcesz - dostrajasz dwanaście aromatów.
+            Vinokompas to system, w którym każdy znajdzie swoje wino w 3 prostych krokach.
+            Zaczynasz od smaku, dorzucasz sześć wrażeń, a jeśli chcesz - dostrajasz dwanaście aromatów.
             Po każdym etapie zobaczysz wina dopasowane do twojego profilu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">

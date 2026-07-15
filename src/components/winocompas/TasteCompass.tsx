@@ -71,7 +71,12 @@ const buildSpokes = (): SpokeMeta[] => {
   let i = 0;
   for (const sector of COMPASS_SECTORS) {
     for (const t of sector.tendencje) {
-      const angle = -Math.PI / 2 + arc * i + arc / 2; // -π/2 = up
+      // Sector i STARTS at arc*i from 12 o'clock (centre at +arc/2): the base
+      // taste axes fall exactly on sector BOUNDARIES, as on the canonical
+      // Vinocompas wheel (CIERPKOŚĆ = Szorstkie/Tęgie border, SŁODYCZ =
+      // Miękkie/Oleiste, KWASOWOŚĆ = Świeże/Ziemiste). The old -π/2 offset
+      // shifted the grid half a sector, centring Miękkie on 12 o'clock.
+      const angle = arc * i + arc / 2;
       out.push({
         sector,
         tendencja: t,
@@ -375,7 +380,7 @@ export default function TasteCompass({
         {/* Sector wedges (background tint, full slice for both tendencje of a sector) */}
         {COMPASS_SECTORS.map((sector, sIdx) => {
           const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-          const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+          const angleCenter = arc * sIdx + arc / 2;
           const start = angleCenter - arc / 2;
           const end = angleCenter + arc / 2;
           return (
@@ -449,7 +454,7 @@ export default function TasteCompass({
           : level === 2
             ? COMPASS_SECTORS.map((sector, sIdx) => {
                 const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-                const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+                const angleCenter = arc * sIdx + arc / 2;
                 const start = angleCenter - arc / 2 + 0.01;
                 const end = angleCenter + arc / 2 - 0.01;
                 const intensity = sektorAvg(profile, sector.id);
@@ -482,7 +487,7 @@ export default function TasteCompass({
               if (sektor) {
                 const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
                 const sIdx = COMPASS_SECTORS.indexOf(sektor);
-                const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+                const angleCenter = arc * sIdx + arc / 2;
                 geo = {
                   start: angleCenter - arc / 2 + 0.01,
                   end: angleCenter + arc / 2 - 0.01,
@@ -558,7 +563,7 @@ export default function TasteCompass({
             if (sektor) {
               const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
               const sIdx = COMPASS_SECTORS.indexOf(sektor);
-              const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+              const angleCenter = arc * sIdx + arc / 2;
               return (
                 <path
                   d={annularPath(cx, cy, rInner, rOuter, angleCenter - arc / 2 + 0.01, angleCenter + arc / 2 - 0.01)}
@@ -657,7 +662,7 @@ export default function TasteCompass({
         {level === 2 &&
           COMPASS_SECTORS.map((sector, sIdx) => {
             const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-            const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+            const angleCenter = arc * sIdx + arc / 2;
             const start = angleCenter - arc / 2;
             const end = angleCenter + arc / 2;
             const value = sektorAvg(profile, sector.id);
@@ -853,7 +858,7 @@ export default function TasteCompass({
             a stronger weight at level 2 (where sektor IS the unit of work). */}
         {level >= 2 && COMPASS_SECTORS.map((sector, sIdx) => {
           const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-          const angleCenter = -Math.PI / 2 + arc * sIdx + arc / 2;
+          const angleCenter = arc * sIdx + arc / 2;
           const r = (rOuter + rInner) / 2 - 4;
           const x = cx + r * Math.sin(angleCenter);
           const y = cy - r * Math.cos(angleCenter);

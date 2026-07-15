@@ -1,18 +1,13 @@
 "use client";
 
 /**
- * StagedTutorial - 2-step Vinokompas wine-finding flow (merged from 3).
+ * StagedTutorial - 3-step Vinokompas wine-finding flow.
  *
- * Author's brief (Magdalena Surgiel-Czyż / Vinocompas):
- *   1) VINOKOMPAS - on ONE wheel: set the 3 base smaki (cierpkość, słodycz,
- *                   kwasowość) by tapping the rim labels - which drive the
- *                   wytrawność (dryness) meter - AND set the 6 wrażenia
- *                   (tęgość, miękkość, oleistość, świeżość, ziemistość,
- *                   szorstkość) by tapping the sector wedges.
- *   2) AROMATY    - advanced: fill the 12 tendencje (aromaty). Skip-able.
- *
- * (SMAK + WRAŻENIA were separate stages until the A1 merge; the pre-merge
- *  3-stage flow is tagged `samouczek-3stage-v1` for rollback.)
+ * Author's brief (Magdalena Surgiel-Czyż / Vinocompas). Three stages —
+ * restored 2026-07 at the client's request after trialling a 2-stage merge:
+ *   1) SMAK      - the 3 base smaki on the level-1 wheel + dryness meter.
+ *   2) WRAŻENIA  - the 6 sensations on the level-2 wheel.
+ *   3) AROMATY   - the 12 tendencje on the level-3 wheel.
  *
  * After every stage the user can preview matching wines without finishing
  * the rest of the flow. There is also a "Skip stage" button.
@@ -54,7 +49,7 @@ const InteractiveCompass = dynamic(() => import("./InteractiveCompass"), {
   ),
 });
 
-type Stage = 1 | 2;
+type Stage = 1 | 2 | 3;
 
 interface Props {
   profile: CompassProfile;
@@ -256,11 +251,12 @@ function StageNav({
   setStage: (s: Stage) => void;
 }) {
   const items: { n: Stage; label: string; sub: string }[] = [
-    { n: 1, label: "VINOKOMPAS", sub: "smaki + 6 wrażeń" },
-    { n: 2, label: "AROMATY", sub: "12 aromatów" },
+    { n: 1, label: "SMAK", sub: "3 podstawowe smaki" },
+    { n: 2, label: "WRAŻENIA", sub: "6 wrażeń" },
+    { n: 3, label: "AROMATY", sub: "12 aromatów" },
   ];
   return (
-    <ol className="grid grid-cols-2 gap-2 sm:gap-3">
+    <ol className="grid grid-cols-3 gap-2 sm:gap-3">
       {items.map((it) => {
         const active = it.n === stage;
         const done = it.n < stage;
@@ -336,8 +332,7 @@ export default function StagedTutorial({
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setStage(Number(v) as Stage);
       } else if (v === "3") {
-        // Legacy 3-stage value (AROMATY) → clamp to the new last stage.
-        setStage(2);
+        setStage(3);
       }
     } catch {
       /* ignore */
@@ -354,7 +349,7 @@ export default function StagedTutorial({
 
   const dr = useMemo(() => dryness(profile), [profile]);
 
-  const goNext = () => setStage((s) => (s < 2 ? ((s + 1) as Stage) : s));
+  const goNext = () => setStage((s) => (s < 3 ? ((s + 1) as Stage) : s));
   const goPrev = () => setStage((s) => (s > 1 ? ((s - 1) as Stage) : s));
 
   return (
@@ -387,7 +382,7 @@ export default function StagedTutorial({
                 ← Poprzedni etap
               </button>
             ) : null}
-            {stage < 2 ? (
+            {stage < 3 ? (
               <button
                 type="button"
                 onClick={goNext}
@@ -397,7 +392,7 @@ export default function StagedTutorial({
               </button>
             ) : null}
           </div>
-          {stage < 2 ? (
+          {stage < 3 ? (
             <button
               type="button"
               onClick={goNext}
@@ -422,11 +417,13 @@ export default function StagedTutorial({
         </div>
 
         {stage === 1 ? (
-          <StageVinokompas
+          <StageSmak
             profile={profile}
             onProfileChange={onProfileChange}
             dryness={dr}
           />
+        ) : stage === 2 ? (
+          <StageWrazenia profile={profile} onProfileChange={onProfileChange} />
         ) : (
           <StageAromaty profile={profile} onProfileChange={onProfileChange} />
         )}
@@ -438,8 +435,8 @@ export default function StagedTutorial({
   );
 }
 
-// ─── stage 1: VINOKOMPAS (smaki + 6 wrażeń on one wheel) ──────────────────
-function StageVinokompas({
+// ─── stage 1: SMAK (3 base tastes + dryness) ──────────────────────────────
+function StageSmak({
   profile,
   onProfileChange,
   dryness: dr,
@@ -451,46 +448,61 @@ function StageVinokompas({
   return (
     <div>
       <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap I · Vinokompas</p>
-        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
-          Smak i sześć wrażeń
-        </h2>
-        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Najpierw trzy smaki bazowe - <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong>,{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> - klikaj ich podpisy wokół koła,
-          aby ustawić siłę (0-5; kolejne kliknięcie zaczyna od zera). Wskaźnik pod kołem od razu pokazuje, jak wytrawne jest Twoje wino.
-          Potem klikaj <strong className="not-italic font-semibold text-[#f4efe9]">sześć wrażeń</strong> na samym kole, aby
-          dostroić profil. Nie wiesz od czego zacząć? Auto-przewodnik oprowadzi Cię po wszystkich sześciu.
+        {/* No standalone heading here — the client flagged "Trzy smaki bazowe"
+            as redundant chrome; the eyebrow + description carry the stage. */}
+        <p className="pitch-eyebrow pitch-eyebrow--start">Etap I · Smak</p>
+        <p className="mt-3 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
+          Kliknij jedną z trzech osi - <strong className="not-italic font-semibold text-[#f4efe9]">Słodycz</strong>,{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">Cierpkość</strong> lub{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">Kwasowość</strong> - im dalej od środka klikniesz,
+          tym mocniejszy smak (0-5). Wskaźnik pod kołem od razu pokazuje, jak wytrawne jest Twoje wino.
         </p>
       </header>
 
-      {/* Method cue: base smaki = taste (tongue), wrażenia = aroma (nose).
-          Keeps the Vinokompas tongue/nose distinction explicit even though
-          both now live on one wheel. */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-[#c79f69]/80">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-accent-gold)]" aria-hidden />
-          Podpisy wokół koła = <strong className="font-semibold text-[#e6e1d6]">smaki</strong> (język)
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-sm bg-[#8f9bb3]" aria-hidden />
-          Sektory koła = <strong className="font-semibold text-[#e6e1d6]">wrażenia</strong> (nos · aromaty)
-        </span>
+      <div className="mt-6">
+        <InteractiveCompass
+          profile={profile}
+          onProfileChange={onProfileChange}
+          level={1}
+          autoStartTour
+          // Dryness meter directly under the compass on the same card — first
+          // thing visible, updates live since `dr` is recomputed each render
+          // in the parent.
+          belowCompass={<DrynessMeter score={dr.score} label={dr.label} />}
+        />
       </div>
+    </div>
+  );
+}
+
+// ─── stage 2: WRAŻENIA (6 sensations) ─────────────────────────────────────
+function StageWrazenia({
+  profile,
+  onProfileChange,
+}: {
+  profile: CompassProfile;
+  onProfileChange: (next: CompassProfile) => void;
+}) {
+  return (
+    <div>
+      <header>
+        <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Wrażenia</p>
+        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+          Sześć wrażeń
+        </h2>
+        <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
+          Kliknij wybrane wrażenie na kole, aby ustawić jego siłę (0-5) - im dalej od środka, tym mocniej.
+          Obok pojawi się opis tego wrażenia. Nie wiesz od czego zacząć?{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> oprowadzi Cię po wszystkich sześciu.
+        </p>
+      </header>
 
       <div className="mt-6">
         <InteractiveCompass
           profile={profile}
           onProfileChange={onProfileChange}
           level={2}
-          baseInteractive
           autoStartTour
-          // Dryness meter directly under the compass on the same card - first
-          // thing visible, updates live as the user taps the base-smak labels
-          // (now clickable on the wheel via baseInteractive) since `dr` is
-          // recomputed each render in the parent.
-          belowCompass={<DrynessMeter score={dr.score} label={dr.label} />}
         />
       </div>
     </div>
@@ -574,7 +586,7 @@ function StageAromaty({
   return (
     <div>
       <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Aromaty</p>
+        <p className="pitch-eyebrow pitch-eyebrow--start">Etap III · Aromaty</p>
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
           Dwanaście aromatów
         </h2>

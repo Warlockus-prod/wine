@@ -36,12 +36,13 @@ const readProfile = (page: Page) =>
     PROFILE_KEY,
   );
 
-test("exactly two stages: Vinokompas + Aromaty (no legacy third)", async ({ page }) => {
+test("exactly three stages: Smak + Wrażenia + Aromaty", async ({ page }) => {
   await page.goto("/pl/samouczek", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("button", { name: /VINOKOMPAS/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^SMAK$/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /WRAŻENIA/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /AROMATY/i })).toBeVisible();
-  // The two stage tabs are the only buttons carrying an "ETAP <n>" marker.
-  await expect(page.getByRole("button").filter({ hasText: /ETAP\s*\d/i })).toHaveCount(2);
+  // The three stage tabs are the only buttons carrying an "ETAP <n>" marker.
+  await expect(page.getByRole("button").filter({ hasText: /ETAP\s*\d/i })).toHaveCount(3);
 });
 
 test("compass renders the canonical Vinocompas sectors", async ({ page }) => {
@@ -54,29 +55,28 @@ test("compass renders the canonical Vinocompas sectors", async ({ page }) => {
   }
 });
 
-test("base smak and wrażenie sector are independent on one wheel", async ({ page }) => {
+test("base smak (stage 1) and wrażenie sector (stage 2) are independent", async ({ page }) => {
   await openCompass(page);
 
-  // Tap the SŁODYCZ rim slider 3× → base.slodycz === 3, no sector bleed.
-  const slodycz = page.getByRole("slider", { name: "SŁODYCZ", exact: true });
-  for (let i = 0; i < 3; i++) {
-    await slodycz.click({ force: true });
-    await page.waitForTimeout(200);
-  }
+  // Stage 1 (SMAK): tap the SŁODYCZ wedge → base.slodycz set, no sector bleed.
+  await page.getByRole("slider", { name: "SŁODYCZ", exact: true }).click({ force: true });
   await expect
-    .poll(async () => (await readProfile(page))["base.slodycz"])
-    .toBe(3);
+    .poll(async () => (await readProfile(page))["base.slodycz"] ?? 0)
+    .toBeGreaterThan(0);
   const afterBase = await readProfile(page);
+  const slodyczValue = afterBase["base.slodycz"];
   expect(
     Object.keys(afterBase).some((k) => k.startsWith("swieze")),
     "base taps must not set any wrażenie",
   ).toBe(false);
 
-  // Tap the adjacent Świeże sector → wrażenie set, base.slodycz untouched.
+  // Stage 2 (WRAŻENIA): tap the Świeże sector → wrażenie set, smak untouched.
+  await page.getByRole("button", { name: /WRAŻENIA/i }).click();
+  await page.waitForTimeout(1200);
   await page.getByRole("slider", { name: "Świeże", exact: true }).click({ force: true });
   await page.waitForTimeout(400);
   const afterSector = await readProfile(page);
-  expect(afterSector["base.slodycz"], "sector tap must not change the base smak").toBe(3);
+  expect(afterSector["base.slodycz"], "sector tap must not change the base smak").toBe(slodyczValue);
   expect(
     Object.keys(afterSector).some((k) => k.startsWith("swieze")),
     "sector tap must set the wrażenie",
