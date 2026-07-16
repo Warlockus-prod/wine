@@ -890,7 +890,9 @@ export default function TasteCompass({
             const ringR = rOuter + (level === 2 ? 30 : 27);
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
-            const href = `/_next/image?url=${encodeURIComponent(arcImg)}&w=128&q=80`;
+            // q must stay 75 - Next 16 whitelists image qualities (default
+            // [75]) and any other value 400s ("q parameter not allowed").
+            const href = `/_next/image?url=${encodeURIComponent(arcImg)}&w=128&q=75`;
             const interactive = Boolean(onMedallionSelect);
             const pick = () => onMedallionSelect?.(s.tendencja.id);
             return (
