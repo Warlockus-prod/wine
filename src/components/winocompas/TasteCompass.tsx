@@ -154,6 +154,11 @@ interface Props {
    *  wrażenia be set on a single wheel. The base hit-areas sit OUTSIDE the
    *  sector wedges, so the two click layers never fight. */
   baseInteractive?: boolean;
+  /** Level-2 image-ring medallions: when provided, each medallion becomes a
+   *  real button (click/Enter → this callback with its tendencja id) and
+   *  bubbles hover through onHoverChange - "kliknij obrazek, zobacz opis"
+   *  (client 2026-07). Without it the ring stays decorative. */
+  onMedallionSelect?: (tendencjaId: string) => void;
 }
 
 // Sektor avg helper - fans the same value to both tendencje under a sektor.
@@ -177,6 +182,7 @@ export default function TasteCompass({
   hideLegend = false,
   level = 3,
   baseInteractive = false,
+  onMedallionSelect,
 }: Props) {
   const isControlled = profileProp !== undefined;
   const [internal, setInternal] = useState<CompassProfile>(() => defaultProfile ?? {});
@@ -871,13 +877,31 @@ export default function TasteCompass({
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             const href = `/_next/image?url=${encodeURIComponent(img)}&w=96&q=75`;
+            const interactive = Boolean(onMedallionSelect);
+            const pick = () => onMedallionSelect?.(s.tendencja.id);
             return (
               <g
                 key={`med-${i}-${level}`}
                 className="compass-medallion"
-                style={{ ["--mi" as string]: i }}
-                pointerEvents="none"
-                aria-hidden
+                style={{ ["--mi" as string]: i, cursor: interactive ? "pointer" : undefined }}
+                pointerEvents={interactive ? "auto" : "none"}
+                aria-hidden={interactive ? undefined : true}
+                {...(interactive
+                  ? {
+                      role: "button",
+                      tabIndex: 0,
+                      "aria-label": `Pokaż opis: ${s.tendencja.name_pl}`,
+                      onClick: pick,
+                      onKeyDown: (e: { key: string; preventDefault: () => void }) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          pick();
+                        }
+                      },
+                      onMouseEnter: () => onHoverChange?.(s.tendencja.id),
+                      onMouseLeave: () => onHoverChange?.(null),
+                    }
+                  : {})}
               >
                 <clipPath id={`${baseId}-ring-${s.tendencja.id.replace(".", "-")}`}>
                   <circle cx={ix} cy={iy} r={size / 2} />
@@ -893,14 +917,14 @@ export default function TasteCompass({
                   height={size}
                   preserveAspectRatio="xMidYMid slice"
                   clipPath={`url(#${baseId}-ring-${s.tendencja.id.replace(".", "-")})`}
-                  // The sense photos are dark low-key still lifes — at 44px
-                  // they read as black dots (client, 2026-07). Lift them so
-                  // the subject is recognizable at thumbnail size.
-                  style={{ filter: "brightness(1.55) saturate(1.25) contrast(1.05)" }}
+                  // The sense photos are dark low-key still lifes - at 44px
+                  // they read as black dots (client, 2026-07). Lift them hard
+                  // so the subject is recognizable at thumbnail size.
+                  style={{ filter: "brightness(1.8) saturate(1.3) contrast(1.06)" }}
                 />
                 {/* Whisper of warm tint - 0.14 muddied the already-dark
                     photos on top of the brightness lift. */}
-                <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.07)" />
+                <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.06)" />
                 <circle
                   cx={ix}
                   cy={iy}

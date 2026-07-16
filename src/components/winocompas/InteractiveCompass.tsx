@@ -316,6 +316,22 @@ export default function InteractiveCompass({
             }
             onHoverChange={setHovered}
             hideLegend
+            // Image-ring medallions are informative buttons: click pins the
+            // tendencja description; on phones (no side panel) it opens the
+            // bottom sheet right away (client 2026-07: "kliknij obrazek,
+            // zobacz informację").
+            onMedallionSelect={(id) => {
+              setPinnedId(id);
+              // Pause the auto-tour like any other interaction, otherwise the
+              // tour's own target would override the clicked medallion in the
+              // panel/sheet (tourId wins over pinnedId in focusedId).
+              setInterrupt(true);
+              if (resumeRef.current) clearTimeout(resumeRef.current);
+              resumeRef.current = setTimeout(() => setInterrupt(false), 8000);
+              if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                setMobileInfoOpen(true);
+              }
+            }}
           />
         </div>
         {/* Dryness meter - directly under the compass dial, above TWÓJ PROFIL. */}
