@@ -160,6 +160,11 @@ export default function InteractiveCompass({
 
   // Mobile "?" bottom-sheet with the focused item's description.
   const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
+  // Mobile "?" button: after a wedge tap it can rest under the fixed tab bar
+  // (320x568 measured 39 of its 44px occluded — taps landed on the bar).
+  // Nudge it into view whenever the focus target changes; scroll-mb on the
+  // button keeps it clear of the bar.
+  const mobileInfoBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const tourId = tourActive ? tourIds[tourIdx] : null;
   // Priority: tour > hover > pinned. Tour wraps the others while playing;
@@ -174,6 +179,15 @@ export default function InteractiveCompass({
         ? focused.sector.name_pl
         : focused.tendencja.name_pl
     : "";
+
+  // Keep the mobile "?" disclosure reachable: when the focus target changes
+  // on a phone, scroll it clear of the fixed tab bar (scroll-mb on the
+  // button provides the clearance; "nearest" avoids jumping when visible).
+  useEffect(() => {
+    if (!focusedId || typeof window === "undefined") return;
+    if (window.innerWidth >= 1024) return;
+    mobileInfoBtnRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [focusedId]);
 
   // Pin whenever profile changes (i.e. user clicked a spoke / sektor / base).
   // Listens to ALL profile keys, including base.* and the per-tendencja ids,
@@ -329,8 +343,9 @@ export default function InteractiveCompass({
           {focused ? (
             <button
               type="button"
+              ref={mobileInfoBtnRef}
               onClick={() => setMobileInfoOpen(true)}
-              className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-[var(--gold-hairline)] px-4 py-2 text-[12px] font-semibold tracking-wider uppercase text-[var(--color-accent-gold)] transition hover:border-[var(--color-accent-gold)]"
+              className="inline-flex min-h-[44px] w-full scroll-mb-[calc(var(--mobile-tabbar-h)+12px)] items-center justify-center gap-2 rounded-full border border-[var(--gold-hairline)] px-4 py-2 text-[12px] font-semibold tracking-wider uppercase text-[var(--color-accent-gold)] transition hover:border-[var(--color-accent-gold)]"
             >
               <span
                 aria-hidden
@@ -357,7 +372,7 @@ export default function InteractiveCompass({
           <div
             role="dialog"
             aria-label={`Opis: ${focusedTitle}`}
-            className="relative max-h-[75dvh] w-full overflow-y-auto rounded-t-3xl border-t border-[var(--gold-hairline)] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
+            className="relative max-h-[75dvh] w-full overflow-y-auto rounded-t-3xl border-t border-[var(--gold-hairline)] p-5 pt-4 pr-16 pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
             style={{ background: "var(--surface-elevated)", color: "var(--ink)" }}
           >
             <button

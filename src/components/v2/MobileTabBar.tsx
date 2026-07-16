@@ -26,7 +26,7 @@ export default function MobileTabBar() {
   return (
     <nav
       aria-label={tx("bottomNav")}
-      className="fixed right-0 bottom-0 left-0 z-[70] border-t border-white/10 bg-[#0b1f44cc] px-2 pt-2 pb-[calc(0.6rem+env(safe-area-inset-bottom))] backdrop-blur-md md:hidden"
+      className="fixed right-0 bottom-0 left-0 z-[70] h-[var(--mobile-tabbar-h)] border-t border-white/10 bg-[#0b1f44cc] px-2 pt-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
     >
       <ul className={`grid gap-1 ${tabs.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
         {tabs.map((tab) => {

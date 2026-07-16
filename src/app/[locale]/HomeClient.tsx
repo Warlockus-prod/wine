@@ -118,7 +118,7 @@ export default function HomeClient({
     <div className="min-h-screen bg-background-dark text-gray-100">
       <Navigation />
 
-      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+      <main className="mobile-safe-bottom mx-auto w-full max-w-7xl overflow-x-hidden px-4 pt-24 pb-16 sm:px-6 sm:pt-28 lg:px-8">
         <section className="rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(199,159,105,0.18),transparent_35%),rgba(255,255,255,0.03)] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.22)] sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="max-w-3xl">
@@ -128,7 +128,7 @@ export default function HomeClient({
               {/* pitch-display owns weight + tracking (Baskerville 400/700).
                   No <em> accent here: directoryTitle also feeds the metadata
                   <title>, so markup in the string would leak into the tab. */}
-              <h1 className="pitch-display mt-3 text-4xl text-white sm:text-5xl">
+              <h1 className="pitch-display mt-2 text-[1.9rem] text-white sm:mt-3 sm:text-5xl">
                 {tx("directoryTitle")}
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">
@@ -136,7 +136,7 @@ export default function HomeClient({
               </p>
               {/* Primary funnel: the tutorial converts curious guests better
                   than the raw directory, so it gets the one gold CTA. */}
-              <Link href="/samouczek" className="pitch-cta-primary mt-6">
+              <Link href="/samouczek" className="pitch-cta-primary mt-4 sm:mt-6">
                 {tx("tutorialCta")}
               </Link>
             </div>
@@ -146,15 +146,15 @@ export default function HomeClient({
                   must not push its numeral off the shared baseline. */}
               <div className="grid grid-cols-3 items-end gap-3 text-center">
                 <div>
-                  <p className="text-[11px] tracking-[0.2em] whitespace-nowrap text-gray-500 uppercase">{tx("statsRestaurants")}</p>
+                  <p className="text-[10px] leading-tight tracking-[0.1em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsRestaurants")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">{catalogRestaurants.length}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] tracking-[0.2em] whitespace-nowrap text-gray-500 uppercase">{tx("statsCities")}</p>
+                  <p className="text-[10px] leading-tight tracking-[0.1em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsCities")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">{cityOptions.length - 1}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] tracking-[0.2em] whitespace-nowrap text-gray-500 uppercase">{tx("statsQrReady")}</p>
+                  <p className="text-[10px] leading-tight tracking-[0.1em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsQrReady")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">100%</p>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export default function HomeClient({
                   // Theme-aware: var(--surface-elevated) flips to white on
                   // light theme, var(--ink) keeps text readable. Drops the
                   // hardcoded #081634f2 dark surface that punched a hole.
-                  className="rounded-2xl border px-4 py-3 text-sm"
+                  className="w-full min-w-0 rounded-2xl border px-4 py-3 text-sm"
                   style={{
                     background: "var(--surface-elevated)",
                     borderColor: "var(--gold-hairline-soft)",
@@ -408,7 +408,7 @@ export default function HomeClient({
                           level="M"
                           marginSize={0}
                           className={`shrink-0 rounded-xl bg-white transition-all ${
-                            expandedQrSlug === restaurant.slug ? "h-40 w-40 p-2" : "h-[72px] w-[72px] p-1.5"
+                            expandedQrSlug === restaurant.slug ? "h-32 w-32 p-2 sm:h-40 sm:w-40" : "h-[72px] w-[72px] p-1.5"
                           }`}
                         />
                         <span className="text-[10px] font-semibold tracking-[0.18em] text-gray-400 uppercase">

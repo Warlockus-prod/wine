@@ -971,9 +971,10 @@ export default function TasteCompass({
           // Labels sit just past the rim. Long ones (KWASOWOŚĆ at the
           // lower-left spoke) would clip the SVG edge on a ~390px viewport,
           // so clamp the centre inward to keep the whole text box on-canvas.
-          // At level 2 the image ring occupies rOuter+27±20, so the labels
-          // move outside it (rOuter+58) to avoid the CIERPKOŚĆ collision.
-          const labelR = level === 2 ? rOuter + 58 : rOuter + 28;
+          // At level 2 the image ring occupies rOuter+27±25 (44px medallions
+          // + parchment ring), so the labels move outside it — +62 clears the
+          // KWASOWOŚĆ↔citrus-medallion kiss measured at 320px wide.
+          const labelR = level === 2 ? rOuter + 62 : rOuter + 28;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.

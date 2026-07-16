@@ -155,8 +155,8 @@ export default async function PitchPage({
           {["Escargots", "Duck Confit", "Beef Tartare"].map((name) => (
             <div key={name} className="rounded-lg border border-[rgba(199,159,105,0.22)] bg-black/30 p-2">
               <div className="grid grid-cols-2 gap-1">
-                <div className="rounded bg-[rgba(199,159,105,0.10)] px-2 py-1 text-[10px] text-gray-200">{name}</div>
-                <div className="rounded bg-[rgba(199,159,105,0.10)] px-2 py-1 text-[10px] italic text-[#e1d3b5]">{name === "Escargots" ? "Ślimaki" : name === "Duck Confit" ? "Konfitowana kaczka" : "Tatar"}</div>
+                <div className="min-w-0 truncate rounded bg-[rgba(199,159,105,0.10)] px-2 py-1 text-[10px] text-gray-200">{name}</div>
+                <div className="min-w-0 truncate rounded bg-[rgba(199,159,105,0.10)] px-2 py-1 text-[10px] italic text-[#e1d3b5]">{name === "Escargots" ? "Ślimaki" : name === "Duck Confit" ? "Konfitowana kaczka" : "Tatar"}</div>
               </div>
               <div className="mt-1 h-2 rounded bg-[rgba(199,159,105,0.10)]" />
             </div>
@@ -504,7 +504,7 @@ export default async function PitchPage({
             </div>
           </header>
 
-          <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-4 xl:gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-4 xl:gap-6">
             {tiers.map((tier, i) => {
               const featured = i === 1;
               return (
@@ -528,8 +528,11 @@ export default async function PitchPage({
                   <h3 className="pitch-display mt-3 text-3xl text-white">{tier.name}</h3>
 
                   <div className="mt-6 flex items-end gap-2">
+                    {/* break-words + smaller base size: the unbreakable serif
+                        "Porozmawiajmy" price at text-4xl forced 57px of page
+                        overflow at 320px (audit 2026-07 mobile pass). */}
                     <p
-                      className={`pitch-display text-4xl ${
+                      className={`pitch-display break-words text-3xl sm:text-4xl ${
                         featured ? "text-[var(--color-accent-gold)]" : "text-white"
                       }`}
                     >

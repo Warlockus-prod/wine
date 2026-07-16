@@ -190,7 +190,7 @@ export default function RestaurantPageClient({
                       borderColor: "rgba(199, 159, 105, 0.4)",
                     }}
                   >
-                    <p className="text-[10px] font-semibold tracking-[0.18em] uppercase sm:text-[11px] sm:tracking-[0.2em]" style={{ color: "#c79f69" }}>
+                    <p className="text-[10px] font-semibold tracking-[0.1em] uppercase sm:text-[11px] sm:tracking-[0.2em]" style={{ color: "#c79f69" }}>
                       {s.label}
                     </p>
                     <p className="mt-1 font-serif text-base italic sm:text-xl" style={{ color: "#ffffff" }}>

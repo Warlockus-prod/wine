@@ -501,7 +501,23 @@ function PanelShell({
           having to expand it first. Not rendered at all in the empty state
           (hideMobile) — see prop docs. */}
       {hideMobile ? null : (
+      <>
+      {/* Scrim behind the open sheet — dims the page strip above 70dvh and
+          gives an obvious tap-to-close (the drag handle alone was fiddly). */}
+      {mobileOpen ? (
+        <button
+          type="button"
+          aria-label="Zamknij panel łączenia"
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-20 bg-black/30 lg:hidden"
+        />
+      ) : null}
       <div className="fixed inset-x-0 bottom-[var(--mobile-tabbar-h)] z-30 lg:hidden">
+        {/* Grab handle only while OPEN — collapsed, the invisible full-width
+            strip floated over page content and swallowed taps meant for the
+            controls under it (audit 2026-07 mobile pass); the peek chip is
+            the open affordance. */}
+        {mobileOpen ? (
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -514,6 +530,7 @@ function PanelShell({
             style={{ background: "var(--hairline-strong)" }}
           />
         </button>
+        ) : null}
         {!mobileOpen && peek ? (
           <button
             type="button"
@@ -537,14 +554,21 @@ function PanelShell({
             color: "var(--ink)",
             // When `peek` content is visible (collapsed state), this main
             // sheet has 0 height so the peek replaces the old empty bar.
-            // When open, sheet expands to 70dvh as before.
-            maxHeight: mobileOpen ? "70dvh" : peek ? "0" : "3.5rem",
+            // Open height is capped so the grab handle can never slide under
+            // the fixed top nav (5rem) — at 320x568 a plain 70dvh put the
+            // handle 90% under the glass-nav and taps were swallowed.
+            maxHeight: mobileOpen
+              ? "min(70dvh, calc(100dvh - var(--mobile-tabbar-h) - 5rem - 2.5rem))"
+              : peek
+                ? "0"
+                : "3.5rem",
             borderWidth: mobileOpen ? "1px" : peek ? "0" : "1px",
           }}
         >
           {children}
         </div>
       </div>
+      </>
       )}
     </>
   );

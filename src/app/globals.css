@@ -124,7 +124,7 @@
      ghosted through the blur and the header read as a rendering bug; at 0.97
      the samouczek hero credit line still showed through on mobile (audits
      2026-07). 0.99 keeps a hint of frost without legible bleed-through. */
-  --nav-bg: rgba(255, 255, 255, 0.99);
+  --nav-bg: #ffffff; /* fully opaque: translucency bought nothing on light and ghosted content through the blur */
   --nav-border: rgba(11, 31, 68, 0.08);
 }
 

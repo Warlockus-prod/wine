@@ -755,13 +755,19 @@ export default function PairingClient({
                             {t(dish.description, locale)}
                           </p>
                         </div>
-                        <div className="shrink-0 text-right">
+                        {/* max-w cap keeps the dish title readable at 320px —
+                            the intrinsic width of "96% dopasowania" used to
+                            crush the min-w-0 column to ~8px (audit 2026-07). */}
+                        <div className="max-w-[45%] shrink-0 text-right">
                           <span className="block text-sm font-bold text-primary sm:text-base">
-                            ${dish.price}
+                            {dish.price} zł
                           </span>
                           {ranking ? (
                             <span className="mt-1 block text-[10px] font-semibold tracking-wide text-white/70 uppercase">
-                              {tx("matchPercent", { score: ranking.score })}
+                              <span className="sm:hidden">{ranking.score}%</span>
+                              <span className="hidden sm:inline">
+                                {tx("matchPercent", { score: ranking.score })}
+                              </span>
                             </span>
                           ) : null}
                         </div>
@@ -1161,7 +1167,7 @@ export default function PairingClient({
           className="keep-dark fixed inset-x-0 z-[35] border-t border-[color:var(--gold-hairline)] md:hidden"
           style={{ bottom: "var(--mobile-tabbar-h)", background: "#0b1f44" }}
         >
-          <div className="flex items-center gap-2 py-2 pr-[4.75rem] pl-4">
+          <div className="flex items-center gap-2 py-2 pr-3 pl-4">
             {/* Score sits OUTSIDE the truncating name — long wine names were
                 swallowing the "· NN%" entirely (audit 2026-07). */}
             <p className="min-w-0 flex-1 truncate text-sm text-white">
@@ -1187,7 +1193,7 @@ export default function PairingClient({
               onClick={scrollToMobileResult}
               className="inline-flex min-h-[36px] shrink-0 items-center gap-1 rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/12 px-3 text-[11px] font-semibold tracking-[0.14em] whitespace-nowrap text-[var(--color-accent-gold)] uppercase"
             >
-              {tx("resultBarCta")} →
+              <span className="max-[359px]:hidden">{tx("resultBarCta")} </span>→
             </button>
             <button
               type="button"
@@ -1213,6 +1219,10 @@ export default function PairingClient({
           history follows the user. */}
       <FloatingTasteChat
         defaultCollapsed
+        // While the sticky result bar owns the bottom-right corner on phones,
+        // the chat FAB steps aside (it was half-sunk into the bar, and its
+        // clearance padding starved the bar's wine name to 0px at 320).
+        mobileHidden={Boolean(mobileResultSource)}
         pageContext={[
           restaurantContext
             ? `Restauracja: ${t(restaurantContext.name, locale)} (${restaurantContext.city}, ${restaurantContext.country}).`

@@ -39,6 +39,10 @@ interface Props {
   disabled?: boolean;
   /** Page-aware hint passed through to <TasteChat> (and the API). */
   pageContext?: string;
+  /** Hide the launcher below md — used while a page-level bottom bar (e.g.
+   *  the pairing result bar) owns that corner, so two fixed layers never
+   *  stack (audit 2026-07 mobile pass). Desktop is unaffected. */
+  mobileHidden?: boolean;
 }
 
 const STATE_KEY = "wn_floating_chat_open_v1";
@@ -50,6 +54,7 @@ export default function FloatingTasteChat({
   defaultCollapsed = false,
   disabled = false,
   pageContext,
+  mobileHidden = false,
 }: Props) {
   // Lazy state init reads localStorage exactly once on mount - no render
   // thrash, no setState-in-effect lint, no SSR mismatch (this whole
@@ -149,7 +154,7 @@ export default function FloatingTasteChat({
           type="button"
           onClick={() => toggle(true)}
           aria-label="Otwórz przewodnika Vinokompasu"
-          className="group fixed right-3 bottom-[calc(var(--mobile-tabbar-h)+12px)] z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:right-4 sm:bottom-6"
+          className={`group fixed right-3 bottom-[calc(var(--mobile-tabbar-h)+12px)] z-40 flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 ${mobileHidden ? "max-md:hidden" : ""} border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:right-4 sm:bottom-6`}
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="text-white">
@@ -181,7 +186,7 @@ export default function FloatingTasteChat({
           />
           <div
             ref={panelRef}
-            className="fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[60vh] sm:w-[380px]"
+            className={`fixed inset-x-2 top-[40dvh] bottom-[calc(var(--mobile-tabbar-h)+0.5rem)] z-[60] flex flex-col sm:inset-x-auto sm:top-auto sm:right-5 sm:bottom-5 sm:z-40 sm:max-h-[60vh] sm:w-[380px] ${mobileHidden ? "max-md:hidden" : ""}`}
             role="dialog"
             aria-modal="true"
             aria-label="Vinovigator"
