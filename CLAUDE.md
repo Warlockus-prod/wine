@@ -92,23 +92,21 @@ Every write emits an `admin_*` event into the analytics table with the actor id.
 
 Manual, not CI. Full topology in memory: `~/.claude/projects/-Users-Andrey-App-web-wn/memory/deployment.md`.
 
-**⚠️ PRODUCTION MOVED 2026-07-16: wine.icoffio.com now resolves to VPS2
-(Hetzner FSN1, `178.104.223.93`) — deploy THERE.** VPS1 (`46.225.11.249`)
-still runs a legacy copy of the stack (kept in sync as fallback; its Postgres
-holds the pre-migration analytics/events history). Same SSH key for both.
-VPS2's TLS cert is a fresh LE issue (2026-07-16 → 2026-10-14) — the manual
-DNS-01 ritual below applied to VPS1 and may be obsolete on VPS2; verify
-before renewing.
+**Single production host since 2026-07-16: VPS2 (Hetzner FSN1,
+`178.104.223.93`).** The old VPS1 (`46.225.11.249`) was wiped of this project
+the same day (containers/volume/image/repo removed; final DB dump archived at
+`/opt/repos/wine_web_wn/backups/wine-vps1-final-20260716.sql.gz` on VPS2).
+Postgres on VPS2 carries the full pilot history (events since 2026-05-05).
+Daily DB backup: cron `20 3 * * *` → `/opt/backups/wine_web_wn/` (14-day
+retention). TLS: certbot with auto-renew (`certbot.timer`) on VPS2 — the old
+manual DNS-01 ritual is dead.
 
 ```bash
 # Local
 npm run check && git push origin main
 
-# VPS2 — PRODUCTION (same script contract: git pull + docker build + rm/run)
+# VPS2 — PRODUCTION (git pull + docker build + rm/run)
 ssh -i ~/.ssh/aiw_new_vps_ed25519 root@178.104.223.93 'bash /opt/repos/wine_web_wn/update_wine_web.sh'
-
-# VPS1 — legacy/fallback copy, keep in sync after prod deploys
-ssh -i ~/.ssh/aiw_new_vps_ed25519 root@46.225.11.249 'bash /opt/repos/wine_web_wn/update_wine_web.sh'
 
 # Smoke
 curl -I https://wine.icoffio.com   # expect 200 OK
@@ -122,40 +120,11 @@ There is **no docker-compose.yml** on this VPS for this project — `update_wine
 
 App binds `172.17.0.1:4300` only — public access is via the shared `nginx_server` reverse proxy. Never expose 4300 publicly. Never restart `nginx_server`; reload via `docker exec nginx_server nginx -s reload`. The VPS hosts other production services (n8n, flask_wine, regatta, icoffio-front) — see `~/.claude/memory/vps_infrastructure.md` before touching anything outside this project's container.
 
-## TLS / cert renewal — manual quarterly action required
+## TLS
 
-**`wine.icoffio.com` is NOT in MetroWeb edge's auto-SSL system** (unlike `app`, `n8n`, `regatta`, `web`, `moda`, `voxcategory` etc., which the edge auto-renews via its own ACME client). Reason: nobody added wine to the MetroWeb auto-renew list. As a result certbot on this VPS owns the cert, but webroot HTTP-01 renewal is blocked — the MetroWeb edge (`178.104.223.93`) terminates port 80 and returns 404 for `/.well-known/acme-challenge/...`; port 443 is TCP-passthrough to our nginx, so a locally-installed cert IS served to browsers.
-
-Cert was last issued via manual DNS-01 on **2026-05-26**, expires **2026-08-24**. Must repeat by then. Deploy hook `/etc/letsencrypt/renewal-hooks/deploy/wine_icoffio_sync.sh` auto-installs the new cert to `/opt/repos/certs/{certs,private}/wine.icoffio.com.{crt,key}` and reloads `nginx_server` on successful issuance — so renewal is a single certbot run + a single DNS record.
-
-### Renewal procedure (~5 min)
-
-1. On VPS, launch detached certbot manual DNS-01 (FIFO holds it paused at the DNS prompt):
-   ```bash
-   ssh -i ~/.ssh/aiw_new_vps_ed25519 root@46.225.11.249 '
-     rm -f /tmp/cbfifo /tmp/cbout; mkfifo /tmp/cbfifo;
-     setsid bash -c "exec 9<>/tmp/cbfifo; certbot certonly --manual --preferred-challenges dns \
-       --cert-name wine.icoffio.com -d wine.icoffio.com \
-       --agree-tos --no-eff-email --force-renewal \
-       < /tmp/cbfifo > /tmp/cbout 2>&1" </dev/null >/dev/null 2>&1 & disown;
-     sleep 8; cat /tmp/cbout'
-   ```
-2. Read the TXT value from the prompt output and add it in MetroWeb DirectAdmin:
-   - Panel: `https://server001.metroweb.pl:2222/evo/user/dns-records` (account `icoffio.com`).
-   - Click **Dodaj rekord** → Typ: `TXT`, Nazwa: `_acme-challenge.wine` (`.icoffio.com` is appended automatically), TTL: 300, Wartość: `<value from certbot prompt>`. Save.
-3. Verify propagation: `dig +short @8.8.8.8 TXT _acme-challenge.wine.icoffio.com` — must echo the value.
-4. Resume certbot:
-   ```bash
-   ssh -i ~/.ssh/aiw_new_vps_ed25519 root@46.225.11.249 '
-     echo "" > /tmp/cbfifo; sleep 15; cat /tmp/cbout; rm -f /tmp/cbfifo /tmp/cbout'
-   ```
-   Expect `Successfully received certificate` + multiple `nginx configuration file test is successful`. Deploy hook fires automatically.
-5. Optionally delete the TXT record in MetroWeb (it's harmless to leave).
-
-### Long-term fixes (pick when convenient)
-
-- **Best:** ask MetroWeb support to add `wine.icoffio.com` to the edge auto-SSL list, same as the other icoffio subdomains. Eliminates the manual ritual forever.
-- **Alt:** wire a DirectAdmin DNS API auth hook for certbot (`--manual-auth-hook` script that POSTs to DA API to add the TXT, then deletes it on cleanup). Requires a DA API token.
+Handled automatically on VPS2: certbot renewal config for `wine.icoffio.com`
++ systemd `certbot.timer`. Current cert 2026-07-16 → 2026-10-14. The manual
+DNS-01 ritual documented pre-migration applied to VPS1 and is obsolete.
 
 ## Posture & caveats
 
