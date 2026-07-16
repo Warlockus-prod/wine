@@ -299,7 +299,7 @@ export default function InteractiveCompass({
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-7">
       {/* ── Compass ─────────────────────────────────────────────────── */}
       <div className="flex flex-col items-center">
-        <div className="w-full max-w-[440px]">
+        <div className="w-full max-w-[440px] lg:max-w-[400px]">
           <TasteCompass
             profile={profile}
             onChange={handleCompassChange}
@@ -337,6 +337,17 @@ export default function InteractiveCompass({
         {/* Dryness meter - directly under the compass dial, above TWÓJ PROFIL. */}
         {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
 
+        {tourActive ? (
+          /* Client 16.07: "po włączeniu przewodnika nie da się go wyłączyć"
+             - an explicit stop, not just the 3s interaction pause. */
+          <button
+            type="button"
+            onClick={() => setTourOn(false)}
+            className="mt-3 inline-flex min-h-[36px] items-center gap-2 rounded-full border border-[var(--gold-hairline)] px-4 text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:border-[var(--color-accent-gold)]"
+          >
+            ■ Zatrzymaj przewodnik
+          </button>
+        ) : null}
         {tourActive ? (
           /* Level-aware vocabulary: etap 1 talks only about the 3 smaki —
              "tendencja" is stage-3 jargon (client's guiding principle). */
@@ -825,26 +836,6 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
         </div>
       ) : null}
 
-      {/* Sector legend only where sectors are on the wheel - at level 1 the
-          six wrażenia haven't been introduced yet (etap 1 uczy wytrawności,
-          nie terminologii). */}
-      {level >= 2 ? (
-        <ul className="mt-6 grid grid-cols-2 gap-2 text-[10px] tracking-wider uppercase">
-          {COMPASS_SECTORS.map((s) => (
-            <li
-              key={s.id}
-              className="flex items-center gap-1.5 rounded-md border border-[rgba(199,159,105,0.18)] bg-[#0b1f44]/60 px-2 py-1.5"
-            >
-              <span
-                aria-hidden
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ background: s.color }}
-              />
-              <span className="truncate text-[#e6e1d6]">{s.name_pl}</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
     </div>
   );
 }

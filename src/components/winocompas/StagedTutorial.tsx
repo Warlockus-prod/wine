@@ -27,7 +27,7 @@
  *   then bucketed into 6 labels.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -364,11 +364,25 @@ export default function StagedTutorial({
 
   const dr = useMemo(() => dryness(profile), [profile]);
 
+  // Deterministic landing after a stage switch: always scroll to the tab
+  // strip (client 16.07: "przeskakuje czasem za daleko, czasem za blisko" -
+  // the layout height changes between stages, so the browser's own scroll
+  // anchoring was random). Skipped on first mount.
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    rootRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [stage]);
+
   const goNext = () => setStage((s) => (s < 3 ? ((s + 1) as Stage) : s));
   const goPrev = () => setStage((s) => (s > 1 ? ((s - 1) as Stage) : s));
 
   return (
-    <div>
+    <div ref={rootRef} className="scroll-mt-[5.5rem]">
       {/* Top: stage tabs + chat toggle. On phones the tab strip takes the
           whole row (basis-full) so labels stop bleeding across tab borders;
           the Czat toggle wraps underneath. */}
@@ -383,7 +397,7 @@ export default function StagedTutorial({
       </div>
 
       {/* Body */}
-      <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#081634] p-5 sm:p-7">
+      <div className="mt-5 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#081634] p-5 sm:p-6">
         {/* Stage controls - rendered at the TOP and BOTTOM of the card
             (client review 2026-07: "przejście do kolejnych etapów powinno
             być i na górze i na dole"). Includes the profile reset that used
@@ -395,7 +409,7 @@ export default function StagedTutorial({
           goNext={goNext}
           onReset={() => onProfileChange({})}
           placement="top"
-          className="mb-6 border-b border-[rgba(199,159,105,0.20)] pb-5"
+          className="mb-4 border-b border-[rgba(199,159,105,0.20)] pb-4"
         />
 
         {stage === 1 ? (
@@ -478,7 +492,7 @@ function StageControls({
           <button
             type="button"
             onClick={goNext}
-            className="col-span-2 min-h-[44px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
+            className="order-last col-span-2 min-h-[44px] rounded-full border border-[rgba(199,159,105,0.30)] lg:order-none bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
           >
             Pokaż dopasowane wina →
           </button>
@@ -527,7 +541,7 @@ function StageSmak({
             heading replaces the old mechanics-first instruction ("etap 1 uczy,
             że wytrawność to coś więcej niż cukier"). */}
         <p className="pitch-eyebrow pitch-eyebrow--start">Etap I · Smak</p>
-        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+        <h2 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
           Jak odbierasz smak wina, które lubisz?
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
@@ -535,7 +549,7 @@ function StageSmak({
         </p>
       </header>
 
-      <div className="mt-6">
+      <div className="mt-4">
         <InteractiveCompass
           profile={profile}
           onProfileChange={onProfileChange}
@@ -576,7 +590,7 @@ function StageWrazenia({
         <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Wrażenia</p>
         {/* Client round-3 copy, verbatim ("etap 2 uczy rozpoznawania
             charakteru wina", not terminology). */}
-        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+        <h2 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
           Jaki charakter ma wino, które lubisz?
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
@@ -594,7 +608,7 @@ function StageWrazenia({
         </p>
       </header>
 
-      <div className="mt-6">
+      <div className="mt-4">
         <InteractiveCompass
           profile={profile}
           onProfileChange={onProfileChange}
@@ -708,7 +722,7 @@ function StageAromaty({
         </p>
       </header>
 
-      <div className="mt-6">
+      <div className="mt-4">
         <InteractiveCompass
           profile={profile}
           onProfileChange={onProfileChange}

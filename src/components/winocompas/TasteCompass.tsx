@@ -807,7 +807,18 @@ export default function TasteCompass({
             const baseline = yUnit < -0.3 ? "auto" : yUnit > 0.3 ? "hanging" : "middle";
 
             const label = s.tendencja.shortLabel_pl ?? s.tendencja.name_pl;
-            const lines = label.includes("·") ? label.split("·").map((p) => p.trim()) : [label];
+            let lines = label.includes("·") ? label.split("·").map((p) => p.trim()) : [label];
+            // Client 16.07 on-wheel names are longer ("Kawa i czekolada") -
+            // wrap at the space nearest the middle so side labels don't
+            // clip the viewBox edge.
+            if (lines.length === 1 && label.length > 12 && label.includes(" ")) {
+              const mid = Math.floor(label.length / 2);
+              let best = -1;
+              for (let j = 0; j < label.length; j++) {
+                if (label[j] === " " && (best === -1 || Math.abs(j - mid) < Math.abs(best - mid))) best = j;
+              }
+              if (best > 0) lines = [label.slice(0, best), label.slice(best + 1)];
+            }
             const lineHeight = 11;
             const totalH = (lines.length - 1) * lineHeight;
             const y0 = labelPos.y - (baseline === "middle" ? totalH / 2 : 0);
