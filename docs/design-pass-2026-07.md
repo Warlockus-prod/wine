@@ -131,6 +131,31 @@ dryness meter (an all-zero profile used to assert "Wytrawne"), and a
 full-width row for the long "Pokaż dopasowane wina" button on the mobile
 control grid (was wrapping to 3 lines).
 
+## Mobile deep-audit (2026-07-16) — 320/390/414, interactions included
+
+A 5-agent programmatic sweep (horizontal overflow, text clipping,
+fixed-layer overlap at 3 scroll depths, plus eyeballed screenshots of every
+interactive state) found 19 issues, all fixed and re-verified live at 320px:
+
+- **Token mismatch**: `--mobile-tabbar-h` (76.8px) vs the rendered tab bar
+  (73px) showed a 4px see-through slit under every bottom-anchored bar/sheet
+  → the tab bar's height is now pinned to the token.
+- **320px width class**: hero stat labels (8px base — "RESTAURACJE" is one
+  unbreakable word in a 63px cell), expanded QR 128px, selects `w-full
+  min-w-0`, pairing dish-card match block capped at 45% (+%-only label) —
+  the title column was 8px wide, result bar reclaims FAB clearance (name had
+  0px), pitch tier grid `grid-cols-1` ("Porozmawiajmy" price forced 57px
+  page overflow), compass side axis labels lifted 10 units into the medallion
+  gap.
+- **Fixed-layer choreography**: chat FAB hides (max-md) while the pairing
+  result bar is up and is 48px below sm; restaurant sheet height capped
+  below the top nav (the grab handle slid under it — taps swallowed);
+  collapsed ghost handle removed; scrim added behind the open sheet;
+  samouczek "?"-sheet content clears the ✕ (the N/5 pill rendered beneath
+  it); the "Co oznacza…?" button scroll-margins above the tab bar and
+  auto-nudges into view on focus change.
+- Nav is now fully opaque in light theme; pairing dish prices show zł.
+
 ## Guardrails honored
 
 - e2e contract kept: 3 stage tabs (/ETAP \d/i ×3), slider aria-labels,
