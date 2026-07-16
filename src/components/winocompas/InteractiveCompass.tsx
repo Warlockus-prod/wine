@@ -186,7 +186,12 @@ export default function InteractiveCompass({
   useEffect(() => {
     if (!focusedId || typeof window === "undefined") return;
     if (window.innerWidth >= 1024) return;
+    // USER interactions only. The auto-tour changes focus every 4s — nudging
+    // then yanked the page back to the wheel wherever the user had scrolled
+    // (the client's "przeskakuje czasem za daleko, czasem za blisko").
+    if (tourId) return;
     mobileInfoBtnRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedId]);
 
   // Pin whenever profile changes (i.e. user clicked a spoke / sektor / base).
