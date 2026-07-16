@@ -488,7 +488,7 @@ function StageControls({
         <button
           type="button"
           onClick={goNext}
-          className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 text-xs lg:col-auto"
+          className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5! py-2! text-xs lg:col-auto"
         >
           Następny etap
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
@@ -498,7 +498,7 @@ function StageControls({
       ) : (
         <Link
           href="/pairing"
-          className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 text-xs lg:col-auto"
+          className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5! py-2! text-xs lg:col-auto"
         >
           Pokaż wina
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
