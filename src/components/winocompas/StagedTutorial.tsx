@@ -434,7 +434,9 @@ export default function StagedTutorial({
       </div>
 
       {/* Live wine proposals - appear right below, update as the profile changes */}
-      <InlineProposals profile={profile} />
+      <div id="propozycje" className="scroll-mt-[5.5rem]">
+        <InlineProposals profile={profile} />
+      </div>
     </div>
   );
 }
@@ -491,7 +493,9 @@ function StageControls({
         {stage < 3 ? (
           <button
             type="button"
-            onClick={goNext}
+            onClick={() =>
+              document.getElementById("propozycje")?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
             className="order-last col-span-2 min-h-[44px] rounded-full border border-[rgba(199,159,105,0.30)] lg:order-none bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
           >
             Pokaż dopasowane wina →
@@ -510,15 +514,18 @@ function StageControls({
           </svg>
         </button>
       ) : (
-        <Link
-          href="/pairing"
+        <button
+          type="button"
+          onClick={() =>
+            document.getElementById("propozycje")?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }
           className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5! py-2! text-xs lg:col-auto"
         >
           Pokaż wina
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </Link>
+        </button>
       )}
     </div>
   );

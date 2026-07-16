@@ -12,7 +12,10 @@ import type {
   WineTannin,
 } from "@/types/pairing";
 
-const STORAGE_KEY = "web_wn_pairing_dataset_v3";
+// v4 (2026-07-16): bump re-seeds browsers that cached the pre-PL dataset —
+// the client saw English dish descriptions on /pl/pairing because their
+// localStorage held a v3 snapshot from before the seed got translations.
+const STORAGE_KEY = "web_wn_pairing_dataset_v4";
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 

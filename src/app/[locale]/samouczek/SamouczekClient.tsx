@@ -241,12 +241,6 @@ export default function SamouczekClient() {
             </Link>
           </div>
         </section>
-        {/* Discreet method credit - client moved it out of the hero
-            ("nie wiem czy tutaj to jest konieczne", 16.07); licensing homage
-            stays on the page, just at the very end. */}
-        <p className="mt-16 text-center font-serif text-[11px] italic tracking-wide text-[var(--color-accent-gold)] opacity-60">
-          Metoda za zgodą i w hołdzie Magdalenie Surgiel-Czyż / parfumealavin / vinocompas.pl
-        </p>
       </main>
 
       <MobileTabBar />
