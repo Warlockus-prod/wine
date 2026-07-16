@@ -179,7 +179,11 @@ export async function POST(request: Request) {
       ],
     });
 
-    const reply = completion.choices?.[0]?.message?.content?.trim();
+    // Humanize: the model loves em/en-dashes, which read as "AI tekst"
+    // (client 2026-07) - normalize them to a plain hyphen before returning.
+    const reply = completion.choices?.[0]?.message?.content
+      ?.trim()
+      .replace(/\s*[—–]\s*/g, " - ");
     if (!reply) {
       return NextResponse.json({ error: "Bot nie zwrócił odpowiedzi." }, { status: 502 });
     }

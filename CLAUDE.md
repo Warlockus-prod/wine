@@ -92,11 +92,22 @@ Every write emits an `admin_*` event into the analytics table with the actor id.
 
 Manual, not CI. Full topology in memory: `~/.claude/projects/-Users-Andrey-App-web-wn/memory/deployment.md`.
 
+**⚠️ PRODUCTION MOVED 2026-07-16: wine.icoffio.com now resolves to VPS2
+(Hetzner FSN1, `178.104.223.93`) — deploy THERE.** VPS1 (`46.225.11.249`)
+still runs a legacy copy of the stack (kept in sync as fallback; its Postgres
+holds the pre-migration analytics/events history). Same SSH key for both.
+VPS2's TLS cert is a fresh LE issue (2026-07-16 → 2026-10-14) — the manual
+DNS-01 ritual below applied to VPS1 and may be obsolete on VPS2; verify
+before renewing.
+
 ```bash
 # Local
 npm run check && git push origin main
 
-# VPS (shared icoffio host) — single command does git pull + docker build + rm/run
+# VPS2 — PRODUCTION (same script contract: git pull + docker build + rm/run)
+ssh -i ~/.ssh/aiw_new_vps_ed25519 root@178.104.223.93 'bash /opt/repos/wine_web_wn/update_wine_web.sh'
+
+# VPS1 — legacy/fallback copy, keep in sync after prod deploys
 ssh -i ~/.ssh/aiw_new_vps_ed25519 root@46.225.11.249 'bash /opt/repos/wine_web_wn/update_wine_web.sh'
 
 # Smoke

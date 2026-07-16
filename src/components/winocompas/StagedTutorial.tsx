@@ -91,7 +91,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
     <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#0b1f44] p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          {/* SR announcement when proposals arrive/refresh — the visible list
+          {/* SR announcement when proposals arrive/refresh - the visible list
               re-sorts silently otherwise. Text flips between 3 states only, so
               it never spams per-click. */}
           <span className="sr-only" role="status">
@@ -103,12 +103,12 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
               ? "Wina dopasowane do Twojego smaku"
               : filled === 0
                 ? "Ustaw Vinokompas, a wina pojawią się tutaj"
-                : "Jeszcze chwila — dobór się dostraja"}
+                : "Jeszcze chwila - dobór się dostraja"}
           </h3>
           <p className="mt-1.5 font-serif text-sm italic text-[#e6e1d6]">
             {enough
-              ? `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach — im pełniejszy, tym pewniejszy dobór.`
-              : `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) — masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`}
+              ? `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach - im pełniejszy, tym pewniejszy dobór.`
+              : `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`}
           </p>
           {/* Profile-completeness meter - richness toward a confident match. */}
           <div
@@ -244,7 +244,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
         >
           winnica.pl
         </a>{" "}
-        — twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
+        - twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
       </p>
     </div>
   );
@@ -284,7 +284,7 @@ function StageNav({
                     : "border-white/10 bg-[#0b1f44]/30 hover:border-white/25"
               }`}
             >
-              {/* Row 1: chip + "ETAP n" on ONE nowrap line — at 360-390px the
+              {/* Row 1: chip + "ETAP n" on ONE nowrap line - at 360-390px the
                   digit used to wrap under "ETAP" (audit 2026-07). */}
               <span className="flex min-w-0 items-center gap-1.5 whitespace-nowrap sm:gap-2">
                 <span
@@ -308,7 +308,7 @@ function StageNav({
                   ETAP {it.n}
                 </span>
               </span>
-              {/* Row 2: plain sans 12px on phones — the serif italic + wide
+              {/* Row 2: plain sans 12px on phones - the serif italic + wide
                   tracking made "WRAŻENIA" 90px wide inside a 73px tab and it
                   clipped to "WRAŻENL" (audit 2026-07). Fancy styling returns
                   from sm: up where the tabs have room. */}
@@ -384,11 +384,11 @@ export default function StagedTutorial({
 
       {/* Body */}
       <div className="mt-6 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#081634] p-5 sm:p-7">
-        {/* Stage controls — rendered at the TOP and BOTTOM of the card
+        {/* Stage controls - rendered at the TOP and BOTTOM of the card
             (client review 2026-07: "przejście do kolejnych etapów powinno
             być i na górze i na dole"). Includes the profile reset that used
             to live in the removed TWÓJ PROFIL chip bar. The top strip is
-            desktop-only — on phones the pair doubled up within one screen. */}
+            desktop-only - on phones the pair doubled up within one screen. */}
         <StageControls
           stage={stage}
           goPrev={goPrev}
@@ -458,19 +458,19 @@ function StageControls({
           <button
             type="button"
             onClick={goPrev}
-            className="min-h-[40px] rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
+            className="min-h-[44px] rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
           >
             ← Poprzedni etap
           </button>
         ) : null}
         {/* Wyczyść BEFORE the long skip button: on the mobile 2-col grid the
             short pair (Poprzedni/Wyczyść) shares one row and the long "Pokaż
-            dopasowane wina" gets its own full row — no 3-line wrap (audit
+            dopasowane wina" gets its own full row - no 3-line wrap (audit
             2026-07). At stage 1 Wyczyść has no partner, so it goes full-width. */}
         <button
           type="button"
           onClick={onReset}
-          className={`min-h-[40px] rounded-full border border-white/12 px-3.5 py-2 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 1 ? "col-span-2 lg:col-auto" : ""}`}
+          className={`min-h-[44px] rounded-full border border-white/12 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 1 ? "col-span-2 lg:col-auto" : ""}`}
         >
           Wyczyść
         </button>
@@ -478,7 +478,7 @@ function StageControls({
           <button
             type="button"
             onClick={goNext}
-            className="col-span-2 min-h-[40px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
+            className="col-span-2 min-h-[44px] rounded-full border border-[rgba(199,159,105,0.30)] bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
           >
             Pokaż dopasowane wina →
           </button>
@@ -488,7 +488,7 @@ function StageControls({
         <button
           type="button"
           onClick={goNext}
-          className="pitch-cta-primary col-span-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs lg:col-auto"
+          className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 text-xs lg:col-auto"
         >
           Następny etap
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
@@ -498,7 +498,7 @@ function StageControls({
       ) : (
         <Link
           href="/pairing"
-          className="pitch-cta-primary col-span-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs lg:col-auto"
+          className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 text-xs lg:col-auto"
         >
           Pokaż wina
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
@@ -673,7 +673,7 @@ function DrynessMeter({
       </div>
 
       {/* Client round-3 caption. The underlying score is still the 3-base-smak
-          placeholder model (see dryness() comment) — the copy frames it as a
+          placeholder model (see dryness() comment) - the copy frames it as a
           profile readout, which is exactly what it is. */}
       <p className="mt-3 text-xs leading-snug text-[color:var(--color-accent-gold)]">
         Na podstawie wybranych proporcji słodyczy, kwasowości i cierpkości Vinocompas pokazuje,
@@ -703,7 +703,7 @@ function StageAromaty({
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
           Tryb dla zaawansowanych: każde wrażenie ma dwa aromaty. Kliknij konkretny
-          aromat na kole, aby dostroić profil (0-5). Po prawej — pełny opis i skojarzenia
+          aromat na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
           każdej z 12. <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> pokaże je po kolei.
         </p>
       </header>

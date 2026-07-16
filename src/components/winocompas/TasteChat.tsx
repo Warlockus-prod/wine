@@ -207,7 +207,7 @@ export default function TasteChat({
         <button
           type="button"
           onClick={reset}
-          className="rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-semibold tracking-wider text-gray-300 uppercase transition hover:border-white/35 hover:text-white"
+          className="inline-flex min-h-[40px] items-center rounded-full border border-white/15 px-4 text-[11px] font-semibold tracking-wider text-gray-300 uppercase transition hover:border-white/35 hover:text-white"
         >
           Wyczyść
         </button>

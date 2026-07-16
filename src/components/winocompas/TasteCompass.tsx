@@ -853,14 +853,14 @@ export default function TasteCompass({
             );
           })}
 
-        {/* Image ring — the client's "ramka wypełniona obrazkami wrażeń i
+        {/* Image ring - the client's "ramka wypełniona obrazkami wrażeń i
             tendencji" (2026-07): one still-life photo per tendencja, orbiting
             just outside the dial at the tendencja's centre angle. Decorative
             (pointer-events none) so it never steals wedge clicks; images go
             through /_next/image so 12 thumbs cost ~5KB each, not 300KB.
             Each photo is framed as an inlaid medallion (parchment ring +
             gold hairline + warm tint) and enters with a staggered fade+scale
-            via the .compass-medallion atom — keyed by level so re-entering
+            via the .compass-medallion atom - keyed by level so re-entering
             stage 2 retriggers the entrance. */}
         {level === 2 &&
           SPOKES.map((s, i) => {
@@ -882,7 +882,7 @@ export default function TasteCompass({
                 <clipPath id={`${baseId}-ring-${s.tendencja.id.replace(".", "-")}`}>
                   <circle cx={ix} cy={iy} r={size / 2} />
                 </clipPath>
-                {/* Parchment backing ring — the "inlay" the photo sits in.
+                {/* Parchment backing ring - the "inlay" the photo sits in.
                     Literal #f4efe9 (paper tone) so it reads on both themes. */}
                 <circle cx={ix} cy={iy} r={size / 2 + 3} fill="#f4efe9" />
                 <image
@@ -898,7 +898,7 @@ export default function TasteCompass({
                   // the subject is recognizable at thumbnail size.
                   style={{ filter: "brightness(1.55) saturate(1.25) contrast(1.05)" }}
                 />
-                {/* Whisper of warm tint — 0.14 muddied the already-dark
+                {/* Whisper of warm tint - 0.14 muddied the already-dark
                     photos on top of the brightness lift. */}
                 <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.07)" />
                 <circle

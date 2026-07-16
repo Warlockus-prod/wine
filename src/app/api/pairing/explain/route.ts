@@ -154,7 +154,11 @@ Explain in two sentences using Vinokompas vocabulary.`;
       ],
     });
 
-    const reply = completion.choices?.[0]?.message?.content?.trim();
+    // Humanize: normalize the model's em/en-dashes to a plain hyphen —
+    // "— tekst —" reads as AI-generated (client 2026-07).
+    const reply = completion.choices?.[0]?.message?.content
+      ?.trim()
+      .replace(/\s*[—–]\s*/g, " - ");
     if (!reply) {
       return NextResponse.json({ error: "Empty reply" }, { status: 502 });
     }

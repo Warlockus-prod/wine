@@ -228,7 +228,7 @@ export default function InteractiveCompass({
     window.dispatchEvent(
       new CustomEvent("wn:open-chat", {
         detail: {
-          prefill: `Opowiedz mi więcej o wrażeniu „${label}" — czego szukać w winie?`,
+          prefill: `Opowiedz mi więcej o wrażeniu „${label}" - czego szukać w winie?`,
         },
       }),
     );
@@ -318,7 +318,7 @@ export default function InteractiveCompass({
             hideLegend
           />
         </div>
-        {/* Dryness meter — directly under the compass dial, above TWÓJ PROFIL. */}
+        {/* Dryness meter - directly under the compass dial, above TWÓJ PROFIL. */}
         {belowCompass ? <div className="mt-5 w-full max-w-[440px]">{belowCompass}</div> : null}
 
         {tourActive ? (
@@ -326,18 +326,18 @@ export default function InteractiveCompass({
              "tendencja" is stage-3 jargon (client's guiding principle). */
           <p className="mt-2 max-w-[440px] text-center text-xs leading-snug text-[var(--ink-soft)]">
             {level === 1
-              ? "Każdy smak ustawiasz od 1 (ledwo wyczuwalny) do 5 (dominujący) — kliknij oś, aby wybrać siłę."
+              ? "Każdy smak ustawiasz od 1 (ledwo wyczuwalny) do 5 (dominujący) - kliknij oś, aby wybrać siłę."
               : level === 2
-                ? "Każde wrażenie ustawiasz od 1 (ledwo wyczuwalne) do 5 (dominujące) — kliknij koło, aby wybrać siłę."
-                : "Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) — kliknij koło, aby wybrać siłę."}
+                ? "Każde wrażenie ustawiasz od 1 (ledwo wyczuwalne) do 5 (dominujące) - kliknij koło, aby wybrać siłę."
+                : "Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) - kliknij koło, aby wybrać siłę."}
           </p>
         ) : null}
 
         {/* "Najedź lub kliknij" hint + the TWÓJ PROFIL chip bar removed
-            2026-07 per client review — the wheel itself carries the state
+            2026-07 per client review - the wheel itself carries the state
             and the chips duplicated it below the fold. */}
 
-        {/* Mobile: the always-on side panel is gone (client review) — a "?"
+        {/* Mobile: the always-on side panel is gone (client review) - a "?"
             disclosure opens the description as a bottom sheet instead. */}
         <div className="mt-3 w-full max-w-[440px] lg:hidden">
           {focused ? (
@@ -394,7 +394,7 @@ export default function InteractiveCompass({
         </div>
       ) : null}
 
-      {/* ── Side info panel — desktop only (mobile uses the "?" sheet).
+      {/* ── Side info panel - desktop only (mobile uses the "?" sheet).
           Chrome is BRAND GOLD regardless of the focused sector (client
           review 2026-07: drop the red accent). self-start keeps the card
           content-height (it used to stretch to the wheel column, ~60%
@@ -411,7 +411,7 @@ export default function InteractiveCompass({
         }}
       >
         {/* SR announcement: the FULL description once per focus change. The
-            visible TourText types char-by-char — keeping aria-live on the whole
+            visible TourText types char-by-char - keeping aria-live on the whole
             aside made screen readers spell out every character (audit 2026-07). */}
         <span className="sr-only" role="status">
           {focused
@@ -437,7 +437,7 @@ export default function InteractiveCompass({
             }}
           />
         )}
-        {/* Restart entry point — the IdleCard's "Uruchom przewodnika" vanishes
+        {/* Restart entry point - the IdleCard's "Uruchom przewodnika" vanishes
             forever after the first wheel tap pins a selection (audit 2026-07).
             Small persistent control brings the auto-tour back. */}
         {!tourOn && focused ? (
@@ -507,12 +507,12 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
  * do" feel instead of static description text.
  */
 const INTENSITY_COMMENTS: Record<number, string> = {
-  0: "Jeszcze nie zaznaczone — kliknij koło, aby ustawić siłę (0-5).",
-  1: "Ledwo wyczuwalne — subtelny akcent w tle.",
-  2: "Delikatne — lekko zaznaczone.",
-  3: "Umiarkowane — wyraźnie obecne, ale nie dominuje.",
-  4: "Mocne — jedno z głównych wrażeń Twojego wina.",
-  5: "Dominujące — definiuje styl, którego szukasz.",
+  0: "Jeszcze nie zaznaczone - kliknij koło, aby ustawić siłę (0-5).",
+  1: "Ledwo wyczuwalne - subtelny akcent w tle.",
+  2: "Delikatne - lekko zaznaczone.",
+  3: "Umiarkowane - wyraźnie obecne, ale nie dominuje.",
+  4: "Mocne - jedno z głównych wrażeń Twojego wina.",
+  5: "Dominujące - definiuje styl, którego szukasz.",
 };
 
 function SelectionComment({
@@ -676,7 +676,7 @@ function FocusedCard({
             <TourText key={`${isTour}:${focused.description}`} text={focused.description} typing={isTour} />
           </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
-            Trzy smaki bazowe — cierpkość, słodycz, kwasowość — to
+            Trzy smaki bazowe - cierpkość, słodycz, kwasowość - to
             podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym
             wyraźniej dominują w twoim ulubionym profilu.
           </p>
@@ -809,7 +809,7 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
         </div>
       ) : null}
 
-      {/* Sector legend only where sectors are on the wheel — at level 1 the
+      {/* Sector legend only where sectors are on the wheel - at level 1 the
           six wrażenia haven't been introduced yet (etap 1 uczy wytrawności,
           nie terminologii). */}
       {level >= 2 ? (

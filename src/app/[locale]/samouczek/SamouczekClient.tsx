@@ -83,7 +83,7 @@ export default function SamouczekClient() {
           aria-labelledby="hero-title"
           className="editorial-hero relative overflow-hidden rounded-[36px] border border-white/8 bg-[radial-gradient(circle_at_10%_20%,rgba(199,159,105,0.18),transparent_45%),radial-gradient(circle_at_90%_85%,rgba(199,159,105,0.18),transparent_45%),linear-gradient(180deg,#122a52_0%,#081634_100%)] px-5 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-20"
         >
-          {/* Hero copy is the client's own (round-3 review, 2026-07) — keep
+          {/* Hero copy is the client's own (round-3 review, 2026-07) - keep
               verbatim, incl. the "Vinocompas" brand spelling. The secondary
               "Otwórz Pairing" button was explicitly dropped ("pomijamy"). */}
           <span className="pitch-eyebrow pitch-eyebrow--start">Vinocompas AI</span>
@@ -174,7 +174,7 @@ export default function SamouczekClient() {
                 Pytania i odpowiedzi
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Najczęstsze wątpliwości. Jeśli czegoś brakuje — włącz czat przy scenariuszu i zapytaj przewodnika.
+                Najczęstsze wątpliwości. Jeśli czegoś brakuje - włącz czat przy scenariuszu i zapytaj przewodnika.
               </p>
             </div>
           </header>
@@ -233,7 +233,7 @@ export default function SamouczekClient() {
             Twój profil jest zapisany. Czas znaleźć wina.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-            Otwórz widok Pairing i wybierz danie — zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
+            Otwórz widok Pairing i wybierz danie - zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/pairing" className="pitch-cta-primary">

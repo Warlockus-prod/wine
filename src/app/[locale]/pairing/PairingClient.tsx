@@ -508,8 +508,8 @@ export default function PairingClient({
         if (!controller.signal.aborted) {
           setVinokompasExplanation(
             locale === "pl"
-              ? "Sommelier AI chwilowo odpoczywa — pełne uzasadnienie w języku Vinokompasu pojawi się przy następnej próbie."
-              : "The AI sommelier is taking a short break — the Vinokompas rationale will appear on the next try.",
+              ? "Sommelier AI chwilowo odpoczywa - pełne uzasadnienie w języku Vinokompasu pojawi się przy następnej próbie."
+              : "The AI sommelier is taking a short break - the Vinokompas rationale will appear on the next try.",
           );
         }
       } finally {
@@ -653,7 +653,7 @@ export default function PairingClient({
                 <span aria-hidden className="hidden text-gray-500 md:inline">→</span>
                 <span className="shrink-0 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 whitespace-nowrap text-gray-200">{tx("step3")}</span>
               </div>
-              {/* KONTEKST + AI status merged into a single meta line — they
+              {/* KONTEKST + AI status merged into a single meta line - they
                   used to stack as two rows on mobile. */}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {restaurantContext ? (
@@ -924,7 +924,7 @@ export default function PairingClient({
                 <p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
                   {tx("explanationKicker")}
                 </p>
-                {/* pitch-display styles the <em> as gold italic — the "× wine"
+                {/* pitch-display styles the <em> as gold italic - the "× wine"
                     half reads as the editorial counterpoint to the dish. */}
                 <h2 className="pitch-display mt-2 text-2xl text-white sm:text-3xl">
                   {t(activeDish.name, locale)} <em>× {t(selectedWine.name, locale)}</em>
@@ -1013,7 +1013,7 @@ export default function PairingClient({
 
                 {/* Keyed on the pair so the four bubbles replay their staggered
                     fade-up (~120ms apart, vk-rise handles reduced-motion) on
-                    every new dish×wine — the panel used to snap in as one
+                    every new dish×wine - the panel used to snap in as one
                     static block. Presentation only: the explain fetch/cache
                     above is untouched. */}
                 <div key={`${activeDish.id}|${selectedWine.id}`} className="mt-4 space-y-3">
@@ -1157,7 +1157,7 @@ export default function PairingClient({
         ) : null}
       </main>
 
-      {/* Mobile result bar — instant feedback next to the thumb after a
+      {/* Mobile result bar - instant feedback next to the thumb after a
           selection (the re-ranked list lives ~2200px lower at 390px). Navy
           keep-dark strip pinned above the tab-bar; "Zobacz →" jumps to the
           #1 wine card (dish tap) or the rationale panel (wine tap). Right
@@ -1168,7 +1168,7 @@ export default function PairingClient({
           style={{ bottom: "var(--mobile-tabbar-h)", background: "#0b1f44" }}
         >
           <div className="flex items-center gap-2 py-2 pr-3 pl-4">
-            {/* Score sits OUTSIDE the truncating name — long wine names were
+            {/* Score sits OUTSIDE the truncating name - long wine names were
                 swallowing the "· NN%" entirely (audit 2026-07). */}
             <p className="min-w-0 flex-1 truncate text-sm text-white">
               <span aria-hidden className="text-[var(--color-accent-gold)]">★ </span>
