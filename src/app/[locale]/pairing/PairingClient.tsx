@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
@@ -15,9 +15,15 @@ import { Link } from "@/i18n/navigation";
 const FloatingTasteChat = dynamic(() => import("@/components/winocompas/FloatingTasteChat"), {
   ssr: false,
 });
+import { METHOD_STEPS } from "@/data/wine-compass-kb";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 import { t, localizeDecant } from "@/lib/localized";
+import {
+  filledProfileDims,
+  parseStoredProfile,
+  profileWineAffinity,
+} from "@/lib/profile-affinity";
 import {
   applyRestaurantPairingOverrides,
   buildPairingDatasetFromRestaurant,
@@ -35,6 +41,19 @@ type MatchDetails = {
   score: number;
   reason: string;
 };
+
+// "Profil → dobór" (2026-07): the /samouczek tutorial persists the guest's
+// Vinokompas profile under this key. When present, an opt-in toggle blends
+// personal affinity into the wine ranking. No profile (fresh browser, e2e)
+// → toggle hidden → ranking byte-identical to the pre-feature behavior.
+const PROFILE_STORAGE_KEY = "wn_compass_profile_v1";
+/** Toggle defaults ON only when the profile is expressive enough — same
+ *  MIN_FILLED spirit as the tutorial's proposal gate (StagedTutorial). */
+const PROFILE_BLEND_MIN_FILLED = 4;
+/** Wines at/above this affinity carry the tiny gold "profil" badge. */
+const PROFILE_BADGE_MIN = 0.5;
+/** finalScore = 0.75·matchScore + 0.25·(affinity·100). */
+const PROFILE_BLEND_WEIGHT = 0.25;
 
 // Dish/wine tags are raw English vocabulary (wine.style, dish.category,
 // restaurant.cuisine and the sandbox seed tags) rendered straight onto the
@@ -204,6 +223,36 @@ export default function PairingClient({
   // wine tap → jump to the rationale panel. Null until the user acts (the
   // auto-select effects below don't set it), null again when dismissed.
   const [mobileResultSource, setMobileResultSource] = useState<"dish" | "wine" | null>(null);
+  // Samouczek taste profile — read once on mount (localStorage is client-
+  // only). null = no usable profile: the toggle stays hidden and the wine
+  // ranking is untouched.
+  const [tasteProfile, setTasteProfile] = useState<Record<string, number> | null>(null);
+  const [blendProfile, setBlendProfile] = useState(false);
+  // "Degustuj krok po kroku" inline stepper (rationale panel). Ephemeral by
+  // design — nothing persists; ESC/✕ closes.
+  const [tasteAlongOpen, setTasteAlongOpen] = useState(false);
+  const [tasteAlongStep, setTasteAlongStep] = useState(0);
+
+  useEffect(() => {
+    try {
+      const profile = parseStoredProfile(window.localStorage.getItem(PROFILE_STORAGE_KEY));
+      if (profile) {
+        setTasteProfile(profile);
+        setBlendProfile(filledProfileDims(profile) >= PROFILE_BLEND_MIN_FILLED);
+      }
+    } catch {
+      // Private mode / blocked storage — behave exactly like "no profile".
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!tasteAlongOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setTasteAlongOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [tasteAlongOpen]);
 
   useEffect(() => {
     openTimestamp.current = performance.now();
@@ -225,6 +274,30 @@ export default function PairingClient({
     [effectiveDishId, dishes],
   );
 
+  const profileActive = blendProfile && tasteProfile !== null;
+
+  const affinityByWineId = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!tasteProfile) return map;
+    for (const wine of wines) {
+      map.set(wine.id, profileWineAffinity(tasteProfile, wine));
+    }
+    return map;
+  }, [tasteProfile, wines]);
+
+  // Profile blend lives at the sort/display layer ONLY — matchMap (AI fetch,
+  // fallback, curated overrides) stays byte-identical. With the toggle off
+  // or no profile this is the identity function, i.e. the exact pre-feature
+  // ranking.
+  const blendedScore = useCallback(
+    (wineId: string, matchScore: number) =>
+      profileActive
+        ? (1 - PROFILE_BLEND_WEIGHT) * matchScore +
+          PROFILE_BLEND_WEIGHT * (affinityByWineId.get(wineId) ?? 0) * 100
+        : matchScore,
+    [profileActive, affinityByWineId],
+  );
+
   const rankedMatches = useMemo(() => {
     const ranked = wines
       .map((wine) => {
@@ -235,7 +308,10 @@ export default function PairingClient({
         return { wine, match };
       })
       .filter((item): item is { wine: PairingWine; match: MatchDetails } => item !== null)
-      .sort((a, b) => b.match.score - a.match.score);
+      .sort(
+        (a, b) =>
+          blendedScore(b.wine.id, b.match.score) - blendedScore(a.wine.id, a.match.score),
+      );
 
     const best = ranked[0] ?? null;
     const alternative =
@@ -263,7 +339,7 @@ export default function PairingClient({
     }
 
     return { best, alternative, budget, rankByWineId };
-  }, [wines, matchMap]);
+  }, [wines, matchMap, blendedScore]);
 
   const sortedWines = useMemo(() => {
     const list = [...wines];
@@ -280,8 +356,8 @@ export default function PairingClient({
         return matchA ? -1 : 1;
       }
 
-      const scoreA = matchA?.score ?? -1;
-      const scoreB = matchB?.score ?? -1;
+      const scoreA = matchA ? blendedScore(a.id, matchA.score) : -1;
+      const scoreB = matchB ? blendedScore(b.id, matchB.score) : -1;
       if (scoreA !== scoreB) {
         return scoreB - scoreA;
       }
@@ -290,7 +366,7 @@ export default function PairingClient({
     });
 
     return list;
-  }, [wines, matchMap, rankedMatches.rankByWineId]);
+  }, [wines, matchMap, rankedMatches.rankByWineId, blendedScore]);
 
   const selectedWine = useMemo(
     () => wines.find((wine) => wine.id === selectedWineId) ?? null,
@@ -600,20 +676,41 @@ export default function PairingClient({
     }
   }, [selectedWine, dishRankings, activeDishId]);
 
+  if (scopedLoading) {
+    // Scoped restaurant still resolving - a quiet skeleton, not the
+    // "not found" note (that would flash on every scoped visit).
+    return (
+      <div className="mobile-safe-bottom min-h-screen bg-background-dark">
+        <Navigation />
+        <main className="mx-auto max-w-3xl px-6 pt-28 pb-20">
+          <div className="h-40 animate-pulse rounded-3xl border border-white/8 bg-white/5" />
+        </main>
+        <MobileTabBar />
+      </div>
+    );
+  }
+
   if (!activeDish || wines.length === 0) {
+    // Guest-facing empty state: a stale QR / typo'd ?restaurant= slug used to
+    // dead-end here in English admin copy with an "Open Admin" CTA (audit
+    // 2026-07 HIGH). Guests get a friendly PL/EN note + the way back home.
+    const isPl = locale === "pl";
     return (
       <div className="mobile-safe-bottom min-h-screen bg-background-dark text-white">
+        <Navigation />
         <main className="mx-auto max-w-3xl px-6 pt-28 pb-20 text-center">
-          <p className="mb-3 inline-flex rounded-full border border-primary/40 bg-primary/15 px-3 py-1 text-xs font-semibold tracking-wider text-primary uppercase">
-            Pairing Data Required
-          </p>
-          <h1 className="text-3xl font-bold">No pairing data available</h1>
+          <p className="pitch-eyebrow">{isPl ? "Łączenie" : "Pairing"}</p>
+          <h1 className="pitch-display mt-4 text-3xl text-white">
+            {isPl ? "Nie znaleźliśmy tej karty" : "We couldn't find this menu"}
+          </h1>
           <p className="mt-3 text-sm text-gray-300">
-            Add dishes and wines from the new admin panel, then return to the pairing screen.
+            {isPl
+              ? "Ten adres jest nieaktualny albo restauracja nie opublikowała jeszcze swojej karty. Wybierz restaurację z listy - łączenie otworzy się z jej menu i winami."
+              : "This link is out of date, or the restaurant hasn't published its menu yet. Pick a restaurant from the directory - pairing will open with its dishes and wines."}
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <Link href="/admin" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold">
-              Open Admin
+            <Link href="/" className="pitch-cta-primary">
+              {isPl ? "Zobacz restauracje" : "Browse restaurants"}
             </Link>
           </div>
         </main>
@@ -810,6 +907,37 @@ export default function PairingClient({
                   {tx("winesCount", { count: sortedWines.length })}
                 </span>
               </div>
+              {/* Profil → dobór toggle. Rendered only when a samouczek
+                  profile exists in localStorage (fresh browsers — including
+                  e2e — never see it). Sits OUTSIDE the h2 so the "Karta win"
+                  accessible name stays exact for the i18n spec. */}
+              {tasteProfile ? (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setBlendProfile((value) => !value)}
+                    aria-pressed={blendProfile}
+                    className={`inline-flex min-h-[36px] items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] uppercase transition ${
+                      blendProfile
+                        ? "border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/12 text-[var(--color-accent-gold)]"
+                        : "border-white/12 bg-white/5 text-gray-300 hover:border-white/25"
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className={`h-2 w-2 shrink-0 rounded-full transition ${
+                        blendProfile
+                          ? "bg-[var(--color-accent-gold)]"
+                          : "border-[1.5px] border-[color:var(--ink-muted)] bg-transparent"
+                      }`}
+                    />
+                    {tx("profileToggle")}
+                  </button>
+                  {profileActive ? (
+                    <p className="mt-2 text-xs text-gray-400">{tx("profileBlendNote")}</p>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             {/* pb-24 (mobile only): breathing room below the last card so the
@@ -885,7 +1013,7 @@ export default function PairingClient({
                           </p>
                         </div>
                         <span className="shrink-0 text-sm font-bold text-white sm:text-base">
-                          ${wine.price}
+                          {wine.price} zł
                         </span>
                       </div>
 
@@ -899,6 +1027,14 @@ export default function PairingClient({
                             {tx("exploratory")}
                           </span>
                         )}
+                        {/* Gold "profil" badge — this wine resonates with the
+                            guest's samouczek profile (affinity ≥ 0.5). */}
+                        {profileActive &&
+                        (affinityByWineId.get(wine.id) ?? 0) >= PROFILE_BADGE_MIN ? (
+                          <span className="rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/14 px-2 py-1 text-[10px] font-semibold tracking-wide text-[var(--color-accent-gold)] uppercase">
+                            {tx("profileBadge")}
+                          </span>
+                        ) : null}
                         <span className="text-[11px] text-gray-400">
                           {wine.passport.grape}
                         </span>
@@ -964,7 +1100,7 @@ export default function PairingClient({
                   <div className="min-w-0">
                     <h3 className="text-xl font-semibold text-white">{t(activeDish.name, locale)}</h3>
                     <p className="mt-2 text-sm text-gray-400">{t(activeDish.description, locale)}</p>
-                    <p className="mt-3 text-sm font-bold text-primary">${activeDish.price}</p>
+                    <p className="mt-3 text-sm font-bold text-primary">{activeDish.price} zł</p>
                   </div>
                 </div>
               </article>
@@ -991,7 +1127,7 @@ export default function PairingClient({
                       {selectedWine.region} • {selectedWine.vintageLabel ?? selectedWine.year}
                     </p>
                     <p className="mt-2 text-sm text-gray-400">{t(selectedWine.description, locale)}</p>
-                    <p className="mt-3 text-sm font-bold text-white">${selectedWine.price}</p>
+                    <p className="mt-3 text-sm font-bold text-white">{selectedWine.price} zł</p>
                   </div>
                 </div>
               </article>
@@ -1153,6 +1289,111 @@ export default function PairingClient({
                 </div>
               </article>
             </div>
+
+            {/* Taste-along ("Degustuj krok po kroku", 2026-07): guided
+                6-step Vinokompas tasting (METHOD_STEPS) for the selected
+                wine. Inline card in the panel's cream/gold-hairline idiom —
+                not a modal; ESC/✕ closes; nothing persists. Step content is
+                the PL methodology KB (chrome labels are localized). */}
+            <div className="mt-4">
+              {!tasteAlongOpen ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTasteAlongStep(0);
+                    setTasteAlongOpen(true);
+                  }}
+                  className="inline-flex min-h-[40px] items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M7 2h10v2l-3.4 6.8a6 6 0 1 1-3.2 0L7 4V2Zm5 10.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" />
+                  </svg>
+                  {tx("tasteAlong.open")}
+                </button>
+              ) : (
+                <div className="rounded-[28px] border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold tracking-[0.22em] text-[#0b1f44]/75 uppercase">
+                        {tx("tasteAlong.tasting", { wine: t(selectedWine.name, locale) })}
+                      </p>
+                      <h3 className="mt-2 font-serif text-xl italic text-[#0b1f44]">
+                        {METHOD_STEPS[tasteAlongStep].title_pl}
+                      </h3>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="rounded-full border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] px-2.5 py-1 text-[10px] font-semibold tracking-wide whitespace-nowrap text-[#0b1f44]/75 uppercase">
+                        {tx("tasteAlong.progress", {
+                          current: tasteAlongStep + 1,
+                          total: METHOD_STEPS.length,
+                        })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setTasteAlongOpen(false)}
+                        aria-label={tx("tasteAlong.close")}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-[#0b1f44]/60 transition hover:text-[#0b1f44]"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
+                          <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p aria-live="polite" className="mt-3 max-w-2xl text-sm leading-6 text-[#0b1f44]/85">
+                    {METHOD_STEPS[tasteAlongStep].body_pl}
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTasteAlongStep((step) => Math.max(0, step - 1))}
+                      disabled={tasteAlongStep === 0}
+                      className="inline-flex min-h-[36px] items-center rounded-full border border-[#0b1f44]/25 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-[#0b1f44]/70 uppercase transition enabled:hover:border-[#0b1f44]/50 disabled:opacity-40"
+                    >
+                      {tx("tasteAlong.back")}
+                    </button>
+                    {tasteAlongStep < METHOD_STEPS.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setTasteAlongStep((step) => Math.min(METHOD_STEPS.length - 1, step + 1))
+                        }
+                        className="inline-flex min-h-[36px] items-center rounded-full border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[var(--color-accent-gold)]/15 px-4 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-primary uppercase transition hover:bg-[var(--color-accent-gold)]/25"
+                      >
+                        {tx("tasteAlong.next")}
+                      </button>
+                    ) : (
+                      <>
+                        <span className="inline-flex min-h-[36px] items-center rounded-full border border-emerald-700/30 bg-emerald-700/10 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-emerald-800 uppercase">
+                          {tx("tasteAlong.done")}
+                        </span>
+                        {/* Same wn:open-chat prefill pattern as the
+                            "Porozmawiaj z AI sommelierem" button above. */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (typeof window === "undefined") return;
+                            const wine = t(selectedWine.name, locale);
+                            const prefill =
+                              locale === "pl"
+                                ? `Właśnie przeszedłem degustację krok po kroku dla wina „${wine}". Na co jeszcze zwrócić uwagę w tym winie?`
+                                : `I just finished the step-by-step tasting of "${wine}". What else should I look for in this wine?`;
+                            window.dispatchEvent(
+                              new CustomEvent("wn:open-chat", { detail: { prefill } }),
+                            );
+                          }}
+                          className="inline-flex min-h-[36px] items-center gap-2 rounded-full border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[var(--color-accent-gold)]/15 px-4 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-primary uppercase transition hover:bg-[var(--color-accent-gold)]/25"
+                        >
+                          {tx("tasteAlong.askBot")}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </section>
         ) : null}
       </main>
@@ -1170,7 +1411,7 @@ export default function PairingClient({
           <div className="flex items-center gap-2 py-2 pr-3 pl-4">
             {/* Score sits OUTSIDE the truncating name - long wine names were
                 swallowing the "· NN%" entirely (audit 2026-07). */}
-            <p className="min-w-0 flex-1 truncate text-sm text-white">
+            <p role="status" className="min-w-0 flex-1 truncate text-sm text-white">
               <span aria-hidden className="text-[var(--color-accent-gold)]">★ </span>
               <span className="font-semibold">
                 {t(

@@ -33,11 +33,14 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import WineBottleSVG from "@/components/v2/WineBottleSVG";
 import {
+  wineRegion,
+  wineWhy,
   winnicaWineUrl,
   type SamouczekWine,
 } from "@/data/samouczek-wines";
 import { matchWines, filledDimensions } from "@/lib/samouczek-match";
 import { dryness } from "@/lib/dryness";
+import { pickL, type CompassLang } from "@/data/wine-compass-kb";
 import type { CompassProfile } from "./TasteCompass";
 
 // Heavy SVG dial - single instance reused across both stages, level
@@ -57,6 +60,9 @@ interface Props {
   /** When true, hide the chat-launcher (passed down to FloatingTasteChat). */
   chatDisabled: boolean;
   onChatDisabledChange: (next: boolean) => void;
+  /** UI language - "pl" default keeps existing call-sites (and the PL e2e
+   *  surface) byte-identical; the EN /samouczek + /embed pass "en". */
+  lang?: CompassLang;
 }
 
 // dryness algorithm lives in @/lib/dryness (extracted for unit tests).
@@ -69,6 +75,13 @@ const STYLE_LABEL_PL: Record<SamouczekWine["style"], string> = {
   sparkling: "musujące",
   dessert: "deserowe",
 };
+const STYLE_LABEL_EN: Record<SamouczekWine["style"], string> = {
+  white: "white",
+  red: "red",
+  rose: "rosé",
+  sparkling: "sparkling",
+  dessert: "dessert",
+};
 
 // Match guardrail - mirrors the original Vinokompas calculator's "Wybierz co
 // najmniej 7 skojarzeń": below MIN_FILLED set dimensions the cosine match is
@@ -77,7 +90,7 @@ const STYLE_LABEL_PL: Record<SamouczekWine["style"], string> = {
 const MIN_FILLED = 4;
 const TARGET_FILLED = 9;
 
-function InlineProposals({ profile }: { profile: CompassProfile }) {
+function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: CompassLang }) {
   const filled = filledDimensions(profile);
   const matches = matchWines(profile, 3);
   const enough = filled >= MIN_FILLED && matches.length > 0;
@@ -95,20 +108,44 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
               re-sorts silently otherwise. Text flips between 3 states only, so
               it never spams per-click. */}
           <span className="sr-only" role="status">
-            {enough ? `${matches.length} propozycje win dopasowane do Twojego profilu` : ""}
+            {enough
+              ? pickL(
+                  lang,
+                  `${matches.length} propozycje win dopasowane do Twojego profilu`,
+                  `${matches.length} wine suggestions matched to your profile`,
+                )
+              : ""}
           </span>
-          <p className="pitch-eyebrow pitch-eyebrow--start">Twoje propozycje</p>
+          <p className="pitch-eyebrow pitch-eyebrow--start">
+            {pickL(lang, "Twoje propozycje", "Your suggestions")}
+          </p>
           <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
             {enough
-              ? "Wina dopasowane do Twojego smaku"
+              ? pickL(lang, "Wina dopasowane do Twojego smaku", "Wines matched to your taste")
               : filled === 0
-                ? "Ustaw Vinokompas, a wina pojawią się tutaj"
-                : "Jeszcze chwila - dobór się dostraja"}
+                ? pickL(
+                    lang,
+                    "Ustaw Vinokompas, a wina pojawią się tutaj",
+                    "Set your Vinocompas and the wines will appear here",
+                  )
+                : pickL(
+                    lang,
+                    "Jeszcze chwila - dobór się dostraja",
+                    "Almost there — the matching is fine-tuning",
+                  )}
           </h3>
           <p className="mt-1.5 font-serif text-sm italic text-[#e6e1d6]">
             {enough
-              ? `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach - im pełniejszy, tym pewniejszy dobór.`
-              : `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`}
+              ? pickL(
+                  lang,
+                  `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach - im pełniejszy, tym pewniejszy dobór.`,
+                  `The number beside each wine is your profile similarity in %. Your profile is described across ${filled}/${TARGET_FILLED} dimensions — the fuller it gets, the more confident the match.`,
+                )
+              : pickL(
+                  lang,
+                  `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`,
+                  `Your profile is still too sparse for an accurate match. Set at least ${MIN_FILLED} elements (the tastes around the wheel, or the sensation sectors) — you have ${filled}/${MIN_FILLED}. Just like the original Vinocompas: the more associations, the sharper the aim.`,
+                )}
           </p>
           {/* Profile-completeness meter - richness toward a confident match. */}
           <div
@@ -117,7 +154,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
             aria-valuemin={0}
             aria-valuemax={TARGET_FILLED}
             aria-valuenow={filled}
-            aria-label="Kompletność profilu"
+            aria-label={pickL(lang, "Kompletność profilu", "Profile completeness")}
           >
             <div
               className={`h-full rounded-full transition-[width] duration-500 ${enough ? "bg-[var(--color-accent-gold)]" : "bg-[var(--color-accent-gold)]/45"}`}
@@ -129,7 +166,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
           href="/pairing"
           className="pitch-cta-ghost inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs"
         >
-          Pełny dobór
+          {pickL(lang, "Pełny dobór", "Full pairing")}
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -139,10 +176,13 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
       {enough ? (
         <ul className="mt-5 grid gap-3 sm:grid-cols-3">
           {matches.map(({ wine, matchPct }, i) => {
-            // Two grape entries can share a verbatim why_pl — showing the
+            // Two grape entries can share a verbatim why — showing the
             // identical italic blurb twice reads templated, so suppress a
             // card's blurb when it string-matches the previous card's.
-            const showWhy = i === 0 || wine.why_pl !== matches[i - 1].wine.why_pl;
+            // Compared on the RENDERED (locale-picked) text: the EN generic
+            // fallback can collide even when the PL originals differ.
+            const whyText = wineWhy(wine, lang);
+            const showWhy = i === 0 || whyText !== wineWhy(matches[i - 1].wine, lang);
             return (
             <li key={wine.id} className="vk-rise" style={{ animationDelay: `${i * 80}ms` }}>
               <a
@@ -181,25 +221,25 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
                         {matchPct}%
                       </span>
                       <span className="text-[10px] tracking-[0.16em] text-[#c79f69]/70 uppercase">
-                        {STYLE_LABEL_PL[wine.style]}
+                        {lang === "pl" ? STYLE_LABEL_PL[wine.style] : STYLE_LABEL_EN[wine.style]}
                       </span>
                     </div>
                     <p className="mt-2 font-serif text-base leading-tight text-[#f4efe9]">
                       {wine.name_pl}
                     </p>
                     <p className="mt-0.5 text-[10px] tracking-[0.14em] text-[#c79f69]/70 uppercase">
-                      {wine.region_pl}
+                      {wineRegion(wine, lang)}
                     </p>
                   </div>
                 </div>
                 {showWhy ? (
                   <p className="font-serif text-[13px] leading-snug text-[#e6e1d6] italic">
-                    {wine.why_pl}
+                    {whyText}
                   </p>
                 ) : null}
                 <div className="mt-auto flex items-center justify-between gap-2 border-t border-[rgba(199,159,105,0.16)] pt-3">
                   <span className="font-serif text-sm text-[#f4efe9]">
-                    od {wine.priceFrom} zł
+                    {pickL(lang, "od", "from")} {wine.priceFrom} zł
                   </span>
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.14em] text-[var(--color-accent-gold)] uppercase transition group-hover:gap-1.5">
                     winnica.pl
@@ -227,7 +267,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
                 <WineBottleSVG style={style} className="h-16 w-auto" />
               </span>
               <span className="font-serif text-sm italic text-[color:var(--ink-muted)]">
-                Propozycja {i + 1}
+                {pickL(lang, "Propozycja", "Suggestion")} {i + 1}
               </span>
             </div>
           ))}
@@ -235,7 +275,7 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
       )}
 
       <p className="mt-4 text-xs leading-relaxed text-[color:var(--color-accent-gold)]">
-        Propozycje pochodzą z oferty{" "}
+        {pickL(lang, "Propozycje pochodzą z oferty", "Suggestions come from the range at")}{" "}
         <a
           href="https://winnica.pl/pl/"
           target="_blank"
@@ -244,7 +284,11 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
         >
           winnica.pl
         </a>{" "}
-        - twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.
+        {pickL(
+          lang,
+          "- twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.",
+          "— the creators of the Vinocompas method. Matching is calculated live from your taste profile.",
+        )}
       </p>
     </div>
   );
@@ -254,18 +298,27 @@ function InlineProposals({ profile }: { profile: CompassProfile }) {
 function StageNav({
   stage,
   setStage,
+  lang,
 }: {
   stage: Stage;
   setStage: (s: Stage) => void;
+  lang: CompassLang;
 }) {
   // subShort: the mobile slot is ~88px of tracked uppercase — "3 podstawowe
   // smaki" truncated to "3 PODSTAWO…" next to tabs 2-3 that fit (audit
   // 2026-07). Full string returns from sm: up.
-  const items: { n: Stage; label: string; sub: string; subShort: string }[] = [
-    { n: 1, label: "SMAK", sub: "3 osie smaku", subShort: "3 osie" },
-    { n: 2, label: "WRAŻENIA", sub: "6 wrażeń", subShort: "6 wrażeń" },
-    { n: 3, label: "AROMATY", sub: "12 aromatów", subShort: "12 aromatów" },
-  ];
+  const items: { n: Stage; label: string; sub: string; subShort: string }[] =
+    lang === "pl"
+      ? [
+          { n: 1, label: "SMAK", sub: "3 osie smaku", subShort: "3 osie" },
+          { n: 2, label: "WRAŻENIA", sub: "6 wrażeń", subShort: "6 wrażeń" },
+          { n: 3, label: "AROMATY", sub: "12 aromatów", subShort: "12 aromatów" },
+        ]
+      : [
+          { n: 1, label: "TASTE", sub: "3 taste axes", subShort: "3 axes" },
+          { n: 2, label: "SENSATIONS", sub: "6 sensations", subShort: "6 sensations" },
+          { n: 3, label: "AROMAS", sub: "12 aromas", subShort: "12 aromas" },
+        ];
   return (
     <ol className="grid grid-cols-3 gap-2 sm:gap-3">
       {items.map((it) => {
@@ -276,6 +329,7 @@ function StageNav({
             <button
               type="button"
               onClick={() => setStage(it.n)}
+              aria-current={active ? "step" : undefined}
               className={`group flex h-full w-full min-w-0 flex-col items-start gap-1 overflow-hidden rounded-xl border px-3 py-3 text-left transition sm:px-4 ${
                 active
                   ? "border-[var(--color-accent-gold)] bg-[var(--color-accent-gold)]/10"
@@ -305,7 +359,7 @@ function StageNav({
                   )}
                 </span>
                 <span className={`text-[11px] tracking-wide sm:font-serif sm:text-xs sm:italic sm:tracking-wider ${active ? "text-[var(--color-accent-gold)]" : "text-[#e6e1d6]"}`}>
-                  ETAP {it.n}
+                  {pickL(lang, "ETAP", "STAGE")} {it.n}
                 </span>
               </span>
               {/* Row 2: plain sans 12px on phones - the serif italic + wide
@@ -334,6 +388,7 @@ export default function StagedTutorial({
   onProfileChange,
   chatDisabled,
   onChatDisabledChange,
+  lang = "pl",
 }: Props) {
   const [stage, setStage] = useState<Stage>(1);
 
@@ -362,7 +417,7 @@ export default function StagedTutorial({
     }
   }, [stage]);
 
-  const dr = useMemo(() => dryness(profile), [profile]);
+  const dr = useMemo(() => dryness(profile, lang), [profile, lang]);
 
   // Deterministic landing after a stage switch: always scroll to the tab
   // strip (client 16.07: "przeskakuje czasem za daleko, czasem za blisko" -
@@ -388,11 +443,12 @@ export default function StagedTutorial({
           the Czat toggle wraps underneath. */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0 flex-1 basis-full sm:basis-0">
-          <StageNav stage={stage} setStage={setStage} />
+          <StageNav stage={stage} setStage={setStage} lang={lang} />
         </div>
         <ChatToggle
           disabled={chatDisabled}
           onChange={onChatDisabledChange}
+          lang={lang}
         />
       </div>
 
@@ -410,18 +466,21 @@ export default function StagedTutorial({
           onReset={() => onProfileChange({})}
           placement="top"
           className="mb-4 border-b border-[rgba(199,159,105,0.20)] pb-4"
+          lang={lang}
         />
 
         {stage === 1 ? (
           <StageSmak
+            chatDisabled={chatDisabled}
             profile={profile}
             onProfileChange={onProfileChange}
             dryness={dr}
+            lang={lang}
           />
         ) : stage === 2 ? (
-          <StageWrazenia profile={profile} onProfileChange={onProfileChange} />
+          <StageWrazenia profile={profile} onProfileChange={onProfileChange} lang={lang} chatDisabled={chatDisabled} />
         ) : (
-          <StageAromaty profile={profile} onProfileChange={onProfileChange} />
+          <StageAromaty profile={profile} onProfileChange={onProfileChange} lang={lang} chatDisabled={chatDisabled} />
         )}
 
         <StageControls
@@ -430,12 +489,13 @@ export default function StagedTutorial({
           goNext={goNext}
           onReset={() => onProfileChange({})}
           className="mt-7 border-t border-[rgba(199,159,105,0.20)] pt-5"
+          lang={lang}
         />
       </div>
 
       {/* Live wine proposals - appear right below, update as the profile changes */}
       <div id="propozycje" className="scroll-mt-[5.5rem]">
-        <InlineProposals profile={profile} />
+        <InlineProposals profile={profile} lang={lang} />
       </div>
     </div>
   );
@@ -453,6 +513,7 @@ function StageControls({
   onReset,
   className,
   placement = "bottom",
+  lang,
 }: {
   stage: Stage;
   goPrev: () => void;
@@ -460,6 +521,7 @@ function StageControls({
   onReset: () => void;
   className?: string;
   placement?: "top" | "bottom";
+  lang: CompassLang;
 }) {
   const rootDisplay =
     placement === "top"
@@ -476,7 +538,7 @@ function StageControls({
             onClick={goPrev}
             className="min-h-[44px] rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
           >
-            ← Poprzedni etap
+            ← {pickL(lang, "Poprzedni etap", "Previous stage")}
           </button>
         ) : null}
         {/* Wyczyść BEFORE the long skip button: on the mobile 2-col grid the
@@ -488,7 +550,7 @@ function StageControls({
           onClick={onReset}
           className={`min-h-[44px] rounded-full border border-white/12 px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 1 ? "col-span-2 lg:col-auto" : ""}`}
         >
-          Wyczyść
+          {pickL(lang, "Wyczyść", "Clear")}
         </button>
         {stage < 3 ? (
           <button
@@ -498,7 +560,7 @@ function StageControls({
             }
             className="order-last col-span-2 min-h-[44px] rounded-full border border-[rgba(199,159,105,0.30)] lg:order-none bg-[#0b1f44] px-4 py-2 text-xs font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
           >
-            Pokaż dopasowane wina →
+            {pickL(lang, "Pokaż dopasowane wina", "Show matched wines")} →
           </button>
         ) : null}
       </div>
@@ -508,7 +570,7 @@ function StageControls({
           onClick={goNext}
           className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5! py-2! text-xs lg:col-auto"
         >
-          Następny etap
+          {pickL(lang, "Następny etap", "Next stage")}
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -521,7 +583,7 @@ function StageControls({
           }
           className="pitch-cta-primary col-span-2 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5! py-2! text-xs lg:col-auto"
         >
-          Pokaż wina
+          {pickL(lang, "Pokaż wina", "Show wines")}
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -536,31 +598,47 @@ function StageSmak({
   profile,
   onProfileChange,
   dryness: dr,
+  lang,
+  chatDisabled,
 }: {
   profile: CompassProfile;
   onProfileChange: (next: CompassProfile) => void;
   dryness: { score: number; label: string };
+  lang: CompassLang;
+  chatDisabled?: boolean;
 }) {
   return (
     <div>
       <header>
-        {/* Stage copy = the client's round-3 texts, verbatim. The question
-            heading replaces the old mechanics-first instruction ("etap 1 uczy,
-            że wytrawność to coś więcej niż cukier"). */}
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap I · Smak</p>
+        {/* Stage copy = the client's round-3 texts, verbatim (EN = faithful
+            rendering). The question heading replaces the old mechanics-first
+            instruction ("etap 1 uczy, że wytrawność to coś więcej niż cukier"). */}
+        <p className="pitch-eyebrow pitch-eyebrow--start">
+          {pickL(lang, "Etap I · Smak", "Stage I · Taste")}
+        </p>
         <h2 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
-          Jak odbierasz smak wina, które lubisz?
+          {pickL(
+            lang,
+            "Jak odbierasz smak wina, które lubisz?",
+            "How do you experience the taste of a wine you love?",
+          )}
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Kliknij na każdej z trzech osi. Im dalej od środka, tym mocniej odczuwasz daną cechę.
+          {pickL(
+            lang,
+            "Kliknij na każdej z trzech osi. Im dalej od środka, tym mocniej odczuwasz daną cechę.",
+            "Tap each of the three axes. The further from the centre, the more strongly you feel that trait.",
+          )}
         </p>
       </header>
 
       <div className="mt-4">
         <InteractiveCompass
+          chatDisabled={chatDisabled}
           profile={profile}
           onProfileChange={onProfileChange}
           level={1}
+          lang={lang}
           autoStartTour
           // Dryness meter directly under the compass on the same card — first
           // thing visible, updates live since `dr` is recomputed each render
@@ -569,6 +647,7 @@ function StageSmak({
             <DrynessMeter
               score={dr.score}
               label={dr.label}
+              lang={lang}
               // No verdict before the user touches an axis — an all-zero
               // profile scored "Wytrawne", contradicting the caption's
               // "na podstawie WYBRANYCH proporcji" (audit 2026-07).
@@ -587,39 +666,68 @@ function StageSmak({
 function StageWrazenia({
   profile,
   onProfileChange,
+  lang,
+  chatDisabled,
 }: {
   profile: CompassProfile;
   onProfileChange: (next: CompassProfile) => void;
+  lang: CompassLang;
+  chatDisabled?: boolean;
 }) {
   return (
     <div>
       <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap II · Wrażenia</p>
+        <p className="pitch-eyebrow pitch-eyebrow--start">
+          {pickL(lang, "Etap II · Wrażenia", "Stage II · Sensations")}
+        </p>
         {/* Client round-3 copy, verbatim ("etap 2 uczy rozpoznawania
             charakteru wina", not terminology). */}
         <h2 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
-          Jaki charakter ma wino, które lubisz?
+          {pickL(
+            lang,
+            "Jaki charakter ma wino, które lubisz?",
+            "What character does a wine you love have?",
+          )}
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Smak to dopiero początek.{" "}
+          {pickL(lang, "Smak to dopiero początek.", "Taste is only the beginning.")}{" "}
           <strong className="not-italic font-semibold text-[#f4efe9]">
-            Wrażenia opisują, jak odbierasz wino jako całość.
+            {pickL(
+              lang,
+              "Wrażenia opisują, jak odbierasz wino jako całość.",
+              "Sensations describe how you experience a wine as a whole.",
+            )}
           </strong>{" "}
-          Dzięki nim łatwiej nazwać to, co czujesz podczas degustacji i znaleźć wina o podobnym charakterze.
+          {pickL(
+            lang,
+            "Dzięki nim łatwiej nazwać to, co czujesz podczas degustacji i znaleźć wina o podobnym charakterze.",
+            "They make it easier to name what you feel while tasting and to find wines with a similar character.",
+          )}
         </p>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Ustaw siłę każdego z sześciu wrażeń. Im dalej od środka, tym bardziej dane wrażenie
-          opisuje wino, które lubisz. Nie wiesz od czego zacząć?{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">Uruchom przewodnik</strong>{" "}
-          lub najedź kursorem na wybrane wrażenie.
+          {pickL(
+            lang,
+            "Ustaw siłę każdego z sześciu wrażeń. Im dalej od środka, tym bardziej dane wrażenie opisuje wino, które lubisz. Nie wiesz od czego zacząć?",
+            "Set the strength of each of the six sensations. The further from the centre, the more that sensation describes the wine you love. Not sure where to begin?",
+          )}{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">
+            {pickL(lang, "Uruchom przewodnik", "Start the guide")}
+          </strong>{" "}
+          {pickL(
+            lang,
+            "lub najedź kursorem na wybrane wrażenie.",
+            "or hover over a sensation.",
+          )}
         </p>
       </header>
 
       <div className="mt-4">
         <InteractiveCompass
+          chatDisabled={chatDisabled}
           profile={profile}
           onProfileChange={onProfileChange}
           level={2}
+          lang={lang}
           autoStartTour
         />
       </div>
@@ -631,11 +739,13 @@ function DrynessMeter({
   score,
   label,
   empty = false,
+  lang,
 }: {
   score: number;
   label: string;
   /** True while no base smak is set — show a neutral prompt, hide the pin. */
   empty?: boolean;
+  lang: CompassLang;
 }) {
   // Score 0..100 → marker position along the rail, clamped a touch off the
   // rounded ends so the pin never hangs into empty space at the extremes.
@@ -644,11 +754,13 @@ function DrynessMeter({
     <div className="mt-7 rounded-2xl border border-[rgba(199,159,105,0.22)] bg-[#0b1f44]/55 p-5">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[11px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
-          Twój profil wytrawności
+          {pickL(lang, "Twój profil wytrawności", "Your dryness profile")}
         </p>
         <p className="font-serif text-base italic text-white" aria-live="polite">
           {empty ? (
-            <span className="text-sm text-[#e6e1d6]/70">Zaznacz osie, aby zobaczyć profil</span>
+            <span className="text-sm text-[#e6e1d6]/70">
+              {pickL(lang, "Zaznacz osie, aby zobaczyć profil", "Mark the axes to see your profile")}
+            </span>
           ) : (
             label
           )}
@@ -658,9 +770,9 @@ function DrynessMeter({
       {/* Zone labels live in their own row so the marker can never collide
           with them. The centre is the dry/sweet boundary → "Półwytrawne". */}
       <div className="mt-4 flex justify-between text-xs tracking-wider text-[color:var(--color-accent-gold)] uppercase">
-        <span>Bardzo wytrawne</span>
-        <span className="hidden sm:inline">Półwytrawne</span>
-        <span>Bardzo słodkie</span>
+        <span>{pickL(lang, "Bardzo wytrawne", "Bone dry")}</span>
+        <span className="hidden sm:inline">{pickL(lang, "Półwytrawne", "Off-dry")}</span>
+        <span>{pickL(lang, "Bardzo słodkie", "Lusciously sweet")}</span>
       </div>
 
       {/* Rail + position pin */}
@@ -697,8 +809,11 @@ function DrynessMeter({
           placeholder model (see dryness() comment) - the copy frames it as a
           profile readout, which is exactly what it is. */}
       <p className="mt-3 text-xs leading-snug text-[color:var(--color-accent-gold)]">
-        Na podstawie wybranych proporcji słodyczy, kwasowości i cierpkości Vinocompas pokazuje,
-        jak wytrawne jest wino o takim profilu.
+        {pickL(
+          lang,
+          "Na podstawie wybranych proporcji słodyczy, kwasowości i cierpkości Vinocompas pokazuje, jak wytrawne jest wino o takim profilu.",
+          "Based on the proportions of sweetness, acidity and astringency you have chosen, Vinocompas shows how dry a wine with this profile is.",
+        )}
       </p>
     </div>
   );
@@ -711,29 +826,43 @@ function DrynessMeter({
 function StageAromaty({
   profile,
   onProfileChange,
+  lang,
+  chatDisabled,
 }: {
   profile: CompassProfile;
   onProfileChange: (next: CompassProfile) => void;
+  lang: CompassLang;
+  chatDisabled?: boolean;
 }) {
   return (
     <div>
       <header>
-        <p className="pitch-eyebrow pitch-eyebrow--start">Etap III · Aromaty</p>
+        <p className="pitch-eyebrow pitch-eyebrow--start">
+          {pickL(lang, "Etap III · Aromaty", "Stage III · Aromas")}
+        </p>
         <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
-          Dwanaście aromatów
+          {pickL(lang, "Dwanaście aromatów", "Twelve aromas")}
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
-          Tryb dla zaawansowanych: każde wrażenie ma dwa aromaty. Kliknij konkretny
-          aromat na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia
-          każdej z 12. <strong className="not-italic font-semibold text-[#f4efe9]">Auto-przewodnik</strong> pokaże je po kolei.
+          {pickL(
+            lang,
+            "Tryb dla zaawansowanych: każde wrażenie ma dwa aromaty. Kliknij konkretny aromat na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia każdej z 12.",
+            "Advanced mode: each sensation has two aromas. Tap a specific aroma on the wheel to fine-tune your profile (0-5). On the right — the full description and associations for each of the 12.",
+          )}{" "}
+          <strong className="not-italic font-semibold text-[#f4efe9]">
+            {pickL(lang, "Auto-przewodnik", "The auto-guide")}
+          </strong>{" "}
+          {pickL(lang, "pokaże je po kolei.", "will present them one by one.")}
         </p>
       </header>
 
       <div className="mt-4">
         <InteractiveCompass
+          chatDisabled={chatDisabled}
           profile={profile}
           onProfileChange={onProfileChange}
           level={3}
+          lang={lang}
           autoStartTour
         />
       </div>
@@ -745,9 +874,11 @@ function StageAromaty({
 function ChatToggle({
   disabled,
   onChange,
+  lang,
 }: {
   disabled: boolean;
   onChange: (next: boolean) => void;
+  lang: CompassLang;
 }) {
   return (
     <button
@@ -759,7 +890,11 @@ function ChatToggle({
           ? "border-white/15 bg-white/5 text-[#cbc1b1]"
           : "border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 text-[var(--color-accent-gold)]"
       }`}
-      title={disabled ? "Włącz przewodnika" : "Wyłącz przewodnika"}
+      title={
+        disabled
+          ? pickL(lang, "Włącz przewodnika", "Turn the guide on")
+          : pickL(lang, "Wyłącz przewodnika", "Turn the guide off")
+      }
     >
       <span
         aria-hidden
@@ -773,7 +908,7 @@ function ChatToggle({
           }`}
         />
       </span>
-      Czat
+      {pickL(lang, "Czat", "Chat")}
     </button>
   );
 }

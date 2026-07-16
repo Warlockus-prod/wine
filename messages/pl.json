@@ -50,7 +50,8 @@
       "navLabel": "Stopka",
       "tutorial": "Samouczek smaku",
       "pairing": "Łączenie",
-      "forRestaurants": "Dla restauracji"
+      "forRestaurants": "Dla restauracji",
+      "privacy": "Prywatność"
     }
   },
   "restaurant": {
@@ -123,6 +124,19 @@
     "botCompare": "Porównuję <hl>{dish}</hl> z <hl>{wine}</hl>.",
     "botFallbackReason": "To wino jest poza strefą najlepszych dopasowań do wybranego dania, ale styl można jeszcze ocenić poprzez paszport i sygnały rankingowe.",
     "botServiceNote": "Notatka serwisowa: podawać w {temp}°C. {decant}",
+    "profileToggle": "Uwzględnij mój profil smaku",
+    "profileBlendNote": "Ranking łączy dopasowanie do dania z Twoim profilem z samouczka.",
+    "profileBadge": "profil",
+    "tasteAlong": {
+      "open": "Degustuj krok po kroku",
+      "tasting": "Degustujesz: {wine}",
+      "progress": "krok {current}/{total}",
+      "back": "Wstecz",
+      "next": "Dalej",
+      "done": "Gotowe ✓",
+      "close": "Zamknij",
+      "askBot": "Zapytaj AI sommeliera o to wino"
+    },
     "winePassport": "Paszport wina",
     "passport": {
       "grape": "Szczep",

@@ -76,7 +76,9 @@ export default function TasteChat({
     try {
       const raw = window.localStorage.getItem(storageKey);
       if (raw) {
-        const restored = JSON.parse(raw) as ChatMessage[];
+        const restored = (JSON.parse(raw) as ChatMessage[])
+          // A reload mid-send used to resurrect the pulsing "…" bubble forever.
+          .filter((m) => !m.pending);
         if (Array.isArray(restored) && restored.length > 0) {
           setMessages(restored);
         }
@@ -145,6 +147,8 @@ export default function TasteChat({
         body: JSON.stringify({
           messages: baseHistory.map(({ role, content }) => ({ role, content })),
           profile,
+          // Reply language follows the UI locale (EN page → English answers).
+          locale: typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "pl",
           // Page context flows to /api/chat as a system-prompt suffix so
           // the bot knows what the user is looking at right now.
           pageContext,
@@ -159,7 +163,12 @@ export default function TasteChat({
         return [...next, { role: "assistant", content: data.reply! }];
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Coś poszło nie tak.";
+      // Server errors carry a friendly PL string; transport errors leak raw
+      // English ("Failed to fetch") - keep those behind the PL fallback.
+      const raw = err instanceof Error ? err.message : "";
+      const msg = raw && !/failed to fetch|networkerror|load failed/i.test(raw)
+        ? raw
+        : "Coś poszło nie tak - sprawdź połączenie i spróbuj ponownie.";
       setError(msg);
       setMessages((prev) => {
         const next = prev.slice(0, -1);

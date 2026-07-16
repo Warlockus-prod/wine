@@ -38,6 +38,10 @@ export interface SamouczekWine {
   priceFrom: number;
   /** One-line "why it fits your profile", PL. */
   why_pl: string;
+  /** Optional EN twin of why_pl. The generated winnica.pl catalogue has no
+   *  EN copy (do NOT hand-edit winnica-catalog.generated.ts) - EN cards fall
+   *  back to a generic grape/style sentence via wineWhy(). */
+  why_en?: string;
   /** CompassProfile key → strength (0..5, winnica data-sheet scale; the
    *  cosine matcher is scale-invariant so legacy 0..4 entries mix fine). */
   fingerprint: Record<string, number>;
@@ -264,6 +268,71 @@ const LEGACY_ARCHETYPES: SamouczekWine[] = [
     query: "Porto",
   },
 ];
+
+// ── locale helpers for proposal cards ─────────────────────────────────────
+// The catalogue is PL-authored (and the generated file must not be edited),
+// so the EN surface localizes at render time: why_en when present, otherwise
+// a generic grape/style sentence; regions via a small PL→EN geo word map.
+
+const STYLE_WORD_EN: Record<SamouczekWineStyle, string> = {
+  white: "white",
+  red: "red",
+  rose: "rosé",
+  sparkling: "sparkling",
+  dessert: "dessert",
+};
+
+/** Locale-aware "why it fits" line for a proposal card. */
+export function wineWhy(
+  wine: Pick<SamouczekWine, "why_pl" | "why_en" | "grape" | "style">,
+  lang: "pl" | "en",
+): string {
+  if (lang !== "en") return wine.why_pl;
+  if (wine.why_en) return wine.why_en;
+  return wine.grape
+    ? `A ${STYLE_WORD_EN[wine.style]} wine built on ${wine.grape} - matched live to your compass profile.`
+    : "Matched live to your compass profile.";
+}
+
+// PL geo terms appearing in region_pl across the catalogue. Applied token-
+// wise so "Mendoza, Argentyna" → "Mendoza, Argentina"; unknown words pass
+// through untouched (most regions are already language-neutral).
+const REGION_WORD_EN: Record<string, string> = {
+  "Włochy": "Italy",
+  "Francja": "France",
+  "Hiszpania": "Spain",
+  "Niemcy": "Germany",
+  "Portugalia": "Portugal",
+  "Izrael": "Israel",
+  "Grecja": "Greece",
+  "Argentyna": "Argentina",
+  "Nowa Zelandia": "New Zealand",
+  "Nowa Południowa Walia": "New South Wales",
+  "Kastylia": "Castile",
+  "Katalonia": "Catalonia",
+  "Korynt": "Corinth",
+  "Toskania": "Tuscany",
+  "Piemont": "Piedmont",
+  "Burgundia": "Burgundy",
+  "Loara": "Loire",
+  "Alzacja": "Alsace",
+  "Mozela": "Mosel",
+};
+
+/** Locale-aware region label - translates the PL geo words on EN cards. */
+export function wineRegion(
+  wine: Pick<SamouczekWine, "region_pl">,
+  lang: "pl" | "en",
+): string {
+  if (lang !== "en") return wine.region_pl;
+  return wine.region_pl
+    .split(",")
+    .map((part) => {
+      const p = part.trim();
+      return REGION_WORD_EN[p] ?? p;
+    })
+    .join(", ");
+}
 
 /** Build a winnica.pl search URL for a grape/style query. */
 export const winnicaSearchUrl = (query: string): string =>

@@ -32,6 +32,7 @@ import {
   type ApiDish,
   type ApiWine,
 } from "@/lib/use-restaurant-data";
+import { parseWineImport, toWinePayload, winePlural } from "@/lib/wine-import";
 import type { Locale } from "@/i18n/routing";
 import type { LocalizedString } from "@/types/pairing";
 
@@ -386,12 +387,207 @@ function WinesTab({
         </button>
       </article>
 
+      <WineImportPanel slug={slug} onStatus={onStatus} />
+
       <div className="grid gap-3">
         {wines.map((w) => (
           <WineRow key={w.id} slug={slug} wine={w} locale={locale} onStatus={onStatus} />
         ))}
       </div>
     </section>
+  );
+}
+
+/* ─────────────────────────  WINE-LIST IMPORT  ───────────────────────── */
+
+function WineImportPanel({
+  slug,
+  onStatus,
+}: {
+  slug: string;
+  onStatus: (kind: "ok" | "err", text: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [raw, setRaw] = useState("");
+  // Line numbers the operator unchecked in the preview (keyed by source line).
+  const [excluded, setExcluded] = useState<Set<number>>(new Set());
+  const [importing, setImporting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [summary, setSummary] = useState<{
+    created: number;
+    failed: { name: string; reason: string }[];
+  } | null>(null);
+
+  const rows = useMemo(() => parseWineImport(raw), [raw]);
+  const invalidCount = rows.filter((r) => r.errors.length > 0).length;
+  const selected = rows.filter((r) => r.errors.length === 0 && !excluded.has(r.line));
+
+  const toggleRow = (line: number) => {
+    setExcluded((prev) => {
+      const next = new Set(prev);
+      if (next.has(line)) next.delete(line);
+      else next.add(line);
+      return next;
+    });
+  };
+
+  const runImport = async () => {
+    if (selected.length === 0 || importing) return;
+    setImporting(true);
+    setSummary(null);
+    setProgress(0);
+    let created = 0;
+    const failed: { name: string; reason: string }[] = [];
+    // Sequential POSTs — createWine revalidates the SWR wine list after each.
+    for (let i = 0; i < selected.length; i++) {
+      const row = selected[i];
+      try {
+        await createWine(slug, toWinePayload(row));
+        created++;
+      } catch (e) {
+        failed.push({ name: row.name, reason: (e as Error).message });
+      }
+      setProgress(i + 1);
+    }
+    setImporting(false);
+    setSummary({ created, failed });
+    if (failed.length === 0) {
+      setRaw("");
+      setExcluded(new Set());
+      onStatus("ok", `Zaimportowano ${created} ${winePlural(created)}.`);
+    } else {
+      onStatus("err", `Zaimportowano ${created} ${winePlural(created)}, błędów: ${failed.length}.`);
+    }
+  };
+
+  return (
+    <article className="overflow-hidden rounded-2xl border border-white/10 bg-[#081634]">
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-white/4"
+      >
+        <h2 className="text-lg font-semibold text-white">Import karty win</h2>
+        <span className="hidden text-xs text-gray-400 sm:inline">
+          CSV z nagłówkiem albo linie „Nazwa | Region | Szczep | Styl | Rocznik | Cena”
+        </span>
+        <span
+          className="ml-auto text-[var(--color-accent-gold)]"
+          style={{ transform: open ? "rotate(45deg)" : "none", transition: "transform 200ms" }}
+        >
+          +
+        </span>
+      </button>
+      {open ? (
+        <div className="space-y-4 border-t border-white/8 p-5">
+          <textarea
+            className={`${inputCls} min-h-[140px] font-mono text-xs`}
+            placeholder={
+              "Wklej CSV lub linie…\n\nname,region,grape,style,vintage,price,notes\nChablis AC,Burgundia,Chardonnay,White,2022,120,mineralne\n\n— albo —\n\nBarolo DOCG | Piemont | Nebbiolo | Red | 2019 | 240"
+            }
+            aria-label="Wklej CSV lub linie"
+            value={raw}
+            onChange={(e) => {
+              setRaw(e.target.value);
+              setExcluded(new Set());
+              setSummary(null);
+            }}
+            disabled={importing}
+          />
+
+          {rows.length > 0 ? (
+            <>
+              <p className="text-[11px] font-bold tracking-wider text-[var(--color-accent-gold)] uppercase">
+                Podgląd · {rows.length} {rows.length === 1 ? "wiersz" : "wierszy"}
+                {invalidCount > 0 ? (
+                  <span className="ml-2 font-semibold text-rose-300 normal-case tracking-normal">
+                    ({invalidCount} z błędami — pominięte)
+                  </span>
+                ) : null}
+              </p>
+              <div className="overflow-x-auto rounded-xl border border-white/10">
+                <table className="w-full min-w-[680px] text-left text-xs text-gray-300">
+                  <thead>
+                    <tr className="border-b border-white/10 bg-black/30 text-[10px] tracking-wider text-gray-400 uppercase">
+                      <th className="px-3 py-2" aria-label="Wybór" />
+                      <th className="px-3 py-2">Nazwa</th>
+                      <th className="px-3 py-2">Region</th>
+                      <th className="px-3 py-2">Szczep</th>
+                      <th className="px-3 py-2">Styl</th>
+                      <th className="px-3 py-2">Rocznik</th>
+                      <th className="px-3 py-2">Cena</th>
+                      <th className="px-3 py-2">Błędy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => {
+                      const hasErrors = r.errors.length > 0;
+                      const isChecked = !hasErrors && !excluded.has(r.line);
+                      return (
+                        <tr
+                          key={r.line}
+                          className={`border-b border-white/5 last:border-b-0 ${hasErrors ? "opacity-70" : ""}`}
+                        >
+                          <td className="px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              disabled={hasErrors || importing}
+                              onChange={() => toggleRow(r.line)}
+                              aria-label={`Importuj wiersz ${r.line}`}
+                            />
+                          </td>
+                          <td className="px-3 py-2 font-semibold text-white">{r.name || "—"}</td>
+                          <td className="px-3 py-2">{r.region || "—"}</td>
+                          <td className="px-3 py-2">{r.grape || "—"}</td>
+                          <td className="px-3 py-2">{r.style || "—"}</td>
+                          <td className="px-3 py-2">{r.vintage || "—"}</td>
+                          <td className="px-3 py-2">{r.price !== null ? `$${r.price}` : "—"}</td>
+                          <td className="px-3 py-2 text-rose-300">{r.errors.join("; ")}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <button
+                type="button"
+                onClick={runImport}
+                disabled={importing || selected.length === 0}
+                className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-[color:var(--on-primary)] transition hover:bg-primary-dark disabled:opacity-60"
+              >
+                {importing
+                  ? `Importuję… ${progress}/${selected.length}`
+                  : `Importuj ${selected.length} ${winePlural(selected.length)}`}
+              </button>
+            </>
+          ) : null}
+
+          {summary ? (
+            <div
+              className={`rounded-xl border px-3 py-2 text-sm ${
+                summary.failed.length === 0
+                  ? "border-emerald-500/30 bg-emerald-900/20 text-emerald-100"
+                  : "border-rose-500/30 bg-rose-900/20 text-rose-100"
+              }`}
+            >
+              <p>
+                Utworzono: {summary.created} · Nieudane: {summary.failed.length}
+              </p>
+              {summary.failed.length > 0 ? (
+                <ul className="mt-1 list-disc pl-5 text-xs">
+                  {summary.failed.map((f, i) => (
+                    <li key={i}>
+                      {f.name}: {f.reason}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </article>
   );
 }
 

@@ -1462,3 +1462,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .compass-medallion { animation: none; opacity: 1; }
 }
+
+/* ── Wheel keyboard focus (WCAG 2.4.7) — the wedge overlays used inline
+   outline:none; keyboard users had no focus indicator at any level. */
+.taste-compass-svg [role="slider"]:focus-visible,
+.taste-compass-svg [role="button"]:focus-visible {
+  outline: 2px solid #c79f69;
+  outline-offset: 2px;
+}

@@ -16,6 +16,8 @@ interface ChatRequest {
    *  slug, etc.) injected as a system note so the bot's reply is grounded
    *  in what the user is looking at right now. */
   pageContext?: string;
+  /** UI locale of the page ("pl" | "en") - the bot replies in kind. */
+  locale?: string;
   /** Optional analytics passthroughs. */
   anonymousId?: string;
   sessionId?: string;
@@ -88,7 +90,7 @@ const profileToSummary = (profile: Record<string, number> | undefined): string |
   if (nonZero.length === 0) return null;
   const lines = nonZero
     .sort((a, b) => Number(b[1]) - Number(a[1]))
-    .map(([k, v]) => `- ${k}: ${v}/4`)
+    .map(([k, v]) => `- ${k}: ${v}/5`)
     .join("\n");
   return `Aktualny profil użytkownika na kompasie (tylko zaznaczone tendencje):\n${lines}`;
 };
@@ -172,7 +174,7 @@ export async function POST(request: Request) {
         ? { max_completion_tokens: MAX_RESPONSE_TOKENS }
         : { max_tokens: MAX_RESPONSE_TOKENS, temperature: 0.6 }),
       messages: [
-        { role: "system", content: buildChatSystemPrompt() },
+        { role: "system", content: buildChatSystemPrompt(body.locale === "en" ? "en" : "pl") },
         ...(profileNote ? [{ role: "system" as const, content: profileNote }] : []),
         ...(pageNote ? [{ role: "user" as const, content: pageNote }] : []),
         ...cleaned,

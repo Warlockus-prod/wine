@@ -121,9 +121,12 @@ export default function FloatingTasteChat({
   const panelRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!open || typeof window === "undefined") return;
-    const focusTarget =
-      panelRef.current?.querySelector<HTMLElement>("textarea, button, [href], [tabindex]") ??
-      panelRef.current;
+    // First VISIBLE focusable - the first DOM match is the sm:hidden drag
+    // pill, whose focus() silently no-ops on desktop (audit 2026-07).
+    const candidates = Array.from(
+      panelRef.current?.querySelectorAll<HTMLElement>("textarea, button, [href], [tabindex]") ?? [],
+    );
+    const focusTarget = candidates.find((el) => el.offsetParent !== null) ?? panelRef.current;
     focusTarget?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;

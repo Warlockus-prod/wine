@@ -22,7 +22,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { BASE_TASTES, COMPASS_SECTORS } from "@/data/wine-compass-kb";
+import {
+  BASE_TASTES,
+  COMPASS_SECTORS,
+  pickL,
+  type CompassLang,
+} from "@/data/wine-compass-kb";
 import { SENSE_IMAGE_MAP } from "@/data/sense-images";
 import type { CompassLevel, CompassProfile } from "./TasteCompass";
 
@@ -47,6 +52,12 @@ interface Props {
    *  (used by the merged Vinokompas stage so base tastes + 6 wrażenia are
    *  both settable on one wheel). */
   baseInteractive?: boolean;
+  /** UI language - "pl" default keeps every existing call-site (and the PL
+   *  e2e surface) byte-identical; the EN /samouczek passes "en". */
+  lang?: CompassLang;
+  /** When the floating chat is disabled its wn:open-chat listener unmounts -
+   *  the "Zapytaj Vinovigatora" CTA would be a silent no-op, so hide it. */
+  chatDisabled?: boolean;
 }
 
 // Tour ID sets per level - what auto-tour cycles through.
@@ -69,13 +80,20 @@ type FocusRecord =
   | { kind: "sektor"; sector: (typeof COMPASS_SECTORS)[number] }
   | { kind: "base"; baseId: string; name: string; description: string };
 
-const findFocus = (id: string | null): FocusRecord | null => {
+const findFocus = (id: string | null, lang: CompassLang): FocusRecord | null => {
   if (!id) return null;
   // base.<id>?
   if (id.startsWith("base.")) {
     const baseId = id.slice(5);
     const b = BASE_TASTES.find((t) => t.id === baseId);
-    return b ? { kind: "base", baseId, name: b.name_pl, description: b.description_pl } : null;
+    return b
+      ? {
+          kind: "base",
+          baseId,
+          name: pickL(lang, b.name_pl, b.name_en),
+          description: pickL(lang, b.description_pl, b.description_en),
+        }
+      : null;
   }
   // sektor id?
   const sektor = COMPASS_SECTORS.find((s) => s.id === id);
@@ -98,6 +116,8 @@ export default function InteractiveCompass({
   autoStartTour = false,
   belowCompass,
   baseInteractive = false,
+  lang = "pl",
+  chatDisabled = false,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   // Pinned id stays selected after the user clicks (or hovers chip in the
@@ -171,13 +191,13 @@ export default function InteractiveCompass({
   // outside of tour the pinned selection is baseline and hover provides
   // the live preview.
   const focusedId = tourId ?? hovered ?? pinnedId;
-  const focused = useMemo(() => findFocus(focusedId), [focusedId]);
+  const focused = useMemo(() => findFocus(focusedId, lang), [focusedId, lang]);
   const focusedTitle = focused
     ? focused.kind === "base"
       ? focused.name
       : focused.kind === "sektor"
-        ? focused.sector.name_pl
-        : focused.tendencja.name_pl
+        ? pickL(lang, focused.sector.name_pl, focused.sector.name_en)
+        : pickL(lang, focused.tendencja.name_pl, focused.tendencja.name_en)
     : "";
 
   // Keep the mobile "?" disclosure reachable: when the focus target changes
@@ -224,20 +244,27 @@ export default function InteractiveCompass({
   const onAskGuide = useCallback(() => {
     if (typeof window === "undefined") return;
     if (!focused) return;
+    // The chat panel (z-60) opens UNDER this sheet (z-80) - close the sheet
+    // first or the prefill auto-sends an invisible OpenAI call (audit HIGH).
+    setMobileInfoOpen(false);
     const label =
       focused.kind === "tendencja"
-        ? `${focused.sector.name_pl} · ${focused.tendencja.name_pl}`
+        ? `${pickL(lang, focused.sector.name_pl, focused.sector.name_en)} · ${pickL(lang, focused.tendencja.name_pl, focused.tendencja.name_en)}`
         : focused.kind === "sektor"
-          ? focused.sector.name_pl
+          ? pickL(lang, focused.sector.name_pl, focused.sector.name_en)
           : focused.name;
     window.dispatchEvent(
       new CustomEvent("wn:open-chat", {
         detail: {
-          prefill: `Opowiedz mi więcej o wrażeniu „${label}" - czego szukać w winie?`,
+          prefill: pickL(
+            lang,
+            `Opowiedz mi więcej o wrażeniu „${label}" - czego szukać w winie?`,
+            `Tell me more about the "${label}" sensation — what should I look for in a wine?`,
+          ),
         },
       }),
     );
-  }, [focused]);
+  }, [focused, lang]);
 
   // Demo intensity ramp: while the tour narrates a sektor/tendencja, animate
   // a 0→5 preview on the compass to show that intensity varies. Visual only.
@@ -309,6 +336,7 @@ export default function InteractiveCompass({
             profile={profile}
             onChange={handleCompassChange}
             level={level}
+            lang={lang}
             baseInteractive={baseInteractive}
             // Tour wins; pinned (last-clicked) wins over nothing - both are
             // bridged through this single prop so the spoke pulses as long
@@ -348,9 +376,9 @@ export default function InteractiveCompass({
           <button
             type="button"
             onClick={() => setTourOn(false)}
-            className="mt-3 inline-flex min-h-[36px] items-center gap-2 rounded-full border border-[var(--gold-hairline)] px-4 text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:border-[var(--color-accent-gold)]"
+            className="mt-3 inline-flex min-h-[36px] items-center gap-2 rounded-full border border-[var(--gold-hairline)] px-4 text-xs font-semibold tracking-wider text-[color:var(--ink)] uppercase transition hover:border-[var(--color-accent-gold)]"
           >
-            ■ Zatrzymaj przewodnik
+            ■ {pickL(lang, "Zatrzymaj przewodnik", "Stop the guide")}
           </button>
         ) : null}
         {tourActive ? (
@@ -358,10 +386,22 @@ export default function InteractiveCompass({
              "tendencja" is stage-3 jargon (client's guiding principle). */
           <p className="mt-2 max-w-[440px] text-center text-xs leading-snug text-[var(--ink-soft)]">
             {level === 1
-              ? "Każdy smak ustawiasz od 1 (ledwo wyczuwalny) do 5 (dominujący) - kliknij oś, aby wybrać siłę."
+              ? pickL(
+                  lang,
+                  "Każdy smak ustawiasz od 1 (ledwo wyczuwalny) do 5 (dominujący) - kliknij oś, aby wybrać siłę.",
+                  "You set each taste from 1 (barely perceptible) to 5 (dominant) - tap the axis to choose the strength.",
+                )
               : level === 2
-                ? "Każde wrażenie ustawiasz od 1 (ledwo wyczuwalne) do 5 (dominujące) - kliknij koło, aby wybrać siłę."
-                : "Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) - kliknij koło, aby wybrać siłę."}
+                ? pickL(
+                    lang,
+                    "Każde wrażenie ustawiasz od 1 (ledwo wyczuwalne) do 5 (dominujące) - kliknij koło, aby wybrać siłę.",
+                    "You set each sensation from 1 (barely perceptible) to 5 (dominant) - tap the wheel to choose the strength.",
+                  )
+                : pickL(
+                    lang,
+                    "Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) - kliknij koło, aby wybrać siłę.",
+                    "You set each tendency from 1 (barely perceptible) to 5 (dominant) — tap the wheel to choose the strength.",
+                  )}
           </p>
         ) : null}
 
@@ -385,7 +425,7 @@ export default function InteractiveCompass({
               >
                 ?
               </span>
-              Co oznacza „{focusedTitle}”?
+              {lang === "pl" ? <>Co oznacza „{focusedTitle}”?</> : <>What does “{focusedTitle}” mean?</>}
             </button>
           ) : null}
         </div>
@@ -394,23 +434,30 @@ export default function InteractiveCompass({
       {/* Mobile bottom-sheet with the focused description (replaces the
           always-visible panel on phones). */}
       {mobileInfoOpen && focused ? (
-        <div className="fixed inset-0 z-[80] flex items-end lg:hidden">
+        <div
+          className="fixed inset-0 z-[80] flex items-end lg:hidden"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setMobileInfoOpen(false);
+          }}
+        >
           <button
             type="button"
-            aria-label="Zamknij opis"
+            aria-label={pickL(lang, "Zamknij opis", "Close description")}
             onClick={() => setMobileInfoOpen(false)}
             className="absolute inset-0 bg-black/45"
           />
           <div
             role="dialog"
-            aria-label={`Opis: ${focusedTitle}`}
+            aria-modal="true"
+            aria-label={`${pickL(lang, "Opis", "Description")}: ${focusedTitle}`}
             className="relative max-h-[75dvh] w-full overflow-y-auto rounded-t-3xl border-t border-[var(--gold-hairline)] p-5 pt-4 pr-16 pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
             style={{ background: "var(--surface-elevated)", color: "var(--ink)" }}
           >
             <button
               type="button"
+              autoFocus
               onClick={() => setMobileInfoOpen(false)}
-              aria-label="Zamknij"
+              aria-label={pickL(lang, "Zamknij", "Close")}
               className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--hairline-strong)] text-[var(--ink-soft)]"
             >
               ✕
@@ -420,7 +467,8 @@ export default function InteractiveCompass({
               focused={focused}
               profile={profile}
               isTour={false}
-              onAskGuide={onAskGuide}
+              onAskGuide={chatDisabled ? undefined : onAskGuide}
+              lang={lang}
             />
           </div>
         </div>
@@ -449,7 +497,7 @@ export default function InteractiveCompass({
           {focused
             ? focused.kind === "base"
               ? `${focused.name}. ${focused.description}`
-              : `${focused.sector.name_pl}. ${focused.sector.short_pl}`
+              : `${pickL(lang, focused.sector.name_pl, focused.sector.name_en)}. ${pickL(lang, focused.sector.short_pl, focused.sector.short_en)}`
             : ""}
         </span>
         {focused ? (
@@ -458,11 +506,13 @@ export default function InteractiveCompass({
             focused={focused}
             profile={profile}
             isTour={tourOn}
-            onAskGuide={onAskGuide}
+            onAskGuide={chatDisabled ? undefined : onAskGuide}
+            lang={lang}
           />
         ) : (
           <IdleCard
             level={level}
+            lang={lang}
             onStartTour={() => {
               setTourOn(true);
               setTourIdx(0);
@@ -483,7 +533,7 @@ export default function InteractiveCompass({
             className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-[var(--gold-hairline-soft)] px-3.5 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition hover:border-[var(--color-accent-gold)]"
             style={{ color: "var(--color-accent-gold)" }}
           >
-            ▶ Przewodnik od nowa
+            ▶ {pickL(lang, "Przewodnik od nowa", "Restart the guide")}
           </button>
         ) : null}
       </aside>
@@ -538,26 +588,38 @@ function TourText({ text, typing }: { text: string; typing: boolean }) {
  * of that intensity. Gives the panel a "the przewodnik is watching what I
  * do" feel instead of static description text.
  */
-const INTENSITY_COMMENTS: Record<number, string> = {
-  0: "Jeszcze nie zaznaczone - kliknij koło, aby ustawić siłę (0-5).",
-  1: "Ledwo wyczuwalne - subtelny akcent w tle.",
-  2: "Delikatne - lekko zaznaczone.",
-  3: "Umiarkowane - wyraźnie obecne, ale nie dominuje.",
-  4: "Mocne - jedno z głównych wrażeń Twojego wina.",
-  5: "Dominujące - definiuje styl, którego szukasz.",
+const INTENSITY_COMMENTS: Record<CompassLang, Record<number, string>> = {
+  pl: {
+    0: "Jeszcze nie zaznaczone - kliknij koło, aby ustawić siłę (0-5).",
+    1: "Ledwo wyczuwalne - subtelny akcent w tle.",
+    2: "Delikatne - lekko zaznaczone.",
+    3: "Umiarkowane - wyraźnie obecne, ale nie dominuje.",
+    4: "Mocne - jedno z głównych wrażeń Twojego wina.",
+    5: "Dominujące - definiuje styl, którego szukasz.",
+  },
+  en: {
+    0: "Not set yet — tap the wheel to set the strength (0-5).",
+    1: "Barely perceptible — a subtle accent in the background.",
+    2: "Gentle — lightly present.",
+    3: "Moderate — clearly present, but not dominating.",
+    4: "Strong - one of your wine's defining sensations.",
+    5: "Dominant — it defines the style you're after.",
+  },
 };
 
 function SelectionComment({
   intensity,
   accent,
   label,
+  lang,
 }: {
   intensity: number;
   accent: string;
   label: string;
+  lang: CompassLang;
 }) {
   const v = Math.max(0, Math.min(5, Math.round(intensity)));
-  const comment = INTENSITY_COMMENTS[v];
+  const comment = INTENSITY_COMMENTS[lang][v];
   return (
     <div
       className="mt-3 flex items-start gap-2.5 rounded-xl border px-3 py-2.5"
@@ -592,11 +654,13 @@ function FocusedCard({
   profile,
   isTour,
   onAskGuide,
+  lang,
 }: {
   focused: FocusRecord;
   profile: CompassProfile;
   isTour: boolean;
-  onAskGuide: () => void;
+  onAskGuide?: () => void;
+  lang: CompassLang;
 }) {
   // Branch the visible content per focus kind so the same panel reads
   // sensibly at level 1 (base smaki), level 2 (sektor), or level 3 (full).
@@ -608,18 +672,18 @@ function FocusedCard({
   // Title + subtitle vary per kind
   const eyebrow =
     focused.kind === "base"
-      ? "Smak bazowy"
+      ? pickL(lang, "Smak bazowy", "Base taste")
       : focused.kind === "sektor"
-        ? "Wrażenie"
-        : "Tendencja";
+        ? pickL(lang, "Wrażenie", "Sensation")
+        : pickL(lang, "Tendencja", "Tendency");
   const title =
     focused.kind === "base"
       ? focused.name
-      : focused.kind === "sektor"
-        ? focused.sector.name_pl
-        : focused.sector.name_pl;
+      : pickL(lang, focused.sector.name_pl, focused.sector.name_en);
   const subtitle =
-    focused.kind === "tendencja" ? ` · ${focused.tendencja.name_pl}` : "";
+    focused.kind === "tendencja"
+      ? ` · ${pickL(lang, focused.tendencja.name_pl, focused.tendencja.name_en)}`
+      : "";
 
   // Still-life image for this impression (client: "też ważne są obrazki").
   // tendencja → its own image; sektor → sektor image; base → none.
@@ -655,7 +719,7 @@ function FocusedCard({
           aria-hidden
         />
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: accent }}>
-          {isTour ? "Przewodnik mówi…" : eyebrow}
+          {isTour ? pickL(lang, "Przewodnik mówi…", "The guide says…") : eyebrow}
         </p>
         <span className="ml-auto font-mono text-[10px] tracking-wider text-[#c79f69]/70">
           {intensity}/5
@@ -696,7 +760,7 @@ function FocusedCard({
           intensity they set (client: "czy ten przewodnik nie powinien
           komentować tego co zaznaczyłam?"). Updates instantly on every
           click because `intensity` is read from the profile each render. */}
-      <SelectionComment intensity={intensity} accent={accent} label={title} />
+      <SelectionComment intensity={intensity} accent={accent} label={title} lang={lang} />
 
       {/* Body - three paragraphs per kind. The primary description types
           out like a typewriter while the auto-tour is running (client:
@@ -708,15 +772,21 @@ function FocusedCard({
             <TourText key={`${isTour}:${focused.description}`} text={focused.description} typing={isTour} />
           </p>
           <p className="mt-3 text-[12px] leading-relaxed text-[#cbc1b1]">
-            Trzy smaki bazowe - cierpkość, słodycz, kwasowość - to
-            podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym
-            wyraźniej dominują w twoim ulubionym profilu.
+            {pickL(
+              lang,
+              "Trzy smaki bazowe - cierpkość, słodycz, kwasowość - to podstawa rozumienia każdego wina. Im wyżej je zaznaczysz, tym wyraźniej dominują w twoim ulubionym profilu.",
+              "The three base tastes — astringency, sweetness, acidity — are the foundation for understanding any wine. The higher you set them, the more clearly they dominate your favourite profile.",
+            )}
           </p>
         </>
       ) : focused.kind === "sektor" ? (
         <>
           <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
-            <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
+            <TourText
+              key={`${isTour}:${pickL(lang, focused.sector.short_pl, focused.sector.short_en)}`}
+              text={pickL(lang, focused.sector.short_pl, focused.sector.short_en)}
+              typing={isTour}
+            />
           </p>
           <dl className="mt-4 space-y-2 text-[12px] leading-relaxed">
             {focused.sector.tendencje.map((t) => (
@@ -725,66 +795,84 @@ function FocusedCard({
                 className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-3 border-b border-[rgba(199,159,105,0.15)] pb-2 last:border-0"
               >
                 <dt className="font-serif text-[12px] italic text-[var(--color-accent-gold)]">
-                  {t.name_pl}
+                  {pickL(lang, t.name_pl, t.name_en)}
                 </dt>
-                <dd className="text-[#cbc1b1]">{t.associations_pl}</dd>
+                <dd className="text-[#cbc1b1]">{pickL(lang, t.associations_pl, t.associations_en)}</dd>
               </div>
             ))}
           </dl>
           <details className="mt-4 group">
             <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
-              ❦ Pełny opis wrażenia
+              ❦ {pickL(lang, "Pełny opis wrażenia", "Full sensation description")}
             </summary>
             <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
-              {focused.sector.long_pl}
+              {pickL(lang, focused.sector.long_pl, focused.sector.long_en)}
             </p>
           </details>
         </>
       ) : (
         <>
           <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
-            <TourText key={`${isTour}:${focused.sector.short_pl}`} text={focused.sector.short_pl} typing={isTour} />
+            <TourText
+              key={`${isTour}:${pickL(lang, focused.sector.short_pl, focused.sector.short_en)}`}
+              text={pickL(lang, focused.sector.short_pl, focused.sector.short_en)}
+              typing={isTour}
+            />
           </p>
           <dl className="mt-4 divide-y divide-[rgba(199,159,105,0.16)] text-[13px] leading-relaxed">
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">Skojarzenia</dt>
-              <dd className="text-[#e6e1d6]/90">{focused.tendencja.associations_pl}</dd>
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">{pickL(lang, "Skojarzenia", "Associations")}</dt>
+              <dd className="text-[#e6e1d6]/90">{pickL(lang, focused.tendencja.associations_pl, focused.tendencja.associations_en)}</dd>
             </div>
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">Przykład</dt>
-              <dd className="font-serif italic text-[#e6e1d6]/85">{focused.tendencja.examples_pl}</dd>
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">{pickL(lang, "Przykład", "Example")}</dt>
+              <dd className="font-serif italic text-[#e6e1d6]/85">{pickL(lang, focused.tendencja.examples_pl, focused.tendencja.examples_en)}</dd>
             </div>
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">Spotkasz w</dt>
-              <dd className="text-[#cbc1b1]">{focused.tendencja.found_in_pl}</dd>
+              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">{pickL(lang, "Spotkasz w", "Found in")}</dt>
+              <dd className="text-[#cbc1b1]">{pickL(lang, focused.tendencja.found_in_pl, focused.tendencja.found_in_en)}</dd>
             </div>
           </dl>
           <details className="mt-4 group">
             <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
-              ❦ Pełny opis wrażenia
+              ❦ {pickL(lang, "Pełny opis wrażenia", "Full sensation description")}
             </summary>
-            <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">{focused.sector.long_pl}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
+              {pickL(lang, focused.sector.long_pl, focused.sector.long_en)}
+            </p>
           </details>
         </>
       )}
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={onAskGuide}
-          className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-xs font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
-          </svg>
-          Zapytaj Vinovigatora
-        </button>
-      </div>
+      {/* Hidden when the chat is disabled - the wn:open-chat listener is
+          unmounted then and the button was a silent no-op (audit HIGH). */}
+      {onAskGuide ? (
+        <div className="mt-5 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onAskGuide}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-xs font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:bg-[var(--color-accent-gold)]/20"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h2V5a3 3 0 0 1 3-3Zm-3 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
+            </svg>
+            {pickL(lang, "Zapytaj Vinovigatora", "Ask Vinovigator")}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: () => void }) {
+function IdleCard({
+  level,
+  onStartTour,
+  lang,
+}: {
+  level: CompassLevel;
+  onStartTour: () => void;
+  lang: CompassLang;
+}) {
   // Client round-3 copy, per level: stage 1 = help framing + the "Smak"
   // concept text; stage 2 = "Poznaj sześć wrażeń" concept text; stage 3
   // keeps the generic help framing.
@@ -793,26 +881,42 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
     <div>
       <p className="pitch-eyebrow pitch-eyebrow--start">Vinocompas</p>
       <h3 className="pitch-display mt-3 text-2xl text-white">
-        {isLevel2 ? "Poznaj sześć wrażeń" : "Potrzebujesz pomocy?"}
+        {isLevel2
+          ? pickL(lang, "Poznaj sześć wrażeń", "Meet the six sensations")
+          : pickL(lang, "Potrzebujesz pomocy?", "Need a hand?")}
       </h3>
       {isLevel2 ? (
         <>
           <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
-            Wrażenie to sposób, w jaki nasz mózg interpretuje smak, zapach, strukturę
-            i skojarzenia powstające podczas kontaktu z winem.
+            {pickL(
+              lang,
+              "Wrażenie to sposób, w jaki nasz mózg interpretuje smak, zapach, strukturę i skojarzenia powstające podczas kontaktu z winem.",
+              "A sensation is the way our brain interprets the taste, smell, texture and associations that arise when we meet a wine.",
+            )}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
-            Najedź kursorem na wybrane wrażenie, aby zobaczyć jego opis. Możesz również
-            uruchomić przewodnik, który krok po kroku wyjaśni znaczenie wszystkich sześciu wrażeń.
+            {pickL(
+              lang,
+              "Najedź kursorem na wybrane wrażenie, aby zobaczyć jego opis. Możesz również uruchomić przewodnik, który krok po kroku wyjaśni znaczenie wszystkich sześciu wrażeń.",
+              "Hover over a sensation to see its description. You can also start the guide, which will explain the meaning of all six sensations step by step.",
+            )}
           </p>
         </>
       ) : (
         <>
           <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
-            Najedź kursorem na element Vinocompasu, aby poznać jego znaczenie.
+            {pickL(
+              lang,
+              "Najedź kursorem na element Vinocompasu, aby poznać jego znaczenie.",
+              "Hover over any element of the Vinocompas to learn what it means.",
+            )}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
-            Lub uruchom przewodnik, który przeprowadzi Cię przez ten etap krok po kroku.
+            {pickL(
+              lang,
+              "Lub uruchom przewodnik, który przeprowadzi Cię przez ten etap krok po kroku.",
+              "Or start the guide, which will walk you through this stage step by step.",
+            )}
           </p>
         </>
       )}
@@ -824,19 +928,23 @@ function IdleCard({ level, onStartTour }: { level: CompassLevel; onStartTour: ()
         <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
           <path d="M3 2 L10 6 L3 10 Z" />
         </svg>
-        Uruchom przewodnik
+        {pickL(lang, "Uruchom przewodnik", "Start the guide")}
       </button>
       {level === 1 ? (
         <div className="mt-6 border-t border-[rgba(199,159,105,0.22)] pt-4">
           <p className="text-sm leading-relaxed text-[#e6e1d6]">
-            Smak to punkt wyjścia w Vinocompasie. Większość z nas opisuje wino jako
-            wytrawne, półwytrawne czy słodkie. To dobry początek, ale trzy podstawowe
-            smaki nie wystarczą, aby opisać charakter wina ani odkryć Twój winiarski gust.
+            {pickL(
+              lang,
+              "Smak to punkt wyjścia w Vinocompasie. Większość z nas opisuje wino jako wytrawne, półwytrawne czy słodkie. To dobry początek, ale trzy podstawowe smaki nie wystarczą, aby opisać charakter wina ani odkryć Twój winiarski gust.",
+              "Taste is the starting point of the Vinocompas. Most of us describe wine as dry, off-dry or sweet. That's a good start, but three base tastes are not enough to describe a wine's character or to uncover your taste in wine.",
+            )}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
-            Dlatego w Vinocompasie zaczynamy od trzech podstawowych smaków: słodyczy,
-            kwasowości i cierpkości. Ich wzajemne proporcje wpływają na to, jak
-            odbieramy wytrawność wina.
+            {pickL(
+              lang,
+              "Dlatego w Vinocompasie zaczynamy od trzech podstawowych smaków: słodyczy, kwasowości i cierpkości. Ich wzajemne proporcje wpływają na to, jak odbieramy wytrawność wina.",
+              "That's why the Vinocompas starts with the three base tastes: sweetness, acidity and astringency. Their mutual proportions shape how dry a wine seems to us.",
+            )}
           </p>
         </div>
       ) : null}

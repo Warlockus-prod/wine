@@ -1189,7 +1189,7 @@ export const WINNICA_CATALOG: SamouczekWine[] = [
   },
   {
     "id": "wn-190-recioto-valpolicella-fiorato-375-cl",
-    "name_pl": "Recioto Valpolicella &quot;Fiorato&quot; 37,5 cl",
+    "name_pl": "Recioto Valpolicella \"Fiorato\" 37,5 cl",
     "grape": "Corvina Veronese",
     "region_pl": "Veneto, Włochy",
     "style": "dessert",
@@ -1218,7 +1218,7 @@ export const WINNICA_CATALOG: SamouczekWine[] = [
   },
   {
     "id": "wn-452-vin-santo-del-chianti-il-nostro-375-cl",
-    "name_pl": "Vin Santo del Chianti &quot;Il Nostro&quot; 37,5 cl",
+    "name_pl": "Vin Santo del Chianti \"Il Nostro\" 37,5 cl",
     "grape": "Malvasia Bianca",
     "region_pl": "Toscana / Vin Santo del Chianti, Włochy",
     "style": "dessert",
@@ -1348,7 +1348,7 @@ export const WINNICA_CATALOG: SamouczekWine[] = [
   },
   {
     "id": "wn-134-cotes-du-rhoneesprit-barville-rose",
-    "name_pl": "Côtes du Rhône&quot;Esprit Barville&quot; rosé",
+    "name_pl": "Côtes du Rhône\"Esprit Barville\" rosé",
     "grape": "Grenache noir",
     "region_pl": "Cotes du Rhone, Francja",
     "style": "rose",
@@ -1372,7 +1372,7 @@ export const WINNICA_CATALOG: SamouczekWine[] = [
   },
   {
     "id": "wn-145-tavel-les-eglantiers",
-    "name_pl": "Tavel &quot;Les Eglantiers&quot;",
+    "name_pl": "Tavel \"Les Eglantiers\"",
     "grape": "Grenache",
     "region_pl": "Cotes du Rhone, Francja",
     "style": "rose",

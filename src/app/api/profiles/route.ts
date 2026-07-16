@@ -15,10 +15,10 @@ export const dynamic = "force-dynamic";
 const profileSchema = z.object({
   anonymousId: z.string().uuid(),
   compass: z
-    .record(z.string(), z.number().min(0).max(4))
+    .record(z.string(), z.number().min(0).max(5))
     .refine((o) => Object.keys(o).length <= 24, "compass too large"),
   baseTastes: z
-    .record(z.string(), z.number().min(0).max(4))
+    .record(z.string(), z.number().min(0).max(5))
     .refine((o) => Object.keys(o).length <= 8, "baseTastes too large"),
 });
 

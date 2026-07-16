@@ -28,6 +28,27 @@ import { getDishImage, getWineImage } from "@/lib/food-photos";
 import type { CatalogRestaurant } from "@/lib/restaurant-directory";
 import type { Locale } from "@/i18n/routing";
 
+// Dish categories arrive as raw EN vocabulary (MAIN/DESSERT/...) and were
+// printed verbatim on the PL guest menu (audit 2026-07). Render-time map,
+// unknown values fall back to the raw string.
+const CATEGORY_PL: Record<string, string> = {
+  main: "danie główne",
+  starter: "przystawka",
+  dessert: "deser",
+  soup: "zupa",
+  pasta: "makaron",
+  salad: "sałatka",
+  seafood: "owoce morza",
+  tapas: "tapas",
+  signature: "danie popisowe",
+  aperitif: "aperitif",
+  grill: "z grilla",
+  side: "dodatek",
+};
+const categoryLabel = (category: string, locale: string) =>
+  locale === "pl" ? (CATEGORY_PL[category.trim().toLowerCase()] ?? category) : category;
+
+
 export default function RestaurantPageClient({
   slug,
   restaurant,
@@ -361,7 +382,7 @@ export default function RestaurantPageClient({
                         </span>
                       </div>
                       <p className="mt-0.5 text-[10px] font-semibold tracking-[0.18em] text-[var(--color-accent-gold)] uppercase">
-                        {dish.category}
+                        {categoryLabel(dish.category, lng)}
                       </p>
                       <p className="menu-row__desc mt-2 text-sm leading-6 text-gray-300/95 sm:leading-7">
                         {t(dish.description, lng)}
@@ -499,7 +520,7 @@ export default function RestaurantPageClient({
                     eyebrow text (audit 2026-07). Only this first line sits
                     at ribbon height; title + reason below stay flush. */}
                 <p className="pl-7 text-[10px] font-bold tracking-[0.22em] text-[var(--color-accent-gold)] uppercase">
-                  {item.dish.category}
+                  {categoryLabel(item.dish.category, lng)}
                 </p>
                 <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
                   {t(item.dish.name, lng)}

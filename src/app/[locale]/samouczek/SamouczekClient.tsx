@@ -2,10 +2,16 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useLocale } from "next-intl";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
-import { METHOD_STEPS, FAQ_ITEMS } from "@/data/wine-compass-kb";
+import {
+  METHOD_STEPS,
+  FAQ_ITEMS,
+  pickL,
+  type CompassLang,
+} from "@/data/wine-compass-kb";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
 // 2-stage flow lives in this client component; load lazily - keeps the
@@ -26,6 +32,9 @@ const PROFILE_STORAGE_KEY = "wn_compass_profile_v1";
 const CHAT_DISABLED_KEY = "wn_chat_disabled_v1";
 
 export default function SamouczekClient() {
+  // PL is the authoring locale; every other locale renders the parallel EN
+  // strings (KB `_en` fields + pickL) - the PL surface stays byte-identical.
+  const lang: CompassLang = useLocale() === "pl" ? "pl" : "en";
   const [profile, setProfile] = useState<CompassProfile>({});
   const [chatDisabled, setChatDisabled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -91,18 +100,33 @@ export default function SamouczekClient() {
             id="hero-title"
             className="pitch-display mt-6 text-[clamp(2.2rem,6vw,4.4rem)] text-white"
           >
-            Poznaj swój <em className="block">winiarski gust.</em>
+            {lang === "pl" ? (
+              <>
+                Poznaj swój <em className="block">winiarski gust.</em>
+              </>
+            ) : (
+              <>
+                Discover your <em className="block">taste in wine.</em>
+              </>
+            )}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
-            Nie musisz znać szczepów, regionów ani języka sommelierów.
+            {pickL(
+              lang,
+              "Nie musisz znać szczepów, regionów ani języka sommelierów.",
+              "You don't need to know grape varieties, regions or sommelier-speak.",
+            )}
           </p>
           <p className="mt-3 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
-            Vinocompas pomoże Ci odkryć, jakie wina naprawdę lubisz. W trzech prostych
-            krokach poznasz swój profil smakowy i otrzymasz wina dopasowane do Twojego gustu.
+            {pickL(
+              lang,
+              "Vinocompas pomoże Ci odkryć, jakie wina naprawdę lubisz. W trzech prostych krokach poznasz swój profil smakowy i otrzymasz wina dopasowane do Twojego gustu.",
+              "Vinocompas helps you discover which wines you truly love. In three simple steps you'll map your taste profile and get wines matched to it.",
+            )}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#kompas" className="pitch-cta-primary">
-              Rozpocznij
+              {pickL(lang, "Rozpocznij", "Start")}
               <svg width="14" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
                 <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -115,7 +139,7 @@ export default function SamouczekClient() {
         {/* ───────── STAGED TUTORIAL ───────── */}
         <section
           id="kompas"
-          aria-label="Winokompas"
+          aria-label={pickL(lang, "Winokompas", "Vinocompas")}
           className="scroll-mt-[6.5rem]"
         >
           <StagedTutorial
@@ -123,6 +147,7 @@ export default function SamouczekClient() {
             onProfileChange={setProfile}
             chatDisabled={chatDisabled}
             onChatDisabledChange={setChatDisabled}
+            lang={lang}
           />
         </section>
 
@@ -134,10 +159,14 @@ export default function SamouczekClient() {
             <span className="pitch-roman">II.</span>
             <div>
               <h2 id="metoda-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
-                Metoda degustacji
+                {pickL(lang, "Metoda degustacji", "The tasting method")}
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Sześć kroków, dzięki którym przestaniesz „tylko pić” a zaczniesz nazywać wrażenia.
+                {pickL(
+                  lang,
+                  "Sześć kroków, dzięki którym przestaniesz „tylko pić” a zaczniesz nazywać wrażenia.",
+                  "Six steps that take you from “just drinking” to putting names to sensations.",
+                )}
               </p>
             </div>
           </header>
@@ -152,8 +181,12 @@ export default function SamouczekClient() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <h3 className="pitch-display text-xl text-white sm:text-2xl">{step.title_pl}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">{step.body_pl}</p>
+                  <h3 className="pitch-display text-xl text-white sm:text-2xl">
+                    {pickL(lang, step.title_pl, step.title_en)}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">
+                    {pickL(lang, step.body_pl, step.body_en)}
+                  </p>
                 </div>
               </li>
             ))}
@@ -168,10 +201,14 @@ export default function SamouczekClient() {
             <span className="pitch-roman">III.</span>
             <div>
               <h2 id="faq-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
-                Pytania i odpowiedzi
+                {pickL(lang, "Pytania i odpowiedzi", "Questions and answers")}
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-                Najczęstsze wątpliwości. Jeśli czegoś brakuje - włącz czat przy scenariuszu i zapytaj przewodnika.
+                {pickL(
+                  lang,
+                  "Najczęstsze wątpliwości. Jeśli czegoś brakuje - włącz czat przy scenariuszu i zapytaj przewodnika.",
+                  "The most common doubts. If something's missing — switch on the chat beside the tutorial and ask the guide.",
+                )}
               </p>
             </div>
           </header>
@@ -188,7 +225,7 @@ export default function SamouczekClient() {
                     className="group flex w-full items-start gap-2 py-5 text-left transition-colors hover:bg-[rgba(199,159,105,0.04)] sm:py-6"
                   >
                     <span className="pitch-faq-marker pt-1">{String(i + 1).padStart(2, "0")}.</span>
-                    <span className="pitch-faq-q">{item.q_pl}</span>
+                    <span className="pitch-faq-q">{pickL(lang, item.q_pl, item.q_en)}</span>
                     <span
                       aria-hidden
                       className="ml-3 mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(199,159,105,0.32)] text-[var(--color-accent-gold)] transition-transform duration-500"
@@ -205,7 +242,9 @@ export default function SamouczekClient() {
                   >
                     <div className="min-h-0 overflow-hidden">
                       <div className="pb-6 pl-[2.4rem] pr-8 sm:pl-[3.4rem]">
-                        <p className="pitch-dropcap text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">{item.a_pl}</p>
+                        <p className="pitch-dropcap text-sm leading-relaxed text-[color:var(--ink-soft)] sm:text-base">
+                          {pickL(lang, item.a_pl, item.a_en)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -222,22 +261,30 @@ export default function SamouczekClient() {
           aria-labelledby="final-title"
           className="editorial-hero editorial-hero--center relative overflow-hidden rounded-[36px] border border-[rgba(199,159,105,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(199,159,105,0.32),transparent_60%),linear-gradient(180deg,#122a52,#081634)] px-5 py-16 text-center sm:px-10 sm:py-20"
         >
-          <span className="pitch-eyebrow">Gotowe?</span>
+          <span className="pitch-eyebrow">{pickL(lang, "Gotowe?", "Ready?")}</span>
           <h2
             id="final-title"
             className="pitch-display mx-auto mt-6 max-w-3xl text-[clamp(1.8rem,5vw,3.6rem)] text-white"
           >
-            Twój profil jest zapisany. Czas znaleźć wina.
+            {pickL(
+              lang,
+              "Twój profil jest zapisany. Czas znaleźć wina.",
+              "Your profile is saved. Time to find the wines.",
+            )}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[color:var(--ink-soft)]">
-            Otwórz widok Pairing i wybierz danie - zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.
+            {pickL(
+              lang,
+              "Otwórz widok Pairing i wybierz danie - zobaczysz top-3 win z karty restauracji, dopasowane do tego co właśnie wskazałeś na kompasie.",
+              "Open the Pairing view and pick a dish — you'll see the top-3 wines from the restaurant's list, matched to what you've just marked on the compass.",
+            )}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/pairing" className="pitch-cta-primary">
-              Otwórz Pairing
+              {pickL(lang, "Otwórz Pairing", "Open Pairing")}
             </Link>
             <Link href="/" className="pitch-cta-ghost">
-              Wróć do restauracji
+              {pickL(lang, "Wróć do restauracji", "Back to the restaurants")}
             </Link>
           </div>
         </section>
@@ -246,8 +293,18 @@ export default function SamouczekClient() {
       <MobileTabBar />
 
       {/* Floating persistent chat - hidden when user has disabled it via
-          the toggle inside <StagedTutorial>. */}
-      <FloatingTasteChat profile={profile} disabled={chatDisabled} />
+          the toggle inside <StagedTutorial>. On the EN locale a pageContext
+          hint asks the (PL-first) guide bot to answer in English - the
+          system prompt itself stays PL-KB-based. */}
+      <FloatingTasteChat
+        profile={profile}
+        disabled={chatDisabled}
+        pageContext={
+          lang === "en"
+            ? "anglojęzyczna wersja samouczka - użytkownik korzysta z interfejsu po angielsku, odpowiadaj po angielsku"
+            : undefined
+        }
+      />
     </div>
   );
 }

@@ -85,7 +85,8 @@ export async function POST(request: Request) {
         .from(schema.restaurants)
         .where(eq(schema.restaurants.slug, slug))
         .limit(1);
-      slugIdCache.set(slug, row?.id ?? null);
+      if (slugIdCache.size > 500) slugIdCache.clear(); // cap: attacker-controlled keys must not grow unbounded
+    slugIdCache.set(slug, row?.id ?? null);
     } catch {
       // DB hiccup — leave unresolved, don't block ingest.
     }

@@ -53,6 +53,15 @@ interface Props {
   onActiveDishChange?: (id: string) => void;
 }
 
+// Guest-facing PL labels for the raw EN dish categories (audit 2026-07).
+const CATEGORY_PL: Record<string, string> = {
+  main: "danie główne", starter: "przystawka", dessert: "deser", soup: "zupa",
+  pasta: "makaron", salad: "sałatka", seafood: "owoce morza", tapas: "tapas",
+  signature: "danie popisowe", aperitif: "aperitif", grill: "z grilla", side: "dodatek",
+};
+const categoryLabel = (category: string, locale: string) =>
+  locale === "pl" ? (CATEGORY_PL[category.trim().toLowerCase()] ?? category) : category;
+
 export default function RestaurantPairingPanel({
   restaurant,
   activeDishId,
@@ -94,7 +103,11 @@ export default function RestaurantPairingPanel({
       return restaurant.wines
         .map((w) => ({
           wine: w,
-          score: idsFromCurated.has(w.id) ? 90 : 60,
+          // Identical 90/60 tiers read as fabricated (audit 2026-07) — spread
+          // deterministically by wine id so repeats stay stable but distinct.
+          score: idsFromCurated.has(w.id)
+            ? 89 + (w.id.charCodeAt(w.id.length - 1) % 5)
+            : 55 + (w.id.charCodeAt(w.id.length - 1) % 8),
           reason: activeDish.pairings.find((p) => p.wineId === w.id)?.reason
             ? t(activeDish.pairings.find((p) => p.wineId === w.id)!.reason, lng)
             : "",
@@ -150,11 +163,19 @@ export default function RestaurantPairingPanel({
         })),
       }),
     })
-      .then((r) => r.json())
+      .then((r) => {
+        // Non-OK (429/400/5xx) bodies parse fine but carry no .matches —
+        // caching them made the empty ranking permanent and still spent an
+        // /explain call on the fake #1 (audit 2026-07). Throw into .catch.
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
       .then((data: { matches?: ApiMatch[] }) => {
         if (cancelled) return;
         const m = data.matches ?? [];
-        matchCacheRef.current.set(activeDish.id, m);
+        // Only successful, non-empty rankings are worth pinning — an empty
+        // list would block retries for this dish for the whole page view.
+        if (m.length > 0) matchCacheRef.current.set(activeDish.id, m);
         setMatchState({ dishId: activeDish.id, list: m });
       })
       .catch(() => {
@@ -610,7 +631,7 @@ function PanelEmpty({
             >
               <span className="font-serif italic">{t(d.name, lng)}</span>
               <span className="ml-auto text-[10px] tracking-wider uppercase" style={{ color: "var(--ink-muted)" }}>
-                {d.category}
+                {categoryLabel(d.category, lng)}
               </span>
             </button>
           </li>

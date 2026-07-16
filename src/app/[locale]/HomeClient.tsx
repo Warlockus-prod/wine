@@ -12,7 +12,7 @@ import { t } from "@/lib/localized";
 import type { CatalogRestaurant } from "@/lib/restaurant-directory";
 import type { Locale } from "@/i18n/routing";
 
-// Leaflet pulls `window` at module-eval, so it must be client-only.
+// Mapbox GL pulls `window` at module-eval, so it must be client-only.
 const RestaurantMap = dynamic(() => import("@/components/v2/RestaurantMap"), {
   ssr: false,
   loading: () => (
@@ -68,6 +68,31 @@ export default function HomeClient({
   const [selectedSlug, setSelectedSlug] = useState<string>(catalogRestaurants[0]?.slug ?? "");
   // Which card shows its full-size scannable QR; null = all thumbnails.
   const [expandedQrSlug, setExpandedQrSlug] = useState<string | null>(null);
+  // Mapbox GL is ~2.3MB - mount it only when the map section approaches the
+  // viewport (audit 2026-07 perf HIGH: eager below-the-fold load).
+  const mapHostRef = useRef<HTMLDivElement | null>(null);
+  const [mapInView, setMapInView] = useState(false);
+  useEffect(() => {
+    const el = mapHostRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      // Environment-capability fallback, same class as external-store
+      // hydration - the sync set is intentional and runs at most once.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMapInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setMapInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "600px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const cuisineLabel = (value: string) => (locale === "pl" ? (CUISINE_PL[value] ?? value) : value);
 
@@ -247,14 +272,17 @@ export default function HomeClient({
               {/* <768px the canvas caps at 340px - the previous ~950px column
                   buried the catalogue a full screen below the fold. */}
               <div
+                ref={mapHostRef}
                 className="relative h-[340px] overflow-hidden rounded-[30px] border md:h-[620px] lg:h-[700px]"
                 style={{ background: "var(--surface-deep)", borderColor: "var(--hairline-strong)" }}
               >
+                {mapInView ? (
                 <RestaurantMap
                   restaurants={filteredRestaurants}
                   selectedSlug={effectiveSelectedSlug}
                   onSelect={handlePick}
                 />
+                ) : null}
 
                 <div className="pointer-events-none absolute top-3 left-3 z-[400] rounded-full border border-white/10 bg-black/55 px-2.5 py-0.5 text-[10px] font-semibold tracking-[0.22em] text-gray-200 uppercase backdrop-blur sm:top-4 sm:left-4 sm:px-3 sm:py-1 sm:text-[11px]">
                   {tx("europe")}
@@ -487,6 +515,9 @@ export default function HomeClient({
             </Link>
             <Link href="/pitch" className="text-gray-300 underline-offset-4 transition hover:underline">
               {tx("footer.forRestaurants")}
+            </Link>
+            <Link href="/privacy" className="text-gray-300 underline-offset-4 transition hover:underline">
+              {tx("footer.privacy")}
             </Link>
           </nav>
         </div>

@@ -49,6 +49,8 @@ const BASE_SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Drop the X-Powered-By: Next.js banner (minor tech disclosure).
+  poweredByHeader: false,
   outputFileTracingRoot: projectRoot,
   async headers() {
     const embedHeaders = [

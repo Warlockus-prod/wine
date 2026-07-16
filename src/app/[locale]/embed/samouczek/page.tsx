@@ -18,6 +18,8 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
+import { useLocale } from "next-intl";
+import type { CompassLang } from "@/data/wine-compass-kb";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
 const StagedTutorial = dynamic(() => import("@/components/winocompas/StagedTutorial"), {
@@ -55,6 +57,8 @@ function postToParent(msg: Record<string, unknown>) {
 }
 
 export default function EmbedSamouczekPage() {
+  // Same locale rule as the full /samouczek: PL primary, EN at the root.
+  const lang: CompassLang = useLocale() === "pl" ? "pl" : "en";
   const [profile, setProfile] = useState<CompassProfile>({});
   const [chatDisabled, setChatDisabled] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -126,6 +130,7 @@ export default function EmbedSamouczekPage() {
         onProfileChange={setProfile}
         chatDisabled={chatDisabled}
         onChatDisabledChange={setChatDisabled}
+        lang={lang}
       />
       <FloatingTasteChat profile={profile} disabled={chatDisabled} />
     </div>

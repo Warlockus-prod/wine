@@ -64,7 +64,7 @@ export const seedPairingDataset: PairingDataset = {
       rating: 4.8,
       description: {
         en: "Bone-dry profile with mineral finish and focused citrus backbone.",
-        pl: "Wytrawny profil z mineralnym zakończeniem i wyraźną cytrusową strukturą.",
+        pl: "Wytrawny profil z mineralnym finiszem i wyrazistą cytrusową strukturą.",
       },
       image:
         "https://upload.wikimedia.org/wikipedia/commons/9/91/2009_Trimbach_Riesling_%288130797570%29.jpg",
@@ -91,7 +91,7 @@ export const seedPairingDataset: PairingDataset = {
       rating: 4.4,
       description: {
         en: "Citrus, oyster-shell minerality, and a taut, saline finish.",
-        pl: "Cytrusy, mineralność muszli ostrygi i napięte, słone zakończenie.",
+        pl: "Cytrusy, mineralność muszli ostrygi i napięty, słony finisz.",
       },
       image:
         "https://upload.wikimedia.org/wikipedia/commons/6/6e/Chablis_bottle_and_wine.jpg",
@@ -191,7 +191,7 @@ export const seedPairingDataset: PairingDataset = {
       wineId: "riesling",
       reason: {
         en: "Crisp Alsace Riesling cuts through garlic herb butter with citrus drive and saline minerality.",
-        pl: "Wytrawny Riesling z Alzacji przebija masło czosnkowo-ziołowe cytrusowym nerwem i słoną mineralnością.",
+        pl: "Wytrawny Riesling z Alzacji przecina masło czosnkowo-ziołowe cytrusowym nerwem i słoną mineralnością.",
       },
     },
     {
@@ -207,7 +207,7 @@ export const seedPairingDataset: PairingDataset = {
       wineId: "pinot",
       reason: {
         en: "Pinot Noir's red-fruit core and gentle tannin echo crisp duck skin without overpowering it.",
-        pl: "Czerwono-owocowy rdzeń i miękkie taniny Pinot Noir odpowiadają chrupiącej skórce kaczki, nie dominując dania.",
+        pl: "Czerwone owoce i miękkie taniny Pinot Noir współgrają z chrupiącą skórką kaczki, nie przytłaczając dania.",
       },
     },
     {
@@ -215,7 +215,7 @@ export const seedPairingDataset: PairingDataset = {
       wineId: "riesling",
       reason: {
         en: "Off-dry Riesling pulls the fat away from rich confit while complementing the thyme jus.",
-        pl: "Półwytrawny Riesling rozcina tłustość konfitowanej kaczki, podkreślając nuty tymiankowego sosu.",
+        pl: "Półwytrawny Riesling przecina tłustość konfitowanej kaczki, podkreślając nuty tymiankowego sosu.",
       },
     },
     {
@@ -231,7 +231,7 @@ export const seedPairingDataset: PairingDataset = {
       wineId: "pinot",
       reason: {
         en: "Lighter Pinot Noir is the classic foil for tartare - it lifts shallots and capers without crushing them.",
-        pl: "Lżejsze Pinot Noir to klasyczny partner tatara - wydobywa szalotkę i kapary, nie miażdżąc ich.",
+        pl: "Lżejsze Pinot Noir to klasyczny partner tatara - wydobywa szalotkę i kapary, nie przytłaczając ich.",
       },
     },
     {
@@ -247,7 +247,7 @@ export const seedPairingDataset: PairingDataset = {
       wineId: "rose",
       reason: {
         en: "Provence rose's strawberry and citrus lift the truffle oil while staying delicate enough for scallops.",
-        pl: "Truskawka i cytrus prowansalskiego rosé podnoszą oliwę truflową, zachowując delikatność dla przegrzebków.",
+        pl: "Truskawka i cytrusy prowansalskiego rosé podkreślają oliwę truflową, pozostając dość delikatne dla przegrzebków.",
       },
     },
   ],

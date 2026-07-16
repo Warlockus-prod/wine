@@ -50,7 +50,8 @@
       "navLabel": "Footer",
       "tutorial": "Taste tutorial",
       "pairing": "Pairing",
-      "forRestaurants": "For restaurants"
+      "forRestaurants": "For restaurants",
+      "privacy": "Privacy"
     }
   },
   "restaurant": {
@@ -123,6 +124,19 @@
     "botCompare": "I am comparing <hl>{dish}</hl> with <hl>{wine}</hl>.",
     "botFallbackReason": "This wine sits outside the top match zone for the selected dish, but the style can still be reviewed through the passport and ranking signals.",
     "botServiceNote": "Service note: serve at {temp}°C. {decant}",
+    "profileToggle": "Use my taste profile",
+    "profileBlendNote": "The ranking blends the dish match with your taste profile from the tutorial.",
+    "profileBadge": "profile",
+    "tasteAlong": {
+      "open": "Taste along step by step",
+      "tasting": "Tasting: {wine}",
+      "progress": "step {current}/{total}",
+      "back": "Back",
+      "next": "Next",
+      "done": "Done ✓",
+      "close": "Close",
+      "askBot": "Ask the AI sommelier about this wine"
+    },
     "winePassport": "Wine passport",
     "passport": {
       "grape": "Grape",

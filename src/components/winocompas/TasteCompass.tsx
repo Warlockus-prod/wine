@@ -16,7 +16,13 @@
  */
 
 import { useId, useMemo, useState, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
-import { COMPASS_SECTORS, type CompassSector, type Tendencja } from "@/data/wine-compass-kb";
+import {
+  COMPASS_SECTORS,
+  pickL,
+  type CompassLang,
+  type CompassSector,
+  type Tendencja,
+} from "@/data/wine-compass-kb";
 
 export type Intensity = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-5
@@ -47,9 +53,9 @@ const STATE_COUNT = MAX_INTENSITY + 1;
 // (Previously these used -π/2 offsets from a math-convention which put
 //  CIERPKOŚĆ on the left and clipped its label - fixed.)
 const BASE_AXES = [
-  { id: "cierpkosc", label: "CIERPKOŚĆ", angle: 0 },                    // top
-  { id: "slodycz",   label: "SŁODYCZ",   angle: (2 * Math.PI) / 3 },   // lower-right (4 o'clock)
-  { id: "kwasowosc", label: "KWASOWOŚĆ", angle: (4 * Math.PI) / 3 },   // lower-left (8 o'clock)
+  { id: "cierpkosc", label: "CIERPKOŚĆ", label_en: "ASTRINGENCY", angle: 0 },                  // top
+  { id: "slodycz",   label: "SŁODYCZ",   label_en: "SWEETNESS",   angle: (2 * Math.PI) / 3 }, // lower-right (4 o'clock)
+  { id: "kwasowosc", label: "KWASOWOŚĆ", label_en: "ACIDITY",     angle: (4 * Math.PI) / 3 }, // lower-left (8 o'clock)
 ] as const;
 
 interface SpokeMeta {
@@ -158,6 +164,10 @@ interface Props {
    *  bubbles hover through onHoverChange - "kliknij obrazek, zobacz opis"
    *  (client 2026-07). Without it the ring stays decorative. */
   onMedallionSelect?: (tendencjaId: string) => void;
+  /** UI language for labels + aria strings. Defaults to "pl" so every
+   *  existing call-site (and the PL e2e surface) stays byte-identical;
+   *  the EN /samouczek passes "en". */
+  lang?: CompassLang;
 }
 
 // Sektor avg helper - fans the same value to both tendencje under a sektor.
@@ -182,11 +192,17 @@ export default function TasteCompass({
   level = 3,
   baseInteractive = false,
   onMedallionSelect,
+  lang = "pl",
 }: Props) {
   const isControlled = profileProp !== undefined;
   const [internal, setInternal] = useState<CompassProfile>(() => defaultProfile ?? {});
   const profile = isControlled ? profileProp! : internal;
   const baseId = useId();
+  // Locale shorthands - axis rim labels, slider value text, tendencja names.
+  const axisLabel = (axis: (typeof BASE_AXES)[number]) =>
+    lang === "pl" ? axis.label : axis.label_en;
+  const valueText = (value: number) =>
+    lang === "pl" ? `${value} z ${MAX_INTENSITY}` : `${value} of ${MAX_INTENSITY}`;
 
   const setProfile = useCallback(
     (next: CompassProfile) => {
@@ -287,7 +303,7 @@ export default function TasteCompass({
         cycleIntensity(id);
       } else if (e.key === "0") {
         setIntensity(id, 0);
-      } else if (["1", "2", "3", "4"].includes(e.key)) {
+      } else if (["1", "2", "3", "4", "5"].includes(e.key)) {
         setIntensity(id, Number(e.key) as Intensity);
       }
     },
@@ -361,8 +377,12 @@ export default function TasteCompass({
       <svg
         viewBox={`0 0 ${VIEW} ${VIEW}`}
         className="taste-compass-svg"
-        role="application"
-        aria-label="Tarcza Vinokompasu - zaznacz intensywność każdej tendencji"
+        role="group"
+        aria-label={pickL(
+          lang,
+          "Tarcza Vinokompasu - zaznacz intensywność każdej tendencji",
+          "The Vinocompas dial - set the intensity of each tendency",
+        )}
       >
         <defs>
           {/* BG gradient reads from semantic tokens - flips dark↔white per
@@ -614,7 +634,7 @@ export default function TasteCompass({
             const xUnit = Math.sin(axis.angle);
             const yUnit = -Math.cos(axis.angle);
             const labelR = rOuter + 28;
-            const halfW = axis.label.length * 13 * 0.42;
+            const halfW = axisLabel(axis).length * 13 * 0.42;
             const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
             const labelY = cy + labelR * yUnit;
             const id = `base.${axis.id}`;
@@ -637,11 +657,11 @@ export default function TasteCompass({
                 fill="transparent"
                 tabIndex={0}
                 role="slider"
-                aria-label={axis.label}
+                aria-label={axisLabel(axis)}
                 aria-valuemin={0}
                 aria-valuemax={MAX_INTENSITY}
                 aria-valuenow={value}
-                aria-valuetext={`${value} z ${MAX_INTENSITY}`}
+                aria-valuetext={valueText(value)}
                 onClick={() => cycleIntensity(id)}
                 onKeyDown={(e) => {
                   if (e.key === "ArrowUp" || e.key === "ArrowRight") {
@@ -679,18 +699,18 @@ export default function TasteCompass({
                 stroke="transparent"
                 tabIndex={0}
                 role="slider"
-                aria-label={sector.name_pl}
+                aria-label={pickL(lang, sector.name_pl, sector.name_en)}
                 aria-valuemin={0}
                 aria-valuemax={MAX_INTENSITY}
                 aria-valuenow={value}
-                aria-valuetext={`${value} z ${MAX_INTENSITY}`}
+                aria-valuetext={valueText(value)}
                 onClick={(e) => pickSektor(e, sector.id)}
                 onKeyDown={(e) => handleSektorKey(e, sector.id)}
                 onMouseEnter={() => reportHover(sector.id)}
                 onMouseLeave={() =>
                   reportHover(hovered === sector.id ? null : hovered)
                 }
-                style={{ cursor: "pointer", outline: "none" }}
+                style={{ cursor: "pointer" }}
                 className="taste-compass-touch"
               />
             );
@@ -714,18 +734,18 @@ export default function TasteCompass({
                 stroke="transparent"
                 tabIndex={0}
                 role="slider"
-                aria-label={axis.label}
+                aria-label={axisLabel(axis)}
                 aria-valuemin={0}
                 aria-valuemax={MAX_INTENSITY}
                 aria-valuenow={value}
-                aria-valuetext={`${value} z ${MAX_INTENSITY}`}
+                aria-valuetext={valueText(value)}
                 onClick={(e) => pickBase(e, axis.id)}
                 onKeyDown={(e) => handleBaseKey(e, axis.id)}
                 onMouseEnter={() => reportHover(id)}
                 onMouseLeave={() =>
                   reportHover(hovered === id ? null : hovered)
                 }
-                style={{ cursor: "pointer", outline: "none" }}
+                style={{ cursor: "pointer" }}
                 className="taste-compass-touch"
               />
             );
@@ -742,18 +762,18 @@ export default function TasteCompass({
               stroke="transparent"
               tabIndex={0}
               role="slider"
-              aria-label={`${s.sector.name_pl} - ${s.tendencja.name_pl}`}
+              aria-label={`${pickL(lang, s.sector.name_pl, s.sector.name_en)} - ${pickL(lang, s.tendencja.name_pl, s.tendencja.name_en)}`}
               aria-valuemin={0}
               aria-valuemax={MAX_INTENSITY}
               aria-valuenow={fit}
-              aria-valuetext={`${fit} z ${MAX_INTENSITY}`}
+              aria-valuetext={valueText(fit)}
               onClick={(e) => pickIntensity(e, s.tendencja.id)}
               onMouseEnter={() => reportHover(s.tendencja.id)}
               onMouseLeave={() =>
                 reportHover(hovered === s.tendencja.id ? null : hovered)
               }
               onKeyDown={(e) => handleKey(e, s)}
-              style={{ cursor: "pointer", outline: "none" }}
+              style={{ cursor: "pointer" }}
               className="taste-compass-touch"
             />
           );
@@ -806,12 +826,16 @@ export default function TasteCompass({
                 : "end";
             const baseline = yUnit < -0.3 ? "auto" : yUnit > 0.3 ? "hanging" : "middle";
 
-            const label = s.tendencja.shortLabel_pl ?? s.tendencja.name_pl;
+            const label =
+              lang === "pl"
+                ? (s.tendencja.shortLabel_pl ?? s.tendencja.name_pl)
+                : (s.tendencja.shortLabel_en ?? s.tendencja.name_en);
             let lines = label.includes("·") ? label.split("·").map((p) => p.trim()) : [label];
             // Client 16.07 on-wheel names are longer ("Kawa i czekolada") -
             // wrap at the space nearest the middle so side labels don't
-            // clip the viewBox edge.
-            if (lines.length === 1 && label.length > 12 && label.includes(" ")) {
+            // clip the viewBox edge. >= 12 so EN "Forest floor" (12 chars)
+            // wraps like its PL twin; no PL label is exactly 12 chars.
+            if (lines.length === 1 && label.length >= 12 && label.includes(" ")) {
               const mid = Math.floor(label.length / 2);
               let best = -1;
               for (let j = 0; j < label.length; j++) {
@@ -906,7 +930,7 @@ export default function TasteCompass({
                   ? {
                       role: "button",
                       tabIndex: 0,
-                      "aria-label": `Pokaż opis: ${s.tendencja.name_pl}`,
+                      "aria-label": `${pickL(lang, "Pokaż opis", "Show description")}: ${pickL(lang, s.tendencja.name_pl, s.tendencja.name_en)}`,
                       onClick: pick,
                       onKeyDown: (e: { key: string; preventDefault: () => void }) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -963,7 +987,7 @@ export default function TasteCompass({
               pointerEvents="none"
               className="select-none"
             >
-              {sector.name_pl}
+              {pickL(lang, sector.name_pl, sector.name_en)}
             </text>
           );
         })}
@@ -994,7 +1018,7 @@ export default function TasteCompass({
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
-          const halfW = axis.label.length * (labelBright ? 13 : 10.5) * 0.42;
+          const halfW = axisLabel(axis).length * (labelBright ? 13 : 10.5) * 0.42;
           const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
           const labelY = cy + labelR * yUnit + labelYAdjust;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
@@ -1048,7 +1072,7 @@ export default function TasteCompass({
                 fill="var(--ink)"
                 className="select-none"
               >
-                {axis.label}
+                {axisLabel(axis)}
               </text>
               {labelBright ? (
                 <text
@@ -1073,7 +1097,9 @@ export default function TasteCompass({
 
       {/* Live legend - shows what's currently selected.
           Hidden when the wrapper provides its own info side-panel. */}
-      {hideLegend ? null : <CompassLegend profile={profile} onClear={() => setProfile({})} />}
+      {hideLegend ? null : (
+        <CompassLegend profile={profile} onClear={() => setProfile({})} lang={lang} />
+      )}
     </div>
   );
 }
@@ -1082,9 +1108,11 @@ export default function TasteCompass({
 function CompassLegend({
   profile,
   onClear,
+  lang = "pl",
 }: {
   profile: CompassProfile;
   onClear: () => void;
+  lang?: CompassLang;
 }) {
   const selected = SPOKES.flatMap((s) => {
     const v = profile[s.tendencja.id] ?? 0;
@@ -1094,7 +1122,11 @@ function CompassLegend({
   if (selected.length === 0) {
     return (
       <p className="mt-3 text-center font-serif text-xs italic text-[var(--color-accent-gold)] opacity-80">
-        Dotknij sektor i wskaż intensywność (od 0 do 5) - kompas zapamięta twój profil.
+        {pickL(
+          lang,
+          "Dotknij sektor i wskaż intensywność (od 0 do 5) - kompas zapamięta twój profil.",
+          "Tap a sector and set the intensity (from 0 to 5) - the compass remembers your profile.",
+        )}
       </p>
     );
   }
@@ -1112,7 +1144,7 @@ function CompassLegend({
             style={{ background: s.sector.color }}
             aria-hidden
           />
-          <span>{s.tendencja.name_pl}</span>
+          <span>{pickL(lang, s.tendencja.name_pl, s.tendencja.name_en)}</span>
           <span className="font-mono text-[10px] text-gray-400">·{v}</span>
         </span>
       ))}
@@ -1121,7 +1153,7 @@ function CompassLegend({
         onClick={onClear}
         className="ml-1 rounded-full border border-rose-500/30 bg-rose-900/20 px-2.5 py-1 text-[11px] font-semibold text-rose-300 transition hover:bg-rose-900/40"
       >
-        Wyzeruj
+        {pickL(lang, "Wyzeruj", "Reset")}
       </button>
     </div>
   );

@@ -10,7 +10,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "Polish Modern",
     city: "Warszawa",
     description:
-      { en: "Modern Polish fine dining in Łazienki - fermented vegetables, foraged herbs, game and quiet European bottles.", pl: "Nowoczesna kuchnia polska w Łazienkach - fermentowane warzywa, dzika zwierzyna, zioła z lasu i spokojne europejskie wina." },
+      { en: "Modern Polish fine dining in Łazienki - fermented vegetables, foraged herbs, game and quiet European bottles.", pl: "Nowoczesna kuchnia polska w Łazienkach - fermentowane warzywa, dziczyzna, zioła prosto z lasu i niekrzykliwe europejskie wina." },
     coverGradient: "from-[#2f4a35] via-[#5d7a4d] to-[#c4ad7a]",
     wines: [
       {
@@ -20,7 +20,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Sangiovese Blend",
         style: "Red",
         vintage: "2020",
-        notes: { en: "Dark cherry, cedar, tobacco, and polished tannins.", pl: "Ciemna wiśnia, cedr, tytoń i wypolerowane taniny." },
+        notes: { en: "Dark cherry, cedar, tobacco, and polished tannins.", pl: "Ciemna wiśnia, cedr, tytoń i gładkie, dojrzałe taniny." },
       },
       {
         id: "r1-w2",
@@ -29,7 +29,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Sangiovese",
         style: "Red",
         vintage: "2021",
-        notes: { en: "Bright sour cherry, herbs, and savory spice.", pl: "Świeża kwaśna wiśnia, zioła i wytrawne korzenne nuty." },
+        notes: { en: "Bright sour cherry, herbs, and savory spice.", pl: "Soczysta kwaśna wiśnia, zioła i pikantne nuty przypraw." },
       },
       {
         id: "r1-w3",
@@ -95,7 +95,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r1-d1",
         name: { en: "Porcini in Black Garlic", pl: "Borowik w czarnym czosnku" },
         category: "Starter",
-        description: { en: "Foraged porcini mushrooms cured in black garlic, served on a smoked yogurt cloud with rye crumb.", pl: "Leśny borowik peklowany w czarnym czosnku, podany na chmurze wędzonego jogurtu z grzanką żytnią." },
+        description: { en: "Foraged porcini mushrooms cured in black garlic, served on a smoked yogurt cloud with rye crumb.", pl: "Leśny borowik peklowany w czarnym czosnku, podany na obłoku wędzonego jogurtu z żytnią kruszonką." },
         price: 28,
         pairings: [
           {
@@ -104,7 +104,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r1-w3",
-            reason: { en: "Cortese's white-flower nose contrasts the black-garlic depth.", pl: "Nuta białego kwiatu w Cortese kontrastuje z głębią czarnego czosnku." },
+            reason: { en: "Cortese's white-flower nose contrasts the black-garlic depth.", pl: "Nuty białych kwiatów w Cortese kontrastują z głębią czarnego czosnku." },
           },
         ],
       },
@@ -117,7 +117,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r1-w2",
-            reason: { en: "Sangiovese cherry and herbs echo the juniper and rowan notes.", pl: "Wiśnia i zioła Sangiovese odpowiadają nutom jałowca i jarzębiny." },
+            reason: { en: "Sangiovese cherry and herbs echo the juniper and rowan notes.", pl: "Wiśnia i zioła Sangiovese współgrają z nutami jałowca i jarzębiny." },
           },
           {
             wineId: "r1-w1",
@@ -134,11 +134,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r1-w5",
-            reason: { en: "Trento brut bubbles cut the richness of fermented sour and smoked sausage.", pl: "Bąbelki Trento brut przecinają sytość zakwasu i wędzonej kiełbasy." },
+            reason: { en: "Trento brut bubbles cut the richness of fermented sour and smoked sausage.", pl: "Bąbelki Trento brut przecinają treściwość żurku i wędzonej kiełbasy." },
           },
           {
             wineId: "r1-w8",
-            reason: { en: "Pinot Grigio's crispness mirrors the żurek's bright acidity.", pl: "Świeżość Pinot Grigio współgra z jasną kwasowością żurku." },
+            reason: { en: "Pinot Grigio's crispness mirrors the żurek's bright acidity.", pl: "Świeżość Pinot Grigio współgra z żywą kwasowością żurku." },
           },
         ],
       },
@@ -151,11 +151,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r1-w3",
-            reason: { en: "Gavi's mineral citrus echoes the buttermilk-cucumber freshness.", pl: "Mineralne cytrusy Gavi odpowiadają świeżości maślanki i ogórka." },
+            reason: { en: "Gavi's mineral citrus echoes the buttermilk-cucumber freshness.", pl: "Mineralne cytrusy Gavi współgrają ze świeżością maślanki i ogórka." },
           },
           {
             wineId: "r1-w4",
-            reason: { en: "Sicilian Chardonnay's richness wraps the lake pike and dill butter.", pl: "Treściwość sycylijskiego Chardonnay otacza szczupaka i masło koperkowe." },
+            reason: { en: "Sicilian Chardonnay's richness wraps the lake pike and dill butter.", pl: "Treściwość sycylijskiego Chardonnay otula szczupaka i koperkowe masło." },
           },
         ],
       },
@@ -163,16 +163,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r1-d5",
         name: { en: "Juniper-Cured Trout", pl: "Pstrąg w jałowcu" },
         category: "Seafood",
-        description: { en: "Three-day juniper cure on alpine trout, pine-needle oil, fennel ash and beetroot leather.", pl: "Trzydniowe peklowanie pstrąga alpejskiego w jałowcu, olej z igliwia, popiół koprowy i skóra z buraka." },
+        description: { en: "Three-day juniper cure on alpine trout, pine-needle oil, fennel ash and beetroot leather.", pl: "Trzydniowe peklowanie pstrąga alpejskiego w jałowcu, olej z igliwia, popiół koprowy i skórka z buraka." },
         price: 38,
         pairings: [
           {
             wineId: "r1-w8",
-            reason: { en: "Pear and saline notes bring out the alpine clarity of the trout.", pl: "Gruszka i nuty słone wydobywają górską klarowność pstrąga." },
+            reason: { en: "Pear and saline notes bring out the alpine clarity of the trout.", pl: "Gruszka i słone nuty wydobywają górską czystość pstrąga." },
           },
           {
             wineId: "r1-w3",
-            reason: { en: "Gavi's chalky finish balances the fennel ash and pine oil.", pl: "Kredowy finisz Gavi równoważy popiół koprowy i olej iglasty." },
+            reason: { en: "Gavi's chalky finish balances the fennel ash and pine oil.", pl: "Kredowy finisz Gavi równoważy popiół koprowy i olej z igliwia." },
           },
         ],
       },
@@ -185,11 +185,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r1-w7",
-            reason: { en: "Brunello's leather and dried herb notes carry the smoked duck and beet.", pl: "Skórzane i ziołowe nuty Brunello niosą wędzoną kaczkę i buraka." },
+            reason: { en: "Brunello's leather and dried herb notes carry the smoked duck and beet.", pl: "Skórzane i ziołowe nuty Brunello dopełniają wędzoną kaczkę i buraka." },
           },
           {
             wineId: "r1-w1",
-            reason: { en: "Tignanello's depth matches the blackcurrant jus and pearl barley.", pl: "Głębia Tignanello dorównuje sosowi z czarnej porzeczki i kaszy pęczak." },
+            reason: { en: "Tignanello's depth matches the blackcurrant jus and pearl barley.", pl: "Głębia Tignanello współgra z sosem z czarnej porzeczki i kaszą pęczak." },
           },
         ],
       },
@@ -197,12 +197,12 @@ export const seedRestaurants: Restaurant[] = [
         id: "r1-d7",
         name: { en: "Roe Deer with Lingonberry", pl: "Sarna w sosie z borówek" },
         category: "Game",
-        description: { en: "Sous-vide roe deer loin, forest lingonberry sauce, smoked celeriac purée, juniper bread.", pl: "Polędwica sarny sous-vide, sos z leśnych borówek, puree z wędzonego selera i chleb na jałowcu." },
+        description: { en: "Sous-vide roe deer loin, forest lingonberry sauce, smoked celeriac purée, juniper bread.", pl: "Polędwica sarny sous-vide, sos z leśnych borówek, puree z wędzonego selera i chleb jałowcowy." },
         price: 64,
         pairings: [
           {
             wineId: "r1-w1",
-            reason: { en: "Tignanello's tobacco and cedar wrap the gamey loin and lingonberry sweetness.", pl: "Tytoń i cedr Tignanello otaczają dziczyznę i słodycz borówki." },
+            reason: { en: "Tignanello's tobacco and cedar wrap the gamey loin and lingonberry sweetness.", pl: "Tytoń i cedr Tignanello otulają dziczyznę i słodycz borówki." },
           },
           {
             wineId: "r1-w7",
@@ -214,16 +214,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r1-d8",
         name: { en: "Lamb with Buckwheat", pl: "Jagnięcina z kaszą gryczaną" },
         category: "Main",
-        description: { en: "Slow-roasted Podhale lamb shoulder, toasted buckwheat, fermented cabbage and goat cheese foam.", pl: "Wolno pieczona łopatka jagnięcia podhalańskiego, prażona gryka, kiszona kapusta i pianka z koziego sera." },
+        description: { en: "Slow-roasted Podhale lamb shoulder, toasted buckwheat, fermented cabbage and goat cheese foam.", pl: "Wolno pieczona łopatka jagnięciny podhalańskiej, prażona gryka, kiszona kapusta i pianka z koziego sera." },
         price: 52,
         pairings: [
           {
             wineId: "r1-w2",
-            reason: { en: "Chianti Rufina's bright cherry cuts through the slow-roasted lamb fat.", pl: "Jasna wiśnia Chianti Rufina przecina tłuszcz wolno pieczonej jagnięciny." },
+            reason: { en: "Chianti Rufina's bright cherry cuts through the slow-roasted lamb fat.", pl: "Żywa, wiśniowa kwasowość Chianti Rufina przecina tłuszcz wolno pieczonej jagnięciny." },
           },
           {
             wineId: "r1-w7",
-            reason: { en: "Brunello's structure stands up to the fermented cabbage and goat cheese.", pl: "Struktura Brunello dorównuje kiszonej kapuście i koziemu serowi." },
+            reason: { en: "Brunello's structure stands up to the fermented cabbage and goat cheese.", pl: "Struktura Brunello udźwignie kiszoną kapustę i kozi ser." },
           },
         ],
       },
@@ -231,12 +231,12 @@ export const seedRestaurants: Restaurant[] = [
         id: "r1-d9",
         name: { en: "Forest Cheesecake", pl: "Sernik leśny" },
         category: "Dessert",
-        description: { en: "Curd cheesecake on a juniper-crumb base, pine sorbet, candied rowan and meadow honey.", pl: "Sernik z twarogu na spodzie z jałowca, sorbet z igliwia, kandyzowana jarzębina i miód z łąki." },
+        description: { en: "Curd cheesecake on a juniper-crumb base, pine sorbet, candied rowan and meadow honey.", pl: "Sernik z twarogu na spodzie z jałowca, sorbet z igliwia, kandyzowana jarzębina i miód łąkowy." },
         price: 22,
         pairings: [
           {
             wineId: "r1-w6",
-            reason: { en: "Ben Rye's apricot, saffron and honey echo the meadow-honey glaze.", pl: "Morela, szafran i miód Ben Rye odpowiadają glazurze z miodu łąkowego." },
+            reason: { en: "Ben Rye's apricot, saffron and honey echo the meadow-honey glaze.", pl: "Morela, szafran i miód Ben Rye współgrają z glazurą z łąkowego miodu." },
           },
           {
             wineId: "r1-w5",
@@ -253,11 +253,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r1-w6",
-            reason: { en: "Donnafugata Ben Rye's candied orange harmonises with the elderflower pear.", pl: "Kandyzowana pomarańcza Ben Rye harmonizuje z gruszką na czarnym bzie." },
+            reason: { en: "Donnafugata Ben Rye's candied orange harmonises with the elderflower pear.", pl: "Kandyzowana pomarańcza Ben Rye harmonizuje z gruszką w syropie z czarnego bzu." },
           },
           {
             wineId: "r1-w8",
-            reason: { en: "Pinot Grigio's pear note doubles the dish's central fruit.", pl: "Gruszkowa nuta Pinot Grigio podwaja owocowy rdzeń deseru." },
+            reason: { en: "Pinot Grigio's pear note doubles the dish's central fruit.", pl: "Gruszkowa nuta Pinot Grigio wzmacnia owocowy charakter deseru." },
           },
         ],
       },
@@ -320,7 +320,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Pinot Noir Blend",
         style: "Sparkling",
         vintage: "NV",
-        notes: { en: "Wild strawberry, citrus peel, and elegant mousse.", pl: "Poziomka, skórka cytrusów i elegancki mus." },
+        notes: { en: "Wild strawberry, citrus peel, and elegant mousse.", pl: "Poziomka, skórka cytrusów i elegancki perlaż." },
       },
       {
         id: "r2-w6",
@@ -329,7 +329,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Pinot Noir",
         style: "Red",
         vintage: "2022",
-        notes: { en: "Ripe berry, mocha, and silky tannins.", pl: "Dojrzałe jagody, mocha i jedwabiste taniny." },
+        notes: { en: "Ripe berry, mocha, and silky tannins.", pl: "Dojrzałe owoce jagodowe, mokka i jedwabiste taniny." },
       },
       {
         id: "r2-w7",
@@ -338,7 +338,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Zinfandel Blend",
         style: "Red",
         vintage: "2022",
-        notes: { en: "Blackberry, pepper, and savory spice.", pl: "Jeżyna, pieprz i wytrawne korzenne nuty." },
+        notes: { en: "Blackberry, pepper, and savory spice.", pl: "Jeżyna, pieprz i pikantne nuty przypraw." },
       },
       {
         id: "r2-w8",
@@ -360,7 +360,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r2-w1",
-            reason: { en: "Zesty citrus profile mirrors yuzu and lifts raw fish sweetness.", pl: "Pikantny cytrusowy profil odpowiada yuzu i podkreśla słodycz surowej ryby." },
+            reason: { en: "Zesty citrus profile mirrors yuzu and lifts raw fish sweetness.", pl: "Rześki cytrusowy profil współgra z yuzu i podkreśla słodycz surowej ryby." },
           },
           {
             wineId: "r2-w4",
@@ -377,11 +377,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r2-w2",
-            reason: { en: "Chablis minerality mirrors the oceanic purity of nigiri.", pl: "Mineralność Chablis odpowiada oceanicznej czystości nigiri." },
+            reason: { en: "Chablis minerality mirrors the oceanic purity of nigiri.", pl: "Mineralność Chablis współgra z oceaniczną czystością nigiri." },
           },
           {
             wineId: "r2-w4",
-            reason: { en: "Champagne acidity resets the palate between different fish cuts.", pl: "Kwasowość Champagne resetuje podniebienie między różnymi rodzajami ryb." },
+            reason: { en: "Champagne acidity resets the palate between different fish cuts.", pl: "Kwasowość Champagne odświeża podniebienie między kolejnymi rodzajami ryb." },
           },
         ],
       },
@@ -398,7 +398,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r2-w3",
-            reason: { en: "Slight sweetness softens soy salt and enhances umami.", pl: "Lekka słodycz łagodzi sól sojową i wzmacnia umami." },
+            reason: { en: "Slight sweetness softens soy salt and enhances umami.", pl: "Lekka słodycz łagodzi słoność sosu sojowego i wzmacnia umami." },
           },
         ],
       },
@@ -423,7 +423,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r2-d5",
         name: { en: "Miso Black Cod", pl: "Czarny dorsz miso" },
         category: "Main",
-        description: { en: "Saikyo miso marinated cod, pickled daikon, and ginger.", pl: "Dorsz marynowany w saikyō miso, kiszony daikon i imbir." },
+        description: { en: "Saikyo miso marinated cod, pickled daikon, and ginger.", pl: "Dorsz w marynacie saikyō miso, marynowany daikon i imbir." },
         price: 38,
         pairings: [
           {
@@ -445,7 +445,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r2-w4",
-            reason: { en: "Lively mousse cuts fried texture and keeps flavors clean.", pl: "Żywy mus rozcina smażoną teksturę i utrzymuje czystość smaków." },
+            reason: { en: "Lively mousse cuts fried texture and keeps flavors clean.", pl: "Żywy perlaż przecina tłustość tempury i utrzymuje czystość smaków." },
           },
           {
             wineId: "r2-w5",
@@ -457,16 +457,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r2-d7",
         name: { en: "Unagi Don", pl: "Unagi don" },
         category: "Rice",
-        description: { en: "Charcoal grilled eel over rice with tare and sansho.", pl: "Węgorz z grilla na węglu drzewnym na ryżu z sosem tare i pieprzem sanshō." },
+        description: { en: "Charcoal grilled eel over rice with tare and sansho.", pl: "Węgorz grillowany nad węglem drzewnym, podany na ryżu z sosem tare i pieprzem sanshō." },
         price: 33,
         pairings: [
           {
             wineId: "r2-w3",
-            reason: { en: "Residual sugar balances sweet soy glaze and eel fat.", pl: "Resztkowy cukier równoważy słodką glazurę sojową i tłustość węgorza." },
+            reason: { en: "Residual sugar balances sweet soy glaze and eel fat.", pl: "Cukier resztkowy równoważy słodką glazurę sojową i tłustość węgorza." },
           },
           {
             wineId: "r2-w6",
-            reason: { en: "Soft red fruit complements smoky caramelized eel.", pl: "Miękkie czerwone owoce uzupełniają dymnego, karmelizowanego węgorza." },
+            reason: { en: "Soft red fruit complements smoky caramelized eel.", pl: "Miękkie czerwone owoce dopełniają dymnego, karmelizowanego węgorza." },
           },
         ],
       },
@@ -474,16 +474,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r2-d8",
         name: { en: "Wagyu Tataki", pl: "Wagyu tataki" },
         category: "Main",
-        description: { en: "Seared wagyu, ponzu, daikon, and garlic chips.", pl: "Smażone wagyu, ponzu, daikon i chipsy czosnkowe." },
+        description: { en: "Seared wagyu, ponzu, daikon, and garlic chips.", pl: "Obsmażane wagyu, ponzu, daikon i chipsy czosnkowe." },
         price: 44,
         pairings: [
           {
             wineId: "r2-w7",
-            reason: { en: "Concentrated fruit and spice stand up to wagyu richness.", pl: "Skoncentrowana owocowość i korzenność dorównują tłustości wagyu." },
+            reason: { en: "Concentrated fruit and spice stand up to wagyu richness.", pl: "Skoncentrowana owocowość i korzenność dotrzymują kroku tłustości wagyu." },
           },
           {
             wineId: "r2-w6",
-            reason: { en: "Pinot texture supports beef fat without overwhelming ponzu.", pl: "Tekstura Pinot wspiera tłustość wołowiny, nie tłumiąc ponzu." },
+            reason: { en: "Pinot texture supports beef fat without overwhelming ponzu.", pl: "Tekstura Pinota dźwiga tłustość wołowiny, nie zagłuszając ponzu." },
           },
         ],
       },
@@ -496,11 +496,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r2-w1",
-            reason: { en: "Acidic lift cuts broth richness and highlights aromatics.", pl: "Kwasowy charakter rozcina bogactwo bulionu i podkreśla aromaty." },
+            reason: { en: "Acidic lift cuts broth richness and highlights aromatics.", pl: "Żywa kwasowość przecina bogactwo bulionu i podkreśla aromaty." },
           },
           {
             wineId: "r2-w3",
-            reason: { en: "Riesling softness complements salty soy depth.", pl: "Miękkość Rieslinga uzupełnia słoną głębię sosu sojowego." },
+            reason: { en: "Riesling softness complements salty soy depth.", pl: "Miękkość Rieslinga dopełnia słoną głębię sosu sojowego." },
           },
         ],
       },
@@ -508,12 +508,12 @@ export const seedRestaurants: Restaurant[] = [
         id: "r2-d10",
         name: { en: "Matcha Basque Cheesecake", pl: "Sernik baskijski matcha" },
         category: "Dessert",
-        description: { en: "Burnt cheesecake with ceremonial matcha cream.", pl: "Przypalany sernik baskijski z ceremonialnym kremem matcha." },
+        description: { en: "Burnt cheesecake with ceremonial matcha cream.", pl: "Przypalany sernik baskijski z kremem z ceremonialnej matchy." },
         price: 15,
         pairings: [
           {
             wineId: "r2-w5",
-            reason: { en: "Red berry mousse offsets the earthy matcha edge.", pl: "Owocowy mus z czerwonych jagód niweluje ziemisty akcent matchy." },
+            reason: { en: "Red berry mousse offsets the earthy matcha edge.", pl: "Czerwone owoce i perlaż rosé równoważą ziemisty akcent matchy." },
           },
           {
             wineId: "r2-w3",
@@ -534,7 +534,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "Spanish",
     city: "Kraków",
     description:
-      { en: "Spanish wine house in an 1881 Kraków townhouse cellar - modern tapas, wood-fired meats, and a deep list of Rioja, Ribera del Duero and sherry.", pl: "Hiszpański dom wina w piwnicy krakowskiej kamienicy z 1881 roku - nowoczesne tapas, mięsa z ognia i głęboka karta Riojy, Ribera del Duero i sherry." },
+      { en: "Spanish wine house in an 1881 Kraków townhouse cellar - modern tapas, wood-fired meats, and a deep list of Rioja, Ribera del Duero and sherry.", pl: "Hiszpański dom wina w piwnicy krakowskiej kamienicy z 1881 roku - nowoczesne tapas, mięsa z żywego ognia i obszerna karta win z Riojy, Ribera del Duero i sherry." },
     coverGradient: "from-[#5f2f23] via-[#a04d2b] to-[#e1a65b]",
     wines: [
       {
@@ -553,7 +553,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Tempranillo Blend",
         style: "Red",
         vintage: "2020",
-        notes: { en: "Plum, cedar, tobacco, and polished tannins.", pl: "Śliwka, cedr, tytoń i wypolerowane taniny." },
+        notes: { en: "Plum, cedar, tobacco, and polished tannins.", pl: "Śliwka, cedr, tytoń i gładkie, dojrzałe taniny." },
       },
       {
         id: "r3-w3",
@@ -607,7 +607,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Viura Blend",
         style: "White",
         vintage: "2012",
-        notes: { en: "Nuts, dried citrus, and layered oxidative complexity.", pl: "Orzechy, suszone cytrusy i warstwowa oksydacyjna złożoność." },
+        notes: { en: "Nuts, dried citrus, and layered oxidative complexity.", pl: "Orzechy, suszone cytrusy i wielowarstwowa, oksydacyjna złożoność." },
       },
     ],
     dishes: [
@@ -620,7 +620,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w6",
-            reason: { en: "Cava bubbles clean up aioli richness and spice oil.", pl: "Bąbelki Cavy oczyszczają tłustość aioli i pikantnej oliwy." },
+            reason: { en: "Cava bubbles clean up aioli richness and spice oil.", pl: "Bąbelki Cavy przecinają tłustość aioli i pikantnej oliwy." },
           },
           {
             wineId: "r3-w4",
@@ -637,11 +637,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w4",
-            reason: { en: "Saline white enhances sweet shrimp and garlic oil.", pl: "Słone białe wino wzmacnia słodkie krewetki i czosnkową oliwę." },
+            reason: { en: "Saline white enhances sweet shrimp and garlic oil.", pl: "Słone białe wino podkreśla słodycz krewetek i czosnkową oliwę." },
           },
           {
             wineId: "r3-w8",
-            reason: { en: "Layered white handles intensity of garlic and chili.", pl: "Warstwowe białe wino radzi sobie z intensywnością czosnku i chili." },
+            reason: { en: "Layered white handles intensity of garlic and chili.", pl: "Wielowarstwowe białe wino radzi sobie z intensywnością czosnku i chili." },
           },
         ],
       },
@@ -649,16 +649,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r3-d3",
         name: { en: "Tortilla Espanola", pl: "Hiszpańska tortilla" },
         category: "Tapas",
-        description: { en: "Potato and onion omelet with olive oil confit texture.", pl: "Omlet z ziemniakami i cebulą o teksturze konfitowanej w oliwie." },
+        description: { en: "Potato and onion omelet with olive oil confit texture.", pl: "Omlet z ziemniakami i cebulą konfitowanymi w oliwie." },
         price: 14,
         pairings: [
           {
             wineId: "r3-w5",
-            reason: { en: "Medium-bodied white complements egg richness.", pl: "Średnio treściwe białe wino uzupełnia bogactwo jajek." },
+            reason: { en: "Medium-bodied white complements egg richness.", pl: "Średnio treściwe białe wino dopełnia kremowość jajek." },
           },
           {
             wineId: "r3-w6",
-            reason: { en: "Sparkling acidity keeps each bite light.", pl: "Musująca kwasowość utrzymuje każdy kęs lekkim." },
+            reason: { en: "Sparkling acidity keeps each bite light.", pl: "Musująca kwasowość sprawia, że każdy kęs pozostaje lekki." },
           },
         ],
       },
@@ -671,7 +671,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w4",
-            reason: { en: "Albarino minerality complements octopus sweetness.", pl: "Mineralność Albariño uzupełnia słodycz ośmiornicy." },
+            reason: { en: "Albarino minerality complements octopus sweetness.", pl: "Mineralność Albariño dopełnia słodycz ośmiornicy." },
           },
           {
             wineId: "r3-w5",
@@ -688,11 +688,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w2",
-            reason: { en: "Rioja fruit and spice match saffron and roasted meat notes.", pl: "Owocowość i korzenność Rioja pasują do szafranu i pieczonych mięsnych nut." },
+            reason: { en: "Rioja fruit and spice match saffron and roasted meat notes.", pl: "Owocowość i korzenność Riojy pasują do szafranu i nut pieczonego mięsa." },
           },
           {
             wineId: "r3-w4",
-            reason: { en: "Bright acidity keeps the rice dish lively.", pl: "Świeża kwasowość utrzymuje danie z ryżu pełnym życia." },
+            reason: { en: "Bright acidity keeps the rice dish lively.", pl: "Rześka kwasowość dodaje daniu z ryżu lekkości i życia." },
           },
         ],
       },
@@ -705,11 +705,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w8",
-            reason: { en: "Complex aged white supports garlic-driven richness.", pl: "Złożone, dojrzewające białe wino wspiera bogactwo czosnku." },
+            reason: { en: "Complex aged white supports garlic-driven richness.", pl: "Złożone, dojrzałe białe wino udźwignie czosnkowe bogactwo dania." },
           },
           {
             wineId: "r3-w4",
-            reason: { en: "Fresh saline profile balances cod salinity.", pl: "Świeży słony profil równoważy słoność dorsza." },
+            reason: { en: "Fresh saline profile balances cod salinity.", pl: "Świeży, słony profil współgra ze słonością dorsza." },
           },
         ],
       },
@@ -722,7 +722,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r3-w3",
-            reason: { en: "Concentrated red with structure matches crispy pork richness.", pl: "Skoncentrowane czerwone wino ze strukturą odpowiada chrupiącej tłustości wieprzowiny." },
+            reason: { en: "Concentrated red with structure matches crispy pork richness.", pl: "Skoncentrowane, dobrze zbudowane czerwone wino udźwignie tłustość chrupiącego prosięcia." },
           },
           {
             wineId: "r3-w1",
@@ -732,18 +732,18 @@ export const seedRestaurants: Restaurant[] = [
       },
       {
         id: "r3-d8",
-        name: { en: "Croquetas de Jamon", pl: "Krokiety z szynką jamón" },
+        name: { en: "Croquetas de Jamon", pl: "Krokiety z jamón ibérico" },
         category: "Tapas",
         description: { en: "Creamy Iberico ham croquettes with crisp crust.", pl: "Kremowe krokiety z szynką ibérico w chrupiącej panierce." },
         price: 15,
         pairings: [
           {
             wineId: "r3-w6",
-            reason: { en: "Sparkling texture clears bechamel richness.", pl: "Musująca tekstura oczyszcza bogactwo beszamelu." },
+            reason: { en: "Sparkling texture clears bechamel richness.", pl: "Musująca tekstura przełamuje kremowe bogactwo beszamelu." },
           },
           {
             wineId: "r3-w5",
-            reason: { en: "White fruit notes offset savory ham intensity.", pl: "Nuty białych owoców równoważą wytrawną intensywność szynki." },
+            reason: { en: "White fruit notes offset savory ham intensity.", pl: "Nuty białych owoców równoważą słoną intensywność szynki." },
           },
         ],
       },
@@ -751,7 +751,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r3-d9",
         name: { en: "Chuleton a la Brasa", pl: "Chuletón z grilla" },
         category: "Grill",
-        description: { en: "Dry-aged rib steak cooked over oak embers.", pl: "Stek żebrowy dojrzewający na sucho, pieczony nad dębowym żarem." },
+        description: { en: "Dry-aged rib steak cooked over oak embers.", pl: "Sezonowany na sucho antrykot z kością, pieczony nad dębowym żarem." },
         price: 54,
         pairings: [
           {
@@ -760,7 +760,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r3-w7",
-            reason: { en: "Ripe fruit and spice echo grilled crust flavors.", pl: "Dojrzała owocowość i korzenność odpowiadają nutom grillowanej skórki." },
+            reason: { en: "Ripe fruit and spice echo grilled crust flavors.", pl: "Dojrzała owocowość i korzenność współgrają z nutami przypieczonej skorupki." },
           },
         ],
       },
@@ -794,7 +794,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "French Classic",
     city: "Paris",
     description:
-      { en: "Two-Michelin-star French classique on Avenue Franklin D. Roosevelt - couture-grade haute cuisine, the famous retractable rooftop, escargots de Bourgogne, canard à l'orange, and a 70-year-old cellar.", pl: "Dwugwiazdkowa francuska klasyka przy Avenue Franklin D. Roosevelt - haute cuisine klasy couture, słynny otwierany dach, ślimaki burgundzkie, kaczka à l'orange i piwnica licząca 70 lat." },
+      { en: "Two-Michelin-star French classique on Avenue Franklin D. Roosevelt - couture-grade haute cuisine, the famous retractable rooftop, escargots de Bourgogne, canard à l'orange, and a 70-year-old cellar.", pl: "Dwugwiazdkowa francuska klasyka przy Avenue Franklin D. Roosevelt - haute cuisine klasy couture, słynny rozsuwany dach, ślimaki burgundzkie, kaczka à l'orange i piwnica licząca 70 lat." },
     coverGradient: "from-[#2e2540] via-[#5e4d8a] to-[#c9b8e6]",
     wines: [
       {
@@ -813,7 +813,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Chardonnay",
         style: "White",
         vintage: "2022",
-        notes: { en: "Crisp citrus, oyster shell, and linear acidity.", pl: "Świeże cytrusy, muszla ostrygi i liniowa kwasowość." },
+        notes: { en: "Crisp citrus, oyster shell, and linear acidity.", pl: "Świeże cytrusy, muszla ostrygi i precyzyjna kwasowość." },
       },
       {
         id: "r4-w3",
@@ -849,7 +849,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Pinot Noir Blend",
         style: "Sparkling",
         vintage: "NV",
-        notes: { en: "Apple, brioche, toasted nuts, and long mousse.", pl: "Jabłko, brioszka, prażone orzechy i długi mus." },
+        notes: { en: "Apple, brioche, toasted nuts, and long mousse.", pl: "Jabłko, brioszka, prażone orzechy i długi, kremowy perlaż." },
       },
       {
         id: "r4-w7",
@@ -858,7 +858,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Sauvignon Blanc Blend",
         style: "White",
         vintage: "2021",
-        notes: { en: "Citrus, white peach, and subtle oak smoke.", pl: "Cytrusy, biała brzoskwinia i subtelny dąb z dymem." },
+        notes: { en: "Citrus, white peach, and subtle oak smoke.", pl: "Cytrusy, biała brzoskwinia i subtelna, dymna nuta dębu." },
       },
       {
         id: "r4-w8",
@@ -880,7 +880,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r4-w3",
-            reason: { en: "Pinot earthiness mirrors caramelized onion depth.", pl: "Ziemistość Pinota odpowiada głębi karmelizowanej cebuli." },
+            reason: { en: "Pinot earthiness mirrors caramelized onion depth.", pl: "Ziemistość Pinota współgra z głębią karmelizowanej cebuli." },
           },
           {
             wineId: "r4-w6",
@@ -897,11 +897,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r4-w8",
-            reason: { en: "Merlot blend tannins handle beef and butter intensity.", pl: "Taniny mieszanki Merlot radzą sobie z intensywnością wołowiny i masła." },
+            reason: { en: "Merlot blend tannins handle beef and butter intensity.", pl: "Taniny kupażu na bazie Merlota radzą sobie z intensywnością wołowiny i masła." },
           },
           {
             wineId: "r4-w4",
-            reason: { en: "Rhone spice amplifies seared crust and pepper.", pl: "Korzenność Rodanu wzmacnia smażoną skórkę i pieprz." },
+            reason: { en: "Rhone spice amplifies seared crust and pepper.", pl: "Korzenność Rodanu podkreśla przypieczoną skorupkę steku i pieprz." },
           },
         ],
       },
@@ -909,16 +909,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d3",
         name: { en: "Duck Confit", pl: "Konfitowana kaczka" },
         category: "Main",
-        description: { en: "Slow-cooked duck leg, lentils, and mustard jus.", pl: "Wolno pieczone udko kaczki, soczewica i sos musztardowy." },
+        description: { en: "Slow-cooked duck leg, lentils, and mustard jus.", pl: "Konfitowane udko kaczki, soczewica i sos musztardowy." },
         price: 34,
         pairings: [
           {
             wineId: "r4-w4",
-            reason: { en: "Savory Rhone profile matches crispy duck skin.", pl: "Wytrawny profil Rodanu pasuje do chrupiącej skórki kaczki." },
+            reason: { en: "Savory Rhone profile matches crispy duck skin.", pl: "Ziołowo-pikantny profil Rodanu pasuje do chrupiącej skórki kaczki." },
           },
           {
             wineId: "r4-w3",
-            reason: { en: "Pinot brightness lifts the rich confit fat.", pl: "Świeżość Pinota podnosi bogaty tłuszcz konfitu." },
+            reason: { en: "Pinot brightness lifts the rich confit fat.", pl: "Świeżość Pinota przełamuje tłustość konfitu." },
           },
         ],
       },
@@ -926,16 +926,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d4",
         name: { en: "Bouillabaisse", pl: "Bouillabaisse" },
         category: "Seafood",
-        description: { en: "Marseille fish stew with saffron rouille.", pl: "Marsylski gulasz rybny z szafranowym rouille." },
+        description: { en: "Marseille fish stew with saffron rouille.", pl: "Marsylska zupa rybna z szafranowym rouille." },
         price: 37,
         pairings: [
           {
             wineId: "r4-w2",
-            reason: { en: "Mineral Chablis supports shellfish and saffron broth.", pl: "Mineralne Chablis wspiera skorupiaki i bulion z szafranem." },
+            reason: { en: "Mineral Chablis supports shellfish and saffron broth.", pl: "Mineralne Chablis dopełnia skorupiaki i szafranowy bulion." },
           },
           {
             wineId: "r4-w7",
-            reason: { en: "Layered white has enough body for rich rouille.", pl: "Warstwowe białe wino ma wystarczająco treściwości dla bogatego rouille." },
+            reason: { en: "Layered white has enough body for rich rouille.", pl: "Wielowarstwowe białe wino ma dość treściwości, by udźwignąć bogate rouille." },
           },
         ],
       },
@@ -948,11 +948,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r4-w5",
-            reason: { en: "Dry rose complements roasted vegetables and herbs.", pl: "Wytrawne rosé uzupełnia pieczone warzywa i zioła." },
+            reason: { en: "Dry rose complements roasted vegetables and herbs.", pl: "Wytrawne rosé dopełnia pieczone warzywa i zioła." },
           },
           {
             wineId: "r4-w1",
-            reason: { en: "Crisp Loire white lifts tomato sweetness.", pl: "Świeże białe wino z Loary podnosi słodycz pomidora." },
+            reason: { en: "Crisp Loire white lifts tomato sweetness.", pl: "Świeże białe wino z Loary podkreśla słodycz pomidorów." },
           },
         ],
       },
@@ -960,12 +960,12 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d6",
         name: { en: "Coq au Vin", pl: "Coq au vin" },
         category: "Main",
-        description: { en: "Red wine braised chicken, mushrooms, and pearl onions.", pl: "Kurczak duszony w czerwonym winie z grzybami i perłową cebulą." },
+        description: { en: "Red wine braised chicken, mushrooms, and pearl onions.", pl: "Kurczak duszony w czerwonym winie z grzybami i cebulkami perłowymi." },
         price: 31,
         pairings: [
           {
             wineId: "r4-w8",
-            reason: { en: "Soft tannins and plum fruit align with braising sauce.", pl: "Miękkie taniny i nuty śliwki pasują do sosu z duszenia." },
+            reason: { en: "Soft tannins and plum fruit align with braising sauce.", pl: "Miękkie taniny i nuty śliwki wtapiają się w winny sos." },
           },
           {
             wineId: "r4-w4",
@@ -986,7 +986,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r4-w1",
-            reason: { en: "Citrus and minerality keep fish flavors focused.", pl: "Cytrusy i mineralność utrzymują smaki ryby w centrum." },
+            reason: { en: "Citrus and minerality keep fish flavors focused.", pl: "Cytrusy i mineralność zachowują czystość smaku ryby." },
           },
         ],
       },
@@ -994,7 +994,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d8",
         name: { en: "Nicoise Salad", pl: "Sałatka niçoise" },
         category: "Salad",
-        description: { en: "Tuna, egg, olives, green beans, and anchovy dressing.", pl: "Tuńczyk, jajko, oliwki, fasolka szparagowa i sos anchois." },
+        description: { en: "Tuna, egg, olives, green beans, and anchovy dressing.", pl: "Tuńczyk, jajko, oliwki, fasolka szparagowa i sos z anchois." },
         price: 24,
         pairings: [
           {
@@ -1003,7 +1003,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r4-w5",
-            reason: { en: "Rose offers fruit contrast for briny olives.", pl: "Rosé oferuje owocowy kontrast dla słonych oliwek." },
+            reason: { en: "Rose offers fruit contrast for briny olives.", pl: "Rosé daje owocowy kontrapunkt dla słonych oliwek." },
           },
         ],
       },
@@ -1011,7 +1011,7 @@ export const seedRestaurants: Restaurant[] = [
         id: "r4-d9",
         name: { en: "Truffle Brie Ravioli", pl: "Ravioli z brie i truflą" },
         category: "Pasta",
-        description: { en: "Fresh ravioli, truffle cream, and aged comte.", pl: "Świeże ravioli, krem truflowy i dojrzewające comté." },
+        description: { en: "Fresh ravioli, truffle cream, and aged comte.", pl: "Świeże ravioli, krem truflowy i długo dojrzewające comté." },
         price: 29,
         pairings: [
           {
@@ -1020,7 +1020,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r4-w6",
-            reason: { en: "Champagne bubbles reduce richness and reset palate.", pl: "Bąbelki Champagne redukują tłustość i resetują podniebienie." },
+            reason: { en: "Champagne bubbles reduce richness and reset palate.", pl: "Bąbelki Champagne przecinają tłustość i odświeżają podniebienie." },
           },
         ],
       },
@@ -1033,11 +1033,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r4-w6",
-            reason: { en: "Toasty notes mirror caramelized top while staying fresh.", pl: "Tostowe nuty odpowiadają karmelizowanemu wierzchu, pozostając świeże." },
+            reason: { en: "Toasty notes mirror caramelized top while staying fresh.", pl: "Tostowe nuty współgrają z karmelizowanym wierzchem, zachowując świeżość." },
           },
           {
             wineId: "r4-w5",
-            reason: { en: "Dry rose adds berry lift without oversweetening dessert.", pl: "Wytrawne rosé dodaje owocowej nuty bez przesłodzenia deseru." },
+            reason: { en: "Dry rose adds berry lift without oversweetening dessert.", pl: "Wytrawne rosé dodaje owocowej nuty, nie dosładzając deseru." },
           },
         ],
       },
@@ -1054,7 +1054,7 @@ export const seedRestaurants: Restaurant[] = [
     cuisine: "Peruvian Nikkei",
     city: "Lima",
     description:
-      { en: "World #1 Peruvian-Japanese (Nikkei) tasting house at Calle San Martín - Mitsuharu Tsumura's dialogue between Lima's coast and Osaka's tradition: Pacific seafood, ají amarillo, ponzu and Andean tubers.", pl: "Światowy numer 1 - peruwiańsko-japońska (Nikkei) restauracja degustacyjna przy Calle San Martín - dialog Mitsuharu Tsumury między wybrzeżem Limy a tradycją Osaki: owoce morza Pacyfiku, ají amarillo, ponzu i andyjskie bulwy." },
+      { en: "World #1 Peruvian-Japanese (Nikkei) tasting house at Calle San Martín - Mitsuharu Tsumura's dialogue between Lima's coast and Osaka's tradition: Pacific seafood, ají amarillo, ponzu and Andean tubers.", pl: "Światowy numer 1 - peruwiańsko-japońska (Nikkei) restauracja z menu degustacyjnym przy Calle San Martín - dialog Mitsuharu Tsumury między wybrzeżem Limy a tradycją Osaki: owoce morza Pacyfiku, ají amarillo, ponzu i andyjskie bulwy." },
     coverGradient: "from-[#5a2a1a] via-[#d96a3a] to-[#f4d68a]",
     wines: [
       {
@@ -1082,7 +1082,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Chardonnay",
         style: "White",
         vintage: "2023",
-        notes: { en: "Citrus curd, stone fruit, and creamy texture.", pl: "Cytrusowy curd, owoce pestkowe i kremowa tekstura." },
+        notes: { en: "Citrus curd, stone fruit, and creamy texture.", pl: "Lemon curd, owoce pestkowe i kremowa tekstura." },
       },
       {
         id: "r5-w4",
@@ -1109,7 +1109,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Cabernet Sauvignon",
         style: "Red",
         vintage: "2020",
-        notes: { en: "Dark fruit, graphite, and polished oak.", pl: "Ciemne owoce, grafit i wypolerowany dąb." },
+        notes: { en: "Dark fruit, graphite, and polished oak.", pl: "Ciemne owoce, grafit i gładka dębowa nuta." },
       },
       {
         id: "r5-w7",
@@ -1127,7 +1127,7 @@ export const seedRestaurants: Restaurant[] = [
         grape: "Malbec",
         style: "Red",
         vintage: "2021",
-        notes: { en: "Black cherry, cocoa, and structured mouthfeel.", pl: "Czarna wiśnia, kakao i strukturalna wyrazistość w ustach." },
+        notes: { en: "Black cherry, cocoa, and structured mouthfeel.", pl: "Czarna wiśnia, kakao i zwarta struktura w ustach." },
       },
     ],
     dishes: [
@@ -1140,7 +1140,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r5-w5",
-            reason: { en: "Zesty acidity mirrors lime and keeps fish ultra fresh.", pl: "Pikantna kwasowość odpowiada limonce i utrzymuje rybę w pełnej świeżości." },
+            reason: { en: "Zesty acidity mirrors lime and keeps fish ultra fresh.", pl: "Rześka kwasowość współgra z limonką i podkreśla świeżość ryby." },
           },
           {
             wineId: "r5-w7",
@@ -1157,7 +1157,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r5-w3",
-            reason: { en: "Textured Chardonnay supports tuna and sesame richness.", pl: "Strukturalne Chardonnay wspiera tuńczyka i bogactwo sezamu." },
+            reason: { en: "Textured Chardonnay supports tuna and sesame richness.", pl: "Treściwe Chardonnay dopełnia tuńczyka i bogactwo sezamu." },
           },
           {
             wineId: "r5-w5",
@@ -1174,7 +1174,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r5-w1",
-            reason: { en: "Malbec fruit and body hold up to soy-seared beef.", pl: "Owocowość i treściwość Malbeca dorównują wołowinie smażonej w sosie sojowym." },
+            reason: { en: "Malbec fruit and body hold up to soy-seared beef.", pl: "Owocowość i treściwość Malbeca dotrzymują kroku wołowinie smażonej w sosie sojowym." },
           },
           {
             wineId: "r5-w4",
@@ -1186,16 +1186,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r5-d4",
         name: { en: "Aji de Gallina", pl: "Ají de gallina" },
         category: "Main",
-        description: { en: "Creamy chicken stew with aji amarillo and walnuts.", pl: "Kremowy gulasz z kurczaka z ají amarillo i orzechami włoskimi." },
+        description: { en: "Creamy chicken stew with aji amarillo and walnuts.", pl: "Kremowa potrawka z kurczaka z ají amarillo i orzechami włoskimi." },
         price: 25,
         pairings: [
           {
             wineId: "r5-w3",
-            reason: { en: "Creamy Chardonnay texture matches sauce body.", pl: "Kremowa tekstura Chardonnay odpowiada treściwości sosu." },
+            reason: { en: "Creamy Chardonnay texture matches sauce body.", pl: "Kremowa tekstura Chardonnay współgra z treściwością sosu." },
           },
           {
             wineId: "r5-w7",
-            reason: { en: "Floral aromatics cool yellow chili warmth.", pl: "Kwiatowe aromaty chłodzą ciepło żółtego chili." },
+            reason: { en: "Floral aromatics cool yellow chili warmth.", pl: "Kwiatowe aromaty studzą pikantność żółtego chili." },
           },
         ],
       },
@@ -1203,16 +1203,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r5-d5",
         name: { en: "Causa Limena", pl: "Causa limeña" },
         category: "Starter",
-        description: { en: "Layered potato terrine with crab, avocado, and lime.", pl: "Warstwowy terrine ziemniaczany z krabem, awokado i limonką." },
+        description: { en: "Layered potato terrine with crab, avocado, and lime.", pl: "Warstwowa terrina ziemniaczana z krabem, awokado i limonką." },
         price: 19,
         pairings: [
           {
             wineId: "r5-w5",
-            reason: { en: "Fresh saline profile complements crab sweetness.", pl: "Świeży słony profil uzupełnia słodycz kraba." },
+            reason: { en: "Fresh saline profile complements crab sweetness.", pl: "Świeży, słony profil dopełnia słodycz kraba." },
           },
           {
             wineId: "r5-w3",
-            reason: { en: "Rounded white texture suits creamy avocado.", pl: "Zaokrąglona tekstura białego pasuje do kremowego awokado." },
+            reason: { en: "Rounded white texture suits creamy avocado.", pl: "Krągła tekstura białego wina pasuje do kremowego awokado." },
           },
         ],
       },
@@ -1225,7 +1225,7 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r5-w2",
-            reason: { en: "Cabernet tannins match grilled protein and char.", pl: "Taniny Cabernet pasują do grillowanego białka i nut z węgla." },
+            reason: { en: "Cabernet tannins match grilled protein and char.", pl: "Taniny Cabernet pasują do mięsa z grilla i dymnych nut węgla." },
           },
           {
             wineId: "r5-w8",
@@ -1246,7 +1246,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r5-w3",
-            reason: { en: "Fruit-forward Chardonnay complements saffron rice.", pl: "Owocowe Chardonnay uzupełnia ryż z szafranem." },
+            reason: { en: "Fruit-forward Chardonnay complements saffron rice.", pl: "Owocowe Chardonnay dopełnia ryż z szafranem." },
           },
         ],
       },
@@ -1259,11 +1259,11 @@ export const seedRestaurants: Restaurant[] = [
         pairings: [
           {
             wineId: "r5-w8",
-            reason: { en: "Concentrated Malbec handles lamb and herbal braise.", pl: "Skoncentrowany Malbec radzi sobie z jagnięciną i ziołowym duszeniem." },
+            reason: { en: "Concentrated Malbec handles lamb and herbal braise.", pl: "Skoncentrowany Malbec udźwignie jagnięcinę i ziołową głębię sosu." },
           },
           {
             wineId: "r5-w1",
-            reason: { en: "Classic Malbec plushness fits tender slow-cooked meat.", pl: "Klasyczna, aksamitna miękkość malbeca pasuje do delikatnego, wolno duszonego mięsa." },
+            reason: { en: "Classic Malbec plushness fits tender slow-cooked meat.", pl: "Klasyczna, aksamitna miękkość Malbeca pasuje do delikatnego, wolno duszonego mięsa." },
           },
         ],
       },
@@ -1271,16 +1271,16 @@ export const seedRestaurants: Restaurant[] = [
         id: "r5-d9",
         name: { en: "Tacu Tacu", pl: "Tacu tacu" },
         category: "Main",
-        description: { en: "Crisp rice-bean cake with fried egg and salsa criolla.", pl: "Chrupiący placek z ryżu i fasoli z sadzonym jajkiem i salsa criolla." },
+        description: { en: "Crisp rice-bean cake with fried egg and salsa criolla.", pl: "Chrupiący placek z ryżu i fasoli z sadzonym jajkiem i salsą criolla." },
         price: 23,
         pairings: [
           {
             wineId: "r5-w4",
-            reason: { en: "Spicy red profile matches crispy savory bean cake.", pl: "Pikantny czerwony profil pasuje do chrupiącego, wytrawnego placka z fasoli." },
+            reason: { en: "Spicy red profile matches crispy savory bean cake.", pl: "Pikantny czerwony profil pasuje do chrupiącego, treściwego placka z fasoli." },
           },
           {
             wineId: "r5-w1",
-            reason: { en: "Soft tannins and dark fruit complement egg yolk richness.", pl: "Miękkie taniny i ciemne owoce uzupełniają bogactwo żółtka." },
+            reason: { en: "Soft tannins and dark fruit complement egg yolk richness.", pl: "Miękkie taniny i ciemne owoce dopełniają bogactwo żółtka." },
           },
         ],
       },
@@ -1297,7 +1297,7 @@ export const seedRestaurants: Restaurant[] = [
           },
           {
             wineId: "r5-w5",
-            reason: { en: "Dry acidity balances sweet fried dough texture.", pl: "Wytrawna kwasowość równoważy słodką teksturę smażonego ciasta." },
+            reason: { en: "Dry acidity balances sweet fried dough texture.", pl: "Wytrawna kwasowość równoważy słodycz smażonego ciasta." },
           },
         ],
       },

@@ -111,7 +111,7 @@ export default function Navigation() {
             ) : null}
             {/* Operator entrance - leads to /admin (Panel). Renamed from
                 "Sign In" + the previous Admin link merged into one button. */}
-            <Link
+            <Link prefetch={false}
               href="/admin"
               className="hidden items-center gap-2 rounded-lg border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-sm font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20 md:inline-flex"
             >
