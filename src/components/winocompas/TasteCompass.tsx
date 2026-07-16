@@ -17,7 +17,6 @@
 
 import { useId, useMemo, useState, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 import { COMPASS_SECTORS, type CompassSector, type Tendencja } from "@/data/wine-compass-kb";
-import { SENSE_IMAGE_MAP } from "@/data/sense-images";
 
 export type Intensity = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompassProfile = Record<string, Intensity>; // tendencja id -> 0-5
@@ -792,9 +791,10 @@ export default function TasteCompass({
             const yUnit = -Math.cos(s.angle);
             const tickStart = { x: cx + (rOuter + 4) * xUnit, y: cy + (rOuter + 4) * yUnit };
             const tickEnd = { x: cx + (rOuter + 14) * xUnit, y: cy + (rOuter + 14) * yUnit };
+            // Outside the hanging-icon ring (icons occupy rOuter+27±27).
             const labelPos = {
-              x: cx + (rOuter + 22) * xUnit,
-              y: cy + (rOuter + 22) * yUnit,
+              x: cx + (rOuter + 58) * xUnit,
+              y: cy + (rOuter + 58) * yUnit,
             };
             // Anchor by horizontal position relative to centre.
             // Right of axis → start; left → end; near axis → middle.
@@ -879,15 +879,18 @@ export default function TasteCompass({
             gold hairline + warm tint) and enters with a staggered fade+scale
             via the .compass-medallion atom - keyed by level so re-entering
             stage 2 retriggers the entrance. */}
-        {level === 2 &&
+        {level >= 2 &&
           SPOKES.map((s, i) => {
-            const img = SENSE_IMAGE_MAP[s.tendencja.id];
-            if (!img) return null;
-            const ringR = rOuter + 27;
-            const size = 44;
+            // Client 16.07: "nie w okręgach tylko w takich łukach lub jako
+            // wiszące ikony" - transparent cut-out clusters (generated per
+            // tendencja, scripts/gen-arc-icons.mts) hang around the rim on
+            // BOTH the wrażenia and aromaty wheels, like the original poster.
+            const arcImg = `/senses/arc/${s.tendencja.id.replace(/\./g, "-")}.png`;
+            const size = level === 2 ? 66 : 54;
+            const ringR = rOuter + (level === 2 ? 30 : 27);
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
-            const href = `/_next/image?url=${encodeURIComponent(img)}&w=96&q=75`;
+            const href = `/_next/image?url=${encodeURIComponent(arcImg)}&w=128&q=80`;
             const interactive = Boolean(onMedallionSelect);
             const pick = () => onMedallionSelect?.(s.tendencja.id);
             return (
@@ -914,44 +917,16 @@ export default function TasteCompass({
                     }
                   : {})}
               >
-                <clipPath id={`${baseId}-ring-${s.tendencja.id.replace(".", "-")}`}>
-                  <circle cx={ix} cy={iy} r={size / 2} />
-                </clipPath>
-                {/* Parchment backing ring - the "inlay" the photo sits in.
-                    Literal #f4efe9 (paper tone) so it reads on both themes. */}
-                <circle cx={ix} cy={iy} r={size / 2 + 3} fill="#f4efe9" />
+                {/* Invisible round hit-area - the cluster PNG is irregular,
+                    taps should work anywhere in its footprint. */}
+                <circle cx={ix} cy={iy} r={size / 2} fill="transparent" />
                 <image
                   href={href}
                   x={ix - size / 2}
                   y={iy - size / 2}
                   width={size}
                   height={size}
-                  preserveAspectRatio="xMidYMid slice"
-                  clipPath={`url(#${baseId}-ring-${s.tendencja.id.replace(".", "-")})`}
-                  // The sense photos are dark low-key still lifes - at 44px
-                  // they read as black dots (client, 2026-07). Lift them hard
-                  // so the subject is recognizable at thumbnail size.
-                  style={{ filter: "brightness(1.8) saturate(1.3) contrast(1.06)" }}
-                />
-                {/* Whisper of warm tint - 0.14 muddied the already-dark
-                    photos on top of the brightness lift. */}
-                <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.06)" />
-                <circle
-                  cx={ix}
-                  cy={iy}
-                  r={size / 2}
-                  fill="none"
-                  stroke="var(--gold-hairline)"
-                  strokeWidth={1.2}
-                />
-                {/* Gold hairline sealing the parchment ring's outer edge. */}
-                <circle
-                  cx={ix}
-                  cy={iy}
-                  r={size / 2 + 3}
-                  fill="none"
-                  stroke="rgba(199,159,105,0.8)"
-                  strokeWidth={1}
+                  preserveAspectRatio="xMidYMid meet"
                 />
               </g>
             );
@@ -1011,8 +986,8 @@ export default function TasteCompass({
           // labels (KWASOWOŚĆ/SŁODYCZ) are clamped horizontally toward the
           // viewBox edge, so extra radius can't clear the 225°/315° medallion
           // corners — lift them into the gap between medallions instead.
-          const labelR = level === 2 ? rOuter + 58 : rOuter + 28;
-          const labelYAdjust = level === 2 && axis.id !== "cierpkosc" ? -10 : 0;
+          const labelR = level >= 2 ? rOuter + 58 : rOuter + 28;
+          const labelYAdjust = level >= 2 && axis.id !== "cierpkosc" ? -10 : 0;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
