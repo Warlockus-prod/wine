@@ -867,7 +867,7 @@ export default function TasteCompass({
             const img = SENSE_IMAGE_MAP[s.tendencja.id];
             if (!img) return null;
             const ringR = rOuter + 27;
-            const size = 40;
+            const size = 44;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             const href = `/_next/image?url=${encodeURIComponent(img)}&w=96&q=75`;
@@ -893,9 +893,14 @@ export default function TasteCompass({
                   height={size}
                   preserveAspectRatio="xMidYMid slice"
                   clipPath={`url(#${baseId}-ring-${s.tendencja.id.replace(".", "-")})`}
+                  // The sense photos are dark low-key still lifes — at 44px
+                  // they read as black dots (client, 2026-07). Lift them so
+                  // the subject is recognizable at thumbnail size.
+                  style={{ filter: "brightness(1.55) saturate(1.25) contrast(1.05)" }}
                 />
-                {/* Warm gold tint unifies the mixed-palette photos. */}
-                <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.14)" />
+                {/* Whisper of warm tint — 0.14 muddied the already-dark
+                    photos on top of the brightness lift. */}
+                <circle cx={ix} cy={iy} r={size / 2} fill="rgba(199,159,105,0.07)" />
                 <circle
                   cx={ix}
                   cy={iy}
