@@ -972,16 +972,19 @@ export default function TasteCompass({
           // lower-left spoke) would clip the SVG edge on a ~390px viewport,
           // so clamp the centre inward to keep the whole text box on-canvas.
           // At level 2 the image ring occupies rOuter+27±25 (44px medallions
-          // + parchment ring), so the labels move outside it — +62 clears the
-          // KWASOWOŚĆ↔citrus-medallion kiss measured at 320px wide.
-          const labelR = level === 2 ? rOuter + 62 : rOuter + 28;
+          // + parchment ring), so the labels move outside it. The two LOWER
+          // labels (KWASOWOŚĆ/SŁODYCZ) are clamped horizontally toward the
+          // viewBox edge, so extra radius can't clear the 225°/315° medallion
+          // corners — lift them into the gap between medallions instead.
+          const labelR = level === 2 ? rOuter + 58 : rOuter + 28;
+          const labelYAdjust = level === 2 && axis.id !== "cierpkosc" ? -10 : 0;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
           const halfW = axis.label.length * (labelBright ? 13 : 10.5) * 0.42;
           const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
-          const labelY = cy + labelR * yUnit;
+          const labelY = cy + labelR * yUnit + labelYAdjust;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">

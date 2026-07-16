@@ -146,15 +146,18 @@ export default function HomeClient({
                   must not push its numeral off the shared baseline. */}
               <div className="grid grid-cols-3 items-end gap-3 text-center">
                 <div>
-                  <p className="text-[10px] leading-tight tracking-[0.1em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsRestaurants")}</p>
+                  {/* 8px at base: "RESTAURACJE" is one unbreakable 11-glyph
+                      word and the 320px grid cell is 63px — anything larger
+                      paints over the neighbouring label. */}
+                  <p className="text-[8px] leading-tight tracking-[0.06em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsRestaurants")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">{catalogRestaurants.length}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] leading-tight tracking-[0.1em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsCities")}</p>
+                  <p className="text-[8px] leading-tight tracking-[0.06em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsCities")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">{cityOptions.length - 1}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] leading-tight tracking-[0.1em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsQrReady")}</p>
+                  <p className="text-[8px] leading-tight tracking-[0.06em] text-gray-500 uppercase sm:text-[11px] sm:tracking-[0.2em] sm:whitespace-nowrap">{tx("statsQrReady")}</p>
                   <p className="mt-1 text-2xl font-bold text-white">100%</p>
                 </div>
               </div>
