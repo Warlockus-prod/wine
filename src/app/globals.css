@@ -1467,6 +1467,7 @@ body {
    outline:none; keyboard users had no focus indicator at any level. */
 .taste-compass-svg [role="slider"]:focus-visible,
 .taste-compass-svg [role="button"]:focus-visible {
-  outline: 2px solid #c79f69;
+  /* theme-aware gold: #9c7536 on the light cream (≥3:1), #c79f69 on dark */
+  outline: 2px solid var(--color-accent-gold);
   outline-offset: 2px;
 }

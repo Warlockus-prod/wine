@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { pickL, type CompassLang } from "@/data/wine-compass-kb";
 import type { CompassProfile } from "./TasteCompass";
 
 interface ChatMessage {
@@ -30,8 +31,19 @@ const SUGGESTIONS_PL = [
   "Co znaczy moja kombinacja na kompasie?",
 ];
 
+const SUGGESTIONS_EN = [
+  "What is astringency?",
+  "Which wine for someone who likes tobacco?",
+  "How does fresh differ from oily?",
+  "Which wine for someone who likes citrus?",
+  "What does my compass combination mean?",
+];
+
 const HELLO_PL =
   "Cześć! Pomogę dobrać wino. Zrób tak: 1) kliknij danie z menu albo ustaw smak na kompasie, 2) a ja od razu pokażę dopasowane wino i wyjaśnię dlaczego. Nie wiesz od czego zacząć? Kliknij gotowe pytanie poniżej.";
+
+const HELLO_EN =
+  "Hi! I'll help you pick a wine. Here's how: 1) tap a dish from the menu or set a taste on the compass, 2) and I'll instantly show a matched wine and explain why. Not sure where to start? Tap a ready-made question below.";
 
 interface Props {
   profile?: CompassProfile;
@@ -51,6 +63,11 @@ interface Props {
   prefill?: string | null;
   /** Called after the prefill has been dispatched so the parent can clear it. */
   onPrefillConsumed?: () => void;
+  /** UI-chrome language. PL primary, EN at the root locale. The bot reply
+   *  language already follows `document.documentElement.lang`; this prop lets
+   *  the surrounding chrome (greeting, chips, buttons, placeholders, aria)
+   *  match. Defaults to "pl" so existing PL call-sites are unchanged. */
+  lang?: CompassLang;
 }
 
 export default function TasteChat({
@@ -60,9 +77,12 @@ export default function TasteChat({
   headerInsetRight = false,
   prefill = null,
   onPrefillConsumed,
+  lang = "pl",
 }: Props) {
+  const hello = pickL(lang, HELLO_PL, HELLO_EN);
+  const suggestions = lang === "pl" ? SUGGESTIONS_PL : SUGGESTIONS_EN;
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: HELLO_PL },
+    { role: "assistant", content: hello },
   ]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -156,7 +176,7 @@ export default function TasteChat({
       });
       const data = (await res.json()) as { reply?: string; error?: string };
       if (!res.ok || !data.reply) {
-        throw new Error(data.error ?? "Błąd serwera");
+        throw new Error(data.error ?? pickL(lang, "Błąd serwera", "Server error"));
       }
       setMessages((prev) => {
         const next = prev.slice(0, -1);
@@ -168,7 +188,11 @@ export default function TasteChat({
       const raw = err instanceof Error ? err.message : "";
       const msg = raw && !/failed to fetch|networkerror|load failed/i.test(raw)
         ? raw
-        : "Coś poszło nie tak - sprawdź połączenie i spróbuj ponownie.";
+        : pickL(
+            lang,
+            "Coś poszło nie tak - sprawdź połączenie i spróbuj ponownie.",
+            "Something went wrong - check your connection and try again.",
+          );
       setError(msg);
       setMessages((prev) => {
         const next = prev.slice(0, -1);
@@ -176,7 +200,11 @@ export default function TasteChat({
           ...next,
           {
             role: "assistant",
-            content: "Hmm, chwilowo nie mogę odpowiedzieć - spróbuj ponownie za chwilę.",
+            content: pickL(
+              lang,
+              "Hmm, chwilowo nie mogę odpowiedzieć - spróbuj ponownie za chwilę.",
+              "Hmm, I can't answer right now - please try again in a moment.",
+            ),
           },
         ];
       });
@@ -187,7 +215,7 @@ export default function TasteChat({
   };
 
   const reset = () => {
-    setMessages([{ role: "assistant", content: HELLO_PL }]);
+    setMessages([{ role: "assistant", content: hello }]);
     setError(null);
   };
 
@@ -209,7 +237,7 @@ export default function TasteChat({
               Vinovigator
             </p>
             <p className="text-[11px] italic text-[var(--color-accent-gold)] opacity-80">
-              {sending ? "pisze…" : "online"}
+              {sending ? pickL(lang, "pisze…", "typing…") : "online"}
             </p>
           </div>
         </div>
@@ -218,7 +246,7 @@ export default function TasteChat({
           onClick={reset}
           className="inline-flex min-h-[40px] items-center rounded-full border border-white/15 px-4 text-[11px] font-semibold tracking-wider text-gray-300 uppercase transition hover:border-white/35 hover:text-white"
         >
-          Wyczyść
+          {pickL(lang, "Wyczyść", "Clear")}
         </button>
       </div>
 
@@ -250,10 +278,10 @@ export default function TasteChat({
       {messages.length <= 2 ? (
         <div className="border-t border-white/8 px-3 py-3">
           <p className="mb-2 text-[10px] font-semibold tracking-[0.22em] text-gray-400 uppercase">
-            Spróbuj zapytać
+            {pickL(lang, "Spróbuj zapytać", "Try asking")}
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {SUGGESTIONS_PL.map((s) => (
+            {suggestions.map((s) => (
               <button
                 key={s}
                 type="button"
@@ -288,16 +316,16 @@ export default function TasteChat({
           }}
           rows={1}
           maxLength={800}
-          placeholder="Zapytaj o smaki, wrażenia, wino…"
+          placeholder={pickL(lang, "Zapytaj o smaki, wrażenia, wino…", "Ask about tastes, sensations, wine…")}
           className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-white/10 bg-[#122446] px-3 py-2.5 text-sm text-gray-100 outline-none placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent-gold)]"
-          aria-label="Twoje pytanie"
+          aria-label={pickL(lang, "Twoje pytanie", "Your question")}
         />
         <button
           type="submit"
           disabled={sending || input.trim().length === 0}
           className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-[color:var(--on-primary)] shadow-[0_8px_20px_rgba(199,159,105,0.3)] transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {sending ? "…" : "Wyślij"}
+          {sending ? "…" : pickL(lang, "Wyślij", "Send")}
           <svg width="14" height="10" viewBox="0 0 18 10" fill="none" aria-hidden>
             <path d="M1 5h15m0 0L12 1m4 4l-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

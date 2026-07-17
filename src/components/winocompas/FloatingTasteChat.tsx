@@ -21,6 +21,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { pickL, type CompassLang } from "@/data/wine-compass-kb";
 import TasteChat from "./TasteChat";
 import type { CompassProfile } from "./TasteCompass";
 
@@ -149,6 +150,12 @@ export default function FloatingTasteChat({
   // Disabled mode - hide everything. Don't even leave the launcher dot.
   if (disabled) return null;
 
+  // Chrome language follows the UI locale, the same signal the bot reply uses
+  // (EN page → English chrome). Safe here: the component is client-only
+  // (next/dynamic ssr:false) and past the `hydrated` guard above.
+  const lang: CompassLang =
+    typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "pl";
+
   return (
     <>
       {/* Floating launcher - visible whenever chat is collapsed */}
@@ -156,7 +163,7 @@ export default function FloatingTasteChat({
         <button
           type="button"
           onClick={() => toggle(true)}
-          aria-label="Otwórz przewodnika Vinokompasu"
+          aria-label={pickL(lang, "Otwórz przewodnika Vinokompasu", "Open the Vinokompas guide")}
           className={`group fixed right-3 bottom-[calc(var(--mobile-tabbar-h)+12px)] z-40 flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 ${mobileHidden ? "max-md:hidden" : ""} border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:right-4 sm:bottom-6`}
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />
@@ -182,7 +189,7 @@ export default function FloatingTasteChat({
               so users see the chat is overlay rather than the page. */}
           <button
             type="button"
-            aria-label="Zamknij przewodnika"
+            aria-label={pickL(lang, "Zamknij przewodnika", "Close the guide")}
             onClick={() => toggle(false)}
             className="fixed inset-0 z-30 bg-gradient-to-t from-black/45 via-black/20 to-transparent sm:hidden"
             style={{ pointerEvents: "auto" }}
@@ -201,7 +208,7 @@ export default function FloatingTasteChat({
               <button
                 type="button"
                 onClick={() => toggle(false)}
-                aria-label="Zwiń przewodnika"
+                aria-label={pickL(lang, "Zwiń przewodnika", "Collapse the guide")}
                 className="absolute top-0 left-1/2 z-20 flex -translate-x-1/2 items-center justify-center px-10 py-3 sm:hidden"
               >
                 <span className="block h-1.5 w-12 rounded-full bg-white/35 transition hover:bg-white/55" />
@@ -209,7 +216,7 @@ export default function FloatingTasteChat({
               <button
                 type="button"
                 onClick={() => toggle(false)}
-                aria-label="Schowaj przewodnika"
+                aria-label={pickL(lang, "Schowaj przewodnika", "Hide the guide")}
                 className="absolute top-3 right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/55 text-gray-200 backdrop-blur transition hover:border-white/40 hover:text-white"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -224,6 +231,7 @@ export default function FloatingTasteChat({
                   headerInsetRight
                   prefill={pendingPrefill}
                   onPrefillConsumed={() => setPendingPrefill(null)}
+                  lang={lang}
                 />
               </div>
             </div>

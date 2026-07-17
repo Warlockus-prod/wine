@@ -329,7 +329,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
         name_pl: "Piżmo, skóra",
         name_en: "Musk, leather",
         shortLabel_pl: "Piżmo i skóra",
-        shortLabel_en: "Musk",
+        shortLabel_en: "Musk & leather",
         associations_pl: "skojarzenia zwierzęce - zapach mokrego psa, konia, stajni, skóry",
         associations_en:
           "animal associations — the smell of wet dog, horse, stable, leather",
@@ -343,7 +343,7 @@ export const COMPASS_SECTORS: CompassSector[] = [
         name_pl: "Dąb, dym, garbniki",
         name_en: "Oak, smoke, tannins",
         shortLabel_pl: "Dąb i dym",
-        shortLabel_en: "Oak",
+        shortLabel_en: "Oak & smoke",
         associations_pl:
           "drewno, nieheblowana deska, zapach ogniska, tytoń z papierosa, ściąganie na języku przy cierpkich owocach",
         associations_en:

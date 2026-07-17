@@ -1418,7 +1418,20 @@ export default function PairingClient({
           <div className="flex items-center gap-2 py-2 pr-3 pl-4">
             {/* Score sits OUTSIDE the truncating name - long wine names were
                 swallowing the "· NN%" entirely (audit 2026-07). */}
-            <p role="status" className="min-w-0 flex-1 truncate text-sm text-white">
+            {/* aria-label carries BOTH name and % so the status announcement
+                isn't just the name (the score is a separate sibling span). */}
+            <p
+              role="status"
+              aria-label={`${t(
+                (mobileResultSource === "wine" && selectedWine ? selectedWine : rankedMatches.best.wine).name,
+                locale,
+              )} · ${
+                mobileResultSource === "wine" && selectedWine
+                  ? (resolvedSelectedWineMatch?.score ?? rankedMatches.best.match.score)
+                  : rankedMatches.best.match.score
+              }%`}
+              className="min-w-0 flex-1 truncate text-sm text-white"
+            >
               <span aria-hidden className="text-[var(--color-accent-gold)]">★ </span>
               <span className="font-semibold">
                 {t(

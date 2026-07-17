@@ -44,9 +44,32 @@ const CATEGORY_PL: Record<string, string> = {
   aperitif: "aperitif",
   grill: "z grilla",
   side: "dodatek",
+  cold: "na zimno",
+  fried: "smażone",
+  game: "dziczyzna",
+  rice: "ryż",
+  vegetarian: "wegetariańskie",
+  noodles: "makaron ryżowy",
+  sushi: "sushi",
 };
 const categoryLabel = (category: string, locale: string) =>
   locale === "pl" ? (CATEGORY_PL[category.trim().toLowerCase()] ?? category) : category;
+
+// Cuisine + country eyebrows are raw EN in the seed/DB (SPANISH, Spain…) and
+// leaked on the PL hero (audit 2026-07 re-run). Same render-time pattern.
+const CUISINE_PL: Record<string, string> = {
+  spanish: "hiszpańska", japanese: "japońska", "french classic": "francuska klasyka",
+  italian: "włoska", polish: "polska", "polish modern": "polska nowoczesna",
+  "peruvian nikkei": "peruwiańska nikkei",
+};
+const COUNTRY_PL: Record<string, string> = {
+  spain: "Hiszpania", japan: "Japonia", france: "Francja", italy: "Włochy",
+  poland: "Polska", peru: "Peru", germany: "Niemcy", portugal: "Portugalia",
+};
+const cuisineLabel = (v: string, locale: string) =>
+  locale === "pl" ? (CUISINE_PL[v.trim().toLowerCase()] ?? v) : v;
+const countryLabel = (v: string, locale: string) =>
+  locale === "pl" ? (COUNTRY_PL[v.trim().toLowerCase()] ?? v) : v;
 
 
 export default function RestaurantPageClient({
@@ -151,14 +174,14 @@ export default function RestaurantPageClient({
             <div className="hero-stagger flex min-w-0 flex-col">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm">
-                  {restaurant.cuisine}
+                  {cuisineLabel(restaurant.cuisine, lng)}
                 </span>
                 <RestaurantFormat
                   format={restaurant.format}
                   typeClassName="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm"
                 />
                 <span className="rounded-full bg-black/22 px-3 py-1 text-[11px] font-semibold tracking-[0.22em] text-white uppercase backdrop-blur-sm">
-                  {restaurant.city}, {restaurant.country}
+                  {restaurant.city}, {countryLabel(restaurant.country, lng)}
                 </span>
               </div>
 

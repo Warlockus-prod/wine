@@ -58,6 +58,10 @@ const CATEGORY_PL: Record<string, string> = {
   main: "danie główne", starter: "przystawka", dessert: "deser", soup: "zupa",
   pasta: "makaron", salad: "sałatka", seafood: "owoce morza", tapas: "tapas",
   signature: "danie popisowe", aperitif: "aperitif", grill: "z grilla", side: "dodatek",
+  // Seed has 16 categories — the first-pass map covered 12, leaking RICE/COLD/
+  // GAME/SUSHI/… on the PL page (audit 2026-07 re-run). Full set now.
+  cold: "na zimno", fried: "smażone", game: "dziczyzna", rice: "ryż",
+  vegetarian: "wegetariańskie", noodles: "makaron ryżowy", sushi: "sushi",
 };
 const categoryLabel = (category: string, locale: string) =>
   locale === "pl" ? (CATEGORY_PL[category.trim().toLowerCase()] ?? category) : category;

@@ -178,6 +178,32 @@ Open (product decision): our proposal gate is `MIN_FILLED=4` while the
 original Vinocompas asks for 7 associations — raise to 7 or drop the
 "jak w oryginalnym Vinokompasie" line from the nudge copy.
 
+## Final full re-audit (2026-07-17) — 9 agents, adversarially verified
+
+After the backlog + audit waves, a fresh 6-lens re-audit against live
+confirmed nearly everything WORKING (all backlog features, canonical wheel,
+zł currency, security headers, X-Powered-By gone, admin not prefetched,
+Mapbox code-split). Three real i18n gaps found + fixed:
+- AI chat CHROME was 100% Polish on the EN site (only replies localized) —
+  TasteChat + FloatingTasteChat now take a `lang` prop (derived from
+  document.documentElement.lang) with EN variants for greeting, suggestion
+  chips, header, clear, placeholder, send, fallbacks and all aria-labels.
+- Dish-category eyebrows leaked English on the PL restaurant page
+  (RICE/COLD/GAME/SUSHI…) — `CATEGORY_PL` was 12/16; completed to 16 in BOTH
+  RestaurantPageClient and RestaurantPairingPanel (the two maps had drifted).
+- Cuisine/country eyebrows raw English on the PL restaurant hero — added
+  `CUISINE_PL`/`COUNTRY_PL` render-time maps.
+Plus lows: EN Szorstkie wheel labels (Musk & leather / Oak & smoke),
+theme-aware compass focus ring (was hardcoded bright gold, failed 3:1 on
+cream), mobile result-bar aria-label now carries name + %.
+
+## Arc-icon canon (client poster reference)
+
+The client's reference poster is the visual target: each tendencja's hanging
+cluster mirrors the poster's imagery. szorstkie.pizmo now leads with an
+actual HORSE (the poster shows "koń") + leather/saddle/fur/musk. Stage-control
+buttons made compact (36-38px) per "mniejsze guziki wyżej".
+
 ## Guardrails honored
 
 - e2e contract kept: 3 stage tabs (/ETAP \d/i ×3), slider aria-labels,
