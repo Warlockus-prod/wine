@@ -882,26 +882,57 @@ const VIEW = 720;
               lang === "pl"
                 ? (s.tendencja.shortLabel_pl ?? s.tendencja.name_pl)
                 : (s.tendencja.shortLabel_en ?? s.tendencja.name_en);
-            const arcId = `${baseId}-lblarc-${s.tendencja.id.replace(".", "-")}`;
+            // Long labels wrap onto TWO stacked arcs exactly like the
+            // original poster ("suszone / owoce") — that's what lets the
+            // font grow to 10.5 (client 2026-07-18 "очень мелко и не видно")
+            // while every line still fits its 30° slice.
+            const words = label.split(" ");
+            let lines: string[] = [label];
+            if (words.length >= 2 && label.length > 10) {
+              let best = 1;
+              let bestDiff = Infinity;
+              for (let i = 1; i < words.length; i++) {
+                const d = Math.abs(words.slice(0, i).join(" ").length - words.slice(i).join(" ").length);
+                if (d < bestDiff) { bestDiff = d; best = i; }
+              }
+              lines = [words.slice(0, best).join(" "), words.slice(best).join(" ")];
+            }
+            const deg = (((s.angle * 180) / Math.PI) % 360 + 360) % 360;
+            const isBottom = deg > 90 && deg < 270;
+            // Line 1 must read ABOVE line 2 on screen: radially-outer first
+            // on top arcs, radially-inner first on the flipped bottom arcs.
+            const radii =
+              lines.length === 2
+                ? isBottom
+                  ? [rOuter + 8.5, rOuter + 20]
+                  : [rOuter + 20, rOuter + 8.5]
+                : [rOuter + 13];
             return (
               <g key={`lbl-${s.tendencja.id}`} pointerEvents="none">
-                <path id={arcId} d={labelArc(cx, cy, rOuter + 11, s.angle, s.half * 0.98)} fill="none" />
-                <text
-                  fontFamily="var(--font-display)"
-                  fontSize={9}
-                  fontWeight={600}
-                  letterSpacing="0.02em"
-                  fill="var(--ink)"
-                  stroke="var(--compass-halo)"
-                  strokeWidth={1.6}
-                  strokeLinejoin="round"
-                  paintOrder="stroke"
-                  className="select-none"
-                >
-                  <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">
-                    {label}
-                  </textPath>
-                </text>
+                {lines.map((ln, li) => {
+                  const arcId = `${baseId}-lblarc-${s.tendencja.id.replace(".", "-")}-${li}`;
+                  return (
+                    <g key={li}>
+                      <path id={arcId} d={labelArc(cx, cy, radii[li], s.angle, s.half * 0.98)} fill="none" />
+                      <text
+                        fontFamily="var(--font-display)"
+                        fontSize={10.5}
+                        fontWeight={600}
+                        letterSpacing="0.02em"
+                        fill="var(--ink)"
+                        stroke="var(--compass-halo)"
+                        strokeWidth={2}
+                        strokeLinejoin="round"
+                        paintOrder="stroke"
+                        className="select-none"
+                      >
+                        <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">
+                          {ln}
+                        </textPath>
+                      </text>
+                    </g>
+                  );
+                })}
               </g>
             );
           })}
@@ -916,15 +947,15 @@ const VIEW = 720;
             const arcId = `${baseId}-seclblarc-${sector.id}`;
             return (
               <g key={`seclbl-${sector.id}`} pointerEvents="none">
-                <path id={arcId} d={labelArc(cx, cy, rOuter + 11, angleCenter, arc * 0.46)} fill="none" />
+                <path id={arcId} d={labelArc(cx, cy, rOuter + 13, angleCenter, arc * 0.46)} fill="none" />
                 <text
                   fontFamily="var(--font-display)"
-                  fontSize={11.5}
+                  fontSize={14}
                   fontWeight={600}
                   letterSpacing="0.06em"
                   fill="var(--ink)"
                   stroke="var(--compass-halo)"
-                  strokeWidth={1.8}
+                  strokeWidth={2.2}
                   strokeLinejoin="round"
                   paintOrder="stroke"
                   className="select-none"
@@ -955,13 +986,13 @@ const VIEW = 720;
             // the 30° chord at ringR (~138) so neighbours interleave. The
             // wreath sits OUTSIDE the curved label band (labels moved out of
             // the rim 2026-07-18): tiles' inner corners at the diagonals
-            // (ringR − 82 ≈ 185) clear the label glyphs (≤ rOuter+21 = 186);
-            // diagonal outer corners (≈349) stay under the lower axis arcs
+            // (ringR − 82 ≈ 191) clear the two-line label glyphs (≤ rOuter+27 = 192);
+            // diagonal outer corners (≈355) stay under the lower axis arcs
             // and the canvas edge (360).
             const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
             const tileW = 140;
             const tileH = 93;
-            const ringR = rOuter + 102;
+            const ringR = rOuter + 108;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             // q must stay 75 - Next 16 whitelists image qualities (default
@@ -1076,12 +1107,12 @@ const VIEW = 720;
           // outside the lower arcs' radius but 1.5° clear of their angular
           // span (glyphs start at ~229.5°).
           const isLower = axis.id !== "cierpkosc";
-          const axisR = isLower ? rOuter + 179 : rOuter + 173;
+          const axisR = isLower ? rOuter + 181 : rOuter + 177;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
-          const axisFontSize = labelBright ? 13 : 10.5;
+          const axisFontSize = labelBright ? 14.5 : 11.5;
           // Approximate glyph run (avg advance ≈ 0.62em + 0.16em tracking)
           // → half-arc that hugs the text without invading the tile corridor.
           const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.39 + 8) / axisR;

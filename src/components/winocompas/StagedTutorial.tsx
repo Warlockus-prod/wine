@@ -458,14 +458,19 @@ export default function StagedTutorial({
             (client review 2026-07: "przejście do kolejnych etapów powinno
             być i na górze i na dole"). Includes the profile reset that used
             to live in the removed TWÓJ PROFIL chip bar. The top strip is
-            desktop-only - on phones the pair doubled up within one screen. */}
+            desktop-only - on phones the pair doubled up within one screen.
+            STICKY since 2026-07-18 (client: the next-stage buttons scroll
+            out of sight while looking at the compass — "зафиксировать их
+            постоянно как в приложении"): it pins just below the fixed site
+            nav (5rem) and floats over the card on its own navy ground while
+            the wheel scrolls beneath. */}
         <StageControls
           stage={stage}
           goPrev={goPrev}
           goNext={goNext}
           onReset={() => onProfileChange({})}
           placement="top"
-          className="mb-4 border-b border-[rgba(199,159,105,0.20)] pb-4"
+          className="sticky top-[5.25rem] z-30 -mx-2 mb-4 rounded-xl border-b border-[rgba(199,159,105,0.20)] bg-[#081634]/95 px-2 pt-2 pb-3 backdrop-blur-sm"
           lang={lang}
         />
 
