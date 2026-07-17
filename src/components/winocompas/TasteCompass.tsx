@@ -98,6 +98,20 @@ const buildSpokes = (): SpokeMeta[] => {
 
 const SPOKES = buildSpokes();
 
+/** Arc path for a curved label centred on `theta` (0=top, clockwise) spanning
+ *  ±`half`, at radius `r`. Bottom-half arcs are drawn reversed so the text
+ *  never renders upside-down — the classic radial-label flip. */
+function labelArc(cx: number, cy: number, r: number, theta: number, half: number): string {
+  const deg = (((theta * 180) / Math.PI) % 360 + 360) % 360;
+  const bottom = deg > 90 && deg < 270;
+  const a1 = bottom ? theta + half : theta - half;
+  const a2 = bottom ? theta - half : theta + half;
+  const p = (a: number): [number, number] => [cx + r * Math.sin(a), cy - r * Math.cos(a)];
+  const [x1, y1] = p(a1);
+  const [x2, y2] = p(a2);
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 ${bottom ? 0 : 1} ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
 // Level-1 background: each 120° base wedge is coloured as the blend of the two
 // sectors it spans, so the 3 selectable segments show 3 colours (not 6).
 //   CIERPKOŚĆ  = Szorstkie (#5a2c5e) + Tęgie (#8a4b2a)
@@ -107,6 +121,26 @@ const BASE_WEDGE_COLOR: Record<string, string> = {
   cierpkosc: "#723b44",
   slodycz: "#ed8a43",
   kwasowosc: "#638f6c",
+};
+
+// The canonical 12-colour flow of the OFFICIAL Vinocompas wheel (client
+// 2026-07-17 "как оригинал"), sampled from _Vinokompas_pelny_PL: brown → reds
+// → orange → yellow → greens → teal → navy → purple → grey around the circle.
+// Used to paint the 12-segment (level-3) tint + fill; levels 1/2 keep the
+// 3/6-colour blends above / the 6 sector colours.
+const TENDENCJA_COLOR: Record<string, string> = {
+  "tegie.cigaro": "#4a2c28",
+  "tegie.suszone": "#8e0000",
+  "miekkie.dojrzale": "#cc0000",
+  "miekkie.konfitury": "#ff0000",
+  "oleiste.maslo": "#fa7d00",
+  "oleiste.tropikalne": "#ffd400",
+  "swieze.zielone": "#92d050",
+  "swieze.cytrusy": "#00b050",
+  "ziemiste.mineraly": "#2b7589",
+  "ziemiste.sciolka": "#163152",
+  "szorstkie.pizmo": "#460e4a",
+  "szorstkie.dab": "#2f2f2d",
 };
 
 /** Build a path for an annular sector (donut slice).
@@ -243,10 +277,10 @@ export default function TasteCompass({
   // Geometry - viewBox 480 gives breathing room for the level-2 image ring
   // (rOuter+47) AND the base-axis labels pushed outside it (rOuter+58); all
   // coordinates derive from VIEW so the whole dial recentres automatically.
-  // 520 (was 480): a wider canvas so the association icons orbit as a loose
+  // 560 (was 480/520): a wider canvas so the association icons orbit as a loose
 // RING with a clear gap from the wheel, not clusters hugging each segment
 // (client 2026-07-17: "широко по кругу как кольцо ... в каком направлении").
-const VIEW = 520;
+const VIEW = 560;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;
@@ -437,25 +471,37 @@ const VIEW = 520;
                 />
               );
             })
-          : COMPASS_SECTORS.map((sector, sIdx) => {
-              const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-              const angleCenter = arc * sIdx + arc / 2;
-              const start = angleCenter - arc / 2;
-              const end = angleCenter + arc / 2;
-              return (
+          : level === 3
+            ? // Level 3 = the official 12-colour wheel: one colour per tendencja.
+              SPOKES.map((s) => (
                 <path
-                  key={`bg-${sector.id}`}
-                  d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
-                  fill={sector.color}
-                  // Theme-aware tint: 0.06 was tuned for the dark navy plate; on the
-                  // cream default all six wedges read as identical beige, losing the
-                  // canonical Vinocompas colour identity. Light theme raises it.
+                  key={`bg3-${s.tendencja.id}`}
+                  d={annularPath(cx, cy, rInner - 1, rOuter + 1, s.angle - s.half, s.angle + s.half)}
+                  fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
                   style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
                   stroke="var(--hairline)"
                   strokeWidth={0.5}
                 />
-              );
-            })}
+              ))
+            : COMPASS_SECTORS.map((sector, sIdx) => {
+                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+                const angleCenter = arc * sIdx + arc / 2;
+                const start = angleCenter - arc / 2;
+                const end = angleCenter + arc / 2;
+                return (
+                  <path
+                    key={`bg-${sector.id}`}
+                    d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
+                    fill={sector.color}
+                    // Theme-aware tint: 0.06 was tuned for the dark navy plate; on the
+                    // cream default all six wedges read as identical beige, losing the
+                    // canonical Vinocompas colour identity. Light theme raises it.
+                    style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
+                    stroke="var(--hairline)"
+                    strokeWidth={0.5}
+                  />
+                );
+              })}
 
         {/* Concentric ring lines - theme-aware via hairline var */}
         {Array.from({ length: RING_COUNT + 1 }).map((_, i) => (
@@ -509,7 +555,7 @@ const VIEW = 520;
                   <path
                     key={`fill-${s.tendencja.id}-${i}`}
                     d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
-                    fill={s.sector.color}
+                    fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
                     fillOpacity={0.45 + (i / RING_COUNT) * 0.55}
                     pointerEvents="none"
                   />,
@@ -868,95 +914,36 @@ const VIEW = 520;
           Vinocompas
         </text>
 
-        {/* Outer labels - horizontal text, smart-anchored by quadrant.
-            Long labels split on `·` into two lines. The label sits on a
-            short radial tick line for premium chart-y feel.
-            Only rendered at level 3 (12 tendencje view) - at lower levels
-            this would clutter the disc. */}
+        {/* Curved tendencja labels — text follows an arc just outside the
+            wheel, like the ORIGINAL Vinocompas graphic (client 2026-07-17
+            "надписи по кругу как в оригинале"). textPath centred per 30° slice;
+            bottom-half arcs auto-reversed so nothing reads upside-down.
+            Level 3 only (the 12-tendencja view). */}
         {showLabels && level >= 3 &&
           spokes.map((s) => {
-            const xUnit = Math.sin(s.angle);
-            const yUnit = -Math.cos(s.angle);
-            const tickStart = { x: cx + (rOuter + 4) * xUnit, y: cy + (rOuter + 4) * yUnit };
-            const tickEnd = { x: cx + (rOuter + 14) * xUnit, y: cy + (rOuter + 14) * yUnit };
-            // Outside the hanging-icon ring (icons occupy rOuter+46±26).
-            const labelPos = {
-              x: cx + (rOuter + 76) * xUnit,
-              y: cy + (rOuter + 76) * yUnit,
-            };
-            // Anchor by horizontal position relative to centre.
-            // Right of axis → start; left → end; near axis → middle.
-            const anchorBand = Math.abs(xUnit);
-            const textAnchor = anchorBand < 0.3
-              ? "middle"
-              : xUnit > 0
-                ? "start"
-                : "end";
-            const baseline = yUnit < -0.3 ? "auto" : yUnit > 0.3 ? "hanging" : "middle";
-
             const label =
               lang === "pl"
                 ? (s.tendencja.shortLabel_pl ?? s.tendencja.name_pl)
                 : (s.tendencja.shortLabel_en ?? s.tendencja.name_en);
-            let lines = label.includes("·") ? label.split("·").map((p) => p.trim()) : [label];
-            // Client 16.07 on-wheel names are longer ("Kawa i czekolada") -
-            // wrap at the space nearest the middle so side labels don't
-            // clip the viewBox edge. >= 12 so EN "Forest floor" (12 chars)
-            // wraps like its PL twin; no PL label is exactly 12 chars.
-            if (lines.length === 1 && label.length >= 12 && label.includes(" ")) {
-              const mid = Math.floor(label.length / 2);
-              let best = -1;
-              for (let j = 0; j < label.length; j++) {
-                if (label[j] === " " && (best === -1 || Math.abs(j - mid) < Math.abs(best - mid))) best = j;
-              }
-              if (best > 0) lines = [label.slice(0, best), label.slice(best + 1)];
-            }
-            const lineHeight = 11;
-            const totalH = (lines.length - 1) * lineHeight;
-            const y0 = labelPos.y - (baseline === "middle" ? totalH / 2 : 0);
-
+            const arcId = `${baseId}-lblarc-${s.tendencja.id.replace(".", "-")}`;
             return (
               <g key={`lbl-${s.tendencja.id}`} pointerEvents="none">
-                {/* radial tick */}
-                <line
-                  x1={tickStart.x}
-                  y1={tickStart.y}
-                  x2={tickEnd.x}
-                  y2={tickEnd.y}
-                  stroke={s.sector.color}
-                  strokeOpacity={0.55}
-                  strokeWidth={0.9}
-                />
+                <path id={arcId} d={labelArc(cx, cy, rOuter + 18, s.angle, s.half * 0.98)} fill="none" />
                 <text
-                  x={labelPos.x}
-                  y={y0}
-                  textAnchor={textAnchor}
-                  dominantBaseline={baseline}
                   fontFamily="var(--font-display)"
-                  fontSize={11}
+                  fontSize={8.6}
                   fontWeight={600}
-                  letterSpacing="0.04em"
+                  letterSpacing="0.02em"
                   fill="var(--ink)"
                   stroke="var(--compass-halo)"
-                  strokeWidth={1.8}
+                  strokeWidth={1.6}
                   strokeLinejoin="round"
                   paintOrder="stroke"
-                  opacity={1}
                   className="select-none"
                 >
-                  {lines.length === 1 ? (
-                    label
-                  ) : (
-                    lines.map((ln, i) => (
-                      <tspan
-                        key={i}
-                        x={labelPos.x}
-                        dy={i === 0 ? 0 : lineHeight}
-                      >
-                        {ln}
-                      </tspan>
-                    ))
-                  )}
+                  <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">
+                    {label}
+                  </textPath>
                 </text>
               </g>
             );
@@ -982,8 +969,8 @@ const VIEW = 520;
             // One loose ring at every level: pushed well outside the rim
             // (rOuter+46) with a ~20px gap so the icons read as a directional
             // garland, not labels pinned to a segment (client 2026-07-17).
-            const size = 52;
-            const ringR = rOuter + 46;
+            const size = 46;
+            const ringR = rOuter + 72;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             // q must stay 75 - Next 16 whitelists image qualities (default
@@ -1086,7 +1073,7 @@ const VIEW = 520;
           // corners — lift them into the gap between medallions instead.
           // Icons now ring the wheel at EVERY level (client 2026-07), so the
           // base-axis labels always sit outside the wider icon ring (rOuter+76).
-          const labelR = rOuter + 76;
+          const labelR = rOuter + 108;
           const labelYAdjust = axis.id !== "cierpkosc" ? -10 : 0;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
