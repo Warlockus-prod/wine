@@ -112,16 +112,11 @@ function labelArc(cx: number, cy: number, r: number, theta: number, half: number
   return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 ${bottom ? 0 : 1} ${x2.toFixed(2)} ${y2.toFixed(2)}`;
 }
 
-// Level-1 background: each 120° base wedge is coloured as the blend of the two
-// sectors it spans, so the 3 selectable segments show 3 colours (not 6).
-//   CIERPKOŚĆ  = Szorstkie (#5a2c5e) + Tęgie (#8a4b2a)
-//   SŁODYCZ    = Miękkie   (#e74c3c) + Oleiste (#f4c84a)
-//   KWASOWOŚĆ  = Świeże    (#9bc24a) + Ziemiste (#2c5d8e)
-const BASE_WEDGE_COLOR: Record<string, string> = {
-  cierpkosc: "#723b44",
-  slodycz: "#ed8a43",
-  kwasowosc: "#638f6c",
-};
+/** Base-taste wedge that owns spoke i: CIERPKOŚĆ spans ±60° about 12 o'clock
+ *  (spokes 10,11,0,1), SŁODYCZ spokes 2-5, KWASOWOŚĆ spokes 6-9. Used to route
+ *  the level-1 base value onto its four 30° slices so the fill keeps each
+ *  slice's own official colour ("цвета как оригинал", 2026-07-17). */
+const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 2) % 12) / 4)].id;
 
 // The canonical 12-colour flow of the OFFICIAL Vinocompas wheel (client
 // 2026-07-17 "как оригинал"), sampled from _Vinokompas_pelny_PL: brown → reds
@@ -274,13 +269,13 @@ export default function TasteCompass({
     [profile, setIntensity],
   );
 
-  // Geometry - viewBox 480 gives breathing room for the level-2 image ring
-  // (rOuter+47) AND the base-axis labels pushed outside it (rOuter+58); all
-  // coordinates derive from VIEW so the whole dial recentres automatically.
-  // 560 (was 480/520): a wider canvas so the association icons orbit as a loose
-// RING with a clear gap from the wheel, not clusters hugging each segment
-// (client 2026-07-17: "широко по кругу как кольцо ... в каком направлении").
-const VIEW = 560;
+  // Geometry - all coordinates derive from VIEW so the whole dial recentres
+  // automatically. 640 (was 480/520/560): room for the CONTIGUOUS garland of
+  // official association tiles (118×78 each, centred at rOuter+73, edges
+  // nearly touching → a solid ring, not 12 separated clusters) plus the
+  // base-axis labels pushed outside it (client 2026-07-17: "рядом как цельное
+  // кольцо а не группы", like the vinocompas.pl calculator's attribute ring).
+const VIEW = 640;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;
@@ -450,60 +445,52 @@ const VIEW = 560;
         {/* Background plate */}
         <circle cx={cx} cy={cy} r={rOuter + 4} fill={`url(#${baseId}-bg)`} />
 
-        {/* Background tint wedges. Colour count MUST match the selectable
-            segment count per stage (client 2026-07-17): level 1 paints 3
-            wedges (120°, one per base taste, colour = blend of its two
-            sectors) so 3 segments = 3 colours; level 2/3 paint the canonical
-            6 sector colours. */}
-        {level === 1
-          ? BASE_AXES.map((axis) => {
-              const arc = (Math.PI * 2) / BASE_AXES.length;
-              const start = axis.angle - arc / 2;
-              const end = axis.angle + arc / 2;
-              return (
-                <path
-                  key={`bg1-${axis.id}`}
-                  d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
-                  fill={BASE_WEDGE_COLOR[axis.id]}
-                  style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
-                  stroke="var(--hairline)"
-                  strokeWidth={0.5}
-                />
-              );
-            })
-          : level === 3
-            ? // Level 3 = the official 12-colour wheel: one colour per tendencja.
-              SPOKES.map((s) => (
-                <path
-                  key={`bg3-${s.tendencja.id}`}
-                  d={annularPath(cx, cy, rInner - 1, rOuter + 1, s.angle - s.half, s.angle + s.half)}
-                  fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
-                  style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
-                  stroke="var(--hairline)"
-                  strokeWidth={0.5}
-                />
-              ))
-            : COMPASS_SECTORS.map((sector, sIdx) => {
-                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-                const angleCenter = arc * sIdx + arc / 2;
-                const start = angleCenter - arc / 2;
-                const end = angleCenter + arc / 2;
-                return (
-                  <path
-                    key={`bg-${sector.id}`}
-                    d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
-                    fill={sector.color}
-                    // Theme-aware tint: 0.06 was tuned for the dark navy plate; on the
-                    // cream default all six wedges read as identical beige, losing the
-                    // canonical Vinocompas colour identity. Light theme raises it.
-                    style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
-                    stroke="var(--hairline)"
-                    strokeWidth={0.5}
-                  />
-                );
-              })}
+        {/* Background pie — ALWAYS the official 12-colour Vinocompas wheel at
+            full strength (client 2026-07-17 "цвета делаем как оригинал из
+            графики"): identical across all 3 stages, exactly like the poster;
+            only the dividers/labels/click-targets change per stage. Unselected
+            slices sit slightly dimmed so the vivid intensity fill (below)
+            still reads against them. */}
+        {SPOKES.map((s) => (
+          <path
+            key={`bg-${s.tendencja.id}`}
+            d={annularPath(cx, cy, rInner - 1, rOuter + 1, s.angle - s.half, s.angle + s.half)}
+            fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
+            fillOpacity={0.96}
+            stroke="none"
+          />
+        ))}
 
-        {/* Concentric ring lines - theme-aware via hairline var */}
+        {/* Intensity read-out — the resting pie stays FULL saturation (the
+            poster look); once a unit is set, the UNCHOSEN outer rings of its
+            slices get a cream wash, so the vivid area "fills to" the chosen
+            ring. One unified pass at every level: the VALUE source follows
+            the stage's unit of work (tendencja / sektor avg / base axis),
+            each 30° slice washing independently so the official colours never
+            mix. */}
+        {spokes.map((s) => {
+          const v =
+            level >= 3
+              ? s.intensity
+              : level === 2
+                ? sektorAvg(profile, s.sector.id)
+                : ((profile[`base.${axisIdForSpoke(s.index)}`] ?? 0) as number);
+          if (v <= 0 || v >= MAX_INTENSITY) return null;
+          return (
+            <path
+              key={`wash-${s.tendencja.id}`}
+              d={annularPath(cx, cy, rInner + ringStep * v, rOuter + 1, s.start + 0.004, s.end - 0.004)}
+              fill="#f6efe2"
+              fillOpacity={0.62}
+              stroke="rgba(255,255,255,0.95)"
+              strokeWidth={1}
+              pointerEvents="none"
+            />
+          );
+        })}
+
+        {/* Concentric ring lines — white over the vivid pie so the 5 intensity
+            rings stay legible on every hue. */}
         {Array.from({ length: RING_COUNT + 1 }).map((_, i) => (
           <circle
             key={`ring-${i}`}
@@ -511,8 +498,9 @@ const VIEW = 560;
             cy={cy}
             r={rInner + ringStep * i}
             fill="none"
-            stroke="var(--hairline)"
+            stroke="rgba(255,255,255,0.38)"
             strokeWidth={0.6}
+            pointerEvents="none"
           />
         ))}
 
@@ -536,85 +524,12 @@ const VIEW = 560;
               y1={cy}
               x2={x}
               y2={y}
-              stroke="var(--hairline-strong)"
-              strokeWidth={0.5}
+              stroke="rgba(255,255,255,0.65)"
+              strokeWidth={0.9}
+              pointerEvents="none"
             />
           );
         })}
-
-        {/* Filled intensity - at level 3 we draw per-tendencja (12 wedges);
-            at level 2 we paint the average across BOTH tendencje of each
-            sektor as a single wide wedge so the L2 view stays clean. */}
-        {level >= 3
-          ? spokes.map((s) => {
-              const slices: React.ReactNode[] = [];
-              for (let i = 0; i < s.intensity; i++) {
-                const r1 = rInner + ringStep * i;
-                const r2 = rInner + ringStep * (i + 1);
-                slices.push(
-                  <path
-                    key={`fill-${s.tendencja.id}-${i}`}
-                    d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
-                    fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
-                    fillOpacity={0.45 + (i / RING_COUNT) * 0.55}
-                    pointerEvents="none"
-                  />,
-                );
-              }
-              return <g key={`fillg-${s.tendencja.id}`}>{slices}</g>;
-            })
-          : level === 2
-            ? COMPASS_SECTORS.map((sector, sIdx) => {
-                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-                const angleCenter = arc * sIdx + arc / 2;
-                const start = angleCenter - arc / 2 + 0.01;
-                const end = angleCenter + arc / 2 - 0.01;
-                const intensity = sektorAvg(profile, sector.id);
-                if (intensity <= 0) return null;
-                const slices: React.ReactNode[] = [];
-                for (let i = 0; i < intensity; i++) {
-                  const r1 = rInner + ringStep * i;
-                  const r2 = rInner + ringStep * (i + 1);
-                  slices.push(
-                    <path
-                      key={`l2fill-${sector.id}-${i}`}
-                      d={annularPath(cx, cy, r1, r2, start, end)}
-                      fill={sector.color}
-                      fillOpacity={0.40 + (i / RING_COUNT) * 0.55}
-                      pointerEvents="none"
-                    />,
-                  );
-                }
-                return <g key={`l2fillg-${sector.id}`}>{slices}</g>;
-              })
-            : level === 1
-              ? // Level 1: 3 base wedges (120° each, centred on the axis) fill
-                // with intensity rings just like L2/L3 — so all three stages
-                // share the pie design (client 2026-07). Gold, matching the
-                // base-axis treatment; the 6-colour tint shows through faintly.
-                BASE_AXES.map((axis) => {
-                  const arc = (Math.PI * 2) / BASE_AXES.length;
-                  const start = axis.angle - arc / 2 + 0.01;
-                  const end = axis.angle + arc / 2 - 0.01;
-                  const intensity = (profile[`base.${axis.id}`] ?? 0) as number;
-                  if (intensity <= 0) return null;
-                  const slices: React.ReactNode[] = [];
-                  for (let i = 0; i < intensity; i++) {
-                    const r1 = rInner + ringStep * i;
-                    const r2 = rInner + ringStep * (i + 1);
-                    slices.push(
-                      <path
-                        key={`l1fill-${axis.id}-${i}`}
-                        d={annularPath(cx, cy, r1, r2, start, end)}
-                        fill="#c79f69"
-                        fillOpacity={0.34 + (i / RING_COUNT) * 0.5}
-                        pointerEvents="none"
-                      />,
-                    );
-                  }
-                  return <g key={`l1fillg-${axis.id}`}>{slices}</g>;
-                })
-              : null}
 
         {/* Demo intensity preview (auto-tour) - animated rings on the focused
             sektor/tendencja to SHOW that intensity varies. Visual only; never
@@ -634,7 +549,7 @@ const VIEW = 560;
                 };
               } else {
                 const sp = spokes.find((x) => x.tendencja.id === demoFill.id);
-                if (sp) geo = { start: sp.start, end: sp.end, color: sp.sector.color };
+                if (sp) geo = { start: sp.start, end: sp.end, color: TENDENCJA_COLOR[sp.tendencja.id] ?? sp.sector.color };
               }
               if (!geo) return null;
               const bands = [];
@@ -677,22 +592,23 @@ const VIEW = 560;
                   <path
                     d={annularPath(cx, cy, rInner, rOuter, s.start + 0.005, s.end - 0.005)}
                     fill="none"
-                    stroke={s.sector.color}
-                    strokeOpacity={0.85}
+                    stroke="rgba(255,255,255,0.9)"
                     strokeWidth={1.4}
                     pointerEvents="none"
                   />
                 );
               }
               return (
+                // White preview band — the pie beneath is vivid, so a colour
+                // overlay would vanish; a light wash reads on every hue.
                 <path
                   d={annularPath(cx, cy, r1, r2, s.start + 0.005, s.end - 0.005)}
-                  fill={s.sector.color}
-                  fillOpacity={isTour ? 0.32 : 0.18}
+                  fill="#fff"
+                  fillOpacity={isTour ? 0.4 : 0.26}
                   pointerEvents="none"
                 >
                   {isTour ? (
-                    <animate attributeName="fill-opacity" values="0.18;0.45;0.18" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="fill-opacity" values="0.26;0.55;0.26" dur="2s" repeatCount="indefinite" />
                   ) : null}
                 </path>
               );
@@ -704,17 +620,18 @@ const VIEW = 560;
               const sIdx = COMPASS_SECTORS.indexOf(sektor);
               const angleCenter = arc * sIdx + arc / 2;
               return (
+                // Light wash + white rim: a colour overlay would disappear on
+                // the vivid 12-colour pie.
                 <path
                   d={annularPath(cx, cy, rInner, rOuter, angleCenter - arc / 2 + 0.01, angleCenter + arc / 2 - 0.01)}
-                  fill={sektor.color}
-                  fillOpacity={isTour ? 0.18 : 0.10}
-                  stroke={sektor.color}
-                  strokeOpacity={0.85}
+                  fill="#fff"
+                  fillOpacity={isTour ? 0.24 : 0.14}
+                  stroke="rgba(255,255,255,0.9)"
                   strokeWidth={1.4}
                   pointerEvents="none"
                 >
                   {isTour ? (
-                    <animate attributeName="fill-opacity" values="0.10;0.28;0.10" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="fill-opacity" values="0.14;0.34;0.14" dur="2s" repeatCount="indefinite" />
                   ) : null}
                 </path>
               );
@@ -914,11 +831,13 @@ const VIEW = 560;
           Vinocompas
         </text>
 
-        {/* Curved tendencja labels — text follows an arc just outside the
-            wheel, like the ORIGINAL Vinocompas graphic (client 2026-07-17
-            "надписи по кругу как в оригинале"). textPath centred per 30° slice;
-            bottom-half arcs auto-reversed so nothing reads upside-down.
-            Level 3 only (the 12-tendencja view). */}
+        {/* Curved tendencja labels — text follows an arc hugging the INSIDE
+            of the rim, curved "по кругу как в оригинале" (client 2026-07-17).
+            They moved inside when the contiguous tile garland claimed the
+            outside: the diagonal tiles' inner corners reach radius ~169 and
+            were hiding outer labels. White ink + dark halo reads on every
+            vivid slice colour. Bottom-half arcs auto-reversed so nothing
+            renders upside-down. Level 3 only (the 12-tendencja view). */}
         {showLabels && level >= 3 &&
           spokes.map((s) => {
             const label =
@@ -928,14 +847,14 @@ const VIEW = 560;
             const arcId = `${baseId}-lblarc-${s.tendencja.id.replace(".", "-")}`;
             return (
               <g key={`lbl-${s.tendencja.id}`} pointerEvents="none">
-                <path id={arcId} d={labelArc(cx, cy, rOuter + 18, s.angle, s.half * 0.98)} fill="none" />
+                <path id={arcId} d={labelArc(cx, cy, rOuter - 9, s.angle, s.half * 0.98)} fill="none" />
                 <text
                   fontFamily="var(--font-display)"
                   fontSize={8.6}
                   fontWeight={600}
                   letterSpacing="0.02em"
-                  fill="var(--ink)"
-                  stroke="var(--compass-halo)"
+                  fill="#fff"
+                  stroke="rgba(46,22,14,0.55)"
                   strokeWidth={1.6}
                   strokeLinejoin="round"
                   paintOrder="stroke"
@@ -960,22 +879,23 @@ const VIEW = 560;
             stage 2 retriggers the entrance. */}
         {level >= 1 &&
           SPOKES.map((s, i) => {
-            // Client 16.07 + 07-17: "nie w okręgach tylko w takich łukach lub
-            // jako wiszące ikony", "картинки вокруг делаем на всех трех этапах
-            // без изменения" - the same 12 transparent cut-out clusters
-            // (scripts/gen-arc-icons.mts) hang around the rim on ALL THREE
-            // stages, like the original poster.
-            const arcImg = `/senses/arc/${s.tendencja.id.replace(/\./g, "-")}.png`;
-            // One loose ring at every level: pushed well outside the rim
-            // (rOuter+46) with a ~20px gap so the icons read as a directional
-            // garland, not labels pinned to a segment (client 2026-07-17).
-            const size = 46;
-            const ringR = rOuter + 72;
+            // Client 2026-07-17: "элементы ... не группировать рядышком к
+            // сегменту а широко по кругу как кольцо ... с папки и рядом как
+            // цельное кольцо" — the 12 OFFICIAL association tiles from
+            // vinocompas_graphics/obrazkinut (processed to uniform 3:2 by
+            // scratchpad/process-ring.mjs → public/senses/ring/) sit edge to
+            // edge around the wheel, exactly like the attribute1..12.png ring
+            // of the vinocompas.pl calculator. Tile width ≈ the 30° chord at
+            // ringR, so neighbouring tiles nearly touch → one solid garland.
+            const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
+            const tileW = 118;
+            const tileH = 78;
+            const ringR = rOuter + 73;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             // q must stay 75 - Next 16 whitelists image qualities (default
             // [75]) and any other value 400s ("q parameter not allowed").
-            const href = `/_next/image?url=${encodeURIComponent(arcImg)}&w=128&q=75`;
+            const href = `/_next/image?url=${encodeURIComponent(ringImg)}&w=256&q=75`;
             const interactive = Boolean(onMedallionSelect);
             const pick = () => onMedallionSelect?.(s.tendencja.id);
             return (
@@ -1002,15 +922,15 @@ const VIEW = 560;
                     }
                   : {})}
               >
-                {/* Invisible round hit-area - the cluster PNG is irregular,
-                    taps should work anywhere in its footprint. */}
-                <circle cx={ix} cy={iy} r={size / 2} fill="transparent" />
+                {/* Invisible hit-area - the cluster PNG is irregular, taps
+                    should work anywhere in its footprint. */}
+                <rect x={ix - tileW / 2} y={iy - tileH / 2} width={tileW} height={tileH} fill="transparent" />
                 <image
                   href={href}
-                  x={ix - size / 2}
-                  y={iy - size / 2}
-                  width={size}
-                  height={size}
+                  x={ix - tileW / 2}
+                  y={iy - tileH / 2}
+                  width={tileW}
+                  height={tileH}
                   preserveAspectRatio="xMidYMid meet"
                 />
               </g>
@@ -1037,12 +957,15 @@ const VIEW = 560;
               fontStyle="italic"
               fontSize={level === 2 ? 14 : 12}
               fontWeight={600}
-              fill="var(--ink)"
-              stroke="var(--compass-halo)"
+              // White ink + dark halo: the pie beneath is now the vivid
+              // official palette, spanning near-black navy to pure yellow —
+              // the halo carries the contrast on the light slices.
+              fill="#fff"
+              stroke="rgba(46,22,14,0.55)"
               strokeWidth={2.4}
               strokeLinejoin="round"
               paintOrder="stroke"
-              opacity={level === 2 ? 1 : 0.85}
+              opacity={level === 2 ? 1 : 0.9}
               pointerEvents="none"
               className="select-none"
             >
@@ -1071,17 +994,23 @@ const VIEW = 560;
           // labels (KWASOWOŚĆ/SŁODYCZ) are clamped horizontally toward the
           // viewBox edge, so extra radius can't clear the 225°/315° medallion
           // corners — lift them into the gap between medallions instead.
-          // Icons now ring the wheel at EVERY level (client 2026-07), so the
-          // base-axis labels always sit outside the wider icon ring (rOuter+76).
-          const labelR = rOuter + 108;
-          const labelYAdjust = axis.id !== "cierpkosc" ? -10 : 0;
+          // The contiguous tile garland occupies rOuter+73±39 (bounding boxes
+          // reach radius ~307 at the diagonals). CIERPKOŚĆ keeps its radial
+          // spot above everything; the two LOWER labels drop BELOW the garland
+          // (any on-axis radial placement lands on the ±15° flanking tiles),
+          // reading as captions at the ring's lower corners, still on their
+          // axes' outward directions.
+          const labelR = rOuter + 141;
+          const isLower = axis.id !== "cierpkosc";
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
           const halfW = axisLabel(axis).length * (labelBright ? 13 : 10.5) * 0.42;
-          const labelX = Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
-          const labelY = cy + labelR * yUnit + labelYAdjust;
+          const labelX = isLower
+            ? cx + Math.sign(xUnit) * 192
+            : Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
+          const labelY = isLower ? VIEW - 34 : cy + labelR * yUnit;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
