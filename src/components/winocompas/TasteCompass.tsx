@@ -119,22 +119,16 @@ function labelArc(cx: number, cy: number, r: number, theta: number, half: number
 const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 2) % 12) / 4)].id;
 
 // Colour count matches the SELECTABLE segment count per stage (client
-// 2026-07-18: 12 hues behind a 3- or 6-segment picker "путает"): level 1
-// paints 3 wedges, level 2 six sectors, level 3 the full official 12. The
-// 3/6 hues are the arithmetic blends of their children in the official
-// TENDENCJA_COLOR palette, so every stage stays in the original's gamut.
-const SECTOR_COLOR_VIVID: Record<string, string> = {
-  tegie: "#6c1614",     // blend(#4a2c28, #8e0000)
-  miekkie: "#e60000",   // blend(#cc0000, #ff0000)
-  oleiste: "#fca900",   // blend(#fa7d00, #ffd400)
-  swieze: "#49c050",    // blend(#92d050, #00b050)
-  ziemiste: "#20536e",  // blend(#2b7589, #163152)
-  szorstkie: "#3b1f3c", // blend(#460e4a, #2f2f2d)
-};
+// 2026-07-18: 12 hues behind a 3- or 6-segment picker "путает"). Level 2
+// paints the SITE's canonical sector palette (`COMPASS_SECTORS[].color` —
+// the same hues the legend chips, explorer and side panels use, so the
+// wheel matches the rest of the UI); level 1 paints their pairwise blends,
+// which sit naturally in the cream/gold/wine brand gamut (client: "подбери
+// под палитру круга под сайт"). Level 3 keeps the official licensed 12.
 const BASE_WEDGE_VIVID: Record<string, string> = {
-  cierpkosc: "#541b28", // blend(szorstkie, tegie)
-  slodycz: "#f15500",   // blend(miekkie, oleiste)
-  kwasowosc: "#358a5f", // blend(swieze, ziemiste)
+  cierpkosc: "#723b44", // blend(szorstkie #5a2c5e, tęgie #8a4b2a) — wine maroon
+  slodycz: "#ed8a43",   // blend(miękkie #e74c3c, oleiste #f4c84a) — warm apricot
+  kwasowosc: "#638f6c", // blend(świeże #9bc24a, ziemiste #2c5d8e) — sage green
 };
 
 // The canonical 12-colour flow of the OFFICIAL Vinocompas wheel (client
@@ -486,7 +480,7 @@ const VIEW = 720;
                   <path
                     key={`bg2-${sector.id}`}
                     d={annularPath(cx, cy, rInner - 1, rOuter + 1, arc * sIdx, arc * (sIdx + 1))}
-                    fill={SECTOR_COLOR_VIVID[sector.id] ?? sector.color}
+                    fill={sector.color}
                     fillOpacity={0.96}
                     stroke="none"
                   />
