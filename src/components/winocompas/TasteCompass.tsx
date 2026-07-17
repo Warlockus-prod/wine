@@ -436,15 +436,22 @@ export default function TasteCompass({
           />
         ))}
 
-        {/* Spokes - radial dividers between tendencje. Faded out at level 1
-            (when only base axes matter) so the disc reads simpler. */}
-        {SPOKES.map((s) => {
+        {/* Radial dividers — the wheel reads as 3 / 6 / 12 segments per stage
+            (client 2026-07: same pie design, only the subdivision changes).
+            The 12 spoke boundaries fall at 30°·i from 12 o'clock; sector
+            boundaries are the even indices (every 60°), and the 3 base-wedge
+            boundaries sit between the base axes (i = 2, 6, 10 → 60/180/300°).
+            Level 1 shows 3 dividers, level 2 shows 6, level 3 shows all 12. */}
+        {SPOKES.map((s, i) => {
+          const showAtLevel1 = i === 2 || i === 6 || i === 10; // base-wedge borders
+          const showAtLevel2 = i % 2 === 0; // sector borders (every 60°)
+          const visible = level >= 3 || (level === 2 && showAtLevel2) || (level === 1 && showAtLevel1);
+          if (!visible) return null;
           const x = cx + rOuter * Math.sin(s.angle - s.half);
           const y = cy - rOuter * Math.cos(s.angle - s.half);
           return (
             <line
               key={`spoke-${s.tendencja.id}`}
-              opacity={level >= 2 ? 1 : 0.18}
               x1={cx}
               y1={cy}
               x2={x}
@@ -500,7 +507,34 @@ export default function TasteCompass({
                 }
                 return <g key={`l2fillg-${sector.id}`}>{slices}</g>;
               })
-            : null}
+            : level === 1
+              ? // Level 1: 3 base wedges (120° each, centred on the axis) fill
+                // with intensity rings just like L2/L3 — so all three stages
+                // share the pie design (client 2026-07). Gold, matching the
+                // base-axis treatment; the 6-colour tint shows through faintly.
+                BASE_AXES.map((axis) => {
+                  const arc = (Math.PI * 2) / BASE_AXES.length;
+                  const start = axis.angle - arc / 2 + 0.01;
+                  const end = axis.angle + arc / 2 - 0.01;
+                  const intensity = (profile[`base.${axis.id}`] ?? 0) as number;
+                  if (intensity <= 0) return null;
+                  const slices: React.ReactNode[] = [];
+                  for (let i = 0; i < intensity; i++) {
+                    const r1 = rInner + ringStep * i;
+                    const r2 = rInner + ringStep * (i + 1);
+                    slices.push(
+                      <path
+                        key={`l1fill-${axis.id}-${i}`}
+                        d={annularPath(cx, cy, r1, r2, start, end)}
+                        fill="#c79f69"
+                        fillOpacity={0.34 + (i / RING_COUNT) * 0.5}
+                        pointerEvents="none"
+                      />,
+                    );
+                  }
+                  return <g key={`l1fillg-${axis.id}`}>{slices}</g>;
+                })
+              : null}
 
         {/* Demo intensity preview (auto-tour) - animated rings on the focused
             sektor/tendencja to SHOW that intensity varies. Visual only; never
@@ -903,12 +937,13 @@ export default function TasteCompass({
             gold hairline + warm tint) and enters with a staggered fade+scale
             via the .compass-medallion atom - keyed by level so re-entering
             stage 2 retriggers the entrance. */}
-        {level >= 2 &&
+        {level >= 1 &&
           SPOKES.map((s, i) => {
-            // Client 16.07: "nie w okręgach tylko w takich łukach lub jako
-            // wiszące ikony" - transparent cut-out clusters (generated per
-            // tendencja, scripts/gen-arc-icons.mts) hang around the rim on
-            // BOTH the wrażenia and aromaty wheels, like the original poster.
+            // Client 16.07 + 07-17: "nie w okręgach tylko w takich łukach lub
+            // jako wiszące ikony", "картинки вокруг делаем на всех трех этапах
+            // без изменения" - the same 12 transparent cut-out clusters
+            // (scripts/gen-arc-icons.mts) hang around the rim on ALL THREE
+            // stages, like the original poster.
             const arcImg = `/senses/arc/${s.tendencja.id.replace(/\./g, "-")}.png`;
             const size = level === 2 ? 66 : 54;
             const ringR = rOuter + (level === 2 ? 30 : 27);
@@ -1012,8 +1047,10 @@ export default function TasteCompass({
           // labels (KWASOWOŚĆ/SŁODYCZ) are clamped horizontally toward the
           // viewBox edge, so extra radius can't clear the 225°/315° medallion
           // corners — lift them into the gap between medallions instead.
-          const labelR = level >= 2 ? rOuter + 58 : rOuter + 28;
-          const labelYAdjust = level >= 2 && axis.id !== "cierpkosc" ? -10 : 0;
+          // Icons now ring the wheel at EVERY level (client 2026-07), so the
+          // base-axis labels always sit outside the icon ring (rOuter+58).
+          const labelR = rOuter + 58;
+          const labelYAdjust = axis.id !== "cierpkosc" ? -10 : 0;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
@@ -1034,8 +1071,11 @@ export default function TasteCompass({
                 strokeWidth={0.8}
                 strokeDasharray="2 3"
               />
-              {/* Filled beam - proportional to value */}
-              {value > 0 ? (
+              {/* Filled beam - proportional to value. Suppressed at level 1:
+                  the 120° base WEDGE now fills with rings there (client
+                  2026-07), so the thin beam would double-render the value.
+                  Kept at level 2/3 as a dim reference to the base axes. */}
+              {value > 0 && level !== 1 ? (
                 <line
                   x1={cx}
                   y1={cy}
