@@ -190,14 +190,18 @@ export default function PairingClient({
   // error the skeleton spun forever and the guest never saw the friendly
   // "not found" state (audit 2026-07 follow-up).
   const scopedLoading = Boolean(restaurantContextSlug) && !restaurantContext && !ctxError;
+  // Slug given but the lookup failed (404/network): render the EMPTY dataset
+  // so the guest gets the friendly not-found state - falling through to the
+  // localStorage sandbox showed a stranger's demo menu under a broken QR.
+  const scopedFailed = Boolean(restaurantContextSlug) && Boolean(ctxError);
   const activeDataset = useMemo(
     () =>
       restaurantContext
         ? buildPairingDatasetFromRestaurant(restaurantContext)
-        : scopedLoading
+        : scopedLoading || scopedFailed
           ? { dishes: [], wines: [], pairings: [] }
           : dataset,
-    [dataset, restaurantContext, scopedLoading],
+    [dataset, restaurantContext, scopedLoading, scopedFailed],
   );
   const dishes = activeDataset.dishes;
   const wines = activeDataset.wines;
