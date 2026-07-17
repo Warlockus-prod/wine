@@ -156,6 +156,28 @@ interactive state) found 19 issues, all fixed and re-verified live at 320px:
   auto-nudges into view on focus change.
 - Nav is now fully opaque in light theme; pairing dish prices show zł.
 
+## Vinocompas canon sync (2026-07-17)
+
+Cross-checked the whole wheel against the authoritative source
+(vinocompas.pl "Opis systemu" + parfumealavin.my.canva.site/samouczek).
+Methodology: 3 base tastes (SŁODYCZ/CIERPKOŚĆ/KWASOWOŚĆ) → 6 wrażenia →
+12 tendencje, each rated 0–5; original gate is "co najmniej 7 skojarzeń".
+Our structure, sector order, geometry, colours and all 12 tendencja
+`name_pl` values are **100% canonical**.
+
+The `/senses/arc/*` icon ring is the visual dictionary of each tendencja's
+canonical associations — **regenerate only from the samouczek association
+text** (the `SUBJECTS` map in `scripts/gen-arc-icons.mts` is the source of
+truth). Two clusters were corrected 2026-07-17: `szorstkie.pizmo` had
+lavender/herbs (those are Ziemiste) — it's now animal/musk/leather per the
+canon ("skojarzenia zwierzęce: mokry pies, koń, stajnia, skóra");
+`ziemiste.sciolka` gained the canonical violets/lavender/cut-grass.
+On-wheel Szorstkie labels are now "Piżmo i skóra" / "Dąb i dym".
+
+Open (product decision): our proposal gate is `MIN_FILLED=4` while the
+original Vinocompas asks for 7 associations — raise to 7 or drop the
+"jak w oryginalnym Vinokompasie" line from the nudge copy.
+
 ## Guardrails honored
 
 - e2e contract kept: 3 stage tabs (/ETAP \d/i ×3), slider aria-labels,

@@ -38,10 +38,15 @@ const SUBJECTS: Record<string, string> = {
     "lemon wedge, grapefruit half, orange slice, mandarin with leaf",
   "ziemiste.mineraly":
     "smooth river stones, grey flint pebbles, a seashell, a starfish, mineral crystals",
+  // Canonical "Ściółka leśna" = forest floor: soil, cut grass, violets,
+  // lavender (vinocompas.pl samouczek). Lavender/violets belong HERE, not in
+  // szorstkie.pizmo where an earlier prompt misplaced them.
   "ziemiste.sciolka":
-    "forest mushrooms, moss, fallen autumn leaves, a pinecone, fern sprig",
+    "forest mushrooms, green moss, fresh violets, a sprig of lavender, cut grass, fallen autumn leaves",
+  // Canonical "Piżmo, skóra" = ANIMAL/musk associations: wet dog, horse,
+  // stable, leather - not botanical. (samouczek: "skojarzenia zwierzęce".)
   "szorstkie.pizmo":
-    "a piece of brown leather, lavender sprigs, a horse chestnut, dried herbs bundle",
+    "a piece of tan leather, a worn leather saddle, animal fur, a horsehair brush, dark musk resin",
   "szorstkie.dab":
     "a small oak barrel, oak wood chips, an acorn with oak leaf, wisp of smoke",
 };
