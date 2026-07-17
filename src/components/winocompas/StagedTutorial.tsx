@@ -536,7 +536,7 @@ function StageControls({
           <button
             type="button"
             onClick={goPrev}
-            className="min-h-[36px] rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
+            className="min-h-[32px] rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10.5px] font-semibold tracking-wider text-[#e6e1d6] uppercase transition hover:bg-white/10"
           >
             ← {pickL(lang, "Poprzedni etap", "Previous stage")}
           </button>
@@ -548,7 +548,7 @@ function StageControls({
         <button
           type="button"
           onClick={onReset}
-          className={`min-h-[36px] rounded-full border border-white/12 px-3.5 py-1.5 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 1 ? "col-span-2 lg:col-auto" : ""}`}
+          className={`min-h-[32px] rounded-full border border-white/12 px-3 py-1 text-[10.5px] font-semibold tracking-wider text-[#e6e1d6]/60 uppercase transition hover:border-white/30 hover:text-[#e6e1d6] ${stage === 1 ? "col-span-2 lg:col-auto" : ""}`}
         >
           {pickL(lang, "Wyczyść", "Clear")}
         </button>
@@ -558,7 +558,7 @@ function StageControls({
             onClick={() =>
               document.getElementById("propozycje")?.scrollIntoView({ block: "start" })
             }
-            className="order-last col-span-2 min-h-[36px] rounded-full border border-[rgba(199,159,105,0.30)] lg:order-none bg-[#0b1f44] px-3.5 py-1.5 text-[11px] font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
+            className="order-last col-span-2 min-h-[32px] rounded-full border border-[rgba(199,159,105,0.30)] lg:order-none bg-[#0b1f44] px-3 py-1 text-[10.5px] font-semibold tracking-wider text-[#e6e1d6]/80 uppercase transition hover:border-[var(--color-accent-gold)]/60 hover:text-[var(--color-accent-gold)] lg:col-auto"
           >
             {pickL(lang, "Pokaż dopasowane wina", "Show matched wines")} →
           </button>
@@ -568,7 +568,7 @@ function StageControls({
         <button
           type="button"
           onClick={goNext}
-          className="pitch-cta-primary col-span-2 inline-flex min-h-[38px] items-center justify-center gap-2 rounded-full px-4! py-1.5! text-[11px] lg:col-auto"
+          className="pitch-cta-primary col-span-2 inline-flex min-h-[34px] items-center justify-center gap-2 rounded-full px-3.5! py-1! text-[11px] lg:col-auto"
         >
           {pickL(lang, "Następny etap", "Next stage")}
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
@@ -581,7 +581,7 @@ function StageControls({
           onClick={() =>
             document.getElementById("propozycje")?.scrollIntoView({ block: "start" })
           }
-          className="pitch-cta-primary col-span-2 inline-flex min-h-[38px] items-center justify-center gap-2 rounded-full px-4! py-1.5! text-[11px] lg:col-auto"
+          className="pitch-cta-primary col-span-2 inline-flex min-h-[34px] items-center justify-center gap-2 rounded-full px-3.5! py-1! text-[11px] lg:col-auto"
         >
           {pickL(lang, "Pokaż wina", "Show wines")}
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
