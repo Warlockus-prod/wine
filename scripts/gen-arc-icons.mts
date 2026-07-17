@@ -43,10 +43,11 @@ const SUBJECTS: Record<string, string> = {
   // szorstkie.pizmo where an earlier prompt misplaced them.
   "ziemiste.sciolka":
     "forest mushrooms, green moss, fresh violets, a sprig of lavender, cut grass, fallen autumn leaves",
-  // Canonical "Piżmo, skóra" = ANIMAL/musk associations: wet dog, horse,
-  // stable, leather - not botanical. (samouczek: "skojarzenia zwierzęce".)
+  // Canonical "Piżmo, skóra" = ANIMAL/musk (samouczek: "skojarzenia
+  // zwierzęce: mokry pies, koń, stajnia, skóra"). The client's reference
+  // poster literally shows a HORSE here - include it.
   "szorstkie.pizmo":
-    "a piece of tan leather, a worn leather saddle, animal fur, a horsehair brush, dark musk resin",
+    "a brown horse, a piece of tan leather hide, a worn leather saddle, animal fur, dark musk resin",
   "szorstkie.dab":
     "a small oak barrel, oak wood chips, an acorn with oak leaf, wisp of smoke",
 };
