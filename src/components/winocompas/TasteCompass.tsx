@@ -911,18 +911,23 @@ const VIEW = 640;
             stage 2 retriggers the entrance. */}
         {level >= 1 &&
           SPOKES.map((s, i) => {
-            // Client 2026-07-17: "элементы ... не группировать рядышком к
-            // сегменту а широко по кругу как кольцо ... с папки и рядом как
-            // цельное кольцо" — the 12 OFFICIAL association tiles from
+            // Client 2026-07-17/18: "элементы ... с папки и рядом как цельное
+            // кольцо", "объекты ассоциации по кругу размещены близко друг к
+            // другу" — the 12 OFFICIAL association tiles from
             // vinocompas_graphics/obrazkinut (processed to uniform 3:2 by
-            // scratchpad/process-ring.mjs → public/senses/ring/) sit edge to
-            // edge around the wheel, exactly like the attribute1..12.png ring
-            // of the vinocompas.pl calculator. Tile width ≈ the 30° chord at
-            // ringR, so neighbouring tiles nearly touch → one solid garland.
+            // scratchpad/process-ring.mjs → public/senses/ring/) form a DENSE
+            // wreath like the client's Canva reference: tile width EXCEEDS the
+            // 30° chord at ringR (~122) so neighbours overlap ~12px and the
+            // transparent clusters interleave, hugging the wheel (~10px off
+            // the rim at the cardinal-adjacent tiles). Ceilings: diagonal
+            // outer corners ≤313.8 stay 1.3° clear of the lower axis arcs
+            // (glyphs from radius 311 at 229.5°); top corners 295.3 < the
+            // CIERPKOŚĆ arc at 306; bbox corner dips inside the rim are
+            // transparent PNG margins, verified visually.
             const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
-            const tileW = 118;
-            const tileH = 78;
-            const ringR = rOuter + 73;
+            const tileW = 134;
+            const tileH = 89;
+            const ringR = rOuter + 67;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             // q must stay 75 - Next 16 whitelists image qualities (default
