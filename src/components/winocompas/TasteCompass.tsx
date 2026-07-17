@@ -1112,10 +1112,10 @@ const VIEW = 720;
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
-          const axisFontSize = labelBright ? 14.5 : 11.5;
+          const axisFontSize = labelBright ? 17.5 : 13.5;
           // Approximate glyph run (avg advance ≈ 0.62em + 0.16em tracking)
           // → half-arc that hugs the text without invading the tile corridor.
-          const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.39 + 8) / axisR;
+          const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.36 + 8) / axisR;
           const axisArcId = `${baseId}-axisarc-${axis.id}`;
           // Value chip stays straight ON the axis ray, hub-side of its arc —
           // outside the arcs there is no canvas left (lower arcs end ~4px
@@ -1123,7 +1123,7 @@ const VIEW = 720;
           const chipR = isLower ? axisR - 24 : axisR - 20;
           const chipX = cx + chipR * xUnit;
           const chipY = cy + chipR * yUnit;
-          const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
+          const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.55 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
               {/* Faint axis line ALWAYS shown to anchor the geometry */}
@@ -1170,7 +1170,7 @@ const VIEW = 720;
                 fontFamily="var(--font-display)"
                 fontSize={axisFontSize}
                 fontWeight={700}
-                letterSpacing="0.16em"
+                letterSpacing="0.1em"
                 fill="var(--ink)"
                 className="select-none"
               >
@@ -1185,7 +1185,7 @@ const VIEW = 720;
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fontFamily="ui-monospace, SFMono-Regular, monospace"
-                  fontSize={11}
+                  fontSize={12.5}
                   fontWeight={600}
                   fill="var(--ink)"
                   opacity={0.78}
