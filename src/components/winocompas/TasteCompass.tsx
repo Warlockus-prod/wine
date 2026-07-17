@@ -98,6 +98,17 @@ const buildSpokes = (): SpokeMeta[] => {
 
 const SPOKES = buildSpokes();
 
+// Level-1 background: each 120° base wedge is coloured as the blend of the two
+// sectors it spans, so the 3 selectable segments show 3 colours (not 6).
+//   CIERPKOŚĆ  = Szorstkie (#5a2c5e) + Tęgie (#8a4b2a)
+//   SŁODYCZ    = Miękkie   (#e74c3c) + Oleiste (#f4c84a)
+//   KWASOWOŚĆ  = Świeże    (#9bc24a) + Ziemiste (#2c5d8e)
+const BASE_WEDGE_COLOR: Record<string, string> = {
+  cierpkosc: "#723b44",
+  slodycz: "#ed8a43",
+  kwasowosc: "#638f6c",
+};
+
 /** Build a path for an annular sector (donut slice).
  *  All angles in radians, angle 0 = up (12 o'clock), clockwise.   */
 function annularPath(
@@ -232,7 +243,10 @@ export default function TasteCompass({
   // Geometry - viewBox 480 gives breathing room for the level-2 image ring
   // (rOuter+47) AND the base-axis labels pushed outside it (rOuter+58); all
   // coordinates derive from VIEW so the whole dial recentres automatically.
-  const VIEW = 480;
+  // 520 (was 480): a wider canvas so the association icons orbit as a loose
+// RING with a clear gap from the wheel, not clusters hugging each segment
+// (client 2026-07-17: "широко по кругу как кольцо ... в каком направлении").
+const VIEW = 520;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;
@@ -402,26 +416,46 @@ export default function TasteCompass({
         {/* Background plate */}
         <circle cx={cx} cy={cy} r={rOuter + 4} fill={`url(#${baseId}-bg)`} />
 
-        {/* Sector wedges (background tint, full slice for both tendencje of a sector) */}
-        {COMPASS_SECTORS.map((sector, sIdx) => {
-          const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
-          const angleCenter = arc * sIdx + arc / 2;
-          const start = angleCenter - arc / 2;
-          const end = angleCenter + arc / 2;
-          return (
-            <path
-              key={`bg-${sector.id}`}
-              d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
-              fill={sector.color}
-              // Theme-aware tint: 0.06 was tuned for the dark navy plate; on the
-              // cream default all six wedges read as identical beige, losing the
-              // canonical Vinocompas colour identity. Light theme raises it.
-              style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
-              stroke="var(--hairline)"
-              strokeWidth={0.5}
-            />
-          );
-        })}
+        {/* Background tint wedges. Colour count MUST match the selectable
+            segment count per stage (client 2026-07-17): level 1 paints 3
+            wedges (120°, one per base taste, colour = blend of its two
+            sectors) so 3 segments = 3 colours; level 2/3 paint the canonical
+            6 sector colours. */}
+        {level === 1
+          ? BASE_AXES.map((axis) => {
+              const arc = (Math.PI * 2) / BASE_AXES.length;
+              const start = axis.angle - arc / 2;
+              const end = axis.angle + arc / 2;
+              return (
+                <path
+                  key={`bg1-${axis.id}`}
+                  d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
+                  fill={BASE_WEDGE_COLOR[axis.id]}
+                  style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
+                  stroke="var(--hairline)"
+                  strokeWidth={0.5}
+                />
+              );
+            })
+          : COMPASS_SECTORS.map((sector, sIdx) => {
+              const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+              const angleCenter = arc * sIdx + arc / 2;
+              const start = angleCenter - arc / 2;
+              const end = angleCenter + arc / 2;
+              return (
+                <path
+                  key={`bg-${sector.id}`}
+                  d={annularPath(cx, cy, rInner - 1, rOuter + 1, start, end)}
+                  fill={sector.color}
+                  // Theme-aware tint: 0.06 was tuned for the dark navy plate; on the
+                  // cream default all six wedges read as identical beige, losing the
+                  // canonical Vinocompas colour identity. Light theme raises it.
+                  style={{ fillOpacity: "var(--compass-sector-tint, 0.06)" }}
+                  stroke="var(--hairline)"
+                  strokeWidth={0.5}
+                />
+              );
+            })}
 
         {/* Concentric ring lines - theme-aware via hairline var */}
         {Array.from({ length: RING_COUNT + 1 }).map((_, i) => (
@@ -845,10 +879,10 @@ export default function TasteCompass({
             const yUnit = -Math.cos(s.angle);
             const tickStart = { x: cx + (rOuter + 4) * xUnit, y: cy + (rOuter + 4) * yUnit };
             const tickEnd = { x: cx + (rOuter + 14) * xUnit, y: cy + (rOuter + 14) * yUnit };
-            // Outside the hanging-icon ring (icons occupy rOuter+27±27).
+            // Outside the hanging-icon ring (icons occupy rOuter+46±26).
             const labelPos = {
-              x: cx + (rOuter + 58) * xUnit,
-              y: cy + (rOuter + 58) * yUnit,
+              x: cx + (rOuter + 76) * xUnit,
+              y: cy + (rOuter + 76) * yUnit,
             };
             // Anchor by horizontal position relative to centre.
             // Right of axis → start; left → end; near axis → middle.
@@ -945,8 +979,11 @@ export default function TasteCompass({
             // (scripts/gen-arc-icons.mts) hang around the rim on ALL THREE
             // stages, like the original poster.
             const arcImg = `/senses/arc/${s.tendencja.id.replace(/\./g, "-")}.png`;
-            const size = level === 2 ? 66 : 54;
-            const ringR = rOuter + (level === 2 ? 30 : 27);
+            // One loose ring at every level: pushed well outside the rim
+            // (rOuter+46) with a ~20px gap so the icons read as a directional
+            // garland, not labels pinned to a segment (client 2026-07-17).
+            const size = 52;
+            const ringR = rOuter + 46;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             // q must stay 75 - Next 16 whitelists image qualities (default
@@ -1048,8 +1085,8 @@ export default function TasteCompass({
           // viewBox edge, so extra radius can't clear the 225°/315° medallion
           // corners — lift them into the gap between medallions instead.
           // Icons now ring the wheel at EVERY level (client 2026-07), so the
-          // base-axis labels always sit outside the icon ring (rOuter+58).
-          const labelR = rOuter + 58;
+          // base-axis labels always sit outside the wider icon ring (rOuter+76).
+          const labelR = rOuter + 76;
           const labelYAdjust = axis.id !== "cierpkosc" ? -10 : 0;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive

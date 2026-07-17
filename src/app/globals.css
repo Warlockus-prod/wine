@@ -1463,8 +1463,14 @@ body {
   .compass-medallion { animation: none; opacity: 1; }
 }
 
-/* ── Wheel keyboard focus (WCAG 2.4.7) — the wedge overlays used inline
-   outline:none; keyboard users had no focus indicator at any level. */
+/* ── Wheel focus — MOUSE selection must NOT draw the browser's default
+   rectangular outline around the wedge's bbox (client 2026-07: "убрать синюю
+   чёрную рамку при выборе сегмента"). Keyboard users still get a gold ring
+   via :focus-visible only. */
+.taste-compass-svg [role="slider"]:focus,
+.taste-compass-svg [role="button"]:focus {
+  outline: none;
+}
 .taste-compass-svg [role="slider"]:focus-visible,
 .taste-compass-svg [role="button"]:focus-visible {
   /* theme-aware gold: #9c7536 on the light cream (≥3:1), #c79f69 on dark */
