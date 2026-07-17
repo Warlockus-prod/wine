@@ -868,6 +868,38 @@ const VIEW = 640;
             );
           })}
 
+        {/* Level-2 curved SECTOR names on the rim — mirrors the official
+            uproszczony file, where the 6 sektor names run along the circle
+            (no mid-pie text there). Same inside-the-rim adaptation as the
+            level-3 tendencja labels: the tile garland owns the outside. */}
+        {showLabels && level === 2 &&
+          COMPASS_SECTORS.map((sector, sIdx) => {
+            const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+            const angleCenter = arc * sIdx + arc / 2;
+            const arcId = `${baseId}-seclblarc-${sector.id}`;
+            return (
+              <g key={`seclbl-${sector.id}`} pointerEvents="none">
+                <path id={arcId} d={labelArc(cx, cy, rOuter - 10, angleCenter, arc * 0.46)} fill="none" />
+                <text
+                  fontFamily="var(--font-display)"
+                  fontSize={11.5}
+                  fontWeight={600}
+                  letterSpacing="0.06em"
+                  fill="#fff"
+                  stroke="rgba(46,22,14,0.55)"
+                  strokeWidth={1.8}
+                  strokeLinejoin="round"
+                  paintOrder="stroke"
+                  className="select-none"
+                >
+                  <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">
+                    {pickL(lang, sector.name_pl, sector.name_en)}
+                  </textPath>
+                </text>
+              </g>
+            );
+          })}
+
         {/* Image ring - the client's "ramka wypełniona obrazkami wrażeń i
             tendencji" (2026-07): one still-life photo per tendencja, orbiting
             just outside the dial at the tendencja's centre angle. Decorative
@@ -937,10 +969,11 @@ const VIEW = 640;
             );
           })}
 
-        {/* Sector noun labels - one per sector, larger, between the 2 tendencje.
-            Faded at level 1 (compass shows only base axes there) and given
-            a stronger weight at level 2 (where sektor IS the unit of work). */}
-        {level >= 2 && COMPASS_SECTORS.map((sector, sIdx) => {
+        {/* Sector noun labels - one per sector, mid-pie, between the 2
+            tendencje. Level 3 ONLY: at level 2 the sektor names run curved
+            on the rim instead (like the official uproszczony), and level 1
+            shows just the base axes. */}
+        {level >= 3 && COMPASS_SECTORS.map((sector, sIdx) => {
           const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
           const angleCenter = arc * sIdx + arc / 2;
           const r = (rOuter + rInner) / 2 - 4;
@@ -994,32 +1027,30 @@ const VIEW = 640;
           // labels (KWASOWOŚĆ/SŁODYCZ) are clamped horizontally toward the
           // viewBox edge, so extra radius can't clear the 225°/315° medallion
           // corners — lift them into the gap between medallions instead.
-          // The contiguous tile garland occupies rOuter+73±39 (bounding boxes
-          // reach radius ~307 at the diagonals). CIERPKOŚĆ keeps its radial
-          // spot above everything. The two LOWER labels sit ON their axis
-          // rays near the canvas corners, ROTATED ±30° so each caption runs
-          // ALONG its axis exactly like the original poster (client
-          // 2026-07-17: "kwasowość i słodycz более на углы куда ось
-          // показывает"). Radius rOuter+128 threads the rotated strip through
-          // the garland's on-axis corridor — the flanking ±15° tiles clear
-          // the ray beyond radius ~265.
-          const labelR = rOuter + 141;
+          // CURVED base-axis captions — on the ORIGINAL wheel (both the pełny
+          // poster and the uproszczony file) all three run along the outer
+          // circle: CIERPKOŚĆ arcs over the top, KWASOWOŚĆ / SŁODYCZ arc at
+          // the lower corners, bottom arcs flipped readable (labelArc does
+          // exactly the official flip). Radii clear the tile garland: the
+          // top arc sits above it (tile corners reach radius ~295 up there),
+          // the lower arcs at rOuter+155 skim just OUTSIDE the diagonal
+          // tiles' outer corners (~radius 307.6, glyph caps reach ~311).
           const isLower = axis.id !== "cierpkosc";
+          const axisR = isLower ? rOuter + 155 : rOuter + 141;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
-          const halfW = axisLabel(axis).length * (labelBright ? 13 : 10.5) * 0.42;
-          const lowerR = rOuter + 128;
-          const labelX = isLower
-            ? cx + lowerR * xUnit
-            : Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
-          const labelY = isLower ? cy + lowerR * yUnit : cy + labelR * yUnit;
-          // Baseline parallel to the axis, flipped where needed so the text
-          // never reads upside-down: KWASOWOŚĆ (lower-left) ascends toward
-          // the hub, SŁODYCZ (lower-right) descends away from it.
-          const labelRot = isLower ? (xUnit < 0 ? -30 : 30) : 0;
-          const labelTransform = labelRot ? `rotate(${labelRot} ${labelX} ${labelY})` : undefined;
+          const axisFontSize = labelBright ? 13 : 10.5;
+          // Approximate glyph run (avg advance ≈ 0.62em + 0.16em tracking)
+          // → half-arc that hugs the text without invading the tile corridor.
+          const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.39 + 8) / axisR;
+          const axisArcId = `${baseId}-axisarc-${axis.id}`;
+          // Value chip stays straight ON the axis ray: tucked hub-side under
+          // the top arc, or just OUTSIDE the lower arcs toward the corner.
+          const chipR = isLower ? axisR + 22 : axisR - 20;
+          const chipX = cx + chipR * xUnit;
+          const chipY = cy + chipR * yUnit;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
@@ -1062,25 +1093,23 @@ const VIEW = 640;
                   the old radial value pill overlapped the label on the lower
                   spokes. High-contrast theme-aware --ink replaces the dim gold
                   so both read on dark AND light. */}
+              <path id={axisArcId} d={labelArc(cx, cy, axisR, axis.angle, axisHalfArc)} fill="none" />
               <text
-                x={labelX}
-                y={labelY}
-                textAnchor="middle"
-                dominantBaseline="middle"
                 fontFamily="var(--font-display)"
-                fontSize={labelBright ? 13 : 10.5}
+                fontSize={axisFontSize}
                 fontWeight={700}
                 letterSpacing="0.16em"
                 fill="var(--ink)"
-                transform={labelTransform}
                 className="select-none"
               >
-                {axisLabel(axis)}
+                <textPath href={`#${axisArcId}`} startOffset="50%" textAnchor="middle">
+                  {axisLabel(axis)}
+                </textPath>
               </text>
               {labelBright ? (
                 <text
-                  x={labelX}
-                  y={labelY + 16}
+                  x={chipX}
+                  y={chipY}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fontFamily="ui-monospace, SFMono-Regular, monospace"
@@ -1088,7 +1117,6 @@ const VIEW = 640;
                   fontWeight={600}
                   fill="var(--ink)"
                   opacity={0.78}
-                  transform={labelTransform}
                   className="select-none"
                 >
                   {value}/{MAX_INTENSITY}
