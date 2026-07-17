@@ -177,7 +177,7 @@ export default function PairingClient({
   // (was the localStorage catalog). Global sandbox mode still uses
   // usePairingDataset. SWR resolves async; until then context is null and
   // the page shows the sandbox dataset, then swaps in the scoped one.
-  const { data: ctxResp } = useSWR<{ data: CatalogRestaurant | null }>(
+  const { data: ctxResp, error: ctxError } = useSWR<{ data: CatalogRestaurant | null }>(
     restaurantContextSlug ? `/api/restaurants/${restaurantContextSlug}` : null,
     swrFetcher,
   );
@@ -186,7 +186,10 @@ export default function PairingClient({
   // never the localStorage sandbox. The sandbox flash showed a stranger's
   // wines for ~300ms and fired their (remote) images + a throwaway /api/pairing
   // call on every scoped visit (audit 2026-07).
-  const scopedLoading = Boolean(restaurantContextSlug) && !restaurantContext;
+  // A 404/failed slug lookup rejects the fetcher - without checking the
+  // error the skeleton spun forever and the guest never saw the friendly
+  // "not found" state (audit 2026-07 follow-up).
+  const scopedLoading = Boolean(restaurantContextSlug) && !restaurantContext && !ctxError;
   const activeDataset = useMemo(
     () =>
       restaurantContext
