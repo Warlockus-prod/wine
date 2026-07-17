@@ -118,6 +118,25 @@ function labelArc(cx: number, cy: number, r: number, theta: number, half: number
  *  slice's own official colour ("цвета как оригинал", 2026-07-17). */
 const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 2) % 12) / 4)].id;
 
+// Colour count matches the SELECTABLE segment count per stage (client
+// 2026-07-18: 12 hues behind a 3- or 6-segment picker "путает"): level 1
+// paints 3 wedges, level 2 six sectors, level 3 the full official 12. The
+// 3/6 hues are the arithmetic blends of their children in the official
+// TENDENCJA_COLOR palette, so every stage stays in the original's gamut.
+const SECTOR_COLOR_VIVID: Record<string, string> = {
+  tegie: "#6c1614",     // blend(#4a2c28, #8e0000)
+  miekkie: "#e60000",   // blend(#cc0000, #ff0000)
+  oleiste: "#fca900",   // blend(#fa7d00, #ffd400)
+  swieze: "#49c050",    // blend(#92d050, #00b050)
+  ziemiste: "#20536e",  // blend(#2b7589, #163152)
+  szorstkie: "#3b1f3c", // blend(#460e4a, #2f2f2d)
+};
+const BASE_WEDGE_VIVID: Record<string, string> = {
+  cierpkosc: "#541b28", // blend(szorstkie, tegie)
+  slodycz: "#f15500",   // blend(miekkie, oleiste)
+  kwasowosc: "#358a5f", // blend(swieze, ziemiste)
+};
+
 // The canonical 12-colour flow of the OFFICIAL Vinocompas wheel (client
 // 2026-07-17 "как оригинал"), sampled from _Vinokompas_pelny_PL: brown → reds
 // → orange → yellow → greens → teal → navy → purple → grey around the circle.
@@ -270,12 +289,13 @@ export default function TasteCompass({
   );
 
   // Geometry - all coordinates derive from VIEW so the whole dial recentres
-  // automatically. 640 (was 480/520/560): room for the CONTIGUOUS garland of
-  // official association tiles (118×78 each, centred at rOuter+73, edges
-  // nearly touching → a solid ring, not 12 separated clusters) plus the
-  // base-axis labels pushed outside it (client 2026-07-17: "рядом как цельное
-  // кольцо а не группы", like the vinocompas.pl calculator's attribute ring).
-const VIEW = 640;
+  // automatically. 720 (was 480/520/560/640): the ring order now matches the
+  // client's Canva reference exactly — pie → CURVED LABELS OUTSIDE THE RIM
+  // (dark on cream, readable) → dense garland of official tiles → curved
+  // base-axis arcs at the outermost radius. Each band needs its own annulus,
+  // hence the wider canvas (client 2026-07-18: "подписи ... поза кругом что
+  // бы было более читабельно").
+const VIEW = 720;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;
@@ -445,49 +465,74 @@ const VIEW = 640;
         {/* Background plate */}
         <circle cx={cx} cy={cy} r={rOuter + 4} fill={`url(#${baseId}-bg)`} />
 
-        {/* Background pie — ALWAYS the official 12-colour Vinocompas wheel at
-            full strength (client 2026-07-17 "цвета делаем как оригинал из
-            графики"): identical across all 3 stages, exactly like the poster;
-            only the dividers/labels/click-targets change per stage. Unselected
-            slices sit slightly dimmed so the vivid intensity fill (below)
-            still reads against them. */}
-        {SPOKES.map((s) => (
-          <path
-            key={`bg-${s.tendencja.id}`}
-            d={annularPath(cx, cy, rInner - 1, rOuter + 1, s.angle - s.half, s.angle + s.half)}
-            fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
-            fillOpacity={0.96}
-            stroke="none"
-          />
-        ))}
+        {/* Background pie — full-saturation, colour count = the stage's
+            selectable segment count (client 2026-07-18: 12 hues behind a
+            3/6-segment picker "путает"): 3 blended wedges at level 1, the 6
+            blended sector hues at level 2, the official 12 at level 3. */}
+        {level >= 3
+          ? SPOKES.map((s) => (
+              <path
+                key={`bg-${s.tendencja.id}`}
+                d={annularPath(cx, cy, rInner - 1, rOuter + 1, s.angle - s.half, s.angle + s.half)}
+                fill={TENDENCJA_COLOR[s.tendencja.id] ?? s.sector.color}
+                fillOpacity={0.96}
+                stroke="none"
+              />
+            ))
+          : level === 2
+            ? COMPASS_SECTORS.map((sector, sIdx) => {
+                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+                return (
+                  <path
+                    key={`bg2-${sector.id}`}
+                    d={annularPath(cx, cy, rInner - 1, rOuter + 1, arc * sIdx, arc * (sIdx + 1))}
+                    fill={SECTOR_COLOR_VIVID[sector.id] ?? sector.color}
+                    fillOpacity={0.96}
+                    stroke="none"
+                  />
+                );
+              })
+            : BASE_AXES.map((axis) => {
+                const arc = (Math.PI * 2) / BASE_AXES.length;
+                return (
+                  <path
+                    key={`bg1-${axis.id}`}
+                    d={annularPath(cx, cy, rInner - 1, rOuter + 1, axis.angle - arc / 2, axis.angle + arc / 2)}
+                    fill={BASE_WEDGE_VIVID[axis.id]}
+                    fillOpacity={0.96}
+                    stroke="none"
+                  />
+                );
+              })}
 
         {/* Intensity read-out — the resting pie stays FULL saturation (the
-            poster look); once a unit is set, the UNCHOSEN outer rings of its
-            slices get a cream wash, so the vivid area "fills to" the chosen
-            ring. One unified pass at every level: the VALUE source follows
-            the stage's unit of work (tendencja / sektor avg / base axis),
-            each 30° slice washing independently so the official colours never
-            mix. */}
-        {spokes.map((s) => {
-          const v =
-            level >= 3
-              ? s.intensity
-              : level === 2
-                ? sektorAvg(profile, s.sector.id)
-                : ((profile[`base.${axisIdForSpoke(s.index)}`] ?? 0) as number);
-          if (v <= 0 || v >= MAX_INTENSITY) return null;
-          return (
+            poster look); once a unit is set, its UNCHOSEN outer rings get a
+            cream wash, so the vivid area "fills to" the chosen ring. One
+            wash path per UNIT of work (base wedge / sektor / tendencja). */}
+        {(level >= 3
+          ? spokes.map((s) => ({ key: s.tendencja.id, start: s.start, end: s.end, v: s.intensity as number }))
+          : level === 2
+            ? COMPASS_SECTORS.map((sector, sIdx) => {
+                const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
+                return { key: sector.id, start: arc * sIdx + 0.004, end: arc * (sIdx + 1) - 0.004, v: sektorAvg(profile, sector.id) };
+              })
+            : BASE_AXES.map((axis) => {
+                const arc = (Math.PI * 2) / BASE_AXES.length;
+                return { key: axis.id, start: axis.angle - arc / 2 + 0.004, end: axis.angle + arc / 2 - 0.004, v: (profile[`base.${axis.id}`] ?? 0) as number };
+              })
+        ).map((u) =>
+          u.v <= 0 || u.v >= MAX_INTENSITY ? null : (
             <path
-              key={`wash-${s.tendencja.id}`}
-              d={annularPath(cx, cy, rInner + ringStep * v, rOuter + 1, s.start + 0.004, s.end - 0.004)}
+              key={`wash-${u.key}`}
+              d={annularPath(cx, cy, rInner + ringStep * u.v, rOuter + 1, u.start + 0.004, u.end - 0.004)}
               fill="#f6efe2"
               fillOpacity={0.62}
               stroke="rgba(255,255,255,0.95)"
               strokeWidth={1}
               pointerEvents="none"
             />
-          );
-        })}
+          ),
+        )}
 
         {/* Concentric ring lines — white over the vivid pie so the 5 intensity
             rings stay legible on every hue. */}
@@ -831,13 +876,12 @@ const VIEW = 640;
           Vinocompas
         </text>
 
-        {/* Curved tendencja labels — text follows an arc hugging the INSIDE
-            of the rim, curved "по кругу как в оригинале" (client 2026-07-17).
-            They moved inside when the contiguous tile garland claimed the
-            outside: the diagonal tiles' inner corners reach radius ~169 and
-            were hiding outer labels. White ink + dark halo reads on every
-            vivid slice colour. Bottom-half arcs auto-reversed so nothing
-            renders upside-down. Level 3 only (the 12-tendencja view). */}
+        {/* Curved tendencja labels — OUTSIDE the rim on the cream ground,
+            dark ink, exactly like the original poster (client 2026-07-18:
+            "подписи идут поза кругом что бы было более читабельно"; they sat
+            inside the rim briefly, but white-on-colour reads worse). The
+            garland moved outward to make the band. Bottom-half arcs
+            auto-reversed. Level 3 only (the 12-tendencja view). */}
         {showLabels && level >= 3 &&
           spokes.map((s) => {
             const label =
@@ -847,14 +891,14 @@ const VIEW = 640;
             const arcId = `${baseId}-lblarc-${s.tendencja.id.replace(".", "-")}`;
             return (
               <g key={`lbl-${s.tendencja.id}`} pointerEvents="none">
-                <path id={arcId} d={labelArc(cx, cy, rOuter - 9, s.angle, s.half * 0.98)} fill="none" />
+                <path id={arcId} d={labelArc(cx, cy, rOuter + 11, s.angle, s.half * 0.98)} fill="none" />
                 <text
                   fontFamily="var(--font-display)"
-                  fontSize={8.6}
+                  fontSize={9}
                   fontWeight={600}
                   letterSpacing="0.02em"
-                  fill="#fff"
-                  stroke="rgba(46,22,14,0.55)"
+                  fill="var(--ink)"
+                  stroke="var(--compass-halo)"
                   strokeWidth={1.6}
                   strokeLinejoin="round"
                   paintOrder="stroke"
@@ -868,10 +912,9 @@ const VIEW = 640;
             );
           })}
 
-        {/* Level-2 curved SECTOR names on the rim — mirrors the official
+        {/* Level-2 curved SECTOR names — OUTSIDE the rim like the official
             uproszczony file, where the 6 sektor names run along the circle
-            (no mid-pie text there). Same inside-the-rim adaptation as the
-            level-3 tendencja labels: the tile garland owns the outside. */}
+            just past the pie (no mid-pie text there). */}
         {showLabels && level === 2 &&
           COMPASS_SECTORS.map((sector, sIdx) => {
             const arc = (Math.PI * 2) / COMPASS_SECTORS.length;
@@ -879,14 +922,14 @@ const VIEW = 640;
             const arcId = `${baseId}-seclblarc-${sector.id}`;
             return (
               <g key={`seclbl-${sector.id}`} pointerEvents="none">
-                <path id={arcId} d={labelArc(cx, cy, rOuter - 10, angleCenter, arc * 0.46)} fill="none" />
+                <path id={arcId} d={labelArc(cx, cy, rOuter + 11, angleCenter, arc * 0.46)} fill="none" />
                 <text
                   fontFamily="var(--font-display)"
                   fontSize={11.5}
                   fontWeight={600}
                   letterSpacing="0.06em"
-                  fill="#fff"
-                  stroke="rgba(46,22,14,0.55)"
+                  fill="var(--ink)"
+                  stroke="var(--compass-halo)"
                   strokeWidth={1.8}
                   strokeLinejoin="round"
                   paintOrder="stroke"
@@ -911,23 +954,20 @@ const VIEW = 640;
             stage 2 retriggers the entrance. */}
         {level >= 1 &&
           SPOKES.map((s, i) => {
-            // Client 2026-07-17/18: "элементы ... с папки и рядом как цельное
-            // кольцо", "объекты ассоциации по кругу размещены близко друг к
-            // другу" — the 12 OFFICIAL association tiles from
+            // Client 2026-07-17/18: the 12 OFFICIAL association tiles from
             // vinocompas_graphics/obrazkinut (processed to uniform 3:2 by
             // scratchpad/process-ring.mjs → public/senses/ring/) form a DENSE
-            // wreath like the client's Canva reference: tile width EXCEEDS the
-            // 30° chord at ringR (~122) so neighbours overlap ~12px and the
-            // transparent clusters interleave, hugging the wheel (~10px off
-            // the rim at the cardinal-adjacent tiles). Ceilings: diagonal
-            // outer corners ≤313.8 stay 1.3° clear of the lower axis arcs
-            // (glyphs from radius 311 at 229.5°); top corners 295.3 < the
-            // CIERPKOŚĆ arc at 306; bbox corner dips inside the rim are
-            // transparent PNG margins, verified visually.
+            // wreath like the client's Canva reference: tile width exceeds
+            // the 30° chord at ringR (~138) so neighbours interleave. The
+            // wreath sits OUTSIDE the curved label band (labels moved out of
+            // the rim 2026-07-18): tiles' inner corners at the diagonals
+            // (ringR − 82 ≈ 185) clear the label glyphs (≤ rOuter+21 = 186);
+            // diagonal outer corners (≈349) stay under the lower axis arcs
+            // and the canvas edge (360).
             const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
-            const tileW = 134;
-            const tileH = 89;
-            const ringR = rOuter + 67;
+            const tileW = 140;
+            const tileH = 93;
+            const ringR = rOuter + 102;
             const ix = cx + ringR * Math.sin(s.angle);
             const iy = cy - ringR * Math.cos(s.angle);
             // q must stay 75 - Next 16 whitelists image qualities (default
@@ -1036,12 +1076,13 @@ const VIEW = 640;
           // poster and the uproszczony file) all three run along the outer
           // circle: CIERPKOŚĆ arcs over the top, KWASOWOŚĆ / SŁODYCZ arc at
           // the lower corners, bottom arcs flipped readable (labelArc does
-          // exactly the official flip). Radii clear the tile garland: the
-          // top arc sits above it (tile corners reach radius ~295 up there),
-          // the lower arcs at rOuter+155 skim just OUTSIDE the diagonal
-          // tiles' outer corners (~radius 307.6, glyph caps reach ~311).
+          // exactly the official flip). They sit OUTSIDE the tile wreath:
+          // top tiles' outer edges reach ~330 (arc at rOuter+173 = 338);
+          // the lower diagonal tile corners (~349 at azimuth ~228°) sit
+          // outside the lower arcs' radius but 1.5° clear of their angular
+          // span (glyphs start at ~229.5°).
           const isLower = axis.id !== "cierpkosc";
-          const axisR = isLower ? rOuter + 155 : rOuter + 141;
+          const axisR = isLower ? rOuter + 179 : rOuter + 173;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
@@ -1051,9 +1092,10 @@ const VIEW = 640;
           // → half-arc that hugs the text without invading the tile corridor.
           const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.39 + 8) / axisR;
           const axisArcId = `${baseId}-axisarc-${axis.id}`;
-          // Value chip stays straight ON the axis ray: tucked hub-side under
-          // the top arc, or just OUTSIDE the lower arcs toward the corner.
-          const chipR = isLower ? axisR + 22 : axisR - 20;
+          // Value chip stays straight ON the axis ray, hub-side of its arc —
+          // outside the arcs there is no canvas left (lower arcs end ~4px
+          // from the edge).
+          const chipR = isLower ? axisR - 24 : axisR - 20;
           const chipX = cx + chipR * xUnit;
           const chipY = cy + chipR * yUnit;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
