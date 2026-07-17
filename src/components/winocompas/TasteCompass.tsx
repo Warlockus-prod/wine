@@ -996,10 +996,13 @@ const VIEW = 640;
           // corners — lift them into the gap between medallions instead.
           // The contiguous tile garland occupies rOuter+73±39 (bounding boxes
           // reach radius ~307 at the diagonals). CIERPKOŚĆ keeps its radial
-          // spot above everything; the two LOWER labels drop BELOW the garland
-          // (any on-axis radial placement lands on the ±15° flanking tiles),
-          // reading as captions at the ring's lower corners, still on their
-          // axes' outward directions.
+          // spot above everything. The two LOWER labels sit ON their axis
+          // rays near the canvas corners, ROTATED ±30° so each caption runs
+          // ALONG its axis exactly like the original poster (client
+          // 2026-07-17: "kwasowość i słodycz более на углы куда ось
+          // показывает"). Radius rOuter+128 threads the rotated strip through
+          // the garland's on-axis corridor — the flanking ±15° tiles clear
+          // the ray beyond radius ~265.
           const labelR = rOuter + 141;
           const isLower = axis.id !== "cierpkosc";
           // Bright (level-1 size, full opacity) when base axes are the focus:
@@ -1007,10 +1010,16 @@ const VIEW = 640;
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
           const halfW = axisLabel(axis).length * (labelBright ? 13 : 10.5) * 0.42;
+          const lowerR = rOuter + 128;
           const labelX = isLower
-            ? cx + Math.sign(xUnit) * 192
+            ? cx + lowerR * xUnit
             : Math.max(halfW + 6, Math.min(VIEW - halfW - 6, cx + labelR * xUnit));
-          const labelY = isLower ? VIEW - 34 : cy + labelR * yUnit;
+          const labelY = isLower ? cy + lowerR * yUnit : cy + labelR * yUnit;
+          // Baseline parallel to the axis, flipped where needed so the text
+          // never reads upside-down: KWASOWOŚĆ (lower-left) ascends toward
+          // the hub, SŁODYCZ (lower-right) descends away from it.
+          const labelRot = isLower ? (xUnit < 0 ? -30 : 30) : 0;
+          const labelTransform = labelRot ? `rotate(${labelRot} ${labelX} ${labelY})` : undefined;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.4 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
@@ -1063,6 +1072,7 @@ const VIEW = 640;
                 fontWeight={700}
                 letterSpacing="0.16em"
                 fill="var(--ink)"
+                transform={labelTransform}
                 className="select-none"
               >
                 {axisLabel(axis)}
@@ -1078,6 +1088,7 @@ const VIEW = 640;
                   fontWeight={600}
                   fill="var(--ink)"
                   opacity={0.78}
+                  transform={labelTransform}
                   className="select-none"
                 >
                   {value}/{MAX_INTENSITY}
