@@ -118,6 +118,52 @@ function labelArc(cx: number, cy: number, r: number, theta: number, half: number
  *  slice's own official colour ("цвета как оригинал", 2026-07-17). */
 const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 2) % 12) / 4)].id;
 
+// True aspect (w/h) of each garland tile in public/senses/ring/ — the PNGs
+// are trimmed to their content with NO letterbox canvas (process-ring.mjs),
+// so tile boxes sized from these are fully filled with pixels and the
+// wreath spacing the user SEES equals the spacing we lay out.
+const RING_ASPECT: Record<string, number> = {
+  "tegie.cigaro": 1.556,
+  "tegie.suszone": 1.619,
+  "miekkie.dojrzale": 1.523,
+  "miekkie.konfitury": 0.833,
+  "oleiste.maslo": 1.591,
+  "oleiste.tropikalne": 1.328,
+  "swieze.zielone": 1.584,
+  "swieze.cytrusy": 1.353,
+  "ziemiste.mineraly": 1.388,
+  "ziemiste.sciolka": 1.507,
+  "szorstkie.pizmo": 1.565,
+  "szorstkie.dab": 1.647,
+};
+const RING_TILE_H = 82;
+/** Even-wreath layout (client 2026-07-18 "равномерное разложение элементов и
+ *  отступов"): tiles differ in width, so anchoring every one dead-centre on
+ *  its spoke leaves narrow tiles (Konfitury) with big flanking holes. A few
+ *  deterministic relaxation passes nudge each tile toward equalising its two
+ *  gaps, clamped to ±8° so every tile stays clearly WITH its 30° slice. */
+function ringPlacements(ringR: number): { theta: number; w: number; h: number }[] {
+  const lim = (8 * Math.PI) / 180;
+  const w = SPOKES.map((s) =>
+    Math.min(RING_TILE_H * 1.68, Math.max(64, RING_TILE_H * (RING_ASPECT[s.tendencja.id] ?? 1.5))),
+  );
+  const theta = SPOKES.map((s) => s.angle);
+  for (let pass = 0; pass < 4; pass++) {
+    for (let i = 0; i < SPOKES.length; i++) {
+      const prev = (i + SPOKES.length - 1) % SPOKES.length;
+      const next = (i + 1) % SPOKES.length;
+      const arcL = ((theta[i] - theta[prev] + Math.PI * 2) % (Math.PI * 2)) * ringR;
+      const arcR = ((theta[next] - theta[i] + Math.PI * 2) % (Math.PI * 2)) * ringR;
+      const gapL = arcL - (w[i] + w[prev]) / 2;
+      const gapR = arcR - (w[i] + w[next]) / 2;
+      const shift = ((gapR - gapL) / 2 / ringR) * 0.5;
+      const d = Math.max(-lim, Math.min(lim, theta[i] - SPOKES[i].angle + shift));
+      theta[i] = SPOKES[i].angle + d;
+    }
+  }
+  return SPOKES.map((_, i) => ({ theta: theta[i], w: w[i], h: RING_TILE_H }));
+}
+
 // Colour count matches the SELECTABLE segment count per stage (client
 // 2026-07-18: 12 hues behind a 3- or 6-segment picker "путает"). Level 2
 // paints the SITE's canonical sector palette (`COMPASS_SECTORS[].color` —
@@ -978,23 +1024,25 @@ const VIEW = 720;
             via the .compass-medallion atom - keyed by level so re-entering
             stage 2 retriggers the entrance. */}
         {level >= 1 &&
-          SPOKES.map((s, i) => {
+          (() => {
             // Client 2026-07-17/18: the 12 OFFICIAL association tiles from
-            // vinocompas_graphics/obrazkinut (processed to uniform 3:2 by
-            // scratchpad/process-ring.mjs → public/senses/ring/) form a DENSE
-            // wreath like the client's Canva reference: tile width exceeds
-            // the 30° chord at ringR (~138) so neighbours interleave. The
-            // wreath sits OUTSIDE the curved label band (labels moved out of
-            // the rim 2026-07-18): tiles' inner corners at the diagonals
-            // (ringR − 82 ≈ 191) clear the two-line label glyphs (≤ rOuter+27 = 192);
-            // diagonal outer corners (≈355) stay under the lower axis arcs
-            // and the canvas edge (360).
-            const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
-            const tileW = 140;
-            const tileH = 93;
-            const ringR = rOuter + 108;
-            const ix = cx + ringR * Math.sin(s.angle);
-            const iy = cy - ringR * Math.cos(s.angle);
+            // vinocompas_graphics/obrazkinut form an EVEN wreath: each tile
+            // box carries its image's TRUE aspect (RING_ASPECT — the PNGs
+            // have no letterbox margins any more), and ringPlacements()
+            // relaxes the angles so the visible gaps equalise around the
+            // circle (tiles stay within ±8° of their own 30° slice). The
+            // wreath sits between the curved label band (glyphs ≤ rOuter+27)
+            // and the base-axis arcs; the tiles flanking the two lower axes
+            // are the narrow ones (cytrusy/minerały), so the KWASOWOŚĆ /
+            // SŁODYCZ arcs clear their corners.
+            const ringR = rOuter + 105;
+            const tiles = ringPlacements(ringR);
+            return SPOKES.map((s, i) => {
+              const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
+              const tileW = tiles[i].w;
+              const tileH = tiles[i].h;
+              const ix = cx + ringR * Math.sin(tiles[i].theta);
+              const iy = cy - ringR * Math.cos(tiles[i].theta);
             // q must stay 75 - Next 16 whitelists image qualities (default
             // [75]) and any other value 400s ("q parameter not allowed").
             const href = `/_next/image?url=${encodeURIComponent(ringImg)}&w=256&q=75`;
@@ -1037,7 +1085,8 @@ const VIEW = 720;
                 />
               </g>
             );
-          })}
+            });
+          })()}
 
         {/* Sector noun labels - one per sector, mid-pie, between the 2
             tendencje. Level 3 ONLY: at level 2 the sektor names run curved
@@ -1107,12 +1156,12 @@ const VIEW = 720;
           // outside the lower arcs' radius but 1.5° clear of their angular
           // span (glyphs start at ~229.5°).
           const isLower = axis.id !== "cierpkosc";
-          const axisR = isLower ? rOuter + 181 : rOuter + 177;
+          const axisR = isLower ? rOuter + 192 : rOuter + 181;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
-          const axisFontSize = labelBright ? 17.5 : 13.5;
+          const axisFontSize = labelBright ? 19 : 15;
           // Approximate glyph run (avg advance ≈ 0.62em + 0.16em tracking)
           // → half-arc that hugs the text without invading the tile corridor.
           const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.36 + 8) / axisR;
