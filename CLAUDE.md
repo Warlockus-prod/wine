@@ -87,6 +87,7 @@ Every write emits an `admin_*` event into the analytics table with the actor id.
 - Migrations: `npx drizzle-kit generate --name=<change>`. Auto-applied on every deploy.
 - Seed: `tsx scripts/db-seed.mts` — idempotent via `unique(restaurant_id, external_id)` constraints.
 - Server-side analytics: `logEvent({type, ...})` from `@/lib/server-events`. Soft-fail — never blocks user response.
+- **Guest chat logs expire.** `/api/chat` persists every turn (`chat_sessions`/`chat_messages`) for the `/admin/chat` analytics page; `scripts/db-purge-chat.mts` drops anything older than `CHAT_RETENTION_DAYS` (default 90, matching the page's widest range) nightly via `purge_chat.sh`. Sessions are aged by their LAST message, not `ended_at` — chat-store only closes a session when the same guest returns after a 45-min gap, so most stay open forever. The window **fails closed**: a malformed or <7 value aborts the run instead of deleting (`src/lib/chat-retention.ts`, unit-tested). `--dry-run` reports without touching anything. **Ops scripts may import from `src/lib` only because `Dockerfile.vps` copies it into the runtime image** — same for `src/db`/`src/data`; a script importing from anywhere else in `src/` dies with ERR_MODULE_NOT_FOUND at cron time.
 - Edge constraint: middleware MUST NOT import `@/auth` (pulls postgres into edge runtime and crashes). The admin gate uses env Basic Auth via `src/lib/admin-auth.ts` (zero imports, edge-safe) — see `src/middleware.ts`.
 
 ## Deployment
@@ -99,7 +100,9 @@ the same day (containers/volume/image/repo removed; final DB dump archived at
 `/opt/repos/wine_web_wn/backups/wine-vps1-final-20260716.sql.gz` on VPS2).
 Postgres on VPS2 carries the full pilot history (events since 2026-05-05).
 Daily DB backup: cron `20 3 * * *` → `/opt/backups/wine_web_wn/` (14-day
-retention). TLS: certbot with auto-renew (`certbot.timer`) on VPS2 — the old
+retention). **Chat-log retention: cron `40 3 * * *` → `purge_chat.sh`**
+(20 min after the backup, so a purged day is always in that night's dump
+first) → `/var/log/wine-chat-purge.log`. TLS: certbot with auto-renew (`certbot.timer`) on VPS2 — the old
 manual DNS-01 ritual is dead.
 
 ```bash
