@@ -1071,7 +1071,6 @@ export default function PairingClient({
                 <h2 className="pitch-display mt-2 text-2xl text-white sm:text-3xl">
                   {t(activeDish.name, locale)} <em>× {t(selectedWine.name, locale)}</em>
                 </h2>
-                <p className="mt-2 text-sm text-gray-400">{tx("explanationLine")}</p>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
