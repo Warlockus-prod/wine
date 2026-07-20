@@ -1215,7 +1215,7 @@ const VIEW = 640;
           // outside the lower arcs' radius but 1.5° clear of their angular
           // span (glyphs start at ~229.5°).
           const isLower = axis.id !== "cierpkosc";
-          const axisR = isLower ? rOuter + 141 : rOuter + 133;
+          const axisR = isLower ? rOuter + 149 : rOuter + 133;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
