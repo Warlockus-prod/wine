@@ -28,7 +28,7 @@ import {
   pickL,
   type CompassLang,
 } from "@/data/wine-compass-kb";
-import { SENSE_IMAGE_MAP } from "@/data/sense-images";
+import { ringImagesFor } from "@/data/sense-images";
 import type { CompassLevel, CompassProfile } from "./TasteCompass";
 
 const TasteCompass = dynamic(() => import("./TasteCompass"), { ssr: false });
@@ -685,14 +685,16 @@ function FocusedCard({
       ? ` · ${pickL(lang, focused.tendencja.name_pl, focused.tendencja.name_en)}`
       : "";
 
-  // Still-life image for this impression (client: "też ważne są obrazki").
-  // tendencja → its own image; sektor → sektor image; base → none.
-  const senseImg =
+  // Association artwork for this impression (client: "też ważne są obrazki").
+  // Uses the CLIENT'S OWN objects — the same ones ringing the wheel — instead
+  // of the dark AI still-lifes, which were unreadable in this card (client
+  // 2026-07-18). tendencja → its objects; sektor → both children; base → none.
+  const senseImgs =
     focused.kind === "tendencja"
-      ? SENSE_IMAGE_MAP[focused.tendencja.id] ?? SENSE_IMAGE_MAP[focused.sector.id]
+      ? ringImagesFor(focused.tendencja.id)
       : focused.kind === "sektor"
-        ? SENSE_IMAGE_MAP[focused.sector.id]
-        : undefined;
+        ? ringImagesFor(focused.sector.id)
+        : [];
 
   // Intensity per focus kind (used in the value pill upper-right)
   const intensity =
@@ -729,23 +731,25 @@ function FocusedCard({
       {/* Still-life image of the impression - the "obrazki" from the
           canonical Vinokompas (citrus for Świeże, leather/oak for
           Szorstkie, etc.), generated to match the wine-bar aesthetic. */}
-      {senseImg ? (
+      {senseImgs.length > 0 ? (
+        // Cream ground + object-contain: the artwork is a transparent cut-out,
+        // so it needs a LIGHT backdrop and must not be cropped (the old
+        // object-cover + dark overlay is exactly what made these unreadable).
         <div
-          className="relative mt-3 h-28 w-full overflow-hidden rounded-xl border"
-          style={{ borderColor: `${accent}44`, background: `linear-gradient(135deg, ${accent}26, transparent 70%)` }}
+          className="mt-3 flex h-28 w-full items-center justify-center gap-2 overflow-hidden rounded-xl border bg-[#f6efe2] px-2"
+          style={{ borderColor: `${accent}44` }}
         >
-          <Image
-            src={senseImg}
-            alt={title}
-            fill
-            sizes="(min-width: 1024px) 340px, 90vw"
-            className="object-cover"
-          />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{ background: `linear-gradient(180deg, transparent 55%, ${accent}22)` }}
-          />
+          {senseImgs.map((src) => (
+            <div key={src} className="relative h-full flex-1">
+              <Image
+                src={src}
+                alt={title}
+                fill
+                sizes="(min-width: 1024px) 340px, 90vw"
+                className="object-contain p-1.5"
+              />
+            </div>
+          ))}
         </div>
       ) : null}
 

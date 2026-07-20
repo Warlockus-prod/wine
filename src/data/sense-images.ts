@@ -27,3 +27,40 @@ export const SENSE_IMAGE_MAP: Record<string, string> = {
 
 export const getSenseImageById = (id: string): string | null =>
   SENSE_IMAGE_MAP[id] ?? null;
+
+/**
+ * The CLIENT'S OWN association artwork (vinocompas_graphics/obrazkinut →
+ * background-stripped by scratchpad/process-ring.mjs), i.e. the very objects
+ * that ring the wheel. Preferred over SENSE_IMAGE_MAP above: those are
+ * AI-generated dark still-lifes that read as unreadable murk inside the
+ * guide card (client 2026-07-18 "сильно тёмные, нечитабельные"), while these
+ * are bright cut-outs on transparency and keep the card visually identical
+ * to the garland the guest just clicked.
+ *
+ * 12 tendencje only — a sektor card composes its two children.
+ */
+export const RING_IMAGE_MAP: Record<string, string> = {
+  "tegie.cigaro": "/senses/ring/tegie-cigaro.png",
+  "tegie.suszone": "/senses/ring/tegie-suszone.png",
+  "miekkie.dojrzale": "/senses/ring/miekkie-dojrzale.png",
+  "miekkie.konfitury": "/senses/ring/miekkie-konfitury.png",
+  "oleiste.maslo": "/senses/ring/oleiste-maslo.png",
+  "oleiste.tropikalne": "/senses/ring/oleiste-tropikalne.png",
+  "swieze.zielone": "/senses/ring/swieze-zielone.png",
+  "swieze.cytrusy": "/senses/ring/swieze-cytrusy.png",
+  "ziemiste.mineraly": "/senses/ring/ziemiste-mineraly.png",
+  "ziemiste.sciolka": "/senses/ring/ziemiste-sciolka.png",
+  "szorstkie.pizmo": "/senses/ring/szorstkie-pizmo.png",
+  "szorstkie.dab": "/senses/ring/szorstkie-dab.png",
+};
+
+/** Images to show for a focused id: one for a tendencja, both children for a
+ *  sektor, none for a base taste (the wheel shows no objects for those). */
+export function ringImagesFor(id: string): string[] {
+  const own = RING_IMAGE_MAP[id];
+  if (own) return [own];
+  const children = Object.entries(RING_IMAGE_MAP)
+    .filter(([k]) => k.startsWith(`${id}.`))
+    .map(([, v]) => v);
+  return children;
+}
