@@ -57,6 +57,16 @@ SVG (`VIEW = 640`, centre 320, `rOuter = 165`, `rInner = 36`); angle 0 =
    worst deviation 11°, gaps ≤55px. Deterministic — no Date/random. Shown on all
    3 stages. Served via `/_next/image?w=96&q=75` (q must stay 75 — Next 16
    whitelists qualities).
+
+   The same sprites are reused OUTSIDE the dial by the guide card
+   (`FocusedCard` in `InteractiveCompass.tsx`) via `ringSpritesFor()` in
+   `src/data/sense-images.ts`: a flex row of ≤5 objects across a cream band,
+   because the whole image is internally two-rowed and `object-contain` in a
+   wide band shrank it to a blob mid-card (client 2026-07-18 "в полоску, а
+   не кучку посредине"). Single-blob tendencje (dojrzałe, masło, zielone,
+   minerały) borrow their sibling's objects; the 5th column hides under
+   `sm:` for the 306px mobile sheet. The dark AI still-lifes in
+   `SENSE_IMAGE_MAP` are no longer used by this card.
 6. **Curved base-axis captions outermost** — CIERPKOŚĆ arc at `rOuter+133`
    (glyphs grow outward), KWASOWOŚĆ/SŁODYCZ at `rOuter+149` (bottom arcs
    flipped, glyphs grow inward; +149 keeps them ~6px clear of the outer
