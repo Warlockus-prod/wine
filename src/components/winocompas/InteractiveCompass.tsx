@@ -28,7 +28,7 @@ import {
   pickL,
   type CompassLang,
 } from "@/data/wine-compass-kb";
-import { ringImagesFor } from "@/data/sense-images";
+import { ringSpritesFor } from "@/data/sense-images";
 import type { CompassLevel, CompassProfile } from "./TasteCompass";
 
 const TasteCompass = dynamic(() => import("./TasteCompass"), { ssr: false });
@@ -691,9 +691,9 @@ function FocusedCard({
   // 2026-07-18). tendencja → its objects; sektor → both children; base → none.
   const senseImgs =
     focused.kind === "tendencja"
-      ? ringImagesFor(focused.tendencja.id)
+      ? ringSpritesFor(focused.tendencja.id)
       : focused.kind === "sektor"
-        ? ringImagesFor(focused.sector.id)
+        ? ringSpritesFor(focused.sector.id)
         : [];
 
   // Intensity per focus kind (used in the value pill upper-right)
@@ -735,17 +735,25 @@ function FocusedCard({
         // Cream ground + object-contain: the artwork is a transparent cut-out,
         // so it needs a LIGHT backdrop and must not be cropped (the old
         // object-cover + dark overlay is exactly what made these unreadable).
+        // Laid out as a ROW of individual objects (client 2026-07-18: "в
+        // полоску, а не кучку посредине") — the whole image is internally
+        // two-rowed and shrank to a blob with cream margins either side.
+        // The 5th object hides under sm: in the 306px mobile sheet five
+        // columns leave 51px each; four read at ~66px.
         <div
-          className="mt-3 flex h-28 w-full items-center justify-center gap-2 overflow-hidden rounded-xl border bg-[#f6efe2] px-2"
+          className="mt-3 flex h-24 w-full items-center justify-between gap-1.5 overflow-hidden rounded-xl border bg-[#f6efe2] px-3"
           style={{ borderColor: `${accent}44` }}
         >
-          {senseImgs.map((src) => (
-            <div key={src} className="relative h-full flex-1">
+          {senseImgs.map((src, i) => (
+            <div
+              key={src}
+              className={`relative h-full min-w-0 flex-1 ${i >= 4 ? "hidden sm:block" : ""}`}
+            >
               <Image
                 src={src}
                 alt={title}
                 fill
-                sizes="(min-width: 1024px) 340px, 90vw"
+                sizes="(min-width: 1024px) 110px, 25vw"
                 className="object-contain p-1.5"
               />
             </div>

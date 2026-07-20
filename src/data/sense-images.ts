@@ -64,3 +64,58 @@ export function ringImagesFor(id: string): string[] {
     .map(([, v]) => v);
   return children;
 }
+
+/**
+ * How many INDIVIDUAL object sprites each tendencja was cut into by
+ * scratchpad/slice-ring2.mjs (public/senses/ring/<tendencja>-<k>.png).
+ * The whole images above are internally arranged in 2 rows, so rendering one
+ * in a wide band reads as a blob huddled mid-card (client 2026-07-18 "не
+ * кучку посредине, нужно в полоску") — the card lays these out in a row
+ * instead, echoing the wheel's garland.
+ */
+const RING_SPRITE_COUNTS: Record<string, number> = {
+  "tegie.cigaro": 5,
+  "tegie.suszone": 5,
+  "miekkie.dojrzale": 1,
+  "miekkie.konfitury": 3,
+  "oleiste.maslo": 1,
+  "oleiste.tropikalne": 5,
+  "swieze.zielone": 1,
+  "swieze.cytrusy": 3,
+  "ziemiste.mineraly": 1,
+  "ziemiste.sciolka": 5,
+  "szorstkie.pizmo": 2,
+  "szorstkie.dab": 5,
+};
+
+const spritesOf = (tendencjaId: string): string[] => {
+  const n = RING_SPRITE_COUNTS[tendencjaId] ?? 0;
+  const base = tendencjaId.replace(/\./g, "-");
+  return Array.from({ length: n }, (_, i) => `/senses/ring/${base}-${i + 1}.png`);
+};
+
+/**
+ * Object sprites for a focused id, as a horizontal strip.
+ *  - tendencja → its own objects; when it was cut into a single blob, its
+ *    SIBLING's objects join the strip so the band never shows one lonely
+ *    huddle (both belong to the same sektor, so the pairing still reads true)
+ *  - sektor    → objects from both children, evenly taken
+ *  - base      → none, matching the wheel
+ */
+export function ringSpritesFor(id: string, max = 5): string[] {
+  if (RING_IMAGE_MAP[id]) {
+    const own = spritesOf(id);
+    if (own.length >= 3) return own.slice(0, max);
+    const sector = id.split(".")[0];
+    const sibling = Object.keys(RING_IMAGE_MAP).find(
+      (k) => k !== id && k.startsWith(`${sector}.`),
+    );
+    const extra = sibling ? spritesOf(sibling) : [];
+    return [...own, ...extra].slice(0, max);
+  }
+  const children = Object.keys(RING_IMAGE_MAP).filter((k) => k.startsWith(`${id}.`));
+  if (children.length === 0) return [];
+  // Interleave so both tendencje of a sektor are represented in the strip.
+  const perChild = Math.max(1, Math.ceil(max / children.length));
+  return children.flatMap((c) => spritesOf(c).slice(0, perChild)).slice(0, max);
+}
