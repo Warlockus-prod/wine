@@ -772,10 +772,10 @@ export default function PairingClient({
                 <span
                   className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${
                     aiStatus === "loading"
-                      ? "bg-white/10 text-gray-300"
+                      ? "bg-[color:var(--paper-tint-strong)] text-[color:var(--ink-muted)]"
                       : aiStatus === "fallback"
-                        ? "bg-amber-900/35 text-amber-300"
-                        : "bg-emerald-900/30 text-emerald-300"
+                        ? "border border-[color:var(--hairline-strong)] text-[color:var(--ink-soft)]"
+                        : "border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/12 text-primary"
                   }`}
                 >
                   {aiStatus === "loading"
@@ -826,7 +826,7 @@ export default function PairingClient({
                     onClick={() => selectDish(dish.id, "cards")}
                     className={`group flex w-full items-start gap-3 rounded-2xl border-2 px-3 py-3 text-left transition-all duration-300 ${
                       isActive
-                        ? "-translate-y-0.5 border-primary bg-gradient-to-r from-primary/30 via-primary/12 to-white/5 shadow-[0_2px_0_rgba(156,117,54,0.15)]"
+                        ? "-translate-y-0.5 border-[var(--color-accent-gold)] bg-gradient-to-r from-[var(--color-accent-gold)]/22 via-primary/12 to-[var(--color-accent-gold)]/10 shadow-[0_0_0_3px_rgba(156,117,54,0.12),0_2px_0_rgba(156,117,54,0.15)]"
                         : "border-white/8 bg-black/18 opacity-80 hover:border-white/22 hover:opacity-100"
                     }`}
                   >
@@ -860,25 +860,23 @@ export default function PairingClient({
                             {t(dish.description, locale)}
                           </p>
                         </div>
-                        {/* max-w cap keeps the dish title readable at 320px —
-                            the intrinsic width of "96% dopasowania" used to
-                            crush the min-w-0 column to ~8px (audit 2026-07). */}
-                        <div className="max-w-[45%] shrink-0 text-right">
-                          <span className="block text-sm font-bold text-primary sm:text-base">
-                            {dish.price} zł
-                          </span>
-                          {ranking ? (
-                            <span className="mt-1 block text-[10px] font-semibold tracking-wide text-white/70 uppercase">
-                              <span className="sm:hidden">{ranking.score}%</span>
-                              <span className="hidden sm:inline">
-                                {tx("matchPercent", { score: ranking.score })}
-                              </span>
-                            </span>
-                          ) : null}
-                        </div>
+                        {/* Price alone on the right. The match badge used to
+                            stack under it behind a max-w-[45%] cap, which at
+                            320px left the title ~72px — two clipped words. It
+                            now rides the chip row below, exactly where the
+                            wine column puts it, so the top row is title+price
+                            and nothing competes for the narrow width. */}
+                        <span className="shrink-0 text-sm font-bold text-primary sm:text-base">
+                          {dish.price} zł
+                        </span>
                       </div>
 
-                      <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        {ranking ? (
+                          <span className="rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/10 px-2 py-1 text-[10px] font-semibold tracking-wide text-primary uppercase shadow-[0_2px_0_rgba(156,117,54,0.15)]">
+                            {tx("matchPercent", { score: ranking.score })}
+                          </span>
+                        ) : null}
                         {dish.tags.map((tag) => (
                           <span
                             key={tag}
@@ -1020,7 +1018,7 @@ export default function PairingClient({
                             {wine.region} • {wine.vintageLabel ?? wine.year}
                           </p>
                         </div>
-                        <span className="shrink-0 text-sm font-bold text-white sm:text-base">
+                        <span className="shrink-0 text-sm font-bold text-primary sm:text-base">
                           {wine.price} zł
                         </span>
                       </div>
@@ -1135,7 +1133,7 @@ export default function PairingClient({
                       {selectedWine.region} • {selectedWine.vintageLabel ?? selectedWine.year}
                     </p>
                     <p className="mt-2 text-sm text-gray-400">{t(selectedWine.description, locale)}</p>
-                    <p className="mt-3 text-sm font-bold text-white">{selectedWine.price} zł</p>
+                    <p className="mt-3 text-sm font-bold text-primary">{selectedWine.price} zł</p>
                   </div>
                 </div>
               </article>
@@ -1265,35 +1263,35 @@ export default function PairingClient({
                   {tx("winePassport")}
                 </p>
                 <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.grape")}</p>
-                    <p className="mt-1 font-serif italic text-[#0b1f44]">{selectedWine.passport.grape}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.grape")}</p>
+                    <p className="mt-1 font-serif italic text-[color:var(--ink)]">{selectedWine.passport.grape}</p>
                   </div>
-                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.abv")}</p>
-                    <p className="mt-1 font-serif italic text-[#0b1f44]">{selectedWine.passport.abv}%</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.abv")}</p>
+                    <p className="mt-1 font-serif italic text-[color:var(--ink)]">{selectedWine.passport.abv}%</p>
                   </div>
-                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.body")}</p>
-                    <p className="mt-1 font-serif italic text-[#0b1f44]">{tx(`body.${selectedWine.passport.body}`)}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.body")}</p>
+                    <p className="mt-1 font-serif italic text-[color:var(--ink)]">{tx(`body.${selectedWine.passport.body}`)}</p>
                   </div>
-                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.acidity")}</p>
-                    <p className="mt-1 font-serif italic text-[#0b1f44]">{tx(`acidity.${selectedWine.passport.acidity}`)}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.acidity")}</p>
+                    <p className="mt-1 font-serif italic text-[color:var(--ink)]">{tx(`acidity.${selectedWine.passport.acidity}`)}</p>
                   </div>
-                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.tannin")}</p>
-                    <p className="mt-1 font-serif italic text-[#0b1f44]">{tx(`tannin.${selectedWine.passport.tannin}`)}</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.tannin")}</p>
+                    <p className="mt-1 font-serif italic text-[color:var(--ink)]">{tx(`tannin.${selectedWine.passport.tannin}`)}</p>
                   </div>
-                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                    <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.serve")}</p>
-                    <p className="mt-1 font-serif italic text-[#0b1f44]">{selectedWine.passport.servingTempC}°C</p>
+                  <div className="rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                    <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.serve")}</p>
+                    <p className="mt-1 font-serif italic text-[color:var(--ink)]">{selectedWine.passport.servingTempC}°C</p>
                   </div>
                 </div>
 
-                <div className="mt-3 rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-3">
-                  <p className="text-[10px] font-semibold tracking-wider text-[#0b1f44]/75 uppercase">{tx("passport.decant")}</p>
-                  <p className="mt-1 font-serif text-sm italic text-[#0b1f44]">{localizeDecant(selectedWine.passport.decant, locale)}</p>
+                <div className="mt-3 rounded-xl border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-3">
+                  <p className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-soft)] uppercase">{tx("passport.decant")}</p>
+                  <p className="mt-1 font-serif text-sm italic text-[color:var(--ink)]">{localizeDecant(selectedWine.passport.decant, locale)}</p>
                 </div>
               </article>
             </div>
@@ -1319,18 +1317,18 @@ export default function PairingClient({
                   {tx("tasteAlong.open")}
                 </button>
               ) : (
-                <div className="rounded-[28px] border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[#f7f2ea] p-5">
+                <div className="rounded-[28px] border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] bg-[color:var(--surface-input)] p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold tracking-[0.22em] text-[#0b1f44]/75 uppercase">
+                      <p className="text-[10px] font-semibold tracking-[0.22em] text-[color:var(--ink-soft)] uppercase">
                         {tx("tasteAlong.tasting", { wine: t(selectedWine.name, locale) })}
                       </p>
-                      <h3 className="mt-2 font-serif text-xl italic text-[#0b1f44]">
+                      <h3 className="mt-2 font-serif text-xl italic text-[color:var(--ink)]">
                         {METHOD_STEPS[tasteAlongStep].title_pl}
                       </h3>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="rounded-full border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] px-2.5 py-1 text-[10px] font-semibold tracking-wide whitespace-nowrap text-[#0b1f44]/75 uppercase">
+                      <span className="rounded-full border border-[color:var(--gold-hairline,rgba(156,117,54,0.45))] px-2.5 py-1 text-[10px] font-semibold tracking-wide whitespace-nowrap text-[color:var(--ink-soft)] uppercase">
                         {tx("tasteAlong.progress", {
                           current: tasteAlongStep + 1,
                           total: METHOD_STEPS.length,
@@ -1340,7 +1338,7 @@ export default function PairingClient({
                         type="button"
                         onClick={() => setTasteAlongOpen(false)}
                         aria-label={tx("tasteAlong.close")}
-                        className="flex h-8 w-8 items-center justify-center rounded-full text-[#0b1f44]/60 transition hover:text-[#0b1f44]"
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--ink-muted)] transition hover:text-[color:var(--ink)]"
                       >
                         <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
                           <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -1349,7 +1347,7 @@ export default function PairingClient({
                     </div>
                   </div>
 
-                  <p aria-live="polite" className="mt-3 max-w-2xl text-sm leading-6 text-[#0b1f44]/85">
+                  <p aria-live="polite" className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--ink)]">
                     {METHOD_STEPS[tasteAlongStep].body_pl}
                   </p>
 
@@ -1358,7 +1356,7 @@ export default function PairingClient({
                       type="button"
                       onClick={() => setTasteAlongStep((step) => Math.max(0, step - 1))}
                       disabled={tasteAlongStep === 0}
-                      className="inline-flex min-h-[36px] items-center rounded-full border border-[#0b1f44]/25 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-[#0b1f44]/70 uppercase transition enabled:hover:border-[#0b1f44]/50 disabled:opacity-40"
+                      className="inline-flex min-h-[36px] items-center rounded-full border border-[color:var(--hairline-strong)] px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-[color:var(--ink)]/70 uppercase transition enabled:hover:border-[#0b1f44]/50 disabled:opacity-40"
                     >
                       {tx("tasteAlong.back")}
                     </button>
@@ -1374,7 +1372,7 @@ export default function PairingClient({
                       </button>
                     ) : (
                       <>
-                        <span className="inline-flex min-h-[36px] items-center rounded-full border border-emerald-700/30 bg-emerald-700/10 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-emerald-800 uppercase">
+                        <span className="inline-flex min-h-[36px] items-center rounded-full border border-[color:var(--gold-hairline)] bg-[var(--color-accent-gold)]/10 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-primary uppercase">
                           {tx("tasteAlong.done")}
                         </span>
                         {/* Same wn:open-chat prefill pattern as the
