@@ -47,9 +47,14 @@ SVG (`VIEW = 640`, centre 320, `rOuter = 165`, `rInner = 36`); angle 0 =
    The manifest (file + true aspect) is hardcoded as `RING_SPRITES` in ring
    order. Layout by `spriteRing(r1, r2)`: even indices → inner row
    `rOuter+59`, odd → outer `rOuter+101`; equal-area √A sizing (common
-   scale = the tighter row's budget at 84% coverage, `hCap 0.98·s0`); ONE
-   uniform gap per row; per-row global rotation aligns each tendencja's
-   objects with its 30° slice. Deterministic — no Date/random. Shown on all
+   scale = the tighter row's budget at 84% coverage, `hCap 0.98·s0`).
+   Placement is SLICE-ANCHORED (2026-07-18 independent audit caught 19/37
+   sprites drifting onto neighbouring sectors under pure uniform spacing):
+   each tendencja's row-items start evenly spread within their slice, then
+   gap-equalising relaxation runs with a hard clamp to the slice ±10% pad;
+   slices EMPTY in a given row (single-sprite tendencje) donate half their
+   arc to each neighbour so no holes open — verified 0/37 off-sector,
+   worst deviation 11°, gaps ≤55px. Deterministic — no Date/random. Shown on all
    3 stages. Served via `/_next/image?w=96&q=75` (q must stay 75 — Next 16
    whitelists qualities).
 6. **Curved base-axis captions outermost** — CIERPKOŚĆ arc at `rOuter+133`

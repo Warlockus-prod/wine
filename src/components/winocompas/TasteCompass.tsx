@@ -163,19 +163,16 @@ const RING_SPRITES: { f: string; t: string; a: number }[] = [
   { f: "szorstkie-dab-4", t: "szorstkie-dab", a: 1.167 },
   { f: "szorstkie-dab-5", t: "szorstkie-dab", a: 1.136 },
 ];
-/** Lay the sprites around the circle with ONE uniform gap between every
- *  neighbour (the whole complaint was uneven cluster spacing): widths come
- *  from true aspects at a common height (wide strips flatten to cap), the
- *  common height is solved so the sprites cover ~86% of the circumference,
- *  and a single global rotation aligns each tendencja's centroid with its
- *  30° slice so the garland still reads directionally. Deterministic. */
+/** Lay the sprites in TWO staggered rows with near-uniform gaps AND every
+ *  sprite anchored INSIDE its own 30° slice. The earlier pure-uniform pass
+ *  drifted 19/37 sprites onto neighbouring sectors (worst 47.6° — caught by
+ *  the 2026-07-18 independent audit), which breaks the methodology's
+ *  directional meaning. Now: each tendencja's row-items start evenly spread
+ *  within their slice, then gap-equalising relaxation runs with a HARD
+ *  clamp to the slice's middle 76% — heavy slices (Suszone: 5 wide
+ *  sprites) let their objects overlap each other instead of invading the
+ *  neighbour, exactly like the dense reference poster. Deterministic. */
 function spriteRing(r1: number, r2: number): { f: string; t: string; theta: number; r: number; w: number; h: number }[] {
-  // TWO staggered rows (client 2026-07-18 "в два уровня чтобы крупнее и
-  // больше влезло, как на оригинале"): alternate sprites inner/outer, which
-  // halves each row's arc demand → sprites nearly double in size and the
-  // band reads as the reference poster's dense object field. EQUAL-AREA √A
-  // sizing keeps every sprite at the same visual mass; per-row uniform gaps
-  // + per-row global rotation keep each tendencja's objects over its slice.
   const rows: { idx: number[]; r: number }[] = [
     { idx: RING_SPRITES.map((_, i) => i).filter((i) => i % 2 === 0), r: r1 },
     { idx: RING_SPRITES.map((_, i) => i).filter((i) => i % 2 === 1), r: r2 },
@@ -188,11 +185,11 @@ function spriteRing(r1: number, r2: number): { f: string; t: string; theta: numb
     }),
   );
   const hCap = 0.98 * s0;
-  const centreOf: Record<string, number> = {};
-  for (const s of SPOKES) centreOf[s.tendencja.id.replace(/\./g, "-")] = s.angle;
+  const arc = (Math.PI * 2) / 12;
+  const sliceIdx: Record<string, number> = {};
+  for (const s of SPOKES) sliceIdx[s.tendencja.id.replace(/\./g, "-")] = s.index;
   const out: { f: string; t: string; theta: number; r: number; w: number; h: number }[] = [];
   for (const row of rows) {
-    const C = 2 * Math.PI * row.r;
     const items = row.idx.map((i) => {
       const x = RING_SPRITES[i];
       const aCap = Math.min(x.a, 2.3);
@@ -205,24 +202,53 @@ function spriteRing(r1: number, r2: number): { f: string; t: string; theta: numb
       }
       return { f: x.f, t: x.t, w, h };
     });
-    const totalW = items.reduce((s, x) => s + x.w, 0);
-    const gap = (C - totalW) / items.length;
-    let acc = 0;
-    const pos = items.map((x) => {
-      const c = acc + x.w / 2;
-      acc += x.w + gap;
-      return c;
-    });
-    let off = 0;
-    for (let i = 0; i < items.length; i++) {
-      let d = centreOf[items[i].t] - pos[i] / row.r;
-      while (d > Math.PI) d -= 2 * Math.PI;
-      while (d < -Math.PI) d += 2 * Math.PI;
-      off += d;
+    // Per-tendencja angular domain = its own slice, EXTENDED by half of any
+    // adjacent slice that has no items in THIS row (single-sprite tendencje
+    // occupy only one row; without the donation the other row opens a
+    // ~130px hole there — the slice's true object still shows in its own
+    // row at that angle, so the direction keeps reading correctly).
+    const present = new Set(items.map((x) => sliceIdx[x.t]));
+    const loB: Record<number, number> = {};
+    const hiB: Record<number, number> = {};
+    for (const si of present) {
+      loB[si] = arc * si;
+      hiB[si] = arc * (si + 1);
     }
-    off /= items.length;
-    for (let i = 0; i < items.length; i++) {
-      out.push({ ...items[i], theta: pos[i] / row.r + off, r: row.r });
+    for (let e = 0; e < 12; e++) {
+      if (present.has(e)) continue;
+      let p = (e + 11) % 12;
+      while (!present.has(p)) p = (p + 11) % 12;
+      let n = (e + 1) % 12;
+      while (!present.has(n)) n = (n + 1) % 12;
+      hiB[p] = Math.max(hiB[p], arc * e + arc / 2 + (p > e ? Math.PI * 2 : 0));
+      loB[n] = Math.min(loB[n], arc * e + arc / 2 - (n < e ? Math.PI * 2 : 0));
+    }
+    // initial: spread each tendencja's items evenly WITHIN its domain
+    const theta: number[] = [];
+    for (let k = 0; k < items.length; k++) {
+      const si = sliceIdx[items[k].t];
+      const group = items.map((x, j) => (x.t === items[k].t ? j : -1)).filter((j) => j >= 0);
+      const m = group.length;
+      const pos = group.indexOf(k);
+      theta.push(loB[si] + ((hiB[si] - loB[si]) * (pos + 1)) / (m + 1));
+    }
+    // clamped gap-equalising relaxation within each sprite's domain
+    const pad = arc * 0.1;
+    for (let pass = 0; pass < 8; pass++) {
+      for (let k = 0; k < items.length; k++) {
+        const prev = (k + items.length - 1) % items.length;
+        const next = (k + 1) % items.length;
+        const arcL = (((theta[k] - theta[prev]) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const arcR = (((theta[next] - theta[k]) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const gapL = arcL * row.r - (items[k].w + items[prev].w) / 2;
+        const gapR = arcR * row.r - (items[k].w + items[next].w) / 2;
+        const shift = ((gapR - gapL) / 2 / row.r) * 0.5;
+        const si = sliceIdx[items[k].t];
+        theta[k] = Math.max(loB[si] + pad, Math.min(hiB[si] - pad, theta[k] + shift));
+      }
+    }
+    for (let k = 0; k < items.length; k++) {
+      out.push({ ...items[k], theta: theta[k], r: row.r });
     }
   }
   return out;
