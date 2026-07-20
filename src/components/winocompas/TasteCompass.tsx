@@ -1163,7 +1163,7 @@ function CompassLegend({
             aria-hidden
           />
           <span>{pickL(lang, s.tendencja.name_pl, s.tendencja.name_en)}</span>
-          <span className="font-mono text-[10px] text-gray-400">·{v}</span>
+          <span className="text-[10px] tabular-nums text-gray-400">·{v}</span>
         </span>
       ))}
       <button

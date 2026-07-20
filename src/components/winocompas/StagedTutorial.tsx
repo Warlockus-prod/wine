@@ -224,14 +224,14 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
                       <span className="rounded-full border border-[var(--color-accent-gold)]/45 bg-[var(--color-accent-gold)]/12 px-2 py-0.5 font-serif text-xs font-semibold text-[var(--color-accent-gold)] tabular-nums">
                         {matchPct}%
                       </span>
-                      <span className="text-[10px] tracking-[0.16em] text-[#c79f69]/70 uppercase">
+                      <span className="text-[10px] tracking-[0.16em] text-[color:var(--ink-muted)] uppercase">
                         {lang === "pl" ? STYLE_LABEL_PL[wine.style] : STYLE_LABEL_EN[wine.style]}
                       </span>
                     </div>
                     <p className="mt-2 font-serif text-base leading-tight text-[#f4efe9]">
                       {wine.name_pl}
                     </p>
-                    <p className="mt-0.5 text-[10px] tracking-[0.14em] text-[#c79f69]/70 uppercase">
+                    <p className="mt-0.5 text-[10px] tracking-[0.14em] text-[color:var(--ink-muted)] uppercase">
                       {wineRegion(wine, lang)}
                     </p>
                   </div>
@@ -373,7 +373,7 @@ function StageNav({
               <span className={`max-w-full truncate text-[12px] font-medium sm:font-serif sm:text-lg sm:font-normal sm:italic ${active ? "text-white" : done ? "text-[#f4efe9]" : "text-[#e6e1d6]/85"}`}>
                 {it.label}
               </span>
-              <span className="max-w-full truncate text-[10px] tracking-wider text-[#c79f69]/65 uppercase sm:text-[11px]">
+              <span className="max-w-full truncate text-[10px] tracking-wider text-[color:var(--ink-muted)] uppercase sm:text-[11px]">
                 <span className="sm:hidden">{it.subShort}</span>
                 <span className="hidden sm:inline">{it.sub}</span>
               </span>

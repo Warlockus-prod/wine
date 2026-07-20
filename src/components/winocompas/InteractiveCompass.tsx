@@ -723,7 +723,7 @@ function FocusedCard({
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: accent }}>
           {isTour ? pickL(lang, "Przewodnik mówi…", "The guide says…") : eyebrow}
         </p>
-        <span className="ml-auto font-mono text-[10px] tracking-wider text-[#c79f69]/70">
+        <span className="ml-auto text-[10px] font-semibold tracking-wider tabular-nums text-[color:var(--ink-muted)]">
           {intensity}/5
         </span>
       </div>
@@ -833,15 +833,15 @@ function FocusedCard({
           </p>
           <dl className="mt-4 divide-y divide-[rgba(199,159,105,0.16)] text-[13px] leading-relaxed">
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">{pickL(lang, "Skojarzenia", "Associations")}</dt>
+              <dt className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-muted)] uppercase">{pickL(lang, "Skojarzenia", "Associations")}</dt>
               <dd className="text-[#e6e1d6]/90">{pickL(lang, focused.tendencja.associations_pl, focused.tendencja.associations_en)}</dd>
             </div>
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">{pickL(lang, "Przykład", "Example")}</dt>
+              <dt className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-muted)] uppercase">{pickL(lang, "Przykład", "Example")}</dt>
               <dd className="font-serif italic text-[#e6e1d6]/85">{pickL(lang, focused.tendencja.examples_pl, focused.tendencja.examples_en)}</dd>
             </div>
             <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 py-2.5 first:pt-0 last:pb-0">
-              <dt className="text-[10px] font-semibold tracking-wider text-[#c79f69]/65 uppercase">{pickL(lang, "Spotkasz w", "Found in")}</dt>
+              <dt className="text-[10px] font-semibold tracking-wider text-[color:var(--ink-muted)] uppercase">{pickL(lang, "Spotkasz w", "Found in")}</dt>
               <dd className="text-[#cbc1b1]">{pickL(lang, focused.tendencja.found_in_pl, focused.tendencja.found_in_en)}</dd>
             </div>
           </dl>
