@@ -118,50 +118,98 @@ function labelArc(cx: number, cy: number, r: number, theta: number, half: number
  *  slice's own official colour ("цвета как оригинал", 2026-07-17). */
 const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 2) % 12) / 4)].id;
 
-// True aspect (w/h) of each garland tile in public/senses/ring/ — the PNGs
-// are trimmed to their content with NO letterbox canvas (process-ring.mjs),
-// so tile boxes sized from these are fully filled with pixels and the
-// wreath spacing the user SEES equals the spacing we lay out.
-const RING_ASPECT: Record<string, number> = {
-  "tegie.cigaro": 1.556,
-  "tegie.suszone": 1.619,
-  "miekkie.dojrzale": 1.523,
-  "miekkie.konfitury": 0.833,
-  "oleiste.maslo": 1.591,
-  "oleiste.tropikalne": 1.328,
-  "swieze.zielone": 1.584,
-  "swieze.cytrusy": 1.353,
-  "ziemiste.mineraly": 1.388,
-  "ziemiste.sciolka": 1.507,
-  "szorstkie.pizmo": 1.565,
-  "szorstkie.dab": 1.647,
-};
-const RING_TILE_H = 82;
-/** Even-wreath layout (client 2026-07-18 "равномерное разложение элементов и
- *  отступов"): tiles differ in width, so anchoring every one dead-centre on
- *  its spoke leaves narrow tiles (Konfitury) with big flanking holes. A few
- *  deterministic relaxation passes nudge each tile toward equalising its two
- *  gaps, clamped to ±8° so every tile stays clearly WITH its 30° slice. */
-function ringPlacements(ringR: number): { theta: number; w: number; h: number }[] {
-  const lim = (8 * Math.PI) / 180;
-  const w = SPOKES.map((s) =>
-    Math.min(RING_TILE_H * 1.68, Math.max(64, RING_TILE_H * (RING_ASPECT[s.tendencja.id] ?? 1.5))),
-  );
-  const theta = SPOKES.map((s) => s.angle);
-  for (let pass = 0; pass < 4; pass++) {
-    for (let i = 0; i < SPOKES.length; i++) {
-      const prev = (i + SPOKES.length - 1) % SPOKES.length;
-      const next = (i + 1) % SPOKES.length;
-      const arcL = ((theta[i] - theta[prev] + Math.PI * 2) % (Math.PI * 2)) * ringR;
-      const arcR = ((theta[next] - theta[i] + Math.PI * 2) % (Math.PI * 2)) * ringR;
-      const gapL = arcL - (w[i] + w[prev]) / 2;
-      const gapR = arcR - (w[i] + w[next]) / 2;
-      const shift = ((gapR - gapL) / 2 / ringR) * 0.5;
-      const d = Math.max(-lim, Math.min(lim, theta[i] - SPOKES[i].angle + shift));
-      theta[i] = SPOKES[i].angle + d;
+// The association wreath is a garland of INDIVIDUAL object sprites (client
+// 2026-07-18: "равномерно без отступов", per her reference poster — no
+// grouped tiles). scratchpad/slice-ring2.mjs cuts each official image into
+// its component objects via alpha connected-components + gap-only valley
+// splits → public/senses/ring/<tendencja>-<k>.png. Order below = clockwise
+// ring order (sector order from 12 o'clock); `a` = true sprite aspect.
+const RING_SPRITES: { f: string; t: string; a: number }[] = [
+  { f: "tegie-cigaro-1", t: "tegie-cigaro", a: 1.348 },
+  { f: "tegie-cigaro-2", t: "tegie-cigaro", a: 1.095 },
+  { f: "tegie-cigaro-3", t: "tegie-cigaro", a: 1.611 },
+  { f: "tegie-cigaro-4", t: "tegie-cigaro", a: 1.735 },
+  { f: "tegie-cigaro-5", t: "tegie-cigaro", a: 0.553 },
+  { f: "tegie-suszone-1", t: "tegie-suszone", a: 2.119 },
+  { f: "tegie-suszone-2", t: "tegie-suszone", a: 2.224 },
+  { f: "tegie-suszone-3", t: "tegie-suszone", a: 1.589 },
+  { f: "tegie-suszone-4", t: "tegie-suszone", a: 4.415 },
+  { f: "tegie-suszone-5", t: "tegie-suszone", a: 1.481 },
+  { f: "miekkie-dojrzale-1", t: "miekkie-dojrzale", a: 1.523 },
+  { f: "miekkie-konfitury-1", t: "miekkie-konfitury", a: 0.985 },
+  { f: "miekkie-konfitury-2", t: "miekkie-konfitury", a: 1.2 },
+  { f: "miekkie-konfitury-3", t: "miekkie-konfitury", a: 1.136 },
+  { f: "oleiste-maslo-1", t: "oleiste-maslo", a: 1.591 },
+  { f: "oleiste-tropikalne-1", t: "oleiste-tropikalne", a: 1.364 },
+  { f: "oleiste-tropikalne-2", t: "oleiste-tropikalne", a: 1.723 },
+  { f: "oleiste-tropikalne-3", t: "oleiste-tropikalne", a: 1.573 },
+  { f: "oleiste-tropikalne-4", t: "oleiste-tropikalne", a: 0.576 },
+  { f: "oleiste-tropikalne-5", t: "oleiste-tropikalne", a: 0.527 },
+  { f: "swieze-zielone-1", t: "swieze-zielone", a: 1.584 },
+  { f: "swieze-cytrusy-1", t: "swieze-cytrusy", a: 1.036 },
+  { f: "swieze-cytrusy-2", t: "swieze-cytrusy", a: 1.193 },
+  { f: "swieze-cytrusy-3", t: "swieze-cytrusy", a: 0.87 },
+  { f: "ziemiste-mineraly-1", t: "ziemiste-mineraly", a: 1.386 },
+  { f: "ziemiste-sciolka-1", t: "ziemiste-sciolka", a: 0.969 },
+  { f: "ziemiste-sciolka-2", t: "ziemiste-sciolka", a: 0.959 },
+  { f: "ziemiste-sciolka-3", t: "ziemiste-sciolka", a: 0.86 },
+  { f: "ziemiste-sciolka-4", t: "ziemiste-sciolka", a: 0.948 },
+  { f: "ziemiste-sciolka-5", t: "ziemiste-sciolka", a: 0.394 },
+  { f: "szorstkie-pizmo-1", t: "szorstkie-pizmo", a: 0.295 },
+  { f: "szorstkie-pizmo-2", t: "szorstkie-pizmo", a: 1.216 },
+  { f: "szorstkie-dab-1", t: "szorstkie-dab", a: 0.556 },
+  { f: "szorstkie-dab-2", t: "szorstkie-dab", a: 3.352 },
+  { f: "szorstkie-dab-3", t: "szorstkie-dab", a: 0.766 },
+  { f: "szorstkie-dab-4", t: "szorstkie-dab", a: 1.167 },
+  { f: "szorstkie-dab-5", t: "szorstkie-dab", a: 1.136 },
+];
+/** Lay the sprites around the circle with ONE uniform gap between every
+ *  neighbour (the whole complaint was uneven cluster spacing): widths come
+ *  from true aspects at a common height (wide strips flatten to cap), the
+ *  common height is solved so the sprites cover ~86% of the circumference,
+ *  and a single global rotation aligns each tendencja's centroid with its
+ *  30° slice so the garland still reads directionally. Deterministic. */
+function spriteRing(ringR: number): { f: string; t: string; theta: number; w: number; h: number }[] {
+  const C = 2 * Math.PI * ringR;
+  // EQUAL-AREA normalisation: equal heights made narrow sprites (wheat,
+  // lavender) invisible slivers and multi-object chunks tiny. √A sizing
+  // gives every sprite the same visual mass; heights vary organically like
+  // the reference poster. s0 = √area, solved so widths cover ~86% of C.
+  const sqrtSum = RING_SPRITES.reduce((s, x) => s + Math.sqrt(Math.min(x.a, 2.3)), 0);
+  const s0 = (0.86 * C) / sqrtSum;
+  const hCap = 1.45 * s0;
+  const items = RING_SPRITES.map((x) => {
+    const aCap = Math.min(x.a, 2.3);
+    let w = s0 * Math.sqrt(aCap);
+    let h = w / x.a; // true aspect: capped-wide strips get shorter, narrow ones taller
+    if (h > hCap) {
+      const f = hCap / h;
+      w *= f;
+      h = hCap;
     }
+    return { f: x.f, t: x.t, w, h };
+  });
+  const totalW = items.reduce((s, x) => s + x.w, 0);
+  const gap = (C - totalW) / items.length;
+  let acc = 0;
+  const pos = items.map((x) => {
+    const c = acc + x.w / 2;
+    acc += x.w + gap;
+    return c;
+  });
+  // one global rotation: average signed offset of every sprite from its
+  // tendencja slice centre (linear mean is fine — offsets are small)
+  const centreOf: Record<string, number> = {};
+  for (const s of SPOKES) centreOf[s.tendencja.id.replace(/\./g, "-")] = s.angle;
+  let off = 0;
+  for (let i = 0; i < items.length; i++) {
+    let d = centreOf[items[i].t] - pos[i] / ringR;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    off += d;
   }
-  return SPOKES.map((_, i) => ({ theta: theta[i], w: w[i], h: RING_TILE_H }));
+  off /= items.length;
+  return items.map((x, i) => ({ ...x, theta: pos[i] / ringR + off }));
 }
 
 // Colour count matches the SELECTABLE segment count per stage (client
@@ -329,13 +377,11 @@ export default function TasteCompass({
   );
 
   // Geometry - all coordinates derive from VIEW so the whole dial recentres
-  // automatically. 720 (was 480/520/560/640): the ring order now matches the
-  // client's Canva reference exactly — pie → CURVED LABELS OUTSIDE THE RIM
-  // (dark on cream, readable) → dense garland of official tiles → curved
-  // base-axis arcs at the outermost radius. Each band needs its own annulus,
-  // hence the wider canvas (client 2026-07-18: "подписи ... поза кругом что
-  // бы было более читабельно").
-const VIEW = 720;
+  // automatically. Ring order matches the client's reference: pie → curved
+  // labels outside the rim → uniform sprite garland → curved base-axis arcs.
+  // Back to 640 (from the 720 big-tile era): individual sprites need a far
+  // thinner band than the 93px tiles did, so the wheel gets its size back.
+const VIEW = 640;
   const cx = VIEW / 2;
   const cy = VIEW / 2;
   const rOuter = 165;
@@ -1025,27 +1071,24 @@ const VIEW = 720;
             stage 2 retriggers the entrance. */}
         {level >= 1 &&
           (() => {
-            // Client 2026-07-17/18: the 12 OFFICIAL association tiles from
-            // vinocompas_graphics/obrazkinut form an EVEN wreath: each tile
-            // box carries its image's TRUE aspect (RING_ASPECT — the PNGs
-            // have no letterbox margins any more), and ringPlacements()
-            // relaxes the angles so the visible gaps equalise around the
-            // circle (tiles stay within ±8° of their own 30° slice). The
-            // wreath sits between the curved label band (glyphs ≤ rOuter+27)
-            // and the base-axis arcs; the tiles flanking the two lower axes
-            // are the narrow ones (cytrusy/minerały), so the KWASOWOŚĆ /
-            // SŁODYCZ arcs clear their corners.
-            const ringR = rOuter + 105;
-            const tiles = ringPlacements(ringR);
-            return SPOKES.map((s, i) => {
-              const ringImg = `/senses/ring/${s.tendencja.id.replace(/\./g, "-")}.png`;
-              const tileW = tiles[i].w;
-              const tileH = tiles[i].h;
-              const ix = cx + ringR * Math.sin(tiles[i].theta);
-              const iy = cy - ringR * Math.cos(tiles[i].theta);
+            // Client 2026-07-18 (её референс-постер): the garland is a
+            // CONTINUOUS ring of individual object sprites with ONE uniform
+            // gap everywhere — no grouped tiles, no cluster holes. Sprite
+            // order follows the sectors clockwise, and spriteRing()'s global
+            // rotation keeps each tendencja's objects over its slice.
+            const ringR = rOuter + 62;
+            const sprites = spriteRing(ringR);
+            const tendencjaOf: Record<string, (typeof SPOKES)[number]> = {};
+            for (const sp of SPOKES) tendencjaOf[sp.tendencja.id.replace(/\./g, "-")] = sp;
+            return sprites.map((sprite, i) => {
+              const s = tendencjaOf[sprite.t];
+              const tileW = sprite.w;
+              const tileH = sprite.h;
+              const ix = cx + ringR * Math.sin(sprite.theta);
+              const iy = cy - ringR * Math.cos(sprite.theta);
             // q must stay 75 - Next 16 whitelists image qualities (default
             // [75]) and any other value 400s ("q parameter not allowed").
-            const href = `/_next/image?url=${encodeURIComponent(ringImg)}&w=256&q=75`;
+            const href = `/_next/image?url=${encodeURIComponent(`/senses/ring/${sprite.f}.png`)}&w=96&q=75`;
             const interactive = Boolean(onMedallionSelect);
             const pick = () => onMedallionSelect?.(s.tendencja.id);
             return (
@@ -1156,7 +1199,7 @@ const VIEW = 720;
           // outside the lower arcs' radius but 1.5° clear of their angular
           // span (glyphs start at ~229.5°).
           const isLower = axis.id !== "cierpkosc";
-          const axisR = isLower ? rOuter + 192 : rOuter + 181;
+          const axisR = isLower ? rOuter + 103 : rOuter + 95;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
@@ -1166,10 +1209,9 @@ const VIEW = 720;
           // → half-arc that hugs the text without invading the tile corridor.
           const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.36 + 8) / axisR;
           const axisArcId = `${baseId}-axisarc-${axis.id}`;
-          // Value chip stays straight ON the axis ray, hub-side of its arc —
-          // outside the arcs there is no canvas left (lower arcs end ~4px
-          // from the edge).
-          const chipR = isLower ? axisR - 24 : axisR - 20;
+          // Value chip stays straight ON the axis ray, just OUTSIDE its arc
+          // (hub-side would land on the sprite garland now).
+          const chipR = axisR + (isLower ? 22 : 26);
           const chipX = cx + chipR * xUnit;
           const chipY = cy + chipR * yUnit;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.55 : 1;
