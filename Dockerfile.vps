@@ -42,6 +42,10 @@ COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/src/db ./src/db
 COPY --from=builder /app/src/data ./src/data
+# src/lib too: ops scripts import pure helpers from here (db-purge-chat.mts →
+# chat-retention.ts). Without it the script dies with ERR_MODULE_NOT_FOUND at
+# cron time, long after the deploy looked healthy.
+COPY --from=builder /app/src/lib ./src/lib
 COPY --from=builder /app/scripts ./scripts
 # tsx (devDep) executes db-seed.mts directly without a build step; tsconfig
 # is needed so the TypeScript transformer respects path aliases / target.
