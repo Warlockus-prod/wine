@@ -93,6 +93,32 @@ saturated pie). No selection frame on click (`globals.css` focus rules).
 - Wrapped question headings use `.pitch-display--roomy` (line-height 1.3);
   the display class's 1.04 leading overlaps at text-xl on mobile.
 
+## Where the geometry lives (and what guards it)
+
+The pure maths — `SPOKES`, `BASE_AXES`, `labelArc`, `axisIdForSpoke`,
+`RING_SPRITES`, `spriteRing` — is in **`src/lib/compass-geometry.ts`**, which
+imports nothing from React/next and touches no DOM. `TasteCompass.tsx` only
+renders it.
+
+That split exists so the canon can be unit-tested:
+**`src/lib/__tests__/compass-geometry.test.ts`** runs inside `npm run check`
+(the gate is lint → **vitest** → build → e2e) and locks sector order, the
+axes-on-sector-boundaries rule, the absence of the −π/2 offset, the
+base-taste→spoke routing, the bottom-arc label flip, and — the regression the
+2026-07-18 audit caught — that **every sprite sits inside its own 30° slice**
+(straying only into a slice left empty in that row by the donation rule). It
+also ties the card's sprite-count map in `sense-images.ts` to `RING_SPRITES`
+and to the files on disk, so the two hand-written manifests cannot drift.
+
+Both historical bugs were replayed as mutations to confirm the tests fail on
+them: re-adding `- Math.PI / 2` to the spoke angle reddens 2 tests, and
+removing the slice clamp from the relaxation loop reddens the slice test with
+`tegie-suszone-4 landed on slice 2, owns 1`.
+
+What the tests do NOT cover: **margins**. Radii, font sizes and tile sizes are
+tuned by eye and can collide without violating any invariant above — screenshot
+after any such change.
+
 ## Canonical-correctness checklist (verified 2026-07-18 vs the poster)
 
 - Sector order clockwise from 12: Tęgie → Miękkie → Oleiste → Świeże →
