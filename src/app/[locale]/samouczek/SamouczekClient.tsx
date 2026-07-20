@@ -15,6 +15,7 @@ import {
   type CompassLang,
 } from "@/data/wine-compass-kb";
 import { buildSuggestions, type ViewSection } from "@/lib/chat-suggestions";
+import { HELLO_SAMOUCZEK_PL, HELLO_SAMOUCZEK_EN } from "@/components/winocompas/TasteChat";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
 // 2-stage flow lives in this client component; load lazily - keeps the
@@ -420,6 +421,7 @@ export default function SamouczekClient() {
         profile={profile}
         disabled={chatDisabled}
         suggestions={suggestions}
+        greeting={pickL(lang, HELLO_SAMOUCZEK_PL, HELLO_SAMOUCZEK_EN)}
         pageContext={[
           `strona: samouczek Vinokompasu, etap ${stage} z 3 (${
             stage === 1 ? "SMAK - 3 osie smaku" : stage === 2 ? "WRAŻENIA - 6 sektorów" : "AROMATY - 12 tendencji"

@@ -19,7 +19,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
-import type { CompassLang } from "@/data/wine-compass-kb";
+import { pickL, type CompassLang } from "@/data/wine-compass-kb";
+import { HELLO_SAMOUCZEK_PL, HELLO_SAMOUCZEK_EN } from "@/components/winocompas/TasteChat";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
 const StagedTutorial = dynamic(() => import("@/components/winocompas/StagedTutorial"), {
@@ -132,7 +133,11 @@ export default function EmbedSamouczekPage() {
         onChatDisabledChange={setChatDisabled}
         lang={lang}
       />
-      <FloatingTasteChat profile={profile} disabled={chatDisabled} />
+      <FloatingTasteChat
+        profile={profile}
+        disabled={chatDisabled}
+        greeting={pickL(lang, HELLO_SAMOUCZEK_PL, HELLO_SAMOUCZEK_EN)}
+      />
     </div>
   );
 }

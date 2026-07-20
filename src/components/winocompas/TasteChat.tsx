@@ -40,11 +40,30 @@ const SUGGESTIONS_EN = [
   "What does my compass combination mean?",
 ];
 
+/**
+ * Opening line, per surface (client 2026-07-18: "в pairing предлагает помочь
+ * с едой и вином, в samouczek — про Vinokompas и обучение"). The old single
+ * greeting mentioned BOTH a menu and the wheel, so on either page half of it
+ * was noise. Pages pass their own via the `greeting` prop; these are the
+ * defaults/fallbacks.
+ */
 const HELLO_PL =
-  "Cześć! Pomogę dobrać wino. Zrób tak: 1) kliknij danie z menu albo ustaw smak na kompasie, 2) a ja od razu pokażę dopasowane wino i wyjaśnię dlaczego. Nie wiesz od czego zacząć? Kliknij gotowe pytanie poniżej.";
+  "Cześć! Pomogę dobrać wino. Kliknij danie z karty albo ustaw smak na kole, a pokażę dopasowaną butelkę i wyjaśnię dlaczego. Nie wiesz od czego zacząć? Kliknij gotowe pytanie poniżej.";
 
 const HELLO_EN =
-  "Hi! I'll help you pick a wine. Here's how: 1) tap a dish from the menu or set a taste on the compass, 2) and I'll instantly show a matched wine and explain why. Not sure where to start? Tap a ready-made question below.";
+  "Hi! I'll help you pick a wine. Tap a dish from the menu or set a taste on the wheel, and I'll show a matched bottle and explain why. Not sure where to start? Tap a ready-made question below.";
+
+/** /samouczek — teaching the method, not selling a bottle. */
+export const HELLO_SAMOUCZEK_PL =
+  "Cześć! Jestem Twoim przewodnikiem po Vinokompasie. Przeprowadzę Cię przez trzy etapy: smaki, wrażenia i aromaty. Zaznacz cokolwiek na kole, a wyjaśnię, co to wrażenie znaczy i w jakich winach je spotkasz. Możesz też kliknąć gotowe pytanie poniżej.";
+export const HELLO_SAMOUCZEK_EN =
+  "Hi! I'm your guide to the Vinocompas. I'll walk you through three stages: tastes, sensations and aromas. Set anything on the wheel and I'll explain what that sensation means and which wines carry it. You can also tap a ready-made question below.";
+
+/** /pairing — a dish is on the table, the job is the bottle next to it. */
+export const HELLO_PAIRING_PL =
+  "Cześć! Pomogę dobrać wino do dania. Kliknij pozycję z karty, a pokażę dopasowane wino i wyjaśnię, dlaczego pasuje. Możesz też zapytać o konkretną butelkę albo o to, co podać do całego stołu.";
+export const HELLO_PAIRING_EN =
+  "Hi! I'll help you match wine to a dish. Tap an item from the menu and I'll show the matched wine and explain why it works. You can also ask about a specific bottle, or what to serve for the whole table.";
 
 /** Inline emphasis: `**bold**` / `*italic*` → React nodes. The model answers
  *  in light markdown; we used to print the raw string, so replies showed
@@ -120,6 +139,10 @@ interface Props {
   /** Contextual chips built by the page (stage / last click / visible
    *  section). Falls back to the static KB list when empty. */
   suggestions?: string[];
+  /** Opening line for THIS surface (/samouczek teaches the method,
+   *  /pairing matches a dish). Used for a fresh conversation and for
+   *  "Wyczyść" — an existing history is never rewritten. */
+  greeting?: string;
 }
 
 export default function TasteChat({
@@ -131,8 +154,9 @@ export default function TasteChat({
   onPrefillConsumed,
   lang = "pl",
   suggestions: suggestionsProp,
+  greeting,
 }: Props) {
-  const hello = pickL(lang, HELLO_PL, HELLO_EN);
+  const hello = greeting ?? pickL(lang, HELLO_PL, HELLO_EN);
   // Contextual chips come from the page (it knows the stage / last click /
   // visible section); the static KB list is the fallback for callers that
   // don't supply any.

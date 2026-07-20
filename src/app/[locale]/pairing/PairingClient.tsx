@@ -16,6 +16,7 @@ const FloatingTasteChat = dynamic(() => import("@/components/winocompas/Floating
   ssr: false,
 });
 import { METHOD_STEPS } from "@/data/wine-compass-kb";
+import { HELLO_PAIRING_PL, HELLO_PAIRING_EN } from "@/components/winocompas/TasteChat";
 import { trackEvent } from "@/lib/analytics";
 import { GENERIC_BLUR_DATA_URL } from "@/lib/image-helpers";
 import { t, localizeDecant } from "@/lib/localized";
@@ -1480,6 +1481,7 @@ export default function PairingClient({
           history follows the user. */}
       <FloatingTasteChat
         defaultCollapsed
+        greeting={locale === "pl" ? HELLO_PAIRING_PL : HELLO_PAIRING_EN}
         // While the sticky result bar owns the bottom-right corner on phones,
         // the chat FAB steps aside (it was half-sunk into the bar, and its
         // clearance padding starved the bar's wine name to 0px at 320).
