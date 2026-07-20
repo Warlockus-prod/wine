@@ -694,6 +694,14 @@ body {
   letter-spacing: -0.01em;
   line-height: 1.04;
 }
+/* Small multi-line question headings (samouczek stages, proposal panel):
+   the 1.04 display leading is tuned for LARGE hero lines — at text-xl/2xl a
+   wrapped two-liner overlaps its own descenders on mobile (client
+   2026-07-18). Authored here because .pitch-display is unlayered and would
+   out-rank a Tailwind leading-* utility. */
+.pitch-display--roomy {
+  line-height: 1.3;
+}
 .pitch-display em {
   font-style: italic;
   color: var(--color-accent-gold);

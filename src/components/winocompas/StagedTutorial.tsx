@@ -119,7 +119,7 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
           <p className="pitch-eyebrow pitch-eyebrow--start">
             {pickL(lang, "Twoje propozycje", "Your suggestions")}
           </p>
-          <h3 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
+          <h3 className="pitch-display pitch-display--roomy mt-2 text-xl text-white sm:text-2xl">
             {enough
               ? pickL(lang, "Wina dopasowane do Twojego smaku", "Wines matched to your taste")
               : filled === 0
@@ -621,7 +621,7 @@ function StageSmak({
         <p className="pitch-eyebrow pitch-eyebrow--start">
           {pickL(lang, "Etap I · Smak", "Stage I · Taste")}
         </p>
-        <h2 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
+        <h2 className="pitch-display pitch-display--roomy mt-2 text-xl text-white sm:text-2xl">
           {pickL(
             lang,
             "Jak odbierasz smak wina, które lubisz?",
@@ -687,7 +687,7 @@ function StageWrazenia({
         </p>
         {/* Client round-3 copy, verbatim ("etap 2 uczy rozpoznawania
             charakteru wina", not terminology). */}
-        <h2 className="pitch-display mt-2 text-xl text-white sm:text-2xl">
+        <h2 className="pitch-display pitch-display--roomy mt-2 text-xl text-white sm:text-2xl">
           {pickL(
             lang,
             "Jaki charakter ma wino, które lubisz?",
@@ -845,7 +845,7 @@ function StageAromaty({
         <p className="pitch-eyebrow pitch-eyebrow--start">
           {pickL(lang, "Etap III · Aromaty", "Stage III · Aromas")}
         </p>
-        <h2 className="pitch-display mt-3 text-2xl text-white sm:text-3xl">
+        <h2 className="pitch-display pitch-display--roomy mt-3 text-2xl text-white sm:text-3xl">
           {pickL(lang, "Dwanaście aromatów", "Twelve aromas")}
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
