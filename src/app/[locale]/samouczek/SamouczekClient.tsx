@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
 import MobileTabBar from "@/components/v2/MobileTabBar";
@@ -9,6 +9,8 @@ import { Link } from "@/i18n/navigation";
 import {
   METHOD_STEPS,
   FAQ_ITEMS,
+  BASE_TASTES,
+  COMPASS_SECTORS,
   pickL,
   type CompassLang,
 } from "@/data/wine-compass-kb";
@@ -31,6 +33,32 @@ const FloatingTasteChat = dynamic(() => import("@/components/winocompas/Floating
 const PROFILE_STORAGE_KEY = "wn_compass_profile_v1";
 const CHAT_DISABLED_KEY = "wn_chat_disabled_v1";
 
+/** Human label for a profile key ("base.slodycz" | "swieze.cytrusy") so the
+ *  chat context reads like a sentence instead of an id. */
+function labelForKey(key: string, lang: CompassLang): string | null {
+  if (key.startsWith("base.")) {
+    const b = BASE_TASTES.find((x) => x.id === key.slice(5));
+    return b ? pickL(lang, b.name_pl, b.name_en) : null;
+  }
+  for (const s of COMPASS_SECTORS) {
+    const t = s.tendencje.find((x) => x.id === key);
+    if (t) {
+      return `${pickL(lang, t.name_pl, t.name_en)} (${pickL(lang, s.name_pl, s.name_en)})`;
+    }
+  }
+  return null;
+}
+
+/** Top-3 strongest picks, strongest first — what the bot should reason about. */
+function topPicks(profile: CompassProfile, lang: CompassLang): string {
+  return Object.entries(profile)
+    .filter(([, v]) => Number(v) > 0)
+    .sort((a, b) => Number(b[1]) - Number(a[1]))
+    .slice(0, 3)
+    .map(([k, v]) => `${labelForKey(k, lang) ?? k} ${v}/5`)
+    .join(", ");
+}
+
 export default function SamouczekClient() {
   // PL is the authoring locale; every other locale renders the parallel EN
   // strings (KB `_en` fields + pickL) - the PL surface stays byte-identical.
@@ -38,6 +66,21 @@ export default function SamouczekClient() {
   const [profile, setProfile] = useState<CompassProfile>({});
   const [chatDisabled, setChatDisabled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  // Chat awareness: which stage is open + which segment the user touched last.
+  // The last pick is DERIVED by diffing the profile (no callback threading
+  // through StagedTutorial → stage → compass), so every path that changes a
+  // value — click, keyboard, tour — feeds the bot the same way.
+  const [stage, setStage] = useState<1 | 2 | 3>(1);
+  const [lastPick, setLastPick] = useState<{ key: string; value: number } | null>(null);
+  const prevProfileRef = useRef<CompassProfile>({});
+  useEffect(() => {
+    const prev = prevProfileRef.current;
+    const changed = Object.keys({ ...prev, ...profile }).find(
+      (k) => (prev[k] ?? 0) !== (profile[k] ?? 0),
+    );
+    if (changed) setLastPick({ key: changed, value: Number(profile[changed] ?? 0) });
+    prevProfileRef.current = profile;
+  }, [profile]);
 
   // Hydrate persisted state in useEffect (NOT lazy useState) so SSR and
   // first-client-render produce identical HTML - hydration-mismatch-free.
@@ -148,6 +191,7 @@ export default function SamouczekClient() {
             chatDisabled={chatDisabled}
             onChatDisabledChange={setChatDisabled}
             lang={lang}
+            onStageChange={setStage}
           />
         </section>
 
@@ -299,11 +343,20 @@ export default function SamouczekClient() {
       <FloatingTasteChat
         profile={profile}
         disabled={chatDisabled}
-        pageContext={
+        pageContext={[
+          `strona: samouczek Vinokompasu, etap ${stage} z 3 (${
+            stage === 1 ? "SMAK - 3 osie smaku" : stage === 2 ? "WRAŻENIA - 6 sektorów" : "AROMATY - 12 tendencji"
+          })`,
+          lastPick
+            ? `ostatnio kliknięte: ${labelForKey(lastPick.key, lang) ?? lastPick.key} = ${lastPick.value}/5`
+            : "użytkownik jeszcze nic nie zaznaczył na kole",
+          topPicks(profile, lang) ? `najmocniejsze wybory: ${topPicks(profile, lang)}` : "",
           lang === "en"
             ? "anglojęzyczna wersja samouczka - użytkownik korzysta z interfejsu po angielsku, odpowiadaj po angielsku"
-            : undefined
-        }
+            : "",
+        ]
+          .filter(Boolean)
+          .join("; ")}
       />
     </div>
   );

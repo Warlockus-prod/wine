@@ -45,6 +45,54 @@ const HELLO_PL =
 const HELLO_EN =
   "Hi! I'll help you pick a wine. Here's how: 1) tap a dish from the menu or set a taste on the compass, 2) and I'll instantly show a matched wine and explain why. Not sure where to start? Tap a ready-made question below.";
 
+/** Inline emphasis: `**bold**` / `*italic*` → React nodes. The model answers
+ *  in light markdown; we used to print the raw string, so replies showed
+ *  literal asterisks ("wrażeniem **szorstkie**", client 2026-07-18). Built as
+ *  nodes, never dangerouslySetInnerHTML — the reply is model output. */
+function renderInline(s: string, keyBase: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  const re = /\*\*([^*]+)\*\*|\*([^*\n]+)\*/g;
+  let last = 0;
+  let k = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(s)) !== null) {
+    if (m.index > last) out.push(s.slice(last, m.index));
+    if (m[1] !== undefined) out.push(<strong key={`${keyBase}-b${k++}`}>{m[1]}</strong>);
+    else out.push(<em key={`${keyBase}-i${k++}`}>{m[2]}</em>);
+    last = m.index + m[0].length;
+  }
+  if (last < s.length) out.push(s.slice(last));
+  return out;
+}
+
+/** Block layer: keeps the model's line breaks and turns "- x" / "1. x" rows
+ *  into hanging-indent lines so multi-step answers stay readable in a bubble. */
+function renderReply(text: string): React.ReactNode {
+  return text.split(/\r?\n/).map((raw, i) => {
+    const key = `l${i}`;
+    if (!raw.trim()) return <span key={key} className="block h-2" />;
+    const bullet = raw.match(/^\s*[-•]\s+(.*)$/);
+    const numbered = raw.match(/^\s*(\d+[.)])\s+(.*)$/);
+    if (bullet || numbered) {
+      const marker = bullet ? "·" : numbered![1];
+      const body = bullet ? bullet[1] : numbered![2];
+      return (
+        <span key={key} className="mt-0.5 flex gap-1.5">
+          <span aria-hidden className="shrink-0 opacity-70">
+            {marker}
+          </span>
+          <span>{renderInline(body, key)}</span>
+        </span>
+      );
+    }
+    return (
+      <span key={key} className="block">
+        {renderInline(raw, key)}
+      </span>
+    );
+  });
+}
+
 interface Props {
   profile?: CompassProfile;
   /** Stable storage key so we keep the conversation across reloads. */
@@ -267,7 +315,7 @@ export default function TasteChat({
                     : "rounded-bl-sm border border-primary/22 bg-primary/10 text-gray-100"
                 } ${m.pending ? "animate-pulse opacity-70" : ""}`}
               >
-                {m.content}
+                {isUser ? m.content : renderReply(m.content)}
               </div>
             </div>
           );
@@ -316,7 +364,10 @@ export default function TasteChat({
           }}
           rows={1}
           maxLength={800}
-          placeholder={pickL(lang, "Zapytaj o smaki, wrażenia, wino…", "Ask about tastes, sensations, wine…")}
+          // Short enough to stay on ONE line next to the Send button at
+          // 320-390px — the old 3-noun placeholder wrapped and its second
+          // line was clipped by the 1-row box (client 2026-07-18).
+          placeholder={pickL(lang, "Zapytaj o smaki i wino…", "Ask about tastes and wine…")}
           className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-white/10 bg-[#122446] px-3 py-2.5 text-sm text-gray-100 outline-none placeholder:text-gray-500 focus:border-[var(--color-accent-gold)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-accent-gold)]"
           aria-label={pickL(lang, "Twoje pytanie", "Your question")}
         />

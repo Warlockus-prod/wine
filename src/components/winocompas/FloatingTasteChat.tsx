@@ -223,7 +223,12 @@ export default function FloatingTasteChat({
                   <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
-              <div className="flex flex-1">
+              {/* min-h-0 is load-bearing: without it this flex child refuses
+                  to shrink below its content, TasteChat's internal
+                  `flex-1 overflow-y-auto` never scrolls, and the composer +
+                  the tail of the last reply get clipped by the parent's
+                  overflow-hidden (client 2026-07-18: "невозможно общаться"). */}
+              <div className="flex min-h-0 flex-1">
                 <TasteChat
                   profile={profile}
                   storageKey={storageKey}

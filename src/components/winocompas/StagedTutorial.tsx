@@ -63,6 +63,10 @@ interface Props {
   /** UI language - "pl" default keeps existing call-sites (and the PL e2e
    *  surface) byte-identical; the EN /samouczek + /embed pass "en". */
   lang?: CompassLang;
+  /** Reports the active stage upward so the page can tell the chat bot where
+   *  the user actually is (client 2026-07-18: "чат должен понимать на какой
+   *  ты странице"). Stage state stays owned here. */
+  onStageChange?: (stage: 1 | 2 | 3) => void;
 }
 
 // dryness algorithm lives in @/lib/dryness (extracted for unit tests).
@@ -389,8 +393,15 @@ export default function StagedTutorial({
   chatDisabled,
   onChatDisabledChange,
   lang = "pl",
+  onStageChange,
 }: Props) {
   const [stage, setStage] = useState<Stage>(1);
+  useEffect(() => {
+    onStageChange?.(stage);
+    // onStageChange is a stable page-level setter; excluding it keeps this
+    // from re-firing on every parent render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
   // Persist current stage in sessionStorage so a refresh while filling
   // stage 2 doesn't snap the user back to stage 1.
