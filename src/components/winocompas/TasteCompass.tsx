@@ -169,47 +169,63 @@ const RING_SPRITES: { f: string; t: string; a: number }[] = [
  *  common height is solved so the sprites cover ~86% of the circumference,
  *  and a single global rotation aligns each tendencja's centroid with its
  *  30° slice so the garland still reads directionally. Deterministic. */
-function spriteRing(ringR: number): { f: string; t: string; theta: number; w: number; h: number }[] {
-  const C = 2 * Math.PI * ringR;
-  // EQUAL-AREA normalisation: equal heights made narrow sprites (wheat,
-  // lavender) invisible slivers and multi-object chunks tiny. √A sizing
-  // gives every sprite the same visual mass; heights vary organically like
-  // the reference poster. s0 = √area, solved so widths cover ~86% of C.
-  const sqrtSum = RING_SPRITES.reduce((s, x) => s + Math.sqrt(Math.min(x.a, 2.3)), 0);
-  const s0 = (0.86 * C) / sqrtSum;
-  const hCap = 1.45 * s0;
-  const items = RING_SPRITES.map((x) => {
-    const aCap = Math.min(x.a, 2.3);
-    let w = s0 * Math.sqrt(aCap);
-    let h = w / x.a; // true aspect: capped-wide strips get shorter, narrow ones taller
-    if (h > hCap) {
-      const f = hCap / h;
-      w *= f;
-      h = hCap;
-    }
-    return { f: x.f, t: x.t, w, h };
-  });
-  const totalW = items.reduce((s, x) => s + x.w, 0);
-  const gap = (C - totalW) / items.length;
-  let acc = 0;
-  const pos = items.map((x) => {
-    const c = acc + x.w / 2;
-    acc += x.w + gap;
-    return c;
-  });
-  // one global rotation: average signed offset of every sprite from its
-  // tendencja slice centre (linear mean is fine — offsets are small)
+function spriteRing(r1: number, r2: number): { f: string; t: string; theta: number; r: number; w: number; h: number }[] {
+  // TWO staggered rows (client 2026-07-18 "в два уровня чтобы крупнее и
+  // больше влезло, как на оригинале"): alternate sprites inner/outer, which
+  // halves each row's arc demand → sprites nearly double in size and the
+  // band reads as the reference poster's dense object field. EQUAL-AREA √A
+  // sizing keeps every sprite at the same visual mass; per-row uniform gaps
+  // + per-row global rotation keep each tendencja's objects over its slice.
+  const rows: { idx: number[]; r: number }[] = [
+    { idx: RING_SPRITES.map((_, i) => i).filter((i) => i % 2 === 0), r: r1 },
+    { idx: RING_SPRITES.map((_, i) => i).filter((i) => i % 2 === 1), r: r2 },
+  ];
+  // one common sprite scale = the tighter row's budget (uniform look)
+  const s0 = Math.min(
+    ...rows.map((row) => {
+      const sqrtSum = row.idx.reduce((s, i) => s + Math.sqrt(Math.min(RING_SPRITES[i].a, 2.3)), 0);
+      return (0.84 * 2 * Math.PI * row.r) / sqrtSum;
+    }),
+  );
+  const hCap = 0.98 * s0;
   const centreOf: Record<string, number> = {};
   for (const s of SPOKES) centreOf[s.tendencja.id.replace(/\./g, "-")] = s.angle;
-  let off = 0;
-  for (let i = 0; i < items.length; i++) {
-    let d = centreOf[items[i].t] - pos[i] / ringR;
-    while (d > Math.PI) d -= 2 * Math.PI;
-    while (d < -Math.PI) d += 2 * Math.PI;
-    off += d;
+  const out: { f: string; t: string; theta: number; r: number; w: number; h: number }[] = [];
+  for (const row of rows) {
+    const C = 2 * Math.PI * row.r;
+    const items = row.idx.map((i) => {
+      const x = RING_SPRITES[i];
+      const aCap = Math.min(x.a, 2.3);
+      let w = s0 * Math.sqrt(aCap);
+      let h = w / x.a; // true aspect: capped-wide strips get shorter, narrow ones taller
+      if (h > hCap) {
+        const f = hCap / h;
+        w *= f;
+        h = hCap;
+      }
+      return { f: x.f, t: x.t, w, h };
+    });
+    const totalW = items.reduce((s, x) => s + x.w, 0);
+    const gap = (C - totalW) / items.length;
+    let acc = 0;
+    const pos = items.map((x) => {
+      const c = acc + x.w / 2;
+      acc += x.w + gap;
+      return c;
+    });
+    let off = 0;
+    for (let i = 0; i < items.length; i++) {
+      let d = centreOf[items[i].t] - pos[i] / row.r;
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+      off += d;
+    }
+    off /= items.length;
+    for (let i = 0; i < items.length; i++) {
+      out.push({ ...items[i], theta: pos[i] / row.r + off, r: row.r });
+    }
   }
-  off /= items.length;
-  return items.map((x, i) => ({ ...x, theta: pos[i] / ringR + off }));
+  return out;
 }
 
 // Colour count matches the SELECTABLE segment count per stage (client
@@ -962,6 +978,76 @@ const VIEW = 640;
           Vinocompas
         </text>
 
+        {/* Image ring - the client's "ramka wypełniona obrazkami wrażeń i
+            tendencji" (2026-07): one still-life photo per tendencja, orbiting
+            just outside the dial at the tendencja's centre angle. Decorative
+            (pointer-events none) so it never steals wedge clicks; images go
+            through /_next/image so 12 thumbs cost ~5KB each, not 300KB.
+            Each photo is framed as an inlaid medallion (parchment ring +
+            gold hairline + warm tint) and enters with a staggered fade+scale
+            via the .compass-medallion atom - keyed by level so re-entering
+            stage 2 retriggers the entrance. */}
+        {level >= 1 &&
+          (() => {
+            // Client 2026-07-18 (её референс-постер): the garland is a
+            // CONTINUOUS field of individual object sprites in TWO staggered
+            // rows — uniform gaps, no grouped tiles, bigger objects. Sprite
+            // order follows the sectors clockwise, and spriteRing()'s global
+            // rotation keeps each tendencja's objects over its slice.
+            const sprites = spriteRing(rOuter + 59, rOuter + 101);
+            const tendencjaOf: Record<string, (typeof SPOKES)[number]> = {};
+            for (const sp of SPOKES) tendencjaOf[sp.tendencja.id.replace(/\./g, "-")] = sp;
+            return sprites.map((sprite, i) => {
+              const s = tendencjaOf[sprite.t];
+              const tileW = sprite.w;
+              const tileH = sprite.h;
+              const ix = cx + sprite.r * Math.sin(sprite.theta);
+              const iy = cy - sprite.r * Math.cos(sprite.theta);
+            // q must stay 75 - Next 16 whitelists image qualities (default
+            // [75]) and any other value 400s ("q parameter not allowed").
+            const href = `/_next/image?url=${encodeURIComponent(`/senses/ring/${sprite.f}.png`)}&w=96&q=75`;
+            const interactive = Boolean(onMedallionSelect);
+            const pick = () => onMedallionSelect?.(s.tendencja.id);
+            return (
+              <g
+                key={`med-${i}-${level}`}
+                className="compass-medallion"
+                style={{ ["--mi" as string]: i, cursor: interactive ? "pointer" : undefined }}
+                pointerEvents={interactive ? "auto" : "none"}
+                aria-hidden={interactive ? undefined : true}
+                {...(interactive
+                  ? {
+                      role: "button",
+                      tabIndex: 0,
+                      "aria-label": `${pickL(lang, "Pokaż opis", "Show description")}: ${pickL(lang, s.tendencja.name_pl, s.tendencja.name_en)}`,
+                      onClick: pick,
+                      onKeyDown: (e: { key: string; preventDefault: () => void }) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          pick();
+                        }
+                      },
+                      onMouseEnter: () => onHoverChange?.(s.tendencja.id),
+                      onMouseLeave: () => onHoverChange?.(null),
+                    }
+                  : {})}
+              >
+                {/* Invisible hit-area - the cluster PNG is irregular, taps
+                    should work anywhere in its footprint. */}
+                <rect x={ix - tileW / 2} y={iy - tileH / 2} width={tileW} height={tileH} fill="transparent" />
+                <image
+                  href={href}
+                  x={ix - tileW / 2}
+                  y={iy - tileH / 2}
+                  width={tileW}
+                  height={tileH}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              </g>
+            );
+            });
+          })()}
+
         {/* Curved tendencja labels — OUTSIDE the rim on the cream ground,
             dark ink, exactly like the original poster (client 2026-07-18:
             "подписи идут поза кругом что бы было более читабельно"; they sat
@@ -1060,76 +1146,6 @@ const VIEW = 640;
             );
           })}
 
-        {/* Image ring - the client's "ramka wypełniona obrazkami wrażeń i
-            tendencji" (2026-07): one still-life photo per tendencja, orbiting
-            just outside the dial at the tendencja's centre angle. Decorative
-            (pointer-events none) so it never steals wedge clicks; images go
-            through /_next/image so 12 thumbs cost ~5KB each, not 300KB.
-            Each photo is framed as an inlaid medallion (parchment ring +
-            gold hairline + warm tint) and enters with a staggered fade+scale
-            via the .compass-medallion atom - keyed by level so re-entering
-            stage 2 retriggers the entrance. */}
-        {level >= 1 &&
-          (() => {
-            // Client 2026-07-18 (её референс-постер): the garland is a
-            // CONTINUOUS ring of individual object sprites with ONE uniform
-            // gap everywhere — no grouped tiles, no cluster holes. Sprite
-            // order follows the sectors clockwise, and spriteRing()'s global
-            // rotation keeps each tendencja's objects over its slice.
-            const ringR = rOuter + 62;
-            const sprites = spriteRing(ringR);
-            const tendencjaOf: Record<string, (typeof SPOKES)[number]> = {};
-            for (const sp of SPOKES) tendencjaOf[sp.tendencja.id.replace(/\./g, "-")] = sp;
-            return sprites.map((sprite, i) => {
-              const s = tendencjaOf[sprite.t];
-              const tileW = sprite.w;
-              const tileH = sprite.h;
-              const ix = cx + ringR * Math.sin(sprite.theta);
-              const iy = cy - ringR * Math.cos(sprite.theta);
-            // q must stay 75 - Next 16 whitelists image qualities (default
-            // [75]) and any other value 400s ("q parameter not allowed").
-            const href = `/_next/image?url=${encodeURIComponent(`/senses/ring/${sprite.f}.png`)}&w=96&q=75`;
-            const interactive = Boolean(onMedallionSelect);
-            const pick = () => onMedallionSelect?.(s.tendencja.id);
-            return (
-              <g
-                key={`med-${i}-${level}`}
-                className="compass-medallion"
-                style={{ ["--mi" as string]: i, cursor: interactive ? "pointer" : undefined }}
-                pointerEvents={interactive ? "auto" : "none"}
-                aria-hidden={interactive ? undefined : true}
-                {...(interactive
-                  ? {
-                      role: "button",
-                      tabIndex: 0,
-                      "aria-label": `${pickL(lang, "Pokaż opis", "Show description")}: ${pickL(lang, s.tendencja.name_pl, s.tendencja.name_en)}`,
-                      onClick: pick,
-                      onKeyDown: (e: { key: string; preventDefault: () => void }) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          pick();
-                        }
-                      },
-                      onMouseEnter: () => onHoverChange?.(s.tendencja.id),
-                      onMouseLeave: () => onHoverChange?.(null),
-                    }
-                  : {})}
-              >
-                {/* Invisible hit-area - the cluster PNG is irregular, taps
-                    should work anywhere in its footprint. */}
-                <rect x={ix - tileW / 2} y={iy - tileH / 2} width={tileW} height={tileH} fill="transparent" />
-                <image
-                  href={href}
-                  x={ix - tileW / 2}
-                  y={iy - tileH / 2}
-                  width={tileW}
-                  height={tileH}
-                  preserveAspectRatio="xMidYMid meet"
-                />
-              </g>
-            );
-            });
-          })()}
 
         {/* Sector noun labels - one per sector, mid-pie, between the 2
             tendencje. Level 3 ONLY: at level 2 the sektor names run curved
@@ -1199,7 +1215,7 @@ const VIEW = 640;
           // outside the lower arcs' radius but 1.5° clear of their angular
           // span (glyphs start at ~229.5°).
           const isLower = axis.id !== "cierpkosc";
-          const axisR = isLower ? rOuter + 103 : rOuter + 95;
+          const axisR = isLower ? rOuter + 141 : rOuter + 133;
           // Bright (level-1 size, full opacity) when base axes are the focus:
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
@@ -1207,13 +1223,12 @@ const VIEW = 640;
           const axisFontSize = labelBright ? 19 : 15;
           // Approximate glyph run (avg advance ≈ 0.62em + 0.16em tracking)
           // → half-arc that hugs the text without invading the tile corridor.
-          const axisHalfArc = (axisLabel(axis).length * axisFontSize * 0.36 + 8) / axisR;
+          // The value now rides INSIDE the curved caption ("KWASOWOŚĆ · 0/5"):
+          // the two-row garland claimed every radius a separate chip could
+          // occupy. +6 chars covers " · 0/5".
+          const axisRunLen = axisLabel(axis).length + (labelBright ? 6 : 0);
+          const axisHalfArc = (axisRunLen * axisFontSize * 0.36 + 8) / axisR;
           const axisArcId = `${baseId}-axisarc-${axis.id}`;
-          // Value chip stays straight ON the axis ray, just OUTSIDE its arc
-          // (hub-side would land on the sprite garland now).
-          const chipR = axisR + (isLower ? 22 : 26);
-          const chipX = cx + chipR * xUnit;
-          const chipY = cy + chipR * yUnit;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.55 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
@@ -1267,24 +1282,9 @@ const VIEW = 640;
               >
                 <textPath href={`#${axisArcId}`} startOffset="50%" textAnchor="middle">
                   {axisLabel(axis)}
+                  {labelBright ? ` · ${value}/${MAX_INTENSITY}` : ""}
                 </textPath>
               </text>
-              {labelBright ? (
-                <text
-                  x={chipX}
-                  y={chipY}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontFamily="ui-monospace, SFMono-Regular, monospace"
-                  fontSize={12.5}
-                  fontWeight={600}
-                  fill="var(--ink)"
-                  opacity={0.78}
-                  className="select-none"
-                >
-                  {value}/{MAX_INTENSITY}
-                </text>
-              ) : null}
             </g>
           );
         })}
