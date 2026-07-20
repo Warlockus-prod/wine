@@ -488,6 +488,43 @@ export default function StagedTutorial({
           <StageAromaty profile={profile} onProfileChange={onProfileChange} lang={lang} chatDisabled={chatDisabled} />
         )}
 
+        {/* Mobile app-style pinned quick-nav (client 2026-07-18: "Następny
+            etap" is below the fold while looking at the compass —
+            "зафиксировать кнопки как в приложении которые постоянно внизу").
+            sticky bottom: floats just ABOVE the fixed MobileTabBar
+            (--mobile-tabbar-h, z-70) while the card is in view, then settles
+            above the full strip at the card's end. Centred so it never
+            crowds the FloatingTasteChat launcher in the right corner;
+            pointer-events pass through the transparent wrapper. */}
+        <div className="pointer-events-none sticky bottom-[calc(var(--mobile-tabbar-h)+0.75rem)] z-30 mt-5 flex justify-center gap-2 lg:hidden">
+          {stage > 1 ? (
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label={pickL(lang, "Poprzedni etap", "Previous stage")}
+              className="pointer-events-auto min-h-[42px] rounded-full border border-white/25 bg-[#081634]/95 px-4 text-sm font-semibold text-[#e6e1d6] shadow-lg backdrop-blur-sm"
+            >
+              ←
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={
+              stage < 3
+                ? goNext
+                : () => document.getElementById("propozycje")?.scrollIntoView({ block: "start" })
+            }
+            className="pitch-cta-primary pointer-events-auto inline-flex min-h-[42px] items-center gap-2 rounded-full px-5! text-[11.5px] shadow-lg"
+          >
+            {stage < 3
+              ? pickL(lang, "Następny etap", "Next stage")
+              : pickL(lang, "Pokaż wina", "Show wines")}
+            <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
+              <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+
         <StageControls
           stage={stage}
           goPrev={goPrev}
