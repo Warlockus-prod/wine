@@ -1082,9 +1082,9 @@ const VIEW = 640;
             const radii =
               lines.length === 2
                 ? isBottom
-                  ? [rOuter + 8.5, rOuter + 20]
-                  : [rOuter + 20, rOuter + 8.5]
-                : [rOuter + 13];
+                  ? [rOuter + 8, rOuter + 21.5]
+                  : [rOuter + 21.5, rOuter + 8]
+                : [rOuter + 13.5];
             return (
               <g key={`lbl-${s.tendencja.id}`} pointerEvents="none">
                 {lines.map((ln, li) => {
@@ -1094,12 +1094,12 @@ const VIEW = 640;
                       <path id={arcId} d={labelArc(cx, cy, radii[li], s.angle, s.half * 0.98)} fill="none" />
                       <text
                         fontFamily="var(--font-display)"
-                        fontSize={10.5}
+                        fontSize={12}
                         fontWeight={600}
                         letterSpacing="0.02em"
                         fill="var(--ink)"
                         stroke="var(--compass-halo)"
-                        strokeWidth={2}
+                        strokeWidth={2.2}
                         strokeLinejoin="round"
                         paintOrder="stroke"
                         className="select-none"
@@ -1128,12 +1128,12 @@ const VIEW = 640;
                 <path id={arcId} d={labelArc(cx, cy, rOuter + 13, angleCenter, arc * 0.46)} fill="none" />
                 <text
                   fontFamily="var(--font-display)"
-                  fontSize={14}
+                  fontSize={16}
                   fontWeight={600}
                   letterSpacing="0.06em"
                   fill="var(--ink)"
                   stroke="var(--compass-halo)"
-                  strokeWidth={2.2}
+                  strokeWidth={2.4}
                   strokeLinejoin="round"
                   paintOrder="stroke"
                   className="select-none"
@@ -1166,7 +1166,7 @@ const VIEW = 640;
               dominantBaseline="middle"
               fontFamily="var(--font-serif)"
               fontStyle="italic"
-              fontSize={level === 2 ? 14 : 12}
+              fontSize={13}
               fontWeight={600}
               // White ink + dark halo: the pie beneath is now the vivid
               // official palette, spanning near-black navy to pure yellow —
