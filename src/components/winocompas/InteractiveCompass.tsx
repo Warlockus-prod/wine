@@ -720,7 +720,12 @@ function FocusedCard({
           }}
           aria-hidden
         />
-        <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: accent }}>
+        {/* The dot above carries the sector colour; the LABEL does not. Half
+            the palette fails as 11px text on the cream card — Oleiste
+            #f4c84a is 1.43:1, Świeże #9bc24a 1.85:1, Miękkie #e74c3c 3.43:1
+            against the 4.5:1 small text needs. Ink-soft is 7.64:1 and the
+            colour cue survives in the dot. */}
+        <p className="text-[11px] font-bold tracking-[0.22em] text-[color:var(--ink-soft)] uppercase">
           {isTour ? pickL(lang, "Przewodnik mówi…", "The guide says…") : eyebrow}
         </p>
         <span className="ml-auto text-[10px] font-semibold tracking-wider tabular-nums text-[color:var(--ink-muted)]">
