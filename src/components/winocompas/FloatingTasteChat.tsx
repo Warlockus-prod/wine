@@ -40,6 +40,8 @@ interface Props {
   disabled?: boolean;
   /** Page-aware hint passed through to <TasteChat> (and the API). */
   pageContext?: string;
+  /** Contextual chips from the page; forwarded to TasteChat. */
+  suggestions?: string[];
   /** Hide the launcher below md — used while a page-level bottom bar (e.g.
    *  the pairing result bar) owns that corner, so two fixed layers never
    *  stack (audit 2026-07 mobile pass). Desktop is unaffected. */
@@ -55,6 +57,7 @@ export default function FloatingTasteChat({
   defaultCollapsed = false,
   disabled = false,
   pageContext,
+  suggestions,
   mobileHidden = false,
 }: Props) {
   // Lazy state init reads localStorage exactly once on mount - no render
@@ -233,6 +236,7 @@ export default function FloatingTasteChat({
                   profile={profile}
                   storageKey={storageKey}
                   pageContext={pageContext}
+                  suggestions={suggestions}
                   headerInsetRight
                   prefill={pendingPrefill}
                   onPrefillConsumed={() => setPendingPrefill(null)}

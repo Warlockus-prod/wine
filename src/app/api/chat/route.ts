@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { buildChatSystemPrompt } from "@/data/wine-compass-kb";
 import { logEvent } from "@/lib/server-events";
+import { persistChatTurn } from "@/lib/chat-store";
 import { clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -199,6 +200,16 @@ export async function POST(request: Request) {
       anonymousId: isUuid(body.anonymousId) ? body.anonymousId : null,
       sessionId: body.sessionId ?? null,
     };
+    // Transcript (chat_sessions/chat_messages) — the events table only ever
+    // stored counts, so "what do guests actually ask?" was unanswerable.
+    // Fire-and-forget + soft-fail inside, exactly like logEvent.
+    void persistChatTurn({
+      anonymousId: ids.anonymousId,
+      userText: lastUser?.content ?? "",
+      assistantText: reply,
+      model,
+      tokens: completion.usage?.total_tokens ?? null,
+    });
     void Promise.all([
       logEvent({
         type: "chat_message_user",

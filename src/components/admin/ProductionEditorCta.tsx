@@ -17,12 +17,22 @@ export default function ProductionEditorCta() {
           danych. To jedyne miejsce, w którym zmiany są trwałe i widoczne dla gości.
         </p>
       </div>
-      <Link
-        href="/admin/restaurants"
-        className="pitch-cta-primary inline-flex shrink-0 items-center gap-2 rounded-full px-6 py-3 text-xs font-semibold tracking-wider uppercase"
-      >
-        Otwórz edytor restauracji &rarr;
-      </Link>
+      <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <Link
+          href="/admin/restaurants"
+          className="pitch-cta-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-semibold tracking-wider uppercase"
+        >
+          Otwórz edytor restauracji &rarr;
+        </Link>
+        {/* Transcripts of the guide bot — the "what do guests ask?" number
+            that sells the product to a restaurant. */}
+        <Link
+          href="/admin/chat"
+          className="pitch-cta-ghost inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-semibold tracking-wider uppercase"
+        >
+          Analityka czatu
+        </Link>
+      </div>
     </section>
   );
 }

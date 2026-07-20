@@ -14,6 +14,7 @@ import {
   pickL,
   type CompassLang,
 } from "@/data/wine-compass-kb";
+import { buildSuggestions, type ViewSection } from "@/lib/chat-suggestions";
 import type { CompassProfile } from "@/components/winocompas/TasteCompass";
 
 // 2-stage flow lives in this client component; load lazily - keeps the
@@ -81,6 +82,81 @@ export default function SamouczekClient() {
     if (changed) setLastPick({ key: changed, value: Number(profile[changed] ?? 0) });
     prevProfileRef.current = profile;
   }, [profile]);
+
+  // Which band of the page is on screen — the chat chips switch from compass
+  // questions to "why these wines?" once the proposals scroll into view.
+  // Coarse on purpose: per-element tracking would be noisy and is the least
+  // intentional signal a guest gives.
+  const [section, setSection] = useState<ViewSection>("wheel");
+  useEffect(() => {
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
+    const targets: { id: string; name: ViewSection }[] = [
+      { id: "kompas", name: "wheel" },
+      { id: "propozycje", name: "proposals" },
+    ];
+    let io: IntersectionObserver | null = null;
+    let tries = 0;
+    let timer: number | undefined;
+
+    const attach = () => {
+      const els = targets
+        .map((t) => ({ el: document.getElementById(t.id), name: t.name }))
+        .filter((x): x is { el: HTMLElement; name: ViewSection } => Boolean(x.el));
+      // Both anchors live inside <StagedTutorial>, which is next/dynamic with
+      // ssr:false — on mount they don't exist yet, so a one-shot attach
+      // silently observed nothing. Retry briefly until the lazy chunk lands.
+      if (els.length < targets.length && tries < 20) {
+        tries += 1;
+        timer = window.setTimeout(attach, 300);
+        if (els.length === 0) return;
+      }
+      if (els.length === 0) return;
+      io?.disconnect();
+      io = build(els);
+    };
+
+    function build(els: { el: HTMLElement; name: ViewSection }[]) {
+      // Ratios are kept ACROSS callbacks: the observer only reports targets
+      // whose intersection changed, so picking the max within one batch let a
+      // later single-entry batch (wheel still 0.45 visible) flip the section
+      // back off the proposals. Compare every target every time.
+      const ratios = new Map<HTMLElement, number>(els.map((x) => [x.el, 0]));
+      const obs = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) ratios.set(e.target as HTMLElement, e.intersectionRatio);
+          let bestEl: HTMLElement | null = null;
+          let bestRatio = 0.25; // ignore anything barely peeking in
+          for (const [el, r] of ratios) {
+            if (r > bestRatio) {
+              bestRatio = r;
+              bestEl = el;
+            }
+          }
+          if (!bestEl) return;
+          const hit = els.find((x) => x.el === bestEl);
+          if (hit) setSection(hit.name);
+        },
+        { threshold: [0.25, 0.5, 0.75, 1] },
+      );
+      els.forEach((x) => obs.observe(x.el));
+      return obs;
+    }
+
+    attach();
+    return () => {
+      if (timer) window.clearTimeout(timer);
+      io?.disconnect();
+    };
+  }, []);
+
+  const suggestions = buildSuggestions({
+    lang,
+    stage,
+    lastPickKey: lastPick?.key ?? null,
+    lastPickValue: lastPick?.value ?? null,
+    section,
+    hasProfile: Object.values(profile).some((v) => Number(v) > 0),
+  });
 
   // Hydrate persisted state in useEffect (NOT lazy useState) so SSR and
   // first-client-render produce identical HTML - hydration-mismatch-free.
@@ -343,6 +419,7 @@ export default function SamouczekClient() {
       <FloatingTasteChat
         profile={profile}
         disabled={chatDisabled}
+        suggestions={suggestions}
         pageContext={[
           `strona: samouczek Vinokompasu, etap ${stage} z 3 (${
             stage === 1 ? "SMAK - 3 osie smaku" : stage === 2 ? "WRAŻENIA - 6 sektorów" : "AROMATY - 12 tendencji"

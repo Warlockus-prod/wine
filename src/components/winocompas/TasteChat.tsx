@@ -15,6 +15,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { pickL, type CompassLang } from "@/data/wine-compass-kb";
+import { getAnonymousId } from "@/lib/analytics";
 import type { CompassProfile } from "./TasteCompass";
 
 interface ChatMessage {
@@ -116,6 +117,9 @@ interface Props {
    *  the surrounding chrome (greeting, chips, buttons, placeholders, aria)
    *  match. Defaults to "pl" so existing PL call-sites are unchanged. */
   lang?: CompassLang;
+  /** Contextual chips built by the page (stage / last click / visible
+   *  section). Falls back to the static KB list when empty. */
+  suggestions?: string[];
 }
 
 export default function TasteChat({
@@ -126,9 +130,18 @@ export default function TasteChat({
   prefill = null,
   onPrefillConsumed,
   lang = "pl",
+  suggestions: suggestionsProp,
 }: Props) {
   const hello = pickL(lang, HELLO_PL, HELLO_EN);
-  const suggestions = lang === "pl" ? SUGGESTIONS_PL : SUGGESTIONS_EN;
+  // Contextual chips come from the page (it knows the stage / last click /
+  // visible section); the static KB list is the fallback for callers that
+  // don't supply any.
+  const suggestions =
+    suggestionsProp && suggestionsProp.length > 0
+      ? suggestionsProp
+      : lang === "pl"
+        ? SUGGESTIONS_PL
+        : SUGGESTIONS_EN;
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: hello },
   ]);
@@ -220,6 +233,9 @@ export default function TasteChat({
           // Page context flows to /api/chat as a system-prompt suffix so
           // the bot knows what the user is looking at right now.
           pageContext,
+          // Same per-browser id the analytics queue uses, so the server can
+          // group a guest's questions into one stored conversation.
+          anonymousId: getAnonymousId(),
         }),
       });
       const data = (await res.json()) as { reply?: string; error?: string };
@@ -322,11 +338,18 @@ export default function TasteChat({
         })}
       </div>
 
-      {/* Suggestion chips */}
-      {messages.length <= 2 ? (
+      {/* Suggestion chips — contextual and ALWAYS present (they used to
+          vanish after the second message, exactly when the guest starts
+          needing prompts). The label softens once the conversation is
+          running so the row doesn't keep shouting "Try asking". Chips only
+          ever fire on tap: auto-sending on hover/scroll would mean invisible
+          paid OpenAI calls (audit HIGH). */}
+      {suggestions.length > 0 ? (
         <div className="border-t border-white/8 px-3 py-3">
           <p className="mb-2 text-[10px] font-semibold tracking-[0.22em] text-gray-400 uppercase">
-            {pickL(lang, "Spróbuj zapytać", "Try asking")}
+            {messages.length <= 2
+              ? pickL(lang, "Spróbuj zapytać", "Try asking")
+              : pickL(lang, "Zapytaj dalej", "Ask next")}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {suggestions.map((s) => (

@@ -53,6 +53,12 @@ interface ServerEvent {
 const queue: ServerEvent[] = [];
 let flushTimer: number | null = null;
 
+/** Stable per-browser UUID, shared by the event queue AND the chat route so
+ *  a guest's questions group into one conversation server-side. */
+export function getAnonymousId(): string | undefined {
+  return anonymousId();
+}
+
 function anonymousId(): string | undefined {
   try {
     let v = window.localStorage.getItem(ANON_KEY);
