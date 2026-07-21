@@ -1084,7 +1084,7 @@ const VIEW = 640;
           // either at level 1, or in the merged stage where baseInteractive
           // makes them tappable.
           const labelBright = level === 1 || baseInteractive;
-          const axisFontSize = labelBright ? 19 : 15;
+          const axisFontSize = labelBright ? 21 : 16;
           // Approximate glyph run (avg advance ≈ 0.62em + 0.16em tracking)
           // → half-arc that hugs the text without invading the tile corridor.
           // The value now rides INSIDE the curved caption ("KWASOWOŚĆ · 0/5"):
