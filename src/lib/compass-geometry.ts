@@ -167,7 +167,10 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
   const s0 = Math.min(
     ...rows.map((row) => {
       const sqrtSum = row.idx.reduce((s, i) => s + Math.sqrt(Math.min(RING_SPRITES[i].a, 2.3)), 0);
-      return (0.84 * 2 * Math.PI * row.r) / sqrtSum;
+      // Row coverage: fraction of the ring circumference the sprites fill.
+      // Lowered 0.84 → 0.76 (client 2026-07-21 "еще немного") for a uniform
+      // ~10% of extra air around every sprite, no per-sprite hand-tuning.
+      return (0.76 * 2 * Math.PI * row.r) / sqrtSum;
     }),
   );
   // Radial cap: a sprite may never be taller than the gap between the two
