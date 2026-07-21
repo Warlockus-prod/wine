@@ -436,7 +436,7 @@ export const BASE_TASTES: BaseTasteInfo[] = [
     name_pl: "Cierpkość",
     name_en: "Astringency",
     description_pl:
-      "Cierpkość to uczucie delikatnego ściągania i suchości w ustach. Im jest wyższa, tym wino wydaje się bardziej wyraziste, zdecydowane i wytrawne. W połączeniu ze słodyczą i kwasowością buduje profil smakowy wina - to wzajemne proporcje tych trzech smaków decydują o jego charakterze.",
+      "Cierpkość to uczucie delikatnego ściągania i suchości w ustach. Im jest wyższa, tym wino wydaje się bardziej wyraziste, zdecydowane i wytrawne. W połączeniu ze słodyczą i kwasowością buduje profil smakowy wina. To wzajemne proporcje tych trzech smaków decydują o jego charakterze.",
     description_en:
       "Astringency is the feeling of gentle pucker and dryness in the mouth. The higher it is, the more expressive, assertive and dry the wine seems. Together with sweetness and acidity it builds the wine's taste profile - it is the mutual proportions of these three tastes that decide its character.",
   },

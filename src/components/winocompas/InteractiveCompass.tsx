@@ -399,7 +399,7 @@ export default function InteractiveCompass({
                   )
                 : pickL(
                     lang,
-                    "Każdą tendencję ustawiasz od 1 (ledwo wyczuwalna) do 5 (dominująca) - kliknij koło, aby wybrać siłę.",
+                    "Kliknij wybraną tendencję i określ jej siłę w skali od 1 (ledwo wyczuwalna) do 5 (dominująca).",
                     "You set each tendency from 1 (barely perceptible) to 5 (dominant) — tap the wheel to choose the strength.",
                   )}
           </p>
