@@ -52,6 +52,11 @@ export interface Tendencja {
   examples_en: string;
   found_in_pl: string; // "wina czerwone" | "wina białe" | etc
   found_in_en: string;
+  /** Pełny opis tendencji - the client's immersive scene text (doc
+   *  "vinocompas system", 2026-07-21). Shown in the guide card's
+   *  "Pełny opis tendencji" collapsible. */
+  description_pl: string;
+  description_en: string;
 }
 
 export interface CompassSector {
@@ -92,8 +97,8 @@ export const COMPASS_SECTORS: CompassSector[] = [
     tendencje: [
       {
         id: "tegie.cigaro",
-        name_pl: "Czekolada, kawa, tytoń",
-        name_en: "Chocolate, coffee, tobacco",
+        name_pl: "Kawa i czekolada",
+        name_en: "Coffee & chocolate",
         shortLabel_pl: "Kawa i czekolada",
         shortLabel_en: "Coffee & chocolate",
         associations_pl: "czekolada, kawa, tytoń, słodkie cygaro",
@@ -104,6 +109,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "A weighty tendency that calls to mind a gentlemen's club, a golf clubhouse, an old-fashioned sweet shop or a cigar store. Usually found in red wines.",
         found_in_pl: "wina czerwone (głównie)",
         found_in_en: "red wines (mostly)",
+        description_pl:
+          "To grupa skojarzeń wrażenia Tęgości, która zabiera Cię do eleganckiego klubu dżentelmena. Siadasz w głębokim, skórzanym fotelu. W dłoni trzymasz filiżankę świeżo zaparzonego espresso, obok leży kostka gorzkiej czekolady, a w powietrzu unosi się delikatny aromat cygara i starego drewna. Wszystko jest spokojne, ciężkie, dostojne i pełne klasy. Właśnie taki klimat najlepiej oddaje ten kierunek Tęgości.",
+        description_en:
+          "A group of associations of the Boldness sensation that takes you to an elegant gentlemen's club. You sink into a deep leather armchair. In your hand a cup of freshly brewed espresso; beside it a square of dark chocolate, and the air carries a faint aroma of cigar and old wood. Everything is calm, heavy, dignified and full of class. That is the climate this direction of Boldness captures best.",
       },
       {
         id: "tegie.suszone",
@@ -120,6 +129,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "An intense sensation — think of the dried-fruit compote served on Christmas Eve.",
         found_in_pl: "wina dojrzałe, mocne",
         found_in_en: "mature, powerful wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Tęgości, która przenosi Cię na orientalny targ pełen przypraw i suszonych owoców. Wokół piętrzą się figi, daktyle, rodzynki i suszone śliwki, a w powietrzu unosi się zapach cynamonu, goździków i kardamonu. Jest ciepło, intensywnie i niemal duszno od bogactwa aromatów. To drugi kierunek Tęgości – równie głęboki i skoncentrowany, ale bardziej korzenny i owocowy.",
+        description_en:
+          "A group of associations of the Boldness sensation that carries you to an oriental market piled with spices and dried fruit. Figs, dates, raisins and dried plums tower around you, and the air smells of cinnamon, cloves and cardamom. It is warm, intense and almost heady with the richness of aromas. This is the second direction of Boldness – just as deep and concentrated, but more spicy and fruity.",
       },
     ],
   },
@@ -151,6 +164,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
         examples_en: "The classic fruit notes found in young, fruit-forward wines.",
         found_in_pl: "wina czerwone i białe - różne owoce",
         found_in_en: "red and white wines — different fruits in each",
+        description_pl:
+          "To grupa skojarzeń wrażenia Miękkości, która przenosi Cię do sadu na początku lata. Sięgasz po dojrzałą brzoskwinię lub gruszkę zerwaną prosto z drzewa. Owoce są soczyste, słodkie i delikatne, a ich miąższ niemal rozpływa się w ustach. Wszystko jest lekkie, harmonijne i naturalnie przyjemne. Tak właśnie objawia się najbardziej świeże oblicze Miękkości.",
+        description_en:
+          "A group of associations of the Softness sensation that takes you to an orchard at the start of summer. You reach for a ripe peach or a pear picked straight from the tree. The fruit is juicy, sweet and delicate, its flesh all but melting in the mouth. Everything is light, harmonious and naturally pleasant. That is the freshest face of Softness.",
       },
       {
         id: "miekkie.konfitury",
@@ -167,6 +184,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "Preserves differ from ripe fruit in intensity. Here the apple or strawberry has been baked, stewed or caramelised.",
         found_in_pl: "wina dojrzałe, treściwe",
         found_in_en: "mature, full-bodied wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Miękkości, która przenosi Cię do domu pod koniec lata. W piekarniku rumieni się ciasto z owocami, a na kuchence powoli gotują się domowe konfitury. Owoce są nadal miękkie i słodkie, ale bardziej otulające, ciepłe i skoncentrowane. To spokojniejsze, bardziej domowe oblicze Miękkości.",
+        description_en:
+          "A group of associations of the Softness sensation that brings you home at the end of summer. A fruit cake is browning in the oven while homemade preserves simmer slowly on the stove. The fruit is still soft and sweet, but more enveloping, warm and concentrated. This is the calmer, more homely face of Softness.",
       },
     ],
   },
@@ -186,8 +207,8 @@ export const COMPASS_SECTORS: CompassSector[] = [
     tendencje: [
       {
         id: "oleiste.maslo",
-        name_pl: "Masłowość, tostowość, orzechy",
-        name_en: "Butter, toast, nuts",
+        name_pl: "Masło i orzechy",
+        name_en: "Butter & nuts",
         shortLabel_pl: "Masło i orzechy",
         shortLabel_en: "Butter & nuts",
         associations_pl: "masło, orzechy, tosty, drożdże, ciasteczka maślane, pierniczki",
@@ -198,6 +219,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "All manner of \"rich\" flavours. You'll meet these sensations across many white and red wine styles alike.",
         found_in_pl: "wina białe i czerwone",
         found_in_en: "white and red wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Oleistości, która zabiera Cię do piekarni o poranku. Pachnie świeżą chałką, ciepłym masłem, maślanymi rogalikami i prażonymi orzechami. Wszystko wydaje się kremowe, aksamitne i otulające. Tak właśnie objawia się najbardziej maślane i eleganckie oblicze Oleistości.",
+        description_en:
+          "A group of associations of the Unctuousness sensation that takes you to a bakery in the morning. It smells of fresh challah, warm butter, buttery croissants and roasted nuts. Everything feels creamy, velvety and enveloping. That is the most buttery, elegant face of Unctuousness.",
       },
       {
         id: "oleiste.tropikalne",
@@ -213,6 +238,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "Resinous unctuousness, sweetness in full. You'll most often find these notes in white wines.",
         found_in_pl: "wina białe (głównie)",
         found_in_en: "white wines (mostly)",
+        description_pl:
+          "To grupa skojarzeń wrażenia Oleistości, która przenosi Cię na tropikalną wyspę. Na stole leżą soczyste mango, ananas, marakuja i papaja. Powietrze jest ciepłe, a owoce pełne egzotycznej słodyczy i soczystości. To bardziej egzotyczna, bogata i słoneczna odsłona Oleistości.",
+        description_en:
+          "A group of associations of the Unctuousness sensation that carries you to a tropical island. On the table lie juicy mango, pineapple, passion fruit and papaya. The air is warm and the fruit full of exotic sweetness and juiciness. This is the more exotic, rich and sunny face of Unctuousness.",
       },
     ],
   },
@@ -233,8 +262,8 @@ export const COMPASS_SECTORS: CompassSector[] = [
     tendencje: [
       {
         id: "swieze.zielone",
-        name_pl: "Zielone warzywa i owoce",
-        name_en: "Green vegetables and fruit",
+        name_pl: "Warzywa",
+        name_en: "Vegetables",
         shortLabel_pl: "Warzywa",
         shortLabel_en: "Greens",
         associations_pl: "melon, winogrona, seler, ogórek, karczoch, szparagi",
@@ -245,6 +274,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "You'll often find these notes in white wines; vegetal tendencies also appear frequently in reds.",
         found_in_pl: "wina białe (głównie) i czerwone",
         found_in_en: "white wines (mostly) and reds",
+        description_pl:
+          "To grupa skojarzeń wrażenia Świeżości, która przenosi Cię do letniego ogrodu. Kroisz chrupiącego ogórka, zieloną paprykę i świeże zioła, a obok stoi szklanka domowej lemoniady ogórkowej. Wszystko jest lekkie, zielone i pełne naturalnej świeżości. To spokojniejsze i bardziej roślinne oblicze Świeżości.",
+        description_en:
+          "A group of associations of the Freshness sensation that takes you to a summer garden. You slice a crunchy cucumber, green pepper and fresh herbs, with a glass of homemade cucumber lemonade standing nearby. Everything is light, green and full of natural freshness. This is the calmer, more botanical face of Freshness.",
       },
       {
         id: "swieze.cytrusy",
@@ -259,6 +292,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "You'll meet these sensations across many white and red wine styles alike.",
         found_in_pl: "wina białe i czerwone",
         found_in_en: "white and red wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Świeżości, która zabiera Cię na taras w upalne popołudnie. W dłoni trzymasz szklankę lodowatej lemoniady z cytryny, limonki i grejpfruta. Każdy łyk przynosi przyjemne orzeźwienie i przypływ energii. To najbardziej rześka, soczysta i pobudzająca odsłona Świeżości.",
+        description_en:
+          "A group of associations of the Freshness sensation that takes you to a terrace on a hot afternoon. In your hand a glass of ice-cold lemonade of lemon, lime and grapefruit. Every sip brings pleasant refreshment and a surge of energy. This is the briskest, juiciest, most invigorating face of Freshness.",
       },
     ],
   },
@@ -291,6 +328,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
         examples_en: "Remember what the sea smells like? That scent belongs here too.",
         found_in_pl: "wina białe i czerwone",
         found_in_en: "white and red wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Ziemistości, która przenosi Cię na skaliste wybrzeże tuż po deszczu. Czujesz wilgoć kamieni, słoną bryzę, zapach skał i morskiego powietrza. Wszystko jest spokojne, surowe i niezwykle czyste. To chłodniejsze i bardziej mineralne oblicze Ziemistości.",
+        description_en:
+          "A group of associations of the Earthiness sensation that carries you to a rocky coastline just after rain. You sense the dampness of stones, the salty breeze, the smell of rock and sea air. Everything is calm, raw and remarkably clean. This is the cooler, more mineral face of Earthiness.",
       },
       {
         id: "ziemiste.sciolka",
@@ -306,6 +347,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
           "Notes of forest and soil usually turn up in red wines; the grass belongs to whites like Sauvignon Blanc.",
         found_in_pl: "wina czerwone (las/gleba), białe (trawa)",
         found_in_en: "red wines (forest/soil), whites (grass)",
+        description_pl:
+          "To grupa skojarzeń wrażenia Ziemistości, która zabiera Cię na spacer przez las. Pod stopami miękka ściółka, wokół mech, szyszki, grzyby i wilgotna ziemia. Powietrze pachnie naturą, spokojem i lasem po deszczu. To cieplejsze i bardziej naturalne oblicze Ziemistości.",
+        description_en:
+          "A group of associations of the Earthiness sensation that takes you on a walk through the forest. Soft litter underfoot; moss, pine cones, mushrooms and damp earth all around. The air smells of nature, calm and woodland after rain. This is the warmer, more natural face of Earthiness.",
       },
     ],
   },
@@ -326,8 +371,8 @@ export const COMPASS_SECTORS: CompassSector[] = [
     tendencje: [
       {
         id: "szorstkie.pizmo",
-        name_pl: "Piżmo, skóra",
-        name_en: "Musk, leather",
+        name_pl: "Piżmo i skóra",
+        name_en: "Musk & leather",
         shortLabel_pl: "Piżmo i skóra",
         shortLabel_en: "Musk & leather",
         associations_pl: "skojarzenia zwierzęce - zapach mokrego psa, konia, stajni, skóry",
@@ -337,11 +382,15 @@ export const COMPASS_SECTORS: CompassSector[] = [
         examples_en: "You'll meet these sensations in red wines.",
         found_in_pl: "wina czerwone",
         found_in_en: "red wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Szorstkości, która przenosi Cię do starej stajni lub pracowni rymarskiej. Wokół pachnie naturalną skórą, stodołą i końskim siodłem. To świat surowy, dziki i autentyczny, w którym wszystko ma wyraźny charakter. Tak objawia się bardziej zwierzęca odsłona Szorstkości.",
+        description_en:
+          "A group of associations of the Grippiness sensation that carries you to an old stable or a saddler's workshop. It smells of natural leather, barn and horse saddle. It is a raw, wild, authentic world where everything has a distinct character. That is the more animal face of Grippiness.",
       },
       {
         id: "szorstkie.dab",
-        name_pl: "Dąb, dym, garbniki",
-        name_en: "Oak, smoke, tannins",
+        name_pl: "Dąb i dym",
+        name_en: "Oak & smoke",
         shortLabel_pl: "Dąb i dym",
         shortLabel_en: "Oak & smoke",
         associations_pl:
@@ -352,6 +401,10 @@ export const COMPASS_SECTORS: CompassSector[] = [
         examples_en: "A broad family of \"grippy\" and \"astringent\" sensations.",
         found_in_pl: "wina czerwone",
         found_in_en: "red wines",
+        description_pl:
+          "To grupa skojarzeń wrażenia Szorstkości, która zabiera Cię do dębowego lasu, gdzie płonie niewielkie ognisko. W powietrzu unosi się zapach dymu, drewna, pieprzu i beczki. Wszystko jest wytrawne, zdecydowane i szlachetne. To bardziej drzewna i przyprawowa odsłona Szorstkości.",
+        description_en:
+          "A group of associations of the Grippiness sensation that takes you to an oak forest where a small campfire burns. The air carries smoke, wood, pepper and barrel. Everything is dry, resolute and noble. This is the more woody, spicy face of Grippiness.",
       },
     ],
   },
@@ -408,58 +461,76 @@ export interface MethodStep {
 
 export const METHOD_STEPS: MethodStep[] = [
   {
-    id: "wzrok",
-    title_pl: "Wzrok",
-    title_en: "Sight",
+    id: "obejrzyj",
+    title_pl: "Obejrzyj wino",
+    title_en: "Look at the wine",
     body_pl:
-      "Spójrz na wino: jaki ma kolor (głębia, intensywność), gęstość (czy spływa po szkle wolno czy szybko), czy jest spokojne czy musujące?",
+      "Spójrz na jego kolor, intensywność i przejrzystość. Delikatnie zakręć kieliszkiem i obserwuj, jak spływa po ściankach. Już na tym etapie wino zdradza wiele o swoim stylu.",
     body_en:
-      "Look at the wine: what colour is it (depth, intensity)? How viscous — do the legs run down the glass slowly or quickly? Is it still or sparkling?",
+      "Study its colour, intensity and clarity. Swirl the glass gently and watch how the wine runs down the sides. Even at this stage a wine reveals a lot about its style.",
   },
   {
-    id: "dotyk",
-    title_pl: "Dotyk (w ustach)",
-    title_en: "Touch (in the mouth)",
+    id: "powachaj",
+    title_pl: "Powąchaj wino",
+    title_en: "Smell the wine",
     body_pl:
-      "Zwróć uwagę na gęstość i konsystencję - czy wino jest lekkie i wodniste, czy gęste i oleiste?",
+      "Najpierw delikatnie zakręć kieliszkiem i wykonaj krótki wdech. Następnie zakręć nim ponownie i poświęć aromatom więcej czasu. Nie próbuj od razu ich nazywać – po prostu je zapamiętaj.",
     body_en:
-      "Pay attention to body and texture — is the wine light and watery, or dense and unctuous?",
+      "First swirl the glass gently and take a short sniff. Then swirl it again and give the aromas more time. Don't try to name them straight away – simply remember them.",
   },
   {
-    id: "zapach",
-    title_pl: "Zapach - bez nosa i z nosem",
-    title_en: "Smell — nose pinched, then open",
+    id: "sprobuj",
+    title_pl: "Spróbuj",
+    title_en: "Take a sip",
     body_pl:
-      "Tutaj robi się ciekawie. Najpierw zatkaj nos i wypij łyk - to oddaje czysty smak (słodycz, cierpkość, kwasowość). Potem otwórz nos i powąchaj - wszystkie wrażenia z 6 sektorów kompasu pojawią się w nosie.",
+      "Weź pierwszy łyk i pozwól winu rozlać się po całych ustach. Dopiero teraz rozpoczyna się analiza metodą Vinocompas.",
     body_en:
-      "This is where it gets interesting. First pinch your nose and take a sip — that gives you pure taste (sweetness, astringency, acidity). Then release your nose and smell — all six sensations of the compass will arrive through the nose.",
+      "Take the first sip and let the wine spread across your whole mouth. Only now does the Vinocompas analysis begin.",
   },
   {
-    id: "smak",
-    title_pl: "Smak",
-    title_en: "Taste",
+    id: "okresl-smak",
+    title_pl: "Określ smak",
+    title_en: "Set the taste",
     body_pl:
-      "Gdyby wino składało się tylko ze smaku, mówilibyśmy że wyczuwamy w nim: słodycz, cierpkość lub kwasowość. To są 3 podstawowe wrażenia smakowe - niezależne od 6 wrażeń aromatycznych z kompasu.",
+      "Zaznacz intensywność słodyczy, kwasowości i cierpkości. To trzy podstawowe odczucia, które wpływają na odbiór wytrawności i stanowią fundament Twojego profilu.",
     body_en:
-      "If wine were made of taste alone, all we could say is that we detect sweetness, astringency or acidity. These are the 3 base tastes — independent of the compass's 6 aromatic sensations.",
+      "Mark the intensity of sweetness, acidity and astringency. These are the three basic perceptions that shape how dry a wine seems and form the foundation of your profile.",
   },
   {
-    id: "kompas",
-    title_pl: "Ułóż na kompasie",
-    title_en: "Plot it on the compass",
+    id: "odkryj-wrazenia",
+    title_pl: "Odkryj wrażenia",
+    title_en: "Discover the sensations",
     body_pl:
-      "Każde z 6 wrażeń (świeże, oleiste, miękkie, tęgie, szorstkie, ziemiste) ma 2 tendencje. Zaznacz na kompasie intensywność każdej tendencji (od 0 do 5). To jest twój profil smaku tego wina.",
+      "Na podstawie wybranego smaku określ intensywność sześciu wrażeń: Tęgości, Szorstkości, Miękkości, Oleistości, Świeżości i Ziemistości. To one opisują charakter wina znacznie dokładniej niż sam podział na wytrawne czy słodkie.",
     body_en:
-      "Each of the 6 sensations (fresh, unctuous, soft, bold, grippy, earthy) has 2 tendencies. Mark the intensity of each tendency on the compass (from 0 to 5). That is your taste profile of this wine.",
+      "Based on the taste you've set, mark the intensity of the six sensations: Boldness, Grippiness, Softness, Unctuousness, Freshness and Earthiness. They describe a wine's character far more precisely than a simple dry-or-sweet divide.",
   },
   {
-    id: "porownaj",
-    title_pl: "Porównaj wina",
-    title_en: "Compare wines",
+    id: "doprecyzuj-tendencje",
+    title_pl: "Doprecyzuj tendencje",
+    title_en: "Fine-tune the tendencies",
     body_pl:
-      "Zakręć kieliszkiem, powąchaj, spróbuj win, powąchaj jeszcze raz. Na podstawie znanych już wrażeń i tendencji opisz wina i to, czym się różnią. Stwórz własny Vinokompas i znajdź wina, które naprawdę lubisz.",
+      "Każde wrażenie rozwija się w dwóch kierunkach. Wybierz tendencje, które najlepiej opisują Twoje skojarzenia z degustowanym winem.",
     body_en:
-      "Swirl the glass, nose it, taste the wines, nose them again. Using the sensations and tendencies you now know, describe the wines and how they differ. Build your own Vinocompas and find the wines you truly love.",
+      "Each sensation develops in two directions. Choose the tendencies that best describe your associations with the wine you're tasting.",
+  },
+  {
+    id: "profil-wina",
+    title_pl: "Zobacz profil wina",
+    title_en: "See the wine's profile",
+    body_pl:
+      "Po zaznaczeniu smaków, wrażeń i tendencji Vinocompas tworzy pełny profil degustowanego wina. Dzięki temu możesz łatwo porównywać je z innymi.",
+    body_en:
+      "Once tastes, sensations and tendencies are set, Vinocompas builds a full profile of the wine you're tasting. That makes it easy to compare it with others.",
+  },
+  {
+    id: "podobne-wina",
+    title_pl: "Odkrywaj podobne wina",
+    title_en: "Discover similar wines",
+    body_pl:
+      "Na podstawie stworzonego profilu Vinocompas wyszukuje wina o najbardziej zbliżonym charakterze. Dzięki temu łatwiej znajdziesz kolejne etykiety, które odpowiadają Twojemu winiarskiemu gustowi.",
+    body_en:
+      "Based on the profile you've created, Vinocompas searches for wines with the closest character. That makes it easier to find more labels that match your taste in wine.",
   },
 ];
 
@@ -472,116 +543,140 @@ export interface FAQItem {
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
-    q_pl: "Co to jest Vinokompas?",
+    q_pl: "Czym jest Vinocompas?",
     q_en: "What is Vinocompas?",
     a_pl:
-      "To system opisu wina oparty na 6 wrażeniach zmysłowych (świeże, oleiste, miękkie, tęgie, szorstkie, ziemiste) i 3 podstawowych smakach (słodycz, cierpkość, kwasowość). Każde wrażenie ma 2 tendencje. Po zaznaczeniu intensywności każdej tendencji otrzymujesz unikalny profil smakowy wina - i możesz szukać innych win do niego podobnych.",
+      "Vinocompas to metoda opisywania i porównywania win oparta na tym, jak je odbieramy. Zamiast skupiać się wyłącznie na szczepach, regionach czy ocenach ekspertów, pomaga zrozumieć charakter wina i odkryć własny winiarski gust. Dzięki temu łatwiej znajdziesz kolejne wina, które naprawdę będą Ci smakować.",
     a_en:
-      "It's a system for describing wine built on 6 sensory sensations (fresh, unctuous, soft, bold, grippy, earthy) and 3 base tastes (sweetness, astringency, acidity). Each sensation has 2 tendencies. Once you've marked the intensity of each tendency, you get a unique taste profile of the wine — and you can go looking for other wines that resemble it.",
+      "Vinocompas is a method of describing and comparing wines based on how we experience them. Rather than focusing solely on grape varieties, regions or expert scores, it helps you understand a wine's character and discover your own taste in wine. That makes it easier to find more wines you will genuinely enjoy.",
   },
   {
-    q_pl: "Co to jest tendencja?",
-    q_en: "What is a tendency?",
+    q_pl: "Jak działa Vinocompas?",
+    q_en: "How does Vinocompas work?",
     a_pl:
-      "Tendencja to skojarzenie, które przeważa w danym wrażeniu. Na przykład wrażenie „świeże” ma 2 tendencje: cytrusy i zielone warzywa/owoce. Każde wrażenie ma 2 wyraźne tendencje - to cała filozofia.",
+      "Vinocompas prowadzi Cię przez trzy etapy. Najpierw określasz trzy podstawowe smaki: słodycz, kwasowość i cierpkość. Następnie opisujesz sześć wrażeń, które budują charakter wina. Na końcu wybierasz tendencje – obrazy i skojarzenia najlepiej oddające jego styl. Na podstawie Twojego winiarskiego gustu Vinocompas znajduje wina o najbardziej zbliżonym charakterze.",
     a_en:
-      "A tendency is the association that dominates within a given sensation. The \"fresh\" sensation, for instance, has 2 tendencies: citrus and green vegetables/fruit. Every sensation has 2 distinct tendencies — that's the whole philosophy.",
+      "Vinocompas takes you through three stages. First you set the three base tastes: sweetness, acidity and astringency. Then you describe the six sensations that build a wine's character. Finally you choose tendencies – the images and associations that best capture its style. Based on your taste in wine, Vinocompas then finds wines with the closest character.",
   },
   {
-    q_pl: "Jak rozróżnić wrażenia od tendencji?",
-    q_en: "How do I tell sensations from tendencies?",
+    q_pl: "Co oznacza mój winiarski gust?",
+    q_en: "What does my taste in wine mean?",
     a_pl:
-      "Wrażenie to ogólna kategoria (np. „świeże”). Tendencja to konkretne skojarzenie wewnątrz tej kategorii (np. „cytrusy” albo „zielone warzywa”). Jedno wino może być świeże w stronę cytrusów (jak Riesling), inne świeże w stronę zielonych warzyw (jak Sauvignon Blanc).",
+      "Twój winiarski gust pokazuje, jakie smaki, wrażenia i tendencje najbardziej odpowiadają winom, które lubisz. Nie ocenia, czy wino jest lepsze lub gorsze – opisuje jego charakter i porównuje go z tysiącami innych win, aby znaleźć te najlepiej dopasowane do Twoich preferencji.",
     a_en:
-      "A sensation is the broad category (e.g. \"fresh\"). A tendency is the specific association inside that category (e.g. \"citrus\" or \"green vegetables\"). One wine can be fresh leaning towards citrus (like a Riesling), another fresh leaning towards green vegetables (like a Sauvignon Blanc).",
+      "Your taste in wine shows which tastes, sensations and tendencies best match the wines you love. It doesn't judge whether a wine is better or worse – it describes its character and compares it with thousands of other wines to find those best matched to your preferences.",
   },
   {
-    q_pl: "Co znaczy „cierpkość”?",
-    q_en: "What does \"astringency\" mean?",
+    q_pl: "Czym różni się smak od wrażenia?",
+    q_en: "What's the difference between a taste and a sensation?",
     a_pl:
-      "Cierpkość to uczucie ściągania na języku. W czerwonych winach pochodzi głównie od garbników (tanin) zawartych w skórkach winogron i drewnie beczki. Pomyśl o aronii albo czarnej porzeczce - aż ściąga buzię.",
+      "Smak to to, co odczuwamy najbardziej bezpośrednio – słodycz, kwasowość i cierpkość. Wrażenie powstaje z ich wzajemnego połączenia. To ono opisuje charakter wina, dlatego dwa równie wytrawne wina mogą sprawiać zupełnie inne wrażenie.",
     a_en:
-      "Astringency is that puckering, drying grip on the tongue. In red wines it comes mainly from the tannins in grape skins and barrel wood. Think of chokeberries or blackcurrants — the way they pull your mouth tight.",
+      "Taste is what we perceive most directly – sweetness, acidity and astringency. A sensation arises from their interplay. It is what describes a wine's character, which is why two equally dry wines can leave completely different impressions.",
   },
   {
-    q_pl: "Czym różni się „świeże” od „oleiste”?",
-    q_en: "What's the difference between \"fresh\" and \"unctuous\"?",
+    q_pl: "Czym różni się wrażenie od tendencji?",
+    q_en: "What's the difference between a sensation and a tendency?",
     a_pl:
-      "Świeże wino jest kwaśne, rześkie, lekkie - jak lemoniada. Oleiste wino jest gęste, lepkie, słodkie - jak masło, orzechy, mango. Świeże orzeźwia, oleiste otula. Można też mieć wino które jednocześnie świeże i lekko oleiste - wtedy zaznacz oba sektory na kompasie z różną intensywnością.",
+      "Wrażenie opisuje charakter wina. Tendencja rozwija dane wrażenie w jednym z dwóch kierunków. To grupa skojarzeń i obrazów, które pomagają łatwiej zrozumieć, zapamiętać i rozpoznać charakter wina.",
     a_en:
-      "A fresh wine is tart, crisp, light — like lemonade. An unctuous wine is dense, sticky, sweet — think butter, nuts, mango. Fresh refreshes; unctuous envelops. A wine can also be fresh and lightly unctuous at once — in that case mark both sensations on the compass at different intensities.",
+      "A sensation describes a wine's character. A tendency develops that sensation in one of two directions. It is a group of associations and images that make a wine's character easier to understand, remember and recognise.",
   },
   {
-    q_pl: "Czym różni się „miękkie” od „tęgie”?",
-    q_en: "What's the difference between \"soft\" and \"bold\"?",
+    q_pl: "Co oznacza cierpkość?",
+    q_en: "What does astringency mean?",
     a_pl:
-      "Miękkie to dojrzałe owoce i konfitury - letnie, przyjemne, owocowe. Tęgie to czekolada, kawa, tytoń i suszone owoce - orientalne, ciężkie, intensywne. Wino miękkie pijemy łatwo, wino tęgie wymaga uwagi i często długiego oddychania w karafce.",
+      "Cierpkość to uczucie delikatnego ściągania i suchości w ustach. Możesz je znać z mocnej czarnej herbaty, kakao lub skórki orzecha włoskiego. To właśnie ona odpowiada za strukturę i zdecydowany charakter wielu win, szczególnie czerwonych.",
     a_en:
-      "Soft means ripe fruit and preserves — summery, easy, fruit-driven. Bold means chocolate, coffee, tobacco and dried fruit — oriental, heavy, intense. A soft wine drinks easily; a bold wine demands attention, and often a long breathe in the decanter.",
+      "Astringency is the feeling of gentle puckering and dryness in the mouth. You may know it from strong black tea, cocoa or walnut skin. It is what gives many wines – especially reds – their structure and resolute character.",
   },
   {
-    q_pl: "Czym różni się „szorstkie” od „ziemiste”?",
-    q_en: "What's the difference between \"grippy\" and \"earthy\"?",
+    q_pl: "Dlaczego zmienia się wytrawność, gdy zmieniam słodycz, kwasowość lub cierpkość?",
+    q_en: "Why does dryness change when I adjust sweetness, acidity or astringency?",
     a_pl:
-      "Szorstkie to wrażenie cierpkości, suchości - piżmo, skóra, dąb, dym, garbniki. Ziemiste to wrażenie ziemi, lasu, minerałów. Szorstkie wina mają taniny i drewno; ziemiste mają nuty terroir - kamienia, ściółki leśnej, kwiatów polnych.",
+      "Ponieważ wytrawność nie zależy wyłącznie od ilości cukru w winie. To sposób, w jaki odbieramy wzajemne proporcje słodyczy, kwasowości i cierpkości. Nawet niewielka zmiana jednej z tych cech może sprawić, że wino będzie wydawało się bardziej lub mniej wytrawne.",
     a_en:
-      "Grippy is the sensation of astringency and dryness — musk, leather, oak, smoke, tannins. Earthy is the sensation of soil, forest and minerals. Grippy wines carry tannin and wood; earthy wines carry notes of terroir — stone, forest floor, wildflowers.",
+      "Because dryness doesn't depend on the amount of sugar alone. It is how we perceive the mutual proportions of sweetness, acidity and astringency. Even a small change in one of them can make a wine seem more or less dry.",
   },
   {
-    q_pl: "Jakie wino dla kogoś kto lubi tytoń i kawę?",
-    q_en: "Which wine for someone who loves tobacco and coffee?",
+    q_pl: "Dlaczego nie mogę zaznaczyć tylko jednego wrażenia?",
+    q_en: "Why can't I mark just one sensation?",
     a_pl:
-      "Szukaj wina z wysokim wskaźnikiem w sektorze „tęgie” (tendencja czekolada/kawa/tytoń) i często też „szorstkie” (dąb, garbniki). To zwykle dojrzałe czerwone wina z beczki: Cabernet Sauvignon, Brunello di Montalcino, Tignanello, Vega Sicilia, Chateauneuf-du-Pape.",
+      "Ponieważ każde wino zawiera wszystkie sześć wrażeń. Różni się jedynie ich intensywność. Jedne są dominujące, inne subtelne, ale dopiero ich wzajemne proporcje tworzą charakter wina.",
     a_en:
-      "Look for a wine scoring high in the \"bold\" sensation (the chocolate/coffee/tobacco tendency), and often \"grippy\" too (oak, tannins). That usually means mature, barrel-aged reds: Cabernet Sauvignon, Brunello di Montalcino, Tignanello, Vega Sicilia, Châteauneuf-du-Pape.",
+      "Because every wine contains all six sensations. They differ only in intensity. Some dominate, others stay subtle, but it is their mutual proportions that create a wine's character.",
   },
   {
-    q_pl: "Jakie wino dla kogoś kto lubi cytrusy?",
-    q_en: "Which wine for someone who loves citrus?",
+    q_pl: "Czy mogę lubić jednocześnie wina świeże i tęgie?",
+    q_en: "Can I like both fresh and bold wines at once?",
     a_pl:
-      "Szukaj wina z wysokim wskaźnikiem w sektorze „świeże” (tendencja cytrusy). Klasyki to Riesling z Alzacji albo Mozeli, Sauvignon Blanc z Loary lub Nowej Zelandii (Cloudy Bay), Albarino z Galicji, Chablis z Burgundii.",
+      "Oczywiście. Winiarski gust rzadko ogranicza się do jednego wrażenia. Większość osób lubi różne style win, a Vinocompas pozwala pokazać, które cechy są dla Ciebie najważniejsze i jak się ze sobą łączą.",
     a_en:
-      "Look for a wine scoring high in the \"fresh\" sensation (the citrus tendency). The classics: Riesling from Alsace or the Mosel, Sauvignon Blanc from the Loire or New Zealand (Cloudy Bay), Albariño from Galicia, Chablis from Burgundy.",
+      "Of course. A taste in wine is rarely limited to a single sensation. Most people enjoy several styles, and Vinocompas lets you show which traits matter most to you and how they combine.",
   },
   {
-    q_pl: "Jakie wino dla kogoś kto lubi czekoladę?",
-    q_en: "Which wine for someone who loves chocolate?",
+    q_pl: "Dlaczego Vinocompas poleca mi właśnie te wina?",
+    q_en: "Why does Vinocompas recommend these particular wines?",
     a_pl:
-      "Sektor „tęgie” (czekolada, kawa, tytoń) - pełne czerwone z dębem. Też dobrze będą wina deserowe ze strony „miękkie/konfitury”: Banyuls, Maury, Porto LBV, Recioto della Valpolicella.",
+      "Każde polecane wino ma charakter najbardziej zbliżony do Twojego winiarskiego gustu. Vinocompas porównuje wybrane przez Ciebie smaki, wrażenia i tendencje z opisami wszystkich win w bazie. Im większe podobieństwo, tym wyżej dane wino pojawi się na liście rekomendacji.",
     a_en:
-      "The \"bold\" sensation (chocolate, coffee, tobacco) — full-bodied, oaked reds. Dessert wines from the \"soft/preserves\" side work beautifully too: Banyuls, Maury, LBV Port, Recioto della Valpolicella.",
+      "Every recommended wine has the character closest to your taste in wine. Vinocompas compares the tastes, sensations and tendencies you chose with the descriptions of every wine in the base. The greater the similarity, the higher a wine appears on the list.",
   },
   {
-    q_pl: "Jak korzystać z kompasu w restauracji?",
-    q_en: "How do I use the compass in a restaurant?",
+    q_pl: "Dlaczego nie pytacie o szczep, kraj lub producenta?",
+    q_en: "Why don't you ask about grape, country or producer?",
     a_pl:
-      "1) Powiedz kelnerowi swój profil smaku (np. „lubię świeże cytrusowe” albo „lubię tęgie z kawą”). 2) Albo zeskanuj QR Cellar Compass w restauracji - wybierz danie, system pokaże top-3 wina pasujące do dania, z uzasadnieniem. Działa też w drugą stronę: wybierz wino, system zaproponuje dania.",
+      "Bo Vinocompas opisuje charakter wina, a nie jego pochodzenie. Dwa wina z różnych krajów lub szczepów mogą mieć bardzo podobny charakter, a dwa wina z tego samego szczepu mogą różnić się diametralnie. Dlatego zaczynamy od tego, co naprawdę odczuwasz podczas degustacji.",
     a_en:
-      "1) Tell the waiter your taste profile (e.g. \"I like fresh and citrusy\" or \"I like bold with coffee\"). 2) Or scan the Cellar Compass QR code at the restaurant — pick a dish, and the system shows the top-3 wines for it, with the reasoning. It works the other way round too: pick a wine, and the system suggests dishes.",
+      "Because Vinocompas describes a wine's character, not its origin. Two wines from different countries or grapes can share a very similar character, while two wines of the same grape can differ completely. That's why we start from what you actually perceive while tasting.",
   },
   {
-    q_pl: "Czy każde wino ma wszystkie 6 wrażeń?",
-    q_en: "Does every wine have all 6 sensations?",
+    q_pl: "Jak korzystać z Vinocompasu podczas zakupów lub w restauracji?",
+    q_en: "How do I use Vinocompas while shopping or in a restaurant?",
     a_pl:
-      "Każde wino ma jakąś obecność każdego z 6 wrażeń - ale często z bardzo różną intensywnością. Sauvignon Blanc będzie mocno w „świeże” (cytrusy, zielone) i prawie zero w „tęgie”. Zinfandel z USA - odwrotnie: mocno „tęgie” (suszone owoce), „miękkie” (konfitury), „szorstkie” (dąb).",
+      "Jeśli degustujesz wino lub znasz je z wcześniejszych doświadczeń, opisz je w Vinocompasie. Następnie porównaj jego charakter z innymi winami. Im bardziej zbliżony charakter, tym większa szansa, że nowe wino również przypadnie Ci do gustu.",
     a_en:
-      "Every wine carries some presence of all 6 sensations — but often at very different intensities. A Sauvignon Blanc will run high in \"fresh\" (citrus, green) and near zero in \"bold\". A Zinfandel from the USA is the opposite: strongly \"bold\" (dried fruit), \"soft\" (preserves) and \"grippy\" (oak).",
+      "If you're tasting a wine, or know it from experience, describe it in Vinocompas. Then compare its character with other wines. The closer the character, the better the chance the new wine will suit you too.",
   },
   {
-    q_pl: "Czy mam degustować z zatkanym nosem?",
-    q_en: "Should I really taste with my nose pinched?",
+    q_pl: "Czy nie wystarczy znać wytrawność wina?",
+    q_en: "Isn't knowing a wine's dryness enough?",
     a_pl:
-      "Tak, na początku - to świetny trening. Gdy zatkaniesz nos, wino pokazuje tylko swoje 3 podstawowe smaki: słodycz, cierpkość, kwasowość. Gdy otworzysz nos - eksploduje aromatami z 6 sektorów kompasu. To pokazuje jak nos i język grają w pary.",
+      "Wytrawność to dopiero początek. Dwa równie wytrawne wina mogą mieć zupełnie inny charakter – jedno będzie świeże i cytrusowe, drugie pełne, tęgie i korzenne. Vinocompas pomaga odkryć te różnice i znaleźć wina, które naprawdę odpowiadają Twojemu gustowi.",
     a_en:
-      "Yes, at first — it's excellent training. With your nose pinched, a wine shows only its 3 base tastes: sweetness, astringency, acidity. Release your nose — and it explodes with aromas from the compass's 6 sensations. It shows you how nose and tongue play as a pair.",
+      "Dryness is only the beginning. Two equally dry wines can have entirely different characters – one fresh and citrusy, the other full, bold and spicy. Vinocompas helps you uncover those differences and find wines that genuinely match your taste.",
   },
   {
-    q_pl: "Co znaczy moja kombinacja na kompasie?",
-    q_en: "What does my combination on the compass mean?",
+    q_pl: "Czy muszę znać aromaty, żeby korzystać z Vinocompasu?",
+    q_en: "Do I need to know aromas to use Vinocompas?",
     a_pl:
-      "Twój kompas to twój profil smaku. Im wyższe „świeże/cytrusy” tym częściej szukaj win cytrusowych. Im wyższe „tęgie/cigaro” tym mocniej idź w wina dojrzałe z beczką. Cellar Compass dopasowuje wina z menu restauracji właśnie pod taki profil - albo pod profil dania.",
+      "Nie. Vinocompas został stworzony po to, aby każdy mógł opisywać wino bez znajomości profesjonalnego słownictwa. Wystarczą Twoje odczucia i skojarzenia.",
     a_en:
-      "Your compass is your taste profile. The higher your \"fresh/citrus\", the more you should seek out citrus-driven wines. The higher your \"bold/cigar\", the harder you should lean into mature, barrel-aged wines. Cellar Compass matches wines from the restaurant's list to exactly that profile — or to the profile of a dish.",
+      "No. Vinocompas was created so that anyone can describe wine without professional vocabulary. Your perceptions and associations are enough.",
+  },
+  {
+    q_pl: "Czy istnieją złe odpowiedzi?",
+    q_en: "Are there wrong answers?",
+    a_pl:
+      "Nie. Vinocompas nie ocenia, czy degustujesz „poprawnie”. Opisuje Twój sposób odbierania wina. To właśnie on pozwala odkryć Twój winiarski gust i znaleźć kolejne wina, które będą Ci smakować.",
+    a_en:
+      "No. Vinocompas doesn't judge whether you taste “correctly”. It describes the way you perceive wine. That is what reveals your taste in wine and finds more wines you'll enjoy.",
+  },
+  {
+    q_pl: "Czy Vinocompas zastąpi wiedzę o winie?",
+    q_en: "Will Vinocompas replace wine knowledge?",
+    a_pl:
+      "Nie. Vinocompas nie zastępuje wiedzy o winie – pomaga ją uporządkować. To narzędzie, które ułatwia rozpoznawanie charakteru win, porównywanie ich i odkrywanie własnego winiarskiego gustu.",
+    a_en:
+      "No. Vinocompas doesn't replace wine knowledge – it helps organise it. It is a tool that makes it easier to recognise wines' characters, compare them and discover your own taste in wine.",
+  },
+  {
+    q_pl: "Czy mój winiarski gust może się zmieniać?",
+    q_en: "Can my taste in wine change?",
+    a_pl:
+      "Tak. Winiarski gust zmienia się wraz z doświadczeniem, porą roku, okazją, a nawet nastrojem. Dlatego warto wracać do Vinocompasu i opisywać różne wina. Z czasem lepiej poznasz swoje preferencje i odkryjesz style, po które wcześniej być może nigdy byś nie sięgnął.",
+    a_en:
+      "Yes. A taste in wine changes with experience, season, occasion and even mood. That's why it's worth coming back to Vinocompas and describing different wines. Over time you'll know your preferences better and discover styles you might never have reached for.",
   },
 ];
 
@@ -600,11 +695,11 @@ export function buildChatSystemPrompt(lang: CompassLang = "pl"): string {
 
   const method = METHOD_STEPS.map((m) => `### ${m.title_pl}\n${m.body_pl}`).join("\n\n");
 
-  return `Jesteś sommelierem-przewodnikiem po metodzie Vinokompas (autorka: Magdalena Surgiel-Czyż / parfumealavin / vinocompas.pl). Tłumaczysz początkującym jak opisywać i wybierać wino używając 6 wrażeń i 3 podstawowych smaków.
+  return `Jesteś sommelierem-przewodnikiem po metodzie Vinocompas (autorka: Magdalena Surgiel-Czyż / parfumealavin / vinocompas.pl). Tłumaczysz początkującym jak opisywać i wybierać wino używając 6 wrażeń i 3 podstawowych smaków.
 
 # DOZWOLONE TEMATY (i tylko te)
 - Wino: smak, profil, region, gatunek, łączenie z jedzeniem, serwis (temperatura, dekantacja).
-- Metoda Vinokompas: wrażenia, tendencje, smaki bazowe, jak je rozpoznać.
+- Metoda Vinocompas: wrażenia, tendencje, smaki bazowe, jak je rozpoznać.
 - Jedzenie w kontekście dopasowania do wina (smak dania, tekstura, sos).
 - Restauracje, menu, kultura stołu, rytuał degustacji.
 - Aplikacja Vinovigator AI: jak działa, jak skanować QR, jak czytać sugestie.
@@ -615,7 +710,7 @@ export function buildChatSystemPrompt(lang: CompassLang = "pl"): string {
 - Pogoda, nowinki, sport, celebryci, generator tekstu.
 - Cokolwiek niezwiązanego z winem, jedzeniem, smakiem lub aplikacją.
 Jeśli pytanie wykracza poza te tematy - odpowiedz dokładnie tak (nie inaczej):
-„Jestem przewodnikiem Vinokompasu - odpowiadam tylko o winie, smaku i połączeniach z jedzeniem. Może spytasz mnie o ulubione wino albo o danie, do którego szukasz pary?"
+„Jestem przewodnikiem Vinocompasu - odpowiadam tylko o winie, smaku i połączeniach z jedzeniem. Może spytasz mnie o ulubione wino albo o danie, do którego szukasz pary?"
 Nie próbuj odpowiadać częściowo. Nie tłumacz dlaczego nie odpowiadasz. Nie cytuj zakazanego pytania.
 
 # Zasady odpowiedzi (gdy temat jest dozwolony)
@@ -624,7 +719,7 @@ Nie próbuj odpowiadać częściowo. Nie tłumacz dlaczego nie odpowiadasz. Nie 
 - Maksymalnie 4-5 zdań na odpowiedź. Bez bullet-list, jeśli nie ma 3+ punktów.
 - Używaj nazw wrażeń i tendencji z poniższej bazy (NIE wymyślaj nowych nazw).
 - Gdy użytkownik pyta o konkretne wino - odpowiadaj na bazie ogólnej wiedzy + zaproś do skanu QR w restauracji żeby dostać konkretną rekomendację z karty.
-- NIE nazywaj się modelem, AI ani GPT. Jesteś „przewodnikiem Vinokompasu".
+- NIE nazywaj się modelem, AI ani GPT. Jesteś „przewodnikiem Vinocompasu".
 
 # 6 wrażeń (sektorów kompasu)
 
@@ -638,6 +733,9 @@ ${tastes}
 
 ${method}
 
+# Filozofia metody (dokument klienta, 2026-07)
+Vinocompas nie uczy języka sommelierów. Pomaga zrozumieć własny winiarski gust, wykorzystując doświadczenia, które każdy z nas już zna. Etap I nie uczy degustacji - pokazuje, że wytrawność to coś więcej niż ilość cukru. Etap II nie uczy terminologii - pomaga rozpoznać charakter wina. Etap III nie uczy aromatów - buduje obrazy i skojarzenia, dzięki którym łatwiej zapamiętać własny winiarski gust. Vinocompas nie pyta, jakie wino powinieneś lubić: pokazuje, dlaczego lubisz właśnie takie wina i pomaga znaleźć kolejne o podobnym charakterze.
+
 # Kontekst produktu Cellar Compass
-Cellar Compass to demo aplikacja dla restauracji: gość skanuje QR przy stoliku, wybiera danie z menu, system pokazuje top-3 win z uzasadnieniem (chat-bot odpowiada „dlaczego to wino pasuje”). Działa w obie strony - gość może wybrać wino, system zaproponuje dania. Twoja rola w aplikacji: nauczyciel metody Vinokompas, który pomoże użytkownikowi zrozumieć własny profil smaku i lepiej rozumieć rekomendacje. Kieruj rozmowę w stronę jasnych, konkretnych przykładów - pomagaj użytkownikowi nazwać własne preferencje słowami z metody.`;
+Cellar Compass to demo aplikacja dla restauracji: gość skanuje QR przy stoliku, wybiera danie z menu, system pokazuje top-3 win z uzasadnieniem (chat-bot odpowiada „dlaczego to wino pasuje”). Działa w obie strony - gość może wybrać wino, system zaproponuje dania. Twoja rola w aplikacji: nauczyciel metody Vinocompas, który pomoże użytkownikowi zrozumieć własny profil smaku i lepiej rozumieć rekomendacje. Kieruj rozmowę w stronę jasnych, konkretnych przykładów - pomagaj użytkownikowi nazwać własne preferencje słowami z metody.`;
 }

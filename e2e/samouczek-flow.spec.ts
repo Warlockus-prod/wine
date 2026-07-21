@@ -54,7 +54,7 @@ test("exactly three stages: Smak + Wrażenia + Aromaty", async ({ page }) => {
   // Tab accessible names include the whole label+sub text — match substrings.
   await expect(page.getByRole("button", { name: /ETAP 1/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /WRAŻENIA/i }).first()).toBeVisible();
-  await expect(page.getByRole("button", { name: /AROMATY/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /TENDENCJE/i })).toBeVisible();
   // The three stage tabs are the only buttons carrying an "ETAP <n>" marker.
   await expect(page.getByRole("button").filter({ hasText: /ETAP\s*\d/i })).toHaveCount(3);
 });
@@ -104,7 +104,7 @@ test("base smak (stage 1) and wrażenie sector (stage 2) are independent", async
 
 test("Aromaty stage exposes the 12 tendencja sliders", async ({ page }) => {
   await openCompass(page);
-  await page.getByRole("button", { name: /AROMATY/i }).click();
+  await page.getByRole("button", { name: /TENDENCJE/i }).click();
   await page.waitForTimeout(1500);
   const tendencjaSliders = await page.evaluate(
     () =>

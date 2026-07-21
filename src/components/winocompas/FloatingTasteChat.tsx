@@ -169,7 +169,7 @@ export default function FloatingTasteChat({
         <button
           type="button"
           onClick={() => toggle(true)}
-          aria-label={pickL(lang, "Otwórz przewodnika Vinokompasu", "Open the Vinokompas guide")}
+          aria-label={pickL(lang, "Otwórz przewodnika Vinocompasu", "Open the Vinocompas guide")}
           className={`group fixed right-3 bottom-[calc(var(--mobile-tabbar-h)+12px)] z-40 flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 ${mobileHidden ? "max-md:hidden" : ""} border border-[rgba(199,159,105,0.55)] bg-gradient-to-br from-primary to-primary-dark shadow-[0_18px_48px_rgba(199,159,105,0.45)] transition-transform hover:scale-105 active:scale-95 sm:right-4 sm:bottom-6`}
         >
           <span aria-hidden className="absolute inset-0 -z-10 animate-pulse rounded-full bg-primary/30 blur-md" />

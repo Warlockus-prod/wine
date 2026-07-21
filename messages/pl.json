@@ -387,9 +387,9 @@
   "notFound": {
     "eyebrow": "Coś poszło nie tak",
     "title": "Nie znaleźliśmy tej strony",
-    "subtitle": "Wygląda na to, że ten link wygasł lub został przeniesiony. Wybierz coś poniżej - powrót do mapy restauracji, polecana karta lub przewodnik Vinokompas.",
+    "subtitle": "Wygląda na to, że ten link wygasł lub został przeniesiony. Wybierz coś poniżej - powrót do mapy restauracji, polecana karta lub przewodnik Vinocompas.",
     "backHome": "Wróć do listy restauracji",
     "featured": "Zajrzyj do {name}",
-    "openTutorial": "Samouczek Vinokompas"
+    "openTutorial": "Samouczek Vinocompas"
   }
 }

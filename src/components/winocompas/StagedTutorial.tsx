@@ -121,15 +121,15 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
               : ""}
           </span>
           <p className="pitch-eyebrow pitch-eyebrow--start">
-            {pickL(lang, "Twoje propozycje", "Your suggestions")}
+            {pickL(lang, "Twoje wina", "Your wines")}
           </p>
           <h3 className="pitch-display pitch-display--roomy mt-2 text-xl text-white sm:text-2xl">
             {enough
-              ? pickL(lang, "Wina dopasowane do Twojego smaku", "Wines matched to your taste")
+              ? pickL(lang, "Twój winiarski gust", "Your taste in wine")
               : filled === 0
                 ? pickL(
                     lang,
-                    "Ustaw Vinokompas, a wina pojawią się tutaj",
+                    "Ustaw Vinocompas, a wina pojawią się tutaj",
                     "Set your Vinocompas and the wines will appear here",
                   )
                 : pickL(
@@ -142,12 +142,12 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
             {enough
               ? pickL(
                   lang,
-                  `Liczba przy winie to podobieństwo profilu w %. Twój profil opisany w ${filled}/${TARGET_FILLED} wymiarach - im pełniejszy, tym pewniejszy dobór.`,
-                  `The number beside each wine is your profile similarity in %. Your profile is described across ${filled}/${TARGET_FILLED} dimensions — the fuller it gets, the more confident the match.`,
+                  `Procent pokazuje, jak dobrze dane wino odpowiada Twoim odpowiedziom. Im wyższy wynik, tym większe dopasowanie.`,
+                  `The percentage shows how well a wine matches your answers. The higher the score, the closer the match.`,
                 )
               : pickL(
                   lang,
-                  `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinokompasie: im więcej skojarzeń, tym celniej.`,
+                  `Profil jest jeszcze zbyt ubogi na trafny dobór. Ustaw co najmniej ${MIN_FILLED} elementów (smaki wokół koła lub wrażenia-sektory) - masz ${filled}/${MIN_FILLED}. Jak w oryginalnym Vinocompasie: im więcej skojarzeń, tym celniej.`,
                   `Your profile is still too sparse for an accurate match. Set at least ${MIN_FILLED} elements (the tastes around the wheel, or the sensation sectors) — you have ${filled}/${MIN_FILLED}. Just like the original Vinocompas: the more associations, the sharper the aim.`,
                 )}
           </p>
@@ -170,7 +170,7 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
           href="/pairing"
           className="pitch-cta-ghost inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs"
         >
-          {pickL(lang, "Pełny dobór", "Full pairing")}
+          {pickL(lang, "Zobacz wszystkie wina", "See all wines")}
           <svg width="12" height="9" viewBox="0 0 16 9" fill="none" aria-hidden>
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -279,7 +279,7 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
       )}
 
       <p className="mt-4 text-xs leading-relaxed text-[color:var(--color-accent-gold)]">
-        {pickL(lang, "Propozycje pochodzą z oferty", "Suggestions come from the range at")}{" "}
+        {pickL(lang, "Rekomendacje pochodzą z oferty", "Recommendations come from the range at")}{" "}
         <a
           href="https://winnica.pl/pl/"
           target="_blank"
@@ -290,8 +290,8 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
         </a>{" "}
         {pickL(
           lang,
-          "- twórców metody Vinokompas. Dopasowanie liczone na żywo z Twojego profilu smaku.",
-          "— the creators of the Vinocompas method. Matching is calculated live from your taste profile.",
+          "i są dopasowywane na bieżąco na podstawie Twoich odpowiedzi w Vinocompasie.",
+          "and are matched live to your answers in the Vinocompas.",
         )}
       </p>
     </div>
@@ -316,12 +316,12 @@ function StageNav({
       ? [
           { n: 1, label: "SMAK", sub: "3 osie smaku", subShort: "3 osie" },
           { n: 2, label: "WRAŻENIA", sub: "6 wrażeń", subShort: "6 wrażeń" },
-          { n: 3, label: "AROMATY", sub: "12 aromatów", subShort: "12 aromatów" },
+          { n: 3, label: "TENDENCJE", sub: "12 grup aromatów", subShort: "12 grup" },
         ]
       : [
           { n: 1, label: "TASTE", sub: "3 taste axes", subShort: "3 axes" },
           { n: 2, label: "SENSATIONS", sub: "6 sensations", subShort: "6 sensations" },
-          { n: 3, label: "AROMAS", sub: "12 aromas", subShort: "12 aromas" },
+          { n: 3, label: "TENDENCIES", sub: "12 aroma groups", subShort: "12 groups" },
         ];
   return (
     <ol className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -891,21 +891,17 @@ function StageAromaty({
     <div>
       <header>
         <p className="pitch-eyebrow pitch-eyebrow--start">
-          {pickL(lang, "Etap III · Aromaty", "Stage III · Aromas")}
+          {pickL(lang, "Etap III · Tendencje", "Stage III · Tendencies")}
         </p>
         <h2 className="pitch-display pitch-display--roomy mt-3 text-2xl text-white sm:text-3xl">
-          {pickL(lang, "Dwanaście aromatów", "Twelve aromas")}
+          {pickL(lang, "Doprecyzuj swój winiarski gust", "Fine-tune your taste in wine")}
         </h2>
         <p className="mt-2 max-w-xl font-serif text-sm italic leading-relaxed text-[#e6e1d6]">
           {pickL(
             lang,
-            "Tryb dla zaawansowanych: każde wrażenie ma dwa aromaty. Kliknij konkretny aromat na kole, aby dostroić profil (0-5). Po prawej - pełny opis i skojarzenia każdej z 12.",
-            "Advanced mode: each sensation has two aromas. Tap a specific aroma on the wheel to fine-tune your profile (0-5). On the right — the full description and associations for each of the 12.",
-          )}{" "}
-          <strong className="not-italic font-semibold text-[#f4efe9]">
-            {pickL(lang, "Auto-przewodnik", "The auto-guide")}
-          </strong>{" "}
-          {pickL(lang, "pokaże je po kolei.", "will present them one by one.")}
+            "Każde wrażenie ma dwie tendencje - dwie grupy aromatów, które pomagają jeszcze lepiej opisać wino. Wybierz te, które najlepiej pasują do win, które lubisz.",
+            "Each sensation has two tendencies - two groups of aromas that help describe a wine even better. Choose the ones that best fit the wines you love.",
+          )}
         </p>
       </header>
 

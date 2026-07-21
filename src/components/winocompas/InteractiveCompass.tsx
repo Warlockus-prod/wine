@@ -852,10 +852,10 @@ function FocusedCard({
           </dl>
           <details className="mt-4 group">
             <summary className="cursor-pointer text-[11px] font-semibold tracking-wider text-[var(--color-accent-gold)] uppercase transition hover:text-[#f4efe9]">
-              ❦ {pickL(lang, "Pełny opis wrażenia", "Full sensation description")}
+              ❦ {pickL(lang, "Pełny opis tendencji", "Full tendency description")}
             </summary>
             <p className="mt-2 text-sm leading-relaxed text-[#cbc1b1]">
-              {pickL(lang, focused.sector.long_pl, focused.sector.long_en)}
+              {pickL(lang, focused.tendencja.description_pl, focused.tendencja.description_en)}
             </p>
           </details>
         </>
@@ -894,15 +894,35 @@ function IdleCard({
   // concept text; stage 2 = "Poznaj sześć wrażeń" concept text; stage 3
   // keeps the generic help framing.
   const isLevel2 = level === 2;
+  const isLevel3 = level === 3;
   return (
     <div>
       <p className="pitch-eyebrow pitch-eyebrow--start">Vinocompas</p>
       <h3 className="pitch-display mt-3 text-2xl text-white">
         {isLevel2
           ? pickL(lang, "Poznaj sześć wrażeń", "Meet the six sensations")
-          : pickL(lang, "Potrzebujesz pomocy?", "Need a hand?")}
+          : isLevel3
+            ? pickL(lang, "Poznaj tendencje", "Meet the tendencies")
+            : pickL(lang, "Potrzebujesz pomocy?", "Need a hand?")}
       </h3>
-      {isLevel2 ? (
+      {isLevel3 ? (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
+            {pickL(
+              lang,
+              "Najedź kursorem na wybraną tendencję, aby dowiedzieć się, jakie skojarzenia reprezentuje.",
+              "Hover over a tendency to find out which associations it represents.",
+            )}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[#e6e1d6]">
+            {pickL(
+              lang,
+              "Lub uruchom przewodnik, który przedstawi wszystkie tendencje krok po kroku.",
+              "Or start the guide, which will present every tendency step by step.",
+            )}
+          </p>
+        </>
+      ) : isLevel2 ? (
         <>
           <p className="mt-3 text-sm leading-relaxed text-[#e6e1d6]">
             {pickL(

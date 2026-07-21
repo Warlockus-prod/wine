@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Vinovigator AI",
     short_name: "Vinovigator",
-    description: "Vinokompas-driven wine pairing for restaurants - mobile-first, EN+PL.",
+    description: "Vinocompas-driven wine pairing for restaurants - mobile-first, EN+PL.",
     start_url: "/",
     scope: "/",
     display: "standalone",

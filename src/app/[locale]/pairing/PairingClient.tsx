@@ -592,8 +592,8 @@ export default function PairingClient({
         if (!controller.signal.aborted) {
           setVinokompasExplanation(
             locale === "pl"
-              ? "Sommelier AI chwilowo odpoczywa - pełne uzasadnienie w języku Vinokompasu pojawi się przy następnej próbie."
-              : "The AI sommelier is taking a short break - the Vinokompas rationale will appear on the next try.",
+              ? "Sommelier AI chwilowo odpoczywa - pełne uzasadnienie w języku Vinocompasu pojawi się przy następnej próbie."
+              : "The AI sommelier is taking a short break - the Vinocompas rationale will appear on the next try.",
           );
         }
       } finally {
@@ -1296,7 +1296,7 @@ export default function PairingClient({
             </div>
 
             {/* Taste-along ("Degustuj krok po kroku", 2026-07): guided
-                6-step Vinokompas tasting (METHOD_STEPS) for the selected
+                8-step Vinocompas tasting (METHOD_STEPS) for the selected
                 wine. Inline card in the panel's cream/gold-hairline idiom —
                 not a modal; ESC/✕ closes; nothing persists. Step content is
                 the PL methodology KB (chrome labels are localized). */}

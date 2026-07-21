@@ -58,7 +58,7 @@ test.describe("mobile visual regression", () => {
         // Live/AI-driven widgets inside the fold: floating chat launcher and
         // any status pills that flip between runs.
         mask: [
-          page.locator('[aria-label="Otwórz przewodnika Vinokompasu"]'),
+          page.locator('[aria-label="Otwórz przewodnika Vinocompasu"]'),
           page.locator("text=/AI GOTOWE|AI READY|pisze…/"),
         ],
       });

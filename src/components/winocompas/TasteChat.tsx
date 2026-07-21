@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TasteChat - read-only-style chat with the Vinokompas guide bot.
+ * TasteChat - read-only-style chat with the Vinocompas guide bot.
  *
  * UX rules (per Jakub Parowski feedback in /pairing):
  *  - Bot replies in chat bubbles, no typing indicator clutter.
@@ -42,7 +42,7 @@ const SUGGESTIONS_EN = [
 
 /**
  * Opening line, per surface (client 2026-07-18: "в pairing предлагает помочь
- * с едой и вином, в samouczek — про Vinokompas и обучение"). The old single
+ * с едой и вином, в samouczek — про Vinocompas и обучение"). The old single
  * greeting mentioned BOTH a menu and the wheel, so on either page half of it
  * was noise. Pages pass their own via the `greeting` prop; these are the
  * defaults/fallbacks.
@@ -55,9 +55,9 @@ const HELLO_EN =
 
 /** /samouczek — teaching the method, not selling a bottle. */
 export const HELLO_SAMOUCZEK_PL =
-  "Cześć! Jestem Twoim przewodnikiem po Vinokompasie. Przeprowadzę Cię przez trzy etapy: smaki, wrażenia i aromaty. Zaznacz cokolwiek na kole, a wyjaśnię, co to wrażenie znaczy i w jakich winach je spotkasz. Możesz też kliknąć gotowe pytanie poniżej.";
+  "Cześć! Jestem Twoim przewodnikiem po Vinocompasie. Przeprowadzę Cię przez trzy etapy: smaki, wrażenia i tendencje. Zaznacz cokolwiek na kole, a wyjaśnię, co to wrażenie znaczy i w jakich winach je spotkasz. Możesz też kliknąć gotowe pytanie poniżej.";
 export const HELLO_SAMOUCZEK_EN =
-  "Hi! I'm your guide to the Vinocompas. I'll walk you through three stages: tastes, sensations and aromas. Set anything on the wheel and I'll explain what that sensation means and which wines carry it. You can also tap a ready-made question below.";
+  "Hi! I'm your guide to the Vinocompas. I'll walk you through three stages: tastes, sensations and tendencies. Set anything on the wheel and I'll explain what that sensation means and which wines carry it. You can also tap a ready-made question below.";
 
 /** /pairing — a dish is on the table, the job is the bottle next to it. */
 export const HELLO_PAIRING_PL =

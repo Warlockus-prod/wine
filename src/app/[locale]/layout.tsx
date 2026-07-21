@@ -27,7 +27,7 @@ const libreBaskerville = Libre_Baskerville({
 export const metadata: Metadata = {
   title: "Vinovigator AI - Wine pairing for restaurants",
   description:
-    "Vinovigator AI: kompas smaku, mapa restauracji, QR przy stoliku, dwustronny matching dania i wina z uzasadnieniem językiem Vinokompasu.",
+    "Vinovigator AI: kompas smaku, mapa restauracji, QR przy stoliku, dwustronny matching dania i wina z uzasadnieniem językiem Vinocompasu.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/app-icon.svg", type: "image/svg+xml" }],

@@ -240,9 +240,16 @@ export default function SamouczekClient() {
           <p className="mt-3 max-w-2xl text-base leading-[1.7] text-[color:var(--ink-soft)] sm:text-lg">
             {pickL(
               lang,
-              "Vinocompas pomoże Ci odkryć, jakie wina naprawdę lubisz. W trzech prostych krokach poznasz swój profil smakowy i otrzymasz wina dopasowane do Twojego gustu.",
-              "Vinocompas helps you discover which wines you truly love. In three simple steps you'll map your taste profile and get wines matched to it.",
-            )}
+              "Vinocompas pomoże Ci odkryć, jakie wina naprawdę lubisz. W trzech prostych krokach poznasz swój profil smakowy i otrzymasz wina dopasowane do Twojego gustu,",
+              "Vinocompas helps you discover which wines you truly love. In three simple steps you'll map your taste profile and get wines matched to it —",
+            )}{" "}
+            <a
+              href="#metoda-title"
+              className="text-[color:var(--ink)] underline decoration-[var(--color-accent-gold)]/50 underline-offset-2 transition hover:decoration-[var(--color-accent-gold)]"
+            >
+              {pickL(lang, "lub przeprowadź degustację wina", "or run a wine tasting")}
+            </a>
+            .
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#kompas" className="pitch-cta-primary">
@@ -280,13 +287,13 @@ export default function SamouczekClient() {
             <span className="pitch-roman">II.</span>
             <div>
               <h2 id="metoda-title" className="pitch-display text-[clamp(1.8rem,4.4vw,3rem)] text-white">
-                {pickL(lang, "Metoda degustacji", "The tasting method")}
+                {pickL(lang, "Degustacja krok po kroku", "Tasting step by step")}
               </h2>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-[color:var(--ink-soft)]">
                 {pickL(
                   lang,
-                  "Sześć kroków, dzięki którym przestaniesz „tylko pić” a zaczniesz nazywać wrażenia.",
-                  "Six steps that take you from “just drinking” to putting names to sensations.",
+                  "Najpierw poznaj wino, a potem opisz je językiem Vinocompas. W kilku prostych krokach odkryjesz jego charakter i znajdziesz wina, które najbardziej odpowiadają Twojemu winiarskiemu gustowi.",
+                  "First get to know the wine, then describe it in the language of Vinocompas. In a few simple steps you'll uncover its character and find the wines that best match your taste.",
                 )}
               </p>
             </div>
@@ -423,7 +430,7 @@ export default function SamouczekClient() {
         suggestions={suggestions}
         greeting={pickL(lang, HELLO_SAMOUCZEK_PL, HELLO_SAMOUCZEK_EN)}
         pageContext={[
-          `strona: samouczek Vinokompasu, etap ${stage} z 3 (${
+          `strona: samouczek Vinocompasu, etap ${stage} z 3 (${
             stage === 1 ? "SMAK - 3 osie smaku" : stage === 2 ? "WRAŻENIA - 6 sektorów" : "AROMATY - 12 tendencji"
           })`,
           lastPick

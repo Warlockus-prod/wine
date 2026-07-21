@@ -387,9 +387,9 @@
   "notFound": {
     "eyebrow": "Something went sideways",
     "title": "We couldn't find that page",
-    "subtitle": "It looks like this link expired or moved. Pick a path below - back to the restaurant map, a featured card, or the Vinokompas tutorial.",
+    "subtitle": "It looks like this link expired or moved. Pick a path below - back to the restaurant map, a featured card, or the Vinocompas tutorial.",
     "backHome": "Back to the restaurant map",
     "featured": "Visit {name}",
-    "openTutorial": "Vinokompas tutorial"
+    "openTutorial": "Vinocompas tutorial"
   }
 }
