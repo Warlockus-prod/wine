@@ -105,27 +105,27 @@ export const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 
 // its component objects via alpha connected-components + gap-only valley
 // splits → public/senses/ring/<tendencja>-<k>.png. Order below = clockwise
 // ring order (sector order from 12 o'clock); `a` = true sprite aspect.
-/** `k` — optional per-sprite shrink (client 2026-07-21: "элементы немного
- *  находят друг на друга… только те, что находят, и чуть больше остальных
- *  уменьшить"). Applied AFTER the common scale, so unflagged sprites keep
- *  their size; flagged ones (the 11→2:30 overlap chain in the inner row +
- *  the visually-oversized dojrzałe/masło/konfitury pieces) shrink 8-18%. */
+/** `a` = true sprite aspect (w/h). Per-sprite SIZE is no longer hand-tuned:
+ *  spriteRing() equalises every object toward its row's median area and
+ *  trims the dense 11-2 crown, so the old per-sprite `k` shrink map (which
+ *  itself caused unevenness) is gone. `k` remains an optional escape hatch
+ *  for a one-off override, unused today. */
 export const RING_SPRITES: { f: string; t: string; a: number; k?: number }[] = [
-  { f: "tegie-cigaro-1", t: "tegie-cigaro", a: 1.348, k: 0.8 },
+  { f: "tegie-cigaro-1", t: "tegie-cigaro", a: 1.348 },
   { f: "tegie-cigaro-2", t: "tegie-cigaro", a: 1.095 },
-  { f: "tegie-cigaro-3", t: "tegie-cigaro", a: 1.611, k: 0.75 },
-  { f: "tegie-cigaro-4", t: "tegie-cigaro", a: 1.735, k: 0.92 },
-  { f: "tegie-cigaro-5", t: "tegie-cigaro", a: 0.553, k: 0.86 },
-  { f: "tegie-suszone-1", t: "tegie-suszone", a: 2.119, k: 0.92 },
-  { f: "tegie-suszone-2", t: "tegie-suszone", a: 2.224, k: 0.82 },
+  { f: "tegie-cigaro-3", t: "tegie-cigaro", a: 1.611 },
+  { f: "tegie-cigaro-4", t: "tegie-cigaro", a: 1.735 },
+  { f: "tegie-cigaro-5", t: "tegie-cigaro", a: 0.553 },
+  { f: "tegie-suszone-1", t: "tegie-suszone", a: 2.119 },
+  { f: "tegie-suszone-2", t: "tegie-suszone", a: 2.224 },
   { f: "tegie-suszone-3", t: "tegie-suszone", a: 1.589 },
-  { f: "tegie-suszone-4", t: "tegie-suszone", a: 4.415, k: 0.82 },
-  { f: "tegie-suszone-5", t: "tegie-suszone", a: 1.481, k: 0.9 },
-  { f: "miekkie-dojrzale-1", t: "miekkie-dojrzale", a: 1.523, k: 0.88 },
+  { f: "tegie-suszone-4", t: "tegie-suszone", a: 4.415 },
+  { f: "tegie-suszone-5", t: "tegie-suszone", a: 1.481 },
+  { f: "miekkie-dojrzale-1", t: "miekkie-dojrzale", a: 1.523 },
   { f: "miekkie-konfitury-1", t: "miekkie-konfitury", a: 0.985 },
-  { f: "miekkie-konfitury-2", t: "miekkie-konfitury", a: 1.2, k: 0.92 },
+  { f: "miekkie-konfitury-2", t: "miekkie-konfitury", a: 1.2 },
   { f: "miekkie-konfitury-3", t: "miekkie-konfitury", a: 1.136 },
-  { f: "oleiste-maslo-1", t: "oleiste-maslo", a: 1.591, k: 0.88 },
+  { f: "oleiste-maslo-1", t: "oleiste-maslo", a: 1.591 },
   { f: "oleiste-tropikalne-1", t: "oleiste-tropikalne", a: 1.364 },
   { f: "oleiste-tropikalne-2", t: "oleiste-tropikalne", a: 1.723 },
   { f: "oleiste-tropikalne-3", t: "oleiste-tropikalne", a: 1.573 },
@@ -143,11 +143,11 @@ export const RING_SPRITES: { f: string; t: string; a: number; k?: number }[] = [
   { f: "ziemiste-sciolka-5", t: "ziemiste-sciolka", a: 0.394 },
   { f: "szorstkie-pizmo-1", t: "szorstkie-pizmo", a: 0.295 },
   { f: "szorstkie-pizmo-2", t: "szorstkie-pizmo", a: 1.216 },
-  { f: "szorstkie-dab-1", t: "szorstkie-dab", a: 0.556, k: 0.88 },
+  { f: "szorstkie-dab-1", t: "szorstkie-dab", a: 0.556 },
   { f: "szorstkie-dab-2", t: "szorstkie-dab", a: 3.352 },
-  { f: "szorstkie-dab-3", t: "szorstkie-dab", a: 0.766, k: 0.84 },
+  { f: "szorstkie-dab-3", t: "szorstkie-dab", a: 0.766 },
   { f: "szorstkie-dab-4", t: "szorstkie-dab", a: 1.167 },
-  { f: "szorstkie-dab-5", t: "szorstkie-dab", a: 1.136, k: 0.8 },
+  { f: "szorstkie-dab-5", t: "szorstkie-dab", a: 1.136 },
 ];
 /** Lay the sprites in TWO staggered rows with near-uniform gaps AND every
  *  sprite anchored INSIDE its own 30° slice. The earlier pure-uniform pass
@@ -196,6 +196,32 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
       }
       return { f: x.f, t: x.t, w, h };
     });
+
+    // Area-equalise toward the row median so no object dwarfs another
+    // (client 2026-07-21: "сравни все элементы и выровняй"). Equal-AREA
+    // base sizing + the aspect/height caps left a 5× spread — jars at 3-8h
+    // looked lost next to the dense dark crown at 11-2h. Each sprite is
+    // pulled toward the median area, bounded ±22% so a genuinely wide or
+    // narrow object keeps its character. The 11-2 crown (coffee/dried
+    // fruit/oak, 5 sprites per slice, reads heavy) then gets an extra trim
+    // — the client's "11 12 1 2 уменьш". Bounds keep dense slices from
+    // overflowing; the slice-clamp relaxation below is the hard backstop.
+    const DENSE_CROWN = new Set(["tegie-cigaro", "tegie-suszone", "szorstkie-dab"]);
+    const sorted = items.map((it) => it.w * it.h).sort((a, b) => a - b);
+    const medArea = sorted[Math.floor(sorted.length / 2)] || 1;
+    for (const it of items) {
+      let f = Math.sqrt(medArea / (it.w * it.h));
+      f = Math.max(0.72, Math.min(1.32, f));
+      if (DENSE_CROWN.has(it.t)) f *= 0.88;
+      it.w *= f;
+      it.h *= f;
+      if (it.h > hCap) {
+        const g = hCap / it.h;
+        it.w *= g;
+        it.h = hCap;
+      }
+    }
+
     // Per-tendencja angular domain = its own slice, EXTENDED by half of any
     // adjacent slice that has no items in THIS row (single-sprite tendencje
     // occupy only one row; without the donation the other row opens a
