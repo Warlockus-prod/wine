@@ -74,7 +74,7 @@ export function ringImagesFor(id: string): string[] {
  * instead, echoing the wheel's garland.
  */
 const RING_SPRITE_COUNTS: Record<string, number> = {
-  "tegie.cigaro": 6,
+  "tegie.cigaro": 5,
   "tegie.suszone": 5,
   "miekkie.dojrzale": 9,
   "miekkie.konfitury": 5,
@@ -82,10 +82,10 @@ const RING_SPRITE_COUNTS: Record<string, number> = {
   "oleiste.tropikalne": 6,
   "swieze.zielone": 8,
   "swieze.cytrusy": 6,
-  "ziemiste.mineraly": 10,
+  "ziemiste.mineraly": 9,
   "ziemiste.sciolka": 7,
   "szorstkie.pizmo": 4,
-  "szorstkie.dab": 10,
+  "szorstkie.dab": 5,
 };
 
 const spritesOf = (tendencjaId: string): string[] => {
