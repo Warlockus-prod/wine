@@ -96,16 +96,18 @@ const spritesOf = (tendencjaId: string): string[] => {
 
 /**
  * Object sprites for a focused id, as a horizontal strip.
- *  - tendencja → its own objects; when it was cut into a single blob, its
- *    SIBLING's objects join the strip so the band never shows one lonely
- *    huddle (both belong to the same sektor, so the pairing still reads true)
+ *  - tendencja → ONLY its own objects. Since the 4 glued groups were
+ *    re-sliced (2026-07-21) every tendencja has ≥2 real objects, so the
+ *    card never mixes in a sibling's objects (client: the Warzywa card must
+ *    not show citrus). The sibling-borrow fallback stays for the impossible
+ *    case of a future tendencja with a single sprite.
  *  - sektor    → objects from both children, evenly taken
  *  - base      → none, matching the wheel
  */
 export function ringSpritesFor(id: string, max = 5): string[] {
   if (RING_IMAGE_MAP[id]) {
     const own = spritesOf(id);
-    if (own.length >= 3) return own.slice(0, max);
+    if (own.length >= 2) return own.slice(0, max);
     const sector = id.split(".")[0];
     const sibling = Object.keys(RING_IMAGE_MAP).find(
       (k) => k !== id && k.startsWith(`${sector}.`),
