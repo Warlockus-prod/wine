@@ -821,8 +821,16 @@ const VIEW = 640;
           );
         })}
 
-        {/* Center hub + 6-pointed compass star - fill flips per theme */}
-        <circle cx={cx} cy={cy} r={rInner} fill="var(--surface-deep)" stroke="var(--gold-hairline)" strokeWidth={0.7} />
+        {/* Center medallion — opaque disc behind the "Vinocompas" wordmark.
+            Radius 44 (not rInner=36): the 67px text core fits ±34, but a 36
+            circle narrows at the text's height, so the italic V/s corners
+            (plus the cream halo) used to spill onto the pie — fine on stage 1
+            (3 wedges, solid colour behind) but crossed the 6/12 radial
+            dividers at stages 2/3 (client 2026-07-21 "перекрывает надпись").
+            A 44 disc clears the text at every glyph height on all stages;
+            drawn AFTER the dividers + needles so it covers them. rInner stays
+            36 for the ring math + the tap-to-reset hit zone. */}
+        <circle cx={cx} cy={cy} r={44} fill="var(--surface-deep)" stroke="var(--gold-hairline)" strokeWidth={0.7} />
         <text
           x={cx}
           y={cy + 4}
