@@ -105,22 +105,27 @@ export const axisIdForSpoke = (i: number): string => BASE_AXES[Math.floor(((i + 
 // its component objects via alpha connected-components + gap-only valley
 // splits → public/senses/ring/<tendencja>-<k>.png. Order below = clockwise
 // ring order (sector order from 12 o'clock); `a` = true sprite aspect.
-export const RING_SPRITES: { f: string; t: string; a: number }[] = [
-  { f: "tegie-cigaro-1", t: "tegie-cigaro", a: 1.348 },
+/** `k` — optional per-sprite shrink (client 2026-07-21: "элементы немного
+ *  находят друг на друга… только те, что находят, и чуть больше остальных
+ *  уменьшить"). Applied AFTER the common scale, so unflagged sprites keep
+ *  their size; flagged ones (the 11→2:30 overlap chain in the inner row +
+ *  the visually-oversized dojrzałe/masło/konfitury pieces) shrink 8-18%. */
+export const RING_SPRITES: { f: string; t: string; a: number; k?: number }[] = [
+  { f: "tegie-cigaro-1", t: "tegie-cigaro", a: 1.348, k: 0.8 },
   { f: "tegie-cigaro-2", t: "tegie-cigaro", a: 1.095 },
-  { f: "tegie-cigaro-3", t: "tegie-cigaro", a: 1.611 },
-  { f: "tegie-cigaro-4", t: "tegie-cigaro", a: 1.735 },
-  { f: "tegie-cigaro-5", t: "tegie-cigaro", a: 0.553 },
-  { f: "tegie-suszone-1", t: "tegie-suszone", a: 2.119 },
-  { f: "tegie-suszone-2", t: "tegie-suszone", a: 2.224 },
+  { f: "tegie-cigaro-3", t: "tegie-cigaro", a: 1.611, k: 0.75 },
+  { f: "tegie-cigaro-4", t: "tegie-cigaro", a: 1.735, k: 0.92 },
+  { f: "tegie-cigaro-5", t: "tegie-cigaro", a: 0.553, k: 0.86 },
+  { f: "tegie-suszone-1", t: "tegie-suszone", a: 2.119, k: 0.92 },
+  { f: "tegie-suszone-2", t: "tegie-suszone", a: 2.224, k: 0.82 },
   { f: "tegie-suszone-3", t: "tegie-suszone", a: 1.589 },
-  { f: "tegie-suszone-4", t: "tegie-suszone", a: 4.415 },
-  { f: "tegie-suszone-5", t: "tegie-suszone", a: 1.481 },
-  { f: "miekkie-dojrzale-1", t: "miekkie-dojrzale", a: 1.523 },
+  { f: "tegie-suszone-4", t: "tegie-suszone", a: 4.415, k: 0.82 },
+  { f: "tegie-suszone-5", t: "tegie-suszone", a: 1.481, k: 0.9 },
+  { f: "miekkie-dojrzale-1", t: "miekkie-dojrzale", a: 1.523, k: 0.88 },
   { f: "miekkie-konfitury-1", t: "miekkie-konfitury", a: 0.985 },
-  { f: "miekkie-konfitury-2", t: "miekkie-konfitury", a: 1.2 },
+  { f: "miekkie-konfitury-2", t: "miekkie-konfitury", a: 1.2, k: 0.92 },
   { f: "miekkie-konfitury-3", t: "miekkie-konfitury", a: 1.136 },
-  { f: "oleiste-maslo-1", t: "oleiste-maslo", a: 1.591 },
+  { f: "oleiste-maslo-1", t: "oleiste-maslo", a: 1.591, k: 0.88 },
   { f: "oleiste-tropikalne-1", t: "oleiste-tropikalne", a: 1.364 },
   { f: "oleiste-tropikalne-2", t: "oleiste-tropikalne", a: 1.723 },
   { f: "oleiste-tropikalne-3", t: "oleiste-tropikalne", a: 1.573 },
@@ -138,11 +143,11 @@ export const RING_SPRITES: { f: string; t: string; a: number }[] = [
   { f: "ziemiste-sciolka-5", t: "ziemiste-sciolka", a: 0.394 },
   { f: "szorstkie-pizmo-1", t: "szorstkie-pizmo", a: 0.295 },
   { f: "szorstkie-pizmo-2", t: "szorstkie-pizmo", a: 1.216 },
-  { f: "szorstkie-dab-1", t: "szorstkie-dab", a: 0.556 },
+  { f: "szorstkie-dab-1", t: "szorstkie-dab", a: 0.556, k: 0.88 },
   { f: "szorstkie-dab-2", t: "szorstkie-dab", a: 3.352 },
-  { f: "szorstkie-dab-3", t: "szorstkie-dab", a: 0.766 },
+  { f: "szorstkie-dab-3", t: "szorstkie-dab", a: 0.766, k: 0.84 },
   { f: "szorstkie-dab-4", t: "szorstkie-dab", a: 1.167 },
-  { f: "szorstkie-dab-5", t: "szorstkie-dab", a: 1.136 },
+  { f: "szorstkie-dab-5", t: "szorstkie-dab", a: 1.136, k: 0.8 },
 ];
 /** Lay the sprites in TWO staggered rows with near-uniform gaps AND every
  *  sprite anchored INSIDE its own 30° slice. The earlier pure-uniform pass
@@ -174,7 +179,7 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
     const items = row.idx.map((i) => {
       const x = RING_SPRITES[i];
       const aCap = Math.min(x.a, 2.3);
-      let w = s0 * Math.sqrt(aCap);
+      let w = s0 * Math.sqrt(aCap) * (x.k ?? 1);
       let h = w / x.a; // true aspect: capped-wide strips get shorter, narrow ones taller
       if (h > hCap) {
         const f = hCap / h;
@@ -213,8 +218,16 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
       const pos = group.indexOf(k);
       theta.push(loB[si] + ((hiB[si] - loB[si]) * (pos + 1)) / (m + 1));
     }
-    // clamped gap-equalising relaxation within each sprite's domain
-    const pad = arc * 0.1;
+    // clamped gap-equalising relaxation within each sprite's domain.
+    // Over-full slices (Σ widths > their arc: the dab/cigaro chain at
+    // 11-1 o'clock) get a slimmer pad, so their centres may use more of
+    // their OWN slice before overlapping each other — still hard-clamped
+    // inside the slice, so the canon (sprite in own slice) holds.
+    const sliceLoad: Record<number, number> = {};
+    for (const it of items) {
+      const si = sliceIdx[it.t];
+      sliceLoad[si] = (sliceLoad[si] ?? 0) + it.w;
+    }
     for (let pass = 0; pass < 8; pass++) {
       for (let k = 0; k < items.length; k++) {
         const prev = (k + items.length - 1) % items.length;
@@ -225,6 +238,7 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
         const gapR = arcR * row.r - (items[k].w + items[next].w) / 2;
         const shift = ((gapR - gapL) / 2 / row.r) * 0.5;
         const si = sliceIdx[items[k].t];
+        const pad = arc * (sliceLoad[si] > arc * row.r ? 0.04 : 0.1);
         theta[k] = Math.max(loB[si] + pad, Math.min(hiB[si] - pad, theta[k] + shift));
       }
     }
