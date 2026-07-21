@@ -170,7 +170,12 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
       return (0.84 * 2 * Math.PI * row.r) / sqrtSum;
     }),
   );
-  const hCap = 0.98 * s0;
+  // Radial cap: a sprite may never be taller than the gap between the two
+  // rows minus a hair — otherwise angular neighbours from the OTHER row
+  // stack onto it (client crops 2026-07-21: cocoa over chocolate at 12,
+  // watermelon over papaya at 5). Only tall sprites shrink; wide/flat ones
+  // are untouched — exactly the colliding class.
+  const hCap = Math.min(0.98 * s0, Math.abs(r2 - r1) - 2);
   const arc = (Math.PI * 2) / 12;
   const sliceIdx: Record<string, number> = {};
   for (const s of SPOKES) sliceIdx[s.tendencja.id.replace(/\./g, "-")] = s.index;
