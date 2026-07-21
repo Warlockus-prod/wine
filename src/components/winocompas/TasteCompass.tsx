@@ -958,7 +958,7 @@ const VIEW = 640;
                       <path id={arcId} d={labelArc(cx, cy, radii[li], s.angle, s.half * 0.98)} fill="none" />
                       <text
                         fontFamily="var(--font-display)"
-                        fontSize={12}
+                        fontSize={13.5}
                         fontWeight={600}
                         letterSpacing="0.02em"
                         fill="var(--ink)"
@@ -992,7 +992,7 @@ const VIEW = 640;
                 <path id={arcId} d={labelArc(cx, cy, rOuter + 13, angleCenter, arc * 0.46)} fill="none" />
                 <text
                   fontFamily="var(--font-display)"
-                  fontSize={16}
+                  fontSize={18}
                   fontWeight={600}
                   letterSpacing="0.06em"
                   fill="var(--ink)"
@@ -1030,7 +1030,7 @@ const VIEW = 640;
               dominantBaseline="middle"
               fontFamily="var(--font-serif)"
               fontStyle="italic"
-              fontSize={13}
+              fontSize={15}
               fontWeight={600}
               // White ink + dark halo: the pie beneath is now the vivid
               // official palette, spanning near-black navy to pure yellow —
