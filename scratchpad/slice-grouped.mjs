@@ -25,12 +25,24 @@ const OUT = resolve(ROOT, "scratchpad/sliced");
 const RING = resolve(ROOT, "public/senses/ring");
 mkdirSync(OUT, { recursive: true });
 
-// tendencja → source original (mapped by eye from the labelled contact sheet)
+// tendencja → source original (mapped by eye from the labelled contact sheet).
+// ALL 12 tendencje re-sliced 2026-07-21 to standardise: one object per sprite
+// (client: split the horse from the campfire, the citrus trio, etc.). The
+// bbox-merge PAD reunites a detached leaf/stem with its parent AND keeps a
+// touching composition (honey jar + comb) as one — the client OK'd honey.
 const MAP = {
+  "tegie-cigaro": "16_13_31",     // chocolate, cocoa, coffee cup, cinnamon sticks, choc+beans
+  "tegie-suszone": "16_14_43",    // dried cranberries, apricots, raisins, muesli mix, cinnamon+vanilla
   "miekkie-dojrzale": "16_15_52", // gooseberry, peach, blueberries, strawberry, blackberry, apple, cherries, barberry, fig
-  "oleiste-maslo": "16_22_30",    // nuts, butter, toast, honey, honeycomb, mustard, cookies
-  "ziemiste-mineraly": "16_45_40",// starfish ×2, shells ×3, wave, star anise, rock, crystals
+  "miekkie-konfitury": "16_17_44",// jam jars ×4 + fruit pie
+  "oleiste-maslo": "16_22_30",    // nuts, butter, toast, honey(jar+comb), cookies
+  "oleiste-tropikalne": "16_49_29",// mango, lychee, watermelon, banana, pineapple, papaya
   "swieze-zielone": "16_49_12",   // tomato, asparagus, pepper, cucumber-lemonade, mint, kiwi, artichoke, apple
+  "swieze-cytrusy": "16_47_46",   // grapefruit, lemon peel, orange, lime, lemon, lemonade pitcher
+  "ziemiste-mineraly": "16_45_40",// starfish ×2, shells ×3, wave, star anise, rock, crystals
+  "ziemiste-sciolka": "16_33_51", // lavender, pinecone, mushroom, sprout, thyme, rock, crystals
+  "szorstkie-pizmo": "16_36_23",  // wheat, horse, campfire, leather tag
+  "szorstkie-dab": "16_45_36",    // smoke swirls, barrel, tree, straw, oak+acorns
 };
 
 const findSrc = (stamp) => {
