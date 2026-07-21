@@ -858,7 +858,7 @@ const VIEW = 640;
             // rows — uniform gaps, no grouped tiles, bigger objects. Sprite
             // order follows the sectors clockwise, and spriteRing()'s global
             // rotation keeps each tendencja's objects over its slice.
-            const sprites = spriteRing(rOuter + 59, rOuter + 101);
+            const sprites = spriteRing(rOuter + 52, rOuter + 92);
             const tendencjaOf: Record<string, (typeof SPOKES)[number]> = {};
             for (const sp of SPOKES) tendencjaOf[sp.tendencja.id.replace(/\./g, "-")] = sp;
             return sprites.map((sprite, i) => {
