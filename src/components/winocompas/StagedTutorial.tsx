@@ -820,12 +820,18 @@ function DrynessMeter({
         </p>
       </div>
 
-      {/* Zone labels live in their own row so the marker can never collide
-          with them. The centre is the dry/sweet boundary → "Półwytrawne". */}
-      <div className="mt-4 flex justify-between text-xs tracking-wider text-[color:var(--color-accent-gold)] uppercase">
-        <span>{pickL(lang, "Bardzo wytrawne", "Bone dry")}</span>
-        <span className="hidden sm:inline">{pickL(lang, "Półwytrawne", "Off-dry")}</span>
-        <span>{pickL(lang, "Bardzo słodkie", "Lusciously sweet")}</span>
+      {/* Every interval labelled (client sketch 2026-07-21): five equal
+          fifths, names alternating ABOVE (W, P.S) and BELOW (B.W, P.W, S)
+          the rail exactly like the drawing, so five full words fit even on
+          narrow screens. The sketch's B.W/P.S legend is not rendered —
+          full names on the axis. */}
+      <div className="relative mt-4 h-4 text-[9px] tracking-wider text-[color:var(--color-accent-gold)] uppercase sm:text-[10px]">
+        <span className="absolute left-[30%] -translate-x-1/2 whitespace-nowrap">
+          {pickL(lang, "Wytrawne", "Dry")}
+        </span>
+        <span className="absolute left-[70%] -translate-x-1/2 whitespace-nowrap">
+          {pickL(lang, "Półsłodkie", "Medium sweet")}
+        </span>
       </div>
 
       {/* Rail + position pin */}
@@ -856,6 +862,18 @@ function DrynessMeter({
             <circle cx="12" cy="10" r="3.1" fill="#16294f" />
           </svg>
         </div>
+      </div>
+
+      <div className="relative mt-2 h-7 sm:h-4 text-[9px] tracking-wider text-[color:var(--color-accent-gold)] uppercase sm:text-[10px]">
+        <span className="absolute left-0 max-w-[4.5rem] whitespace-normal leading-tight sm:max-w-none sm:whitespace-nowrap">
+          {pickL(lang, "Bardzo wytrawne", "Bone dry")}
+        </span>
+        <span className="absolute left-[56%] -translate-x-1/2 whitespace-nowrap sm:left-1/2">
+          {pickL(lang, "Półwytrawne", "Off-dry")}
+        </span>
+        <span className="absolute right-0 whitespace-nowrap">
+          {pickL(lang, "Słodkie", "Sweet")}
+        </span>
       </div>
 
       {/* Client round-3 caption. The underlying score is still the 3-base-smak

@@ -5,13 +5,13 @@ describe("dryness (placeholder wytrawność model)", () => {
   it("empty profile → base offset 10 → Wytrawne", () => {
     const r = dryness({});
     expect(r.score).toBe(10);
-    expect(r.label).toBe("Wytrawne");
+    expect(r.label).toBe("Bardzo wytrawne");
   });
 
-  it("max słodycz → clamped to 100 → Bardzo słodkie", () => {
+  it("max słodycz → clamped to 100 → Słodkie", () => {
     const r = dryness({ "base.slodycz": 5 });
     expect(r.score).toBe(100);
-    expect(r.label).toBe("Bardzo słodkie");
+    expect(r.label).toBe("Słodkie");
   });
 
   it("cierpkość + kwasowość pull the score down to the floor", () => {
@@ -36,10 +36,10 @@ describe("dryness (placeholder wytrawność model)", () => {
 
   it("label boundaries match the documented buckets", () => {
     expect(dryness({ "base.cierpkosc": 1 }).label).toBe("Bardzo wytrawne"); // 7
-    expect(dryness({}).label).toBe("Wytrawne"); // 10
-    expect(dryness({ "base.slodycz": 1 }).label).toBe("Półwytrawne"); // 28
-    expect(dryness({ "base.slodycz": 2 }).label).toBe("Półsłodkie"); // 46
-    expect(dryness({ "base.slodycz": 3 }).label).toBe("Półsłodkie"); // 64 (<65)
+    expect(dryness({}).label).toBe("Bardzo wytrawne"); // 10 (<20)
+    expect(dryness({ "base.slodycz": 1 }).label).toBe("Wytrawne"); // 28
+    expect(dryness({ "base.slodycz": 2 }).label).toBe("Półwytrawne"); // 46
+    expect(dryness({ "base.slodycz": 3 }).label).toBe("Półsłodkie"); // 64
     expect(dryness({ "base.slodycz": 4 }).label).toBe("Słodkie"); // 82
   });
 });

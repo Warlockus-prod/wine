@@ -6,7 +6,7 @@
  * pure math is unit-testable without pulling in the React/next tree.
  *
  *   raw = słodycz*18 − cierpkość*3 − kwasowość*3 + 10, clamped 0..100,
- *   then bucketed into 6 labels (higher = sweeter).
+ *   then bucketed into 5 labels (higher = sweeter).
  *
  * `lang` picks the bucket-label language (default PL - existing call-sites
  * and tests stay byte-identical); EN labels follow docs/i18n/samouczek-en.md.
@@ -20,11 +20,12 @@ export interface DrynessResult {
   label: string;
 }
 
-// Bucket labels, driest → sweetest. EN terms per the translation pack
-// (Bone dry / Dry / Off-dry / Medium sweet / Sweet / Lusciously sweet).
-const LABELS: Record<CompassLang, [string, string, string, string, string, string]> = {
-  pl: ["Bardzo wytrawne", "Wytrawne", "Półwytrawne", "Półsłodkie", "Słodkie", "Bardzo słodkie"],
-  en: ["Bone dry", "Dry", "Off-dry", "Medium sweet", "Sweet", "Lusciously sweet"],
+// Bucket labels, driest → sweetest. FIVE intervals per the client's sketch
+// of the scale (2026-07-21: B.W / W / P.W / P.S / S) — each an equal fifth,
+// so the pin always sits inside the interval whose label it carries.
+const LABELS: Record<CompassLang, [string, string, string, string, string]> = {
+  pl: ["Bardzo wytrawne", "Wytrawne", "Półwytrawne", "Półsłodkie", "Słodkie"],
+  en: ["Bone dry", "Dry", "Off-dry", "Medium sweet", "Sweet"],
 };
 
 export function dryness(
@@ -37,12 +38,7 @@ export function dryness(
   const raw = s * 18 - c * 3 - k * 3 + 10;
   const score = Math.max(0, Math.min(100, raw));
   const L = LABELS[lang];
-  let label: string;
-  if (score < 8) label = L[0];
-  else if (score < 25) label = L[1];
-  else if (score < 45) label = L[2];
-  else if (score < 65) label = L[3];
-  else if (score < 85) label = L[4];
-  else label = L[5];
+  // Equal fifths — the interval boundaries match the labelled scale ticks.
+  const label = L[Math.min(4, Math.floor(score / 20))];
   return { score, label };
 }

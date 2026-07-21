@@ -501,6 +501,47 @@ const VIEW = 640;
           );
         })}
 
+        {/* Compass needles on the dividers (client sketch 2026-07-21): a dart
+            at the rim of every boundary, sized by the stage that INTRODUCED
+            the boundary — base axes (0/120/240°, there from stage 1) largest,
+            sector borders added by stage 2 (60/180/300°) smaller, tendencja
+            dividers added by stage 3 (odd 30°s) smallest. So stage 1 shows 3
+            needles, stage 2 shows 6 in two sizes, stage 3 all 12 in three
+            sizes ("na finalnym obrazku będą 3 rozmiary wskazówek"). */}
+        {Array.from({ length: 12 }, (_, k) => {
+          const isBaseAxis = k % 4 === 0; // 0° / 120° / 240°
+          const isSectorBorder = k % 2 === 0 && !isBaseAxis; // 60/180/300°
+          const visible = isBaseAxis || (isSectorBorder ? level >= 2 : level >= 3);
+          if (!visible) return null;
+          const [len, halfW] = isBaseAxis ? [34, 8] : isSectorBorder ? [23, 5.5] : [14, 3.5];
+          const th = (Math.PI / 6) * k;
+          const dirX = Math.sin(th);
+          const dirY = -Math.cos(th);
+          const perpX = Math.cos(th);
+          const perpY = Math.sin(th);
+          const tipR = rOuter - 1;
+          const baseR = tipR - len;
+          const tip = [cx + dirX * tipR, cy + dirY * tipR];
+          const c1 = [cx + dirX * baseR + perpX * halfW, cy + dirY * baseR + perpY * halfW];
+          const c2 = [cx + dirX * baseR - perpX * halfW, cy + dirY * baseR - perpY * halfW];
+          // notched base → the classic compass-dart silhouette from the sketch
+          const notch = [cx + dirX * (baseR + len * 0.26), cy + dirY * (baseR + len * 0.26)];
+          const d = `M ${tip[0].toFixed(2)} ${tip[1].toFixed(2)} L ${c1[0].toFixed(2)} ${c1[1].toFixed(2)} L ${notch[0].toFixed(2)} ${notch[1].toFixed(2)} L ${c2[0].toFixed(2)} ${c2[1].toFixed(2)} Z`;
+          return (
+            <path
+              key={`needle-${k}`}
+              d={d}
+              fill="#0b1f44"
+              fillOpacity={0.92}
+              stroke="#f6efe2"
+              strokeWidth={1}
+              strokeLinejoin="round"
+              pointerEvents="none"
+              aria-hidden
+            />
+          );
+        })}
+
         {/* Demo intensity preview (auto-tour) - animated rings on the focused
             sektor/tendencja to SHOW that intensity varies. Visual only; never
             mutates the profile. */}
