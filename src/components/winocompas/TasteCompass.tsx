@@ -513,20 +513,25 @@ const VIEW = 640;
           const isSectorBorder = k % 2 === 0 && !isBaseAxis; // 60/180/300°
           const visible = isBaseAxis || (isSectorBorder ? level >= 2 : level >= 3);
           if (!visible) return null;
-          const [len, halfW] = isBaseAxis ? [34, 8] : isSectorBorder ? [23, 5.5] : [14, 3.5];
+          // Client 2026-07-21: plain TRIANGLE arrowheads whose TIPS poke OUT
+          // past the rim ("groty ... wychodzą poza koło i raczej trójkąt").
+          // Base sits just inside the rim, tip a stage-sized amount outside.
+          const [bodyLen, halfW, tipOut] = isBaseAxis
+            ? [10, 8, 15]
+            : isSectorBorder
+              ? [8, 6, 11]
+              : [6, 4.5, 8];
           const th = (Math.PI / 6) * k;
           const dirX = Math.sin(th);
           const dirY = -Math.cos(th);
           const perpX = Math.cos(th);
           const perpY = Math.sin(th);
-          const tipR = rOuter - 1;
-          const baseR = tipR - len;
+          const tipR = rOuter + tipOut; // outside the wheel
+          const baseR = rOuter - bodyLen; // base anchored just inside the rim
           const tip = [cx + dirX * tipR, cy + dirY * tipR];
           const c1 = [cx + dirX * baseR + perpX * halfW, cy + dirY * baseR + perpY * halfW];
           const c2 = [cx + dirX * baseR - perpX * halfW, cy + dirY * baseR - perpY * halfW];
-          // notched base → the classic compass-dart silhouette from the sketch
-          const notch = [cx + dirX * (baseR + len * 0.26), cy + dirY * (baseR + len * 0.26)];
-          const d = `M ${tip[0].toFixed(2)} ${tip[1].toFixed(2)} L ${c1[0].toFixed(2)} ${c1[1].toFixed(2)} L ${notch[0].toFixed(2)} ${notch[1].toFixed(2)} L ${c2[0].toFixed(2)} ${c2[1].toFixed(2)} Z`;
+          const d = `M ${tip[0].toFixed(2)} ${tip[1].toFixed(2)} L ${c1[0].toFixed(2)} ${c1[1].toFixed(2)} L ${c2[0].toFixed(2)} ${c2[1].toFixed(2)} Z`;
           return (
             <path
               key={`needle-${k}`}
