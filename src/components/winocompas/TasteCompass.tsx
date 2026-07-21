@@ -225,6 +225,10 @@ const VIEW = 640;
   const cy = VIEW / 2;
   const rOuter = 165;
   const rInner = 36;
+  // Visual centre-medallion radius (the "Vinocompas" disc). Bigger than
+  // rInner so the wordmark fits; EVERY line drawn from the centre must start
+  // at rHub (not cx,cy) or it crosses the medallion and lands on the text.
+  const rHub = 44;
   const ringStep = (rOuter - rInner) / RING_COUNT;
 
   // Radial pick - intensity follows the ring the user clicks (the dial fills
@@ -838,7 +842,7 @@ const VIEW = 640;
             A 44 disc clears the text at every glyph height on all stages;
             drawn AFTER the dividers + needles so it covers them. rInner stays
             36 for the ring math + the tap-to-reset hit zone. */}
-        <circle cx={cx} cy={cy} r={44} fill="var(--surface-deep)" stroke="var(--gold-hairline)" strokeWidth={0.7} />
+        <circle cx={cx} cy={cy} r={rHub} fill="var(--surface-deep)" stroke="var(--gold-hairline)" strokeWidth={0.7} />
         <text
           x={cx}
           y={cy + 4}
@@ -1112,10 +1116,12 @@ const VIEW = 640;
           const dimWhenIrrelevant = baseInteractive ? 1 : level >= 2 ? 0.55 : 1;
           return (
             <g key={`base-${axis.id}`} opacity={dimWhenIrrelevant} pointerEvents="none">
-              {/* Faint axis line ALWAYS shown to anchor the geometry */}
+              {/* Faint axis line ALWAYS shown to anchor the geometry. Starts
+                  at the medallion edge (rHub), NOT the centre — otherwise it
+                  runs across the "Vinocompas" wordmark (client 2026-07-21). */}
               <line
-                x1={cx}
-                y1={cy}
+                x1={cx + rHub * xUnit}
+                y1={cy + rHub * yUnit}
                 x2={cx + (rOuter - 4) * xUnit}
                 y2={cy + (rOuter - 4) * yUnit}
                 stroke="rgba(199, 159, 105, 0.30)"
@@ -1128,8 +1134,8 @@ const VIEW = 640;
                   Kept at level 2/3 as a dim reference to the base axes. */}
               {value > 0 && level !== 1 ? (
                 <line
-                  x1={cx}
-                  y1={cy}
+                  x1={cx + rHub * xUnit}
+                  y1={cy + rHub * yUnit}
                   x2={beamX}
                   y2={beamY}
                   stroke="var(--color-accent-gold)"
