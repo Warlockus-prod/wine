@@ -516,11 +516,14 @@ const VIEW = 640;
           // Client 2026-07-21: plain TRIANGLE arrowheads whose TIPS poke OUT
           // past the rim ("groty ... wychodzą poza koło i raczej trójkąt").
           // Base sits just inside the rim, tip a stage-sized amount outside.
+          // Pronounced 3-tier hierarchy (client 2026-07-21 chose "B": the
+          // steps must read as intentional, not accidental) — each tier is
+          // ~1.6× the next in tip-reach AND width, not just tip-reach.
           const [bodyLen, halfW, tipOut] = isBaseAxis
-            ? [10, 8, 15]
+            ? [11, 9, 20]
             : isSectorBorder
-              ? [8, 6, 11]
-              : [6, 4.5, 8];
+              ? [8, 6, 12]
+              : [5, 4, 6];
           const th = (Math.PI / 6) * k;
           const dirX = Math.sin(th);
           const dirY = -Math.cos(th);
