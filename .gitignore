@@ -44,3 +44,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /prod-pl-*.png
+
+# Slicer intermediates — real sprites live in public/senses/ring
+scratchpad/sliced/
+scratchpad/sliced2/
+scratchpad/*.png
