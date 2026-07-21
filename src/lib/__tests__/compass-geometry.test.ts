@@ -207,7 +207,7 @@ describe("card ↔ wheel sprite manifests", () => {
       const fromCard = ringSpritesFor(spoke.tendencja.id, 99)
         .filter((p) => p.includes(`/${key}-`))
         .length;
-      const onDisk = Array.from({ length: 9 }, (_, i) => i + 1).filter((i) =>
+      const onDisk = Array.from({ length: 12 }, (_, i) => i + 1).filter((i) =>
         existsSync(resolve(process.cwd(), `public/senses/ring/${key}-${i}.png`)),
       ).length;
 
