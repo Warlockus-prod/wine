@@ -17,6 +17,9 @@ Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 
 ## Design-system invariants (2026-07 pass — details in `docs/design-pass-2026-07.md`)
 
+> **Full standards** — colours, typography, wheel placement, and how-we-work
+> rules — are in **`docs/design-standards.md`**. Read it before any UI change.
+
 - **Light cream theme is the shipped default** (`data-theme="light"` static on `<html>`). Global shims in `globals.css` remap `text-white`/`text-gray-*`/dark hex backgrounds/`border-white/*` for light mode. **Panels that stay navy** must use the `.keep-dark` class AND paint their background via inline style (shims can't match inline styles); inside `.keep-dark` the cream text/white-alpha borders/bright gold are restored automatically.
 - **`@theme inline` does NOT emit custom properties at runtime.** Hand-authored CSS that uses `var(--font-serif)`/`var(--font-display)` works only because runtime copies are declared on `:root` right after the `@theme` block — don't remove them, and don't reference new `@theme`-only tokens from authored CSS without adding a runtime copy.
 - `.pitch-cta-primary`/`.pitch-cta-ghost` are pill-shaped (one CTA language site-wide). Serif display = `.pitch-display` (Libre Baskerville); Franklin is body/UI only.
