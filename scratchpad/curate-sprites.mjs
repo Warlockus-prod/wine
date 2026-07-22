@@ -20,11 +20,13 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const RING = resolve(ROOT, "public/senses/ring");
 const write = process.argv.includes("--write");
 
-// Which CURRENT indices to KEEP (drop the rest). Tendencje not listed keep all.
+// Which CURRENT indices to KEEP (drop the rest). Tendencje not listed keep
+// all. NOTE: reads the CURRENT on-disk state — the cigaro/mineraly/dab dedup
+// already shipped, so only the new drops are listed here (client 2026-07-21:
+// remove the two "miksy" — the trail-mix and the nuts-on-spoon).
 const KEEP = {
-  "tegie-cigaro": [1, 2, 3, 4, 6],            // drop 5 (second chocolate)
-  "ziemiste-mineraly": [1, 2, 3, 5, 6, 7, 8, 9, 10], // drop 4 (second red starfish)
-  "szorstkie-dab": [1, 5, 6, 8, 9],           // tree, barrel, one smoke, oak, straw; drop 2/3/4/7 (extra swirls) + 10 (second straw)
+  "tegie-suszone": [1, 2, 3, 4],   // drop 5 (colourful trail/muesli mix)
+  "oleiste-maslo": [1, 3, 4, 5],   // drop 2 (nuts/granola on a spoon)
 };
 
 const TENDENCJE = [

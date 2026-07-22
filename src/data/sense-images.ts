@@ -75,10 +75,10 @@ export function ringImagesFor(id: string): string[] {
  */
 const RING_SPRITE_COUNTS: Record<string, number> = {
   "tegie.cigaro": 5,
-  "tegie.suszone": 5,
+  "tegie.suszone": 4,
   "miekkie.dojrzale": 9,
   "miekkie.konfitury": 5,
-  "oleiste.maslo": 5,
+  "oleiste.maslo": 4,
   "oleiste.tropikalne": 6,
   "swieze.zielone": 8,
   "swieze.cytrusy": 6,
