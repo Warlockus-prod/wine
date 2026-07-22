@@ -239,17 +239,18 @@ export function spriteRing(r1: number, r2: number): { f: string; t: string; thet
     // base sizing + the aspect/height caps left a 5× spread — jars at 3-8h
     // looked lost next to the dense dark crown at 11-2h. Each sprite is
     // pulled toward the median area, bounded ±22% so a genuinely wide or
-    // narrow object keeps its character. The 11-2 crown (coffee/dried
-    // fruit/oak, 5 sprites per slice, reads heavy) then gets an extra trim
-    // — the client's "11 12 1 2 уменьш". Bounds keep dense slices from
-    // overflowing; the slice-clamp relaxation below is the hard backstop.
-    const DENSE_CROWN = new Set(["tegie-cigaro", "tegie-suszone", "szorstkie-dab"]);
+    // narrow object keeps its character.
+    // NOTE: the DENSE_CROWN ×0.88 trim (Tęgie/Szorstkie) was dropped once the
+    // 81→74 dedup thinned those slices — they were then the SMALLEST sectors
+    // (~0.41k vs 0.52k median), so the client asked to enlarge them back
+    // ("powiększyć те в tęgości i szorstkości"). Plain equalisation now sizes
+    // them like the rest; the slice-clamp relaxation below still prevents
+    // overflow.
     const sorted = items.map((it) => it.w * it.h).sort((a, b) => a - b);
     const medArea = sorted[Math.floor(sorted.length / 2)] || 1;
     for (const it of items) {
       let f = Math.sqrt(medArea / (it.w * it.h));
       f = Math.max(0.72, Math.min(1.32, f));
-      if (DENSE_CROWN.has(it.t)) f *= 0.88;
       it.w *= f;
       it.h *= f;
       if (it.h > hCap) {
