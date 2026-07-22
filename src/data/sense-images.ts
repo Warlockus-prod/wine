@@ -81,7 +81,7 @@ const RING_SPRITE_COUNTS: Record<string, number> = {
   "oleiste.maslo": 4,
   "oleiste.tropikalne": 6,
   "swieze.zielone": 8,
-  "swieze.cytrusy": 6,
+  "swieze.cytrusy": 5,
   "ziemiste.mineraly": 9,
   "ziemiste.sciolka": 7,
   "szorstkie.pizmo": 4,

@@ -25,8 +25,7 @@ const write = process.argv.includes("--write");
 // already shipped, so only the new drops are listed here (client 2026-07-21:
 // remove the two "miksy" — the trail-mix and the nuts-on-spoon).
 const KEEP = {
-  "tegie-suszone": [1, 2, 3, 4],   // drop 5 (colourful trail/muesli mix)
-  "oleiste-maslo": [1, 3, 4, 5],   // drop 2 (nuts/granola on a spoon)
+  "swieze-cytrusy": [1, 2, 4, 5, 6], // drop 3 (thin lemon-peel curl — reads as clutter in the card, keep the big fruits)
 };
 
 const TENDENCJE = [
