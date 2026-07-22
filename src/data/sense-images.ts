@@ -75,7 +75,7 @@ export function ringImagesFor(id: string): string[] {
  */
 const RING_SPRITE_COUNTS: Record<string, number> = {
   "tegie.cigaro": 5,
-  "tegie.suszone": 4,
+  "tegie.suszone": 5,
   "miekkie.dojrzale": 9,
   "miekkie.konfitury": 5,
   "oleiste.maslo": 4,

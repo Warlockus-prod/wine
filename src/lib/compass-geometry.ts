@@ -120,6 +120,7 @@ export const RING_SPRITES: { f: string; t: string; a: number; k?: number }[] = [
   { f: "tegie-suszone-2", t: "tegie-suszone", a: 1.61 },
   { f: "tegie-suszone-3", t: "tegie-suszone", a: 2.172 },
   { f: "tegie-suszone-4", t: "tegie-suszone", a: 2.297 },
+  { f: "tegie-suszone-5", t: "tegie-suszone", a: 1.1 },
   { f: "miekkie-dojrzale-1", t: "miekkie-dojrzale", a: 1.445 },
   { f: "miekkie-dojrzale-2", t: "miekkie-dojrzale", a: 1.925 },
   { f: "miekkie-dojrzale-3", t: "miekkie-dojrzale", a: 1.411 },
