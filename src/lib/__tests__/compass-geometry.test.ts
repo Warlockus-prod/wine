@@ -220,7 +220,10 @@ describe("card ↔ wheel sprite manifests", () => {
     for (const spoke of SPOKES) {
       for (const id of [spoke.tendencja.id, spoke.sector.id]) {
         for (const p of ringSpritesFor(id)) {
-          expect(existsSync(resolve(process.cwd(), `public${p}`)), `dead ${p}`).toBe(true);
+          // Sprite URLs carry a `?v=SPRITE_VER` cache-bust (asset-version.ts);
+          // strip it to check the FILE on disk, not the request URL.
+          const file = p.split("?")[0];
+          expect(existsSync(resolve(process.cwd(), `public${file}`)), `dead ${p}`).toBe(true);
         }
       }
     }

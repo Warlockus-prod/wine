@@ -68,6 +68,7 @@ for (const t of TENDENCJE) {
 }
 
 console.log(`\n${write ? "REWROTE public/senses/ring/" : "dry run (add --write)"}  — ${rows.length} sprites total`);
+if (write) console.log("\n⚠  BUMP src/lib/asset-version.ts SPRITE_VER — else next/image serves the OLD art at the reused filename (stale-cache).");
 console.log("\n// RING_SPRITES rows:");
 console.log(rows.join("\n"));
 console.log("\n// RING_SPRITE_COUNTS:");

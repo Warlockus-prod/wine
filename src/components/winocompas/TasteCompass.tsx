@@ -50,6 +50,7 @@ import {
   spriteRing,
   type SpokeMeta,
 } from "@/lib/compass-geometry";
+import { SPRITE_VER } from "@/lib/asset-version";
 
 // Colour count matches the SELECTABLE segment count per stage (client
 // 2026-07-18: 12 hues behind a 3- or 6-segment picker "путает"). Level 2
@@ -889,7 +890,9 @@ const VIEW = 640;
               const iy = cy - sprite.r * Math.cos(sprite.theta);
             // q must stay 75 - Next 16 whitelists image qualities (default
             // [75]) and any other value 400s ("q parameter not allowed").
-            const href = `/_next/image?url=${encodeURIComponent(`/senses/ring/${sprite.f}.png`)}&w=96&q=75`;
+            // `?v=SPRITE_VER` busts the optimizer cache on re-cut (asset-version.ts);
+            // next.config localPatterns whitelists exactly this query on the sprite path.
+            const href = `/_next/image?url=${encodeURIComponent(`/senses/ring/${sprite.f}.png?v=${SPRITE_VER}`)}&w=96&q=75`;
             const interactive = Boolean(onMedallionSelect);
             const pick = () => onMedallionSelect?.(s.tendencja.id);
             return (

@@ -81,6 +81,18 @@ const nextConfig: NextConfig = {
     // non-root container user (Dockerfile.vps), so runtime optimization works.
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Sprite URLs carry a `?v=SPRITE_VER` cache-bust (src/lib/asset-version.ts)
+    // so re-cut art is never masked by a stale optimizer cache. Next 16 rejects
+    // query strings on local images unless a localPattern allows them:
+    //   1. sprite path — allow ANY query (the `?v=` token; no `search` field so
+    //      this never has to stay in sync with the version constant, which the
+    //      config loader can't reliably import anyway),
+    //   2. every other local image — NO query (current behaviour).
+    // An enumeration probe on a non-sprite path (`/dishes/x.png?v=9`) → 400.
+    localPatterns: [
+      { pathname: "/senses/ring/**" },
+      { pathname: "/**", search: "" },
+    ],
     remotePatterns: [
       {
         protocol: "https",
