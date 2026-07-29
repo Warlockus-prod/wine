@@ -298,7 +298,17 @@ export default function TasteChat({
       });
     } finally {
       setSending(false);
-      composerRef.current?.focus();
+      // Desktop: put the caret back so the next question is one keystroke
+      // away. Phones (coarse pointer): the SAME focus() pops the on-screen
+      // keyboard over the fixed panel, burying the composer + chips right as
+      // the reply lands (client 2026-07-29: "недоступно окно ввода, помогает
+      // только Clear" — Clear merely moved focus and closed the keyboard).
+      // Blur instead so the keyboard retracts and the whole panel is visible.
+      if (window.matchMedia("(pointer: fine)").matches) {
+        composerRef.current?.focus();
+      } else {
+        composerRef.current?.blur();
+      }
     }
   };
 

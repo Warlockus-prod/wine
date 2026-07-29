@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { buildChatSystemPrompt } from "@/data/wine-compass-kb";
+import { detectLang, LANG_NAME } from "@/lib/detect-lang";
 import { logEvent } from "@/lib/server-events";
 import { persistChatTurn } from "@/lib/chat-store";
 import { clientIp } from "@/lib/rate-limit";
@@ -17,7 +18,10 @@ interface ChatRequest {
    *  slug, etc.) injected as a system note so the bot's reply is grounded
    *  in what the user is looking at right now. */
   pageContext?: string;
-  /** UI locale of the page ("pl" | "en") - the bot replies in kind. */
+  /** UI locale of the page ("pl" | "en"). The bot MIRRORS the language of the
+   *  guest's own message (ask in Russian → answer in Russian); this locale is
+   *  only the fallback when the message carries no language signal ("ok", an
+   *  emoji) and the language the chips/greeting are written in. */
   locale?: string;
   /** Optional analytics passthroughs. */
   anonymousId?: string;
@@ -150,6 +154,21 @@ export async function POST(request: Request) {
   const pageNote =
     pageContextClean.length > 0 ? `Aktualnie użytkownik ogląda: ${pageContextClean}` : null;
 
+  // Reply language is decided HERE, not by the model. The system prompt is a
+  // long Polish document and the model kept answering in Polish even when the
+  // guest wrote Russian and the prompt told it to mirror (client 2026-07-29).
+  // Detecting server-side and stating the target language as the LAST system
+  // message (closest to the reply) makes it deterministic. Falls back to the
+  // page locale when the message carries no language signal ("ok", an emoji).
+  const lastUserText = [...cleaned].reverse().find((m) => m.role === "user")?.content ?? "";
+  const detected = detectLang(lastUserText);
+  const replyLang =
+    detected !== "unknown" ? LANG_NAME[detected] : body.locale === "en" ? "English" : "Polish";
+  const langNote =
+    `Reply ONLY in ${replyLang}. This overrides the language of every other instruction. ` +
+    `Write the whole answer in ${replyLang}, including the refusal message if the topic is off-limits. ` +
+    `Keep the official Polish names of sensations/tendencies, adding them in brackets at first use when ${replyLang} is not Polish.`;
+
   let openai: OpenAI;
   try {
     openai = getOpenAI();
@@ -179,6 +198,9 @@ export async function POST(request: Request) {
         ...(profileNote ? [{ role: "system" as const, content: profileNote }] : []),
         ...(pageNote ? [{ role: "user" as const, content: pageNote }] : []),
         ...cleaned,
+        // Last message wins attention — the language directive sits AFTER the
+        // conversation so it is the final thing read before generating.
+        { role: "system", content: langNote },
       ],
     });
 
