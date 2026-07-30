@@ -1,8 +1,17 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
+import { siteUrl } from "@/lib/site-url";
+import { siteMode } from "@/lib/site-mode";
 
 export default function robots(): MetadataRoute.Robots {
+  const SITE_URL = siteUrl();
+  // The tutorial deployment serves exactly one page; pointing crawlers at
+  // product URLs it only redirects away would be a lie.
+  if (siteMode() === "samouczek") {
+    return {
+      rules: [{ userAgent: "*", allow: ["/samouczek", "/pl/samouczek"], disallow: ["/api/*"] }],
+      host: SITE_URL,
+    };
+  }
   return {
     rules: [
       {

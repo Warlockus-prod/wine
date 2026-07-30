@@ -43,7 +43,9 @@ const PROFILE_STORAGE_KEY = "wn_compass_profile_v1";
 const ALLOWED_PARENT_ORIGINS = [
   "https://winnica.pl",
   "https://www.winnica.pl",
+  // Both deployments: the tutorial site (wine) and the full product (wine2).
   "https://wine.icoffio.com",
+  "https://wine2.icoffio.com",
 ];
 
 function postToParent(msg: Record<string, unknown>) {

@@ -57,12 +57,33 @@ if [[ -d /opt/repos/wine_web_wn/drizzle/migrations && -n "$(ls -A /opt/repos/win
     node_modules/tsx/dist/cli.mjs scripts/db-seed.mts
 fi
 
+# ── Two deployments, one image (client 2026-07-30: "это два отдельных проекта") ──
+#   :4300  SITE_MODE=full       → wine2.icoffio.com — the whole product
+#   :4301  SITE_MODE=samouczek  → wine.icoffio.com  — the Vinocompas tutorial,
+#                                 everything else 302s to the full site so the
+#                                 QR codes already printed keep resolving.
+# `-e` after --env-file wins, so the shared .env.local supplies secrets while
+# these two vars differentiate the deployments. src/lib/site-mode.ts reads them.
+
 docker run -d \
   --name wine_web_wn_app \
   --restart unless-stopped \
   --network wine_web_wn_net \
   -p 172.17.0.1:4300:3000 \
   "${ENV_ARG[@]}" \
+  -e SITE_MODE=full \
+  -e SITE_URL=https://wine2.icoffio.com \
   wine_web_wn:latest
 
-echo "Updated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+docker rm -f wine_web_wn_samouczek >/dev/null 2>&1 || true
+docker run -d \
+  --name wine_web_wn_samouczek \
+  --restart unless-stopped \
+  --network wine_web_wn_net \
+  -p 172.17.0.1:4301:3000 \
+  "${ENV_ARG[@]}" \
+  -e SITE_MODE=samouczek \
+  -e SITE_URL=https://wine.icoffio.com \
+  wine_web_wn:latest
+
+echo "Updated: $(date -u +%Y-%m-%dT%H:%M:%SZ)  (full :4300 · samouczek :4301)"

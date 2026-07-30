@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import Navigation from "@/components/v2/Navigation";
 import MobileTabBar from "@/components/v2/MobileTabBar";
+import { siteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
 const CONTACT_EMAIL = "hello@icoffio.com";
 const LAST_UPDATED = "2026-07-17";
 
@@ -30,6 +30,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const m = META[locale === "pl" ? "pl" : "en"];
+  // Both deployments serve this page — resolve the host per request.
+  const SITE_URL = siteUrl();
   const url = `${SITE_URL}/${locale === "en" ? "" : `${locale}/`}privacy`;
 
   return {

@@ -15,12 +15,29 @@ import { NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { ADMIN_GATE_ENABLED, checkBasicAuth, BASIC_AUTH_CHALLENGE } from "./lib/admin-auth";
+import { siteMode, samouczekRoute } from "./lib/site-mode";
 
 const intl = createIntlMiddleware(routing);
 
 const ADMIN_PATH_RE = /^\/(?:[a-z]{2}\/)?admin(\/|$)/;
 
 export default function middleware(request: NextRequest) {
+  // Site split (SITE_MODE=samouczek → wine.icoffio.com). Runs FIRST: the
+  // tutorial deployment must never render the product pages, and the redirect
+  // is cheaper than letting i18n rewrite a path we are about to leave.
+  // 302, not 301 — a migration should stay reversible; browsers cache a 301
+  // for a long time and we would not be able to take it back.
+  if (siteMode() === "samouczek") {
+    const decision = samouczekRoute(request.nextUrl.pathname);
+    if (decision) {
+      const target = decision.external
+        ? new URL(decision.to)
+        : new URL(decision.to, request.url);
+      if (decision.external) target.search = request.nextUrl.search;
+      return NextResponse.redirect(target, 302);
+    }
+  }
+
   const intlResponse = intl(request);
   if (!ADMIN_GATE_ENABLED()) return intlResponse;
 

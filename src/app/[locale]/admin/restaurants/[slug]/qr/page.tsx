@@ -13,7 +13,7 @@ import { QRCodeSVG } from "qrcode.react";
 import Navigation from "@/components/v2/Navigation";
 import { Link } from "@/i18n/navigation";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://wine2.icoffio.com";
 
 export default function QrPrintPage({
   params,

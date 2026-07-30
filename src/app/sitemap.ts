@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { catalogRestaurants } from "@/lib/restaurant-directory";
 import { routing } from "@/i18n/routing";
+import { siteUrl } from "@/lib/site-url";
+import { siteMode } from "@/lib/site-mode";
 
 /**
  * sitemap.ts - Next.js App Router auto-generates /sitemap.xml from this.
@@ -10,11 +12,20 @@ import { routing } from "@/i18n/routing";
  * via QR. Tutorial + pairing get medium (0.6); admin omitted (operator-only).
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
-
 export default function sitemap(): MetadataRoute.Sitemap {
+  const SITE_URL = siteUrl();
   const now = new Date();
   const urls: MetadataRoute.Sitemap = [];
+
+  // The tutorial deployment has exactly one indexable page per locale.
+  if (siteMode() === "samouczek") {
+    return routing.locales.map((locale) => ({
+      url: `${SITE_URL}${locale === routing.defaultLocale ? "" : `/${locale}`}/samouczek`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 1.0,
+    }));
+  }
 
   // Static pages × locales (en at root, pl at /pl)
   const staticPaths = ["", "/pairing", "/samouczek", "/pitch"];

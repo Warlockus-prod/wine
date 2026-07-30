@@ -10,7 +10,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 // Origins allowed to embed the /embed/* routes (samouczek widget) in an
 // iframe. Keep this tight — only the shop + our own domain.
 const EMBED_FRAME_ANCESTORS =
-  "frame-ancestors 'self' https://winnica.pl https://*.winnica.pl https://wine.icoffio.com";
+  "frame-ancestors 'self' https://winnica.pl https://*.winnica.pl https://wine.icoffio.com https://wine2.icoffio.com";
 
 // `unsafe-eval` is only needed by the webpack dev server (eval source maps).
 // Production bundles — including Mapbox GL — don't need it, so we drop it there.

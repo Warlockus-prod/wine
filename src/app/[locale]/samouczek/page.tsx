@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import SamouczekClient from "./SamouczekClient";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://wine.icoffio.com";
+import { siteUrl } from "@/lib/site-url";
 
 // The tutorial UI is PL-primary and uses inline copy (no i18n namespace), so
 // metadata strings are defined here per locale rather than via getTranslations.
@@ -26,6 +25,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const m = META[locale === "pl" ? "pl" : "en"];
+  // Resolved per REQUEST, not at module load: this page is served by both
+  // deployments and each must advertise its own host (site-url.ts).
+  const SITE_URL = siteUrl();
   const url = `${SITE_URL}/${locale === "en" ? "" : `${locale}/`}samouczek`;
 
   return {
