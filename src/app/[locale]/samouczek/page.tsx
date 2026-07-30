@@ -3,6 +3,17 @@ import { setRequestLocale } from "next-intl/server";
 import SamouczekClient from "./SamouczekClient";
 import { siteUrl } from "@/lib/site-url";
 
+/**
+ * Rendered per request, not prerendered. ONE image serves both deployments,
+ * so `SITE_MODE` is only known at runtime — a statically generated page would
+ * bake in whatever mode the BUILD had (i.e. "full"), and the tutorial site
+ * would ship the product nav, the bottom tab-bar and the "Open Pairing"
+ * hand-off it must not show. Deciding on the client instead would either
+ * break hydration or flash the wrong chrome. The page is client-heavy
+ * (compass, chat), so the SSR cost here is small.
+ */
+export const dynamic = "force-dynamic";
+
 // The tutorial UI is PL-primary and uses inline copy (no i18n namespace), so
 // metadata strings are defined here per locale rather than via getTranslations.
 const META: Record<"en" | "pl", { title: string; description: string }> = {

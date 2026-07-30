@@ -56,6 +56,15 @@
   --nav-border: rgba(255, 255, 255, 0.10);
 }
 
+/* Tutorial deployment (wine.icoffio.com, SITE_MODE=samouczek): the bottom
+   tab-bar holds only the product tabs (Odkrywaj / Łączenie) and is therefore
+   not rendered there. Its reserved height has to collapse with it, otherwise
+   every bottom-anchored element — page padding, the floating chat — clears a
+   strip of nothing. Set server-side on <html>, so no flash of wrong spacing. */
+:root[data-site-mode="samouczek"] {
+  --mobile-tabbar-h: calc(0.5rem + env(safe-area-inset-bottom));
+}
+
 /* ── Light theme overrides — gallery white mode ───────────────────────
    Pure white canvas with the barest warm whisper. Wine-ink type, gold
    accents printed-foil-style. Inspiration: art-gallery wall labels,

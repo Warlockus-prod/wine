@@ -3,6 +3,7 @@
 import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import Icon, { type IconName } from "@/components/v2/Icon";
+import { useIsTutorialSite } from "@/components/SiteModeProvider";
 
 const GUEST_TABS: { href: string; key: "home" | "pairing"; icon: IconName }[] = [
   { href: "/", key: "home", icon: "travel_explore" },
@@ -22,6 +23,13 @@ export default function MobileTabBar() {
   const tabs = inAdmin
     ? [...GUEST_TABS, { href: "/admin", key: "admin" as const, icon: "settings" as IconName }]
     : GUEST_TABS;
+
+  // Both guest tabs (Odkrywaj / Łączenie) belong to the product deployment, so
+  // on the tutorial site the whole bar would be links that just 302 to wine2
+  // (client 2026-07-30). Drop it entirely; globals.css collapses the height it
+  // reserved via :root[data-site-mode="samouczek"].
+  const isTutorialSite = useIsTutorialSite();
+  if (isTutorialSite) return null;
 
   return (
     <nav

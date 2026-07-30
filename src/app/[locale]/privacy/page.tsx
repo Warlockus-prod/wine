@@ -4,6 +4,11 @@ import Navigation from "@/components/v2/Navigation";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import { siteUrl } from "@/lib/site-url";
 
+/** Served by BOTH deployments, and its chrome + canonical differ per site —
+ *  which is a runtime fact (SITE_MODE), so it cannot be prerendered. See the
+ *  note in samouczek/page.tsx. */
+export const dynamic = "force-dynamic";
+
 const CONTACT_EMAIL = "hello@icoffio.com";
 const LAST_UPDATED = "2026-07-17";
 

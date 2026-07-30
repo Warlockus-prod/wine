@@ -13,6 +13,20 @@ URLs resolve at RUNTIME via `src/lib/site-url.ts` (`SITE_URL` env), which is
 what lets ONE image serve two hosts — `NEXT_PUBLIC_*` bake in at build time and
 cannot differ per container. `robots.txt`/`sitemap.xml` shrink to the single
 tutorial page in samouczek mode.
+
+**Chrome differs per site too** — the tutorial host shows NO product nav, no
+bottom tab-bar and no "Otwórz Pairing" hand-off (they would only 302 a shop
+visitor into wine2). Client components read the mode from
+`useIsTutorialSite()` (`src/components/SiteModeProvider.tsx`), fed by the
+server layout, which also stamps `data-site-mode` on `<html>` so `globals.css`
+can collapse `--mobile-tabbar-h` where the bar is gone.
+
+⚠️ **`SITE_MODE` is a RUNTIME value, so any page whose output depends on it
+MUST NOT be prerendered** — a static page bakes in the mode the BUILD had
+(`full`) and the tutorial site ships the product chrome. `/samouczek` and
+`/privacy` therefore carry `export const dynamic = "force-dynamic"`. Deciding
+on the client instead is not an option: it either breaks hydration or flashes
+the wrong chrome. If you add a page the tutorial site serves, do the same.
 Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 
 ## Stack

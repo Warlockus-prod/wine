@@ -8,6 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import ThemeToggle from "./ThemeToggle";
 import Icon from "@/components/v2/Icon";
+import { useIsTutorialSite } from "@/components/SiteModeProvider";
 
 const PHONE_WIDTH = 390;
 const PHONE_HEIGHT = 844;
@@ -20,11 +21,20 @@ export default function Navigation() {
 
   // Public-facing menu: Admin / Panel are intentionally removed - operator
   // entrance lives in the right-side action button instead.
-  const menuLinks = [
-    { href: "/", label: tx("home") },
-    { href: "/pairing", label: tx("pairing") },
-    { href: "/samouczek", label: tx("samouczek") },
-  ];
+  //
+  // On the TUTORIAL deployment (wine.icoffio.com) the product entries are
+  // dropped entirely: "Odkrywaj" and "Łączenie" only ever 302 the guest to
+  // wine2, and a shop-facing page should not bounce visitors into a different
+  // product (client 2026-07-30). The tutorial is then the whole menu, so the
+  // row would just repeat the logo — render no links at all.
+  const isTutorialSite = useIsTutorialSite();
+  const menuLinks = isTutorialSite
+    ? []
+    : [
+        { href: "/", label: tx("home") },
+        { href: "/pairing", label: tx("pairing") },
+        { href: "/samouczek", label: tx("samouczek") },
+      ];
 
   const switchLocale = (next: Locale) => {
     if (next === locale) return;
@@ -110,7 +120,10 @@ export default function Navigation() {
               </button>
             ) : null}
             {/* Operator entrance - leads to /admin (Panel). Renamed from
-                "Sign In" + the previous Admin link merged into one button. */}
+                "Sign In" + the previous Admin link merged into one button.
+                Hidden on the tutorial site: /admin belongs to the product
+                deployment and would only redirect the guest to wine2. */}
+            {isTutorialSite ? null : (
             <Link prefetch={false}
               href="/admin"
               className="hidden items-center gap-2 rounded-lg border border-[var(--color-accent-gold)]/40 bg-[var(--color-accent-gold)]/10 px-4 py-2 text-sm font-semibold text-[var(--color-accent-gold)] transition hover:bg-[var(--color-accent-gold)]/20 md:inline-flex"
@@ -118,6 +131,7 @@ export default function Navigation() {
               <Icon name="person" className="text-base" />
               Panel
             </Link>
+            )}
             <button
               type="button"
               aria-label="Open menu"

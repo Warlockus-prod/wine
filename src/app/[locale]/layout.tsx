@@ -5,6 +5,8 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { PwaRegister } from "@/components/pwa-register";
 import { ThemeProvider } from "@/components/v2/ThemeProvider";
+import { SiteModeProvider } from "@/components/SiteModeProvider";
+import { siteMode } from "@/lib/site-mode";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -75,6 +77,10 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       data-theme="light"
+      // Which deployment this is. globals.css keys off it to collapse the
+      // bottom tab-bar's reserved height on the tutorial-only site, where the
+      // bar itself is not rendered.
+      data-site-mode={siteMode()}
       suppressHydrationWarning
       className={`${libreFranklin.variable} ${libreBaskerville.variable}`}
     >
@@ -87,8 +93,12 @@ export default async function LocaleLayout({
       <body className="antialiased">
         <ThemeProvider>
           <NextIntlClientProvider>
-            <PwaRegister />
-            {children}
+            {/* Publishes the runtime SITE_MODE to client chrome — the tutorial
+                deployment must not link to pages it only redirects away. */}
+            <SiteModeProvider mode={siteMode()}>
+              <PwaRegister />
+              {children}
+            </SiteModeProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

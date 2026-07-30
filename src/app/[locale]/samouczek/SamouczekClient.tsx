@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
 import MobileTabBar from "@/components/v2/MobileTabBar";
 import Navigation from "@/components/v2/Navigation";
+import { useIsTutorialSite } from "@/components/SiteModeProvider";
 import { Link } from "@/i18n/navigation";
 import {
   METHOD_STEPS,
@@ -65,6 +66,8 @@ export default function SamouczekClient() {
   // PL is the authoring locale; every other locale renders the parallel EN
   // strings (KB `_en` fields + pickL) - the PL surface stays byte-identical.
   const lang: CompassLang = useLocale() === "pl" ? "pl" : "en";
+  // wine.icoffio.com serves the tutorial alone — no product hand-off there.
+  const isTutorialSite = useIsTutorialSite();
   const [profile, setProfile] = useState<CompassProfile>({});
   const [chatDisabled, setChatDisabled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -385,6 +388,14 @@ export default function SamouczekClient() {
         <Ornament />
 
         {/* ───────── FINAL CTA ───────── */}
+        {/* Closing hand-off into the restaurant product ("Open Pairing" /
+            "Back to the restaurants"). The tutorial deployment does not serve
+            those pages — both links would 302 the guest to wine2 — so the
+            whole section is dropped there (client 2026-07-30). Removing only
+            the buttons would leave the heading "Time to find the wines"
+            standing with nothing under it. The page then ends on the FAQ, and
+            the wine suggestions inside the tutorial still link to winnica.pl. */}
+        {isTutorialSite ? null : (
         <section
           aria-labelledby="final-title"
           className="editorial-hero editorial-hero--center relative overflow-hidden rounded-[36px] border border-[rgba(199,159,105,0.32)] bg-[radial-gradient(circle_at_50%_120%,rgba(199,159,105,0.32),transparent_60%),linear-gradient(180deg,#122a52,#081634)] px-5 py-16 text-center sm:px-10 sm:py-20"
@@ -416,6 +427,7 @@ export default function SamouczekClient() {
             </Link>
           </div>
         </section>
+        )}
       </main>
 
       <MobileTabBar />

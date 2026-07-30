@@ -31,6 +31,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useIsTutorialSite } from "@/components/SiteModeProvider";
 import WineBottleSVG from "@/components/v2/WineBottleSVG";
 import {
   wineRegion,
@@ -95,6 +96,7 @@ const MIN_FILLED = 4;
 const TARGET_FILLED = 9;
 
 function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: CompassLang }) {
+  const isTutorialSite = useIsTutorialSite();
   const filled = filledDimensions(profile);
   const matches = matchWines(profile, 3);
   const enough = filled >= MIN_FILLED && matches.length > 0;
@@ -166,6 +168,10 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
             />
           </div>
         </div>
+        {/* Shortcut into /pairing — the product deployment only. On the
+            tutorial site it would 302 the guest to wine2; the live wine
+            suggestions below already link out to winnica.pl. */}
+        {isTutorialSite ? null : (
         <Link
           href="/pairing"
           className="pitch-cta-ghost inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs"
@@ -175,6 +181,7 @@ function InlineProposals({ profile, lang }: { profile: CompassProfile; lang: Com
             <path d="M1 4.5h13m0 0L10.5 1M14 4.5L10.5 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
+        )}
       </div>
 
       {enough ? (
