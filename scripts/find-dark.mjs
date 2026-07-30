@@ -3,8 +3,8 @@
 import { chromium } from "playwright";
 
 const routes = [
-  "https://wine.icoffio.com/pl/pairing",
-  "https://wine.icoffio.com/pl/samouczek",
+  "https://wine2.icoffio.com/pl/pairing",
+  "https://wine2.icoffio.com/pl/samouczek",
 ];
 
 const browser = await chromium.launch();

@@ -1,6 +1,18 @@
 # Vinovigator AI — agent notes
 
-Live: https://wine.icoffio.com — production for restaurant pitches.
+Live — **two sites, one codebase, one image** (split 2026-07-30):
+
+| Host | `SITE_MODE` | Port | Serves |
+|---|---|---|---|
+| **wine2.icoffio.com** | `full` | 4300 | the whole product — directory, `/pairing`, `/admin`, `/pitch`, `/samouczek`. Production for restaurant pitches. |
+| **wine.icoffio.com** | `samouczek` | 4301 | ONLY `/samouczek`, `/embed/samouczek`, `/privacy`. Everything else **302s to wine2 with the path preserved**, so already-printed QR codes keep working. |
+
+`src/lib/site-mode.ts` decides (import-free — middleware is edge runtime); its
+routing contract is locked by `src/lib/__tests__/site-mode.test.ts`. Canonical
+URLs resolve at RUNTIME via `src/lib/site-url.ts` (`SITE_URL` env), which is
+what lets ONE image serve two hosts — `NEXT_PUBLIC_*` bake in at build time and
+cannot differ per container. `robots.txt`/`sitemap.xml` shrink to the single
+tutorial page in samouczek mode.
 Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 
 ## Stack
@@ -42,7 +54,7 @@ npm run build
 npm run test:e2e
 ```
 
-E2E specs in `e2e/` — `smoke.spec.ts` is the load-bearing one and also runs as live smoke against wine.icoffio.com.
+E2E specs in `e2e/` — `smoke.spec.ts` is the load-bearing one and also runs as live smoke against **wine2.icoffio.com** (the full site; it was retargeted in the 2026-07-30 split — wine.icoffio.com now only answers the tutorial paths, so the old target would 302 most of the suite away).
 
 ## Routes worth knowing
 
@@ -116,8 +128,10 @@ npm run check && git push origin main
 ssh -i ~/.ssh/aiw_new_vps_ed25519 root@178.104.223.93 'bash /opt/repos/wine_web_wn/update_wine_web.sh'
 
 # Smoke
-curl -I https://wine.icoffio.com   # expect 200 OK
-curl -I https://wine.icoffio.com/pl   # expect 200 OK (Polish locale)
+curl -I https://wine2.icoffio.com      # full site — expect 200 OK
+curl -I https://wine2.icoffio.com/pl   # expect 200 OK (Polish locale)
+curl -I https://wine.icoffio.com/pl/samouczek   # tutorial site — expect 200
+curl -I https://wine.icoffio.com/pl/pairing     # expect 302 → wine2
 
 # Live regression — runs the smoke + i18n e2e suite against production
 npx playwright test --config=playwright.live.config.ts --grep "v2 admin|i18n EN/PL"

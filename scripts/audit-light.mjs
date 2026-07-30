@@ -6,7 +6,7 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
 const page = await ctx.newPage();
 
-await page.goto("https://wine.icoffio.com/pl/restaurants/atelier-amaro", {
+await page.goto("https://wine2.icoffio.com/pl/restaurants/atelier-amaro", {
   waitUntil: "domcontentloaded",
 });
 await page.evaluate(() => {

@@ -1,6 +1,6 @@
 import { chromium, devices } from "@playwright/test";
 
-const BASE = "https://wine.icoffio.com";
+const BASE = "https://wine2.icoffio.com";
 const phone = devices["iPhone 13"];
 
 const ROUTES = [

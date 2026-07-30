@@ -1,7 +1,7 @@
 // One-off: screenshot the LIVE site in light theme for visual audit.
 import { chromium } from "playwright";
 
-const BASE = "https://wine.icoffio.com";
+const BASE = "https://wine2.icoffio.com";
 const routes = [
   ["/pl", "home"],
   ["/pl/restaurants/atelier-amaro", "restaurant"],

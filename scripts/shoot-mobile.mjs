@@ -11,7 +11,7 @@ mkdirSync(OUT, { recursive: true });
 const FORMS = (process.argv[2] && process.argv[2] !== "both") ? [process.argv[2]] : ["desktop", "mobile"];
 
 const iphone = devices["iPhone 13"];
-const B = "https://wine.icoffio.com/pl";
+const B = "https://wine2.icoffio.com/pl";
 const pages = [
   ["home", `${B}`],
   ["guest", `${B}/restaurants/atelier-amaro`],

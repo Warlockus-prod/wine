@@ -30,10 +30,20 @@ export default function middleware(request: NextRequest) {
   if (siteMode() === "samouczek") {
     const decision = samouczekRoute(request.nextUrl.pathname);
     if (decision) {
-      const target = decision.external
-        ? new URL(decision.to)
-        : new URL(decision.to, request.url);
-      if (decision.external) target.search = request.nextUrl.search;
+      if (decision.external) {
+        const target = new URL(decision.to);
+        target.search = request.nextUrl.search;
+        return NextResponse.redirect(target, 302);
+      }
+      // Same-host hop (root → tutorial). Clone nextUrl rather than trusting a
+      // Host header (that is the classic open-redirect footgun, and this repo
+      // already hardened one such case in safeReturnTo). Next emits a relative
+      // Location for a same-origin target, so the browser resolves it against
+      // whichever public host it asked for — the internal container address
+      // never appears. A hand-written relative Location is NOT an option: the
+      // middleware runtime rejects it with "Invalid URL".
+      const target = request.nextUrl.clone();
+      target.pathname = decision.to;
       return NextResponse.redirect(target, 302);
     }
   }
