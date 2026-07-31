@@ -50,3 +50,7 @@ scratchpad/sliced/
 scratchpad/sliced2/
 scratchpad/*.png
 scratchpad/plum/
+
+# Env backups — these hold live secrets and must never be committed
+.env*.bak*
+.env.local.bak.*

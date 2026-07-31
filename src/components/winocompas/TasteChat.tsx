@@ -318,7 +318,18 @@ export default function TasteChat({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#081634] sm:min-h-[420px]">
+    // Sizing contract: this panel FILLS its parent, which owns the height
+    // (FloatingTasteChat's box is fixed at 60vh on desktop / a dvh band on
+    // mobile). `flex-1 min-h-0` is what makes it obey that.
+    //
+    // It used to be `h-full … sm:min-h-[420px]`, which broke the desktop panel
+    // outright: the percentage height did not resolve against a flex-basis
+    // parent, so the root fell back to CONTENT height (742px inside a 432px
+    // box) and the composer was pushed 253px below the panel's clipping edge —
+    // the guest could read replies but could not type. Measured on production
+    // 2026-07-31. Do NOT reintroduce a min-height here; give the PARENT a
+    // height instead.
+    <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-[rgba(199,159,105,0.32)] bg-[#081634]">
       {/* Header */}
       <div className={`flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3 ${headerInsetRight ? "pr-14" : ""}`}>
         <div className="flex items-center gap-2">
@@ -349,7 +360,10 @@ export default function TasteChat({
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="hide-scrollbar flex-1 space-y-3 overflow-y-auto px-4 py-4">
+      {/* min-h-0 is explicit on purpose: a flex item's automatic minimum size
+          is content-based, and this list must be the part that SHRINKS so the
+          chips and the composer always keep their space. */}
+      <div ref={scrollRef} className="hide-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {messages.map((m, i) => {
           const isUser = m.role === "user";
           return (

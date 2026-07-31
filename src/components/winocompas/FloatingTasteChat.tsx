@@ -8,9 +8,11 @@
  * does not move with scroll.
  *
  * Why a separate component from <TasteChat>:
- *  - <TasteChat> is layout-agnostic and used inline on /samouczek as a
- *    teaching artifact ("here's the bot, talk to it").
- *  - <FloatingTasteChat> wraps it for the persistent always-on UX request.
+ *  - <TasteChat> is the panel itself — chrome, message list, composer. It
+ *    FILLS whatever box it is given and never sets its own height.
+ *  - <FloatingTasteChat> owns that box (fixed positioning, the collapsed
+ *    launcher, persistence) for the always-on UX request.
+ *  This wrapper is currently its only render site.
  *
  * Mobile: when expanded, takes up almost the full screen height
  * (max-h: calc(100dvh - 6rem)) and width (max-w: calc(100vw - 1.5rem)).
@@ -234,7 +236,12 @@ export default function FloatingTasteChat({
                   `flex-1 overflow-y-auto` never scrolls, and the composer +
                   the tail of the last reply get clipped by the parent's
                   overflow-hidden (client 2026-07-18: "невозможно общаться"). */}
-              <div className="flex min-h-0 flex-1">
+              {/* flex-col is load-bearing: <TasteChat> sizes itself with
+                  `flex-1 min-h-0`, which only constrains it when this wrapper
+                  is a COLUMN. As a row, the child fell back to content height
+                  and the composer was clipped out of the panel (fixed
+                  2026-07-31). min-h-0 lets this wrapper shrink in turn. */}
+              <div className="flex min-h-0 flex-1 flex-col">
                 <TasteChat
                   profile={profile}
                   storageKey={storageKey}
