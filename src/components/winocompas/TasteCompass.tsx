@@ -435,10 +435,15 @@ const VIEW = 640;
                 );
               })}
 
-        {/* Intensity read-out — the resting pie stays FULL saturation (the
-            poster look); once a unit is set, its UNCHOSEN outer rings get a
-            cream wash, so the vivid area "fills to" the chosen ring. One
-            wash path per UNIT of work (base wedge / sektor / tendencja). */}
+        {/* Intensity read-out — a unit's UNCHOSEN outer rings get a cream
+            wash, so the vivid area "fills to" the chosen ring. One wash path
+            per UNIT of work (base wedge / sektor / tendencja).
+            v = 0 (nothing chosen) therefore washes the WHOLE wedge: the wash
+            starts at rInner + ringStep*0 = rInner. Empty must LOOK empty —
+            skipping the wash at 0 left the wedge at full saturation, i.e.
+            visually identical to a maxed-out 5/5, so pressing "Wyczyść"
+            appeared to FILL the wheel instead of clearing it (client
+            2026-09-01, reported on both sites). Only v >= MAX draws no wash. */}
         {(level >= 3
           ? spokes.map((s) => ({ key: s.tendencja.id, start: s.start, end: s.end, v: s.intensity as number }))
           : level === 2
@@ -451,7 +456,7 @@ const VIEW = 640;
                 return { key: axis.id, start: axis.angle - arc / 2 + 0.004, end: axis.angle + arc / 2 - 0.004, v: (profile[`base.${axis.id}`] ?? 0) as number };
               })
         ).map((u) =>
-          u.v <= 0 || u.v >= MAX_INTENSITY ? null : (
+          u.v >= MAX_INTENSITY ? null : (
             <path
               key={`wash-${u.key}`}
               d={annularPath(cx, cy, rInner + ringStep * u.v, rOuter + 1, u.start + 0.004, u.end - 0.004)}

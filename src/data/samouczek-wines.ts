@@ -345,7 +345,7 @@ export const winnicaWineUrl = (wine: Pick<SamouczekWine, "url" | "query">): stri
 /**
  * The live tutorial catalogue: REAL winnica.pl wines (prices, photos, and the
  * shop's own per-wine Vinocompas fingerprints), parsed by
- * scripts/parse-winnica.mjs. Legacy archetypes only kick in if the generated
+ * scripts/parse-winnica-api.mjs. Legacy archetypes only kick in if the generated
  * catalogue is unexpectedly empty.
  */
 export const SAMOUCZEK_WINES: SamouczekWine[] =

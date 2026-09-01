@@ -86,3 +86,19 @@ docker run -d \
 echo "Updated: $(date -u +%Y-%m-%dT%H:%M:%SZ)  (full :4300 · samouczek :4301)"
 echo "  full     → $SITE_URL_FULL"
 echo "  tutorial → $SITE_URL_TUTORIAL"
+
+# ── Post-deploy security assertion ────────────────────────────────────────
+# The admin gate FAILS OPEN by design: api-acl.ts treats anything other than
+# AUTH_GATE_ADMIN=1 as "pilot mode" and lets every write through. A dropped or
+# mistyped env var therefore reopens /admin and the whole write API silently —
+# which is exactly how it sat open on production until 2026-09-01. Assert it
+# here so a deploy cannot quietly undo the fix.
+for port in 4300 4301; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "http://172.17.0.1:${port}/api/admin/chat-analytics" || echo 000)
+  if [[ "$code" != "401" ]]; then
+    echo "‼️  ОПАСНО: :${port}/api/admin/chat-analytics вернул ${code}, ожидался 401."
+    echo "   Админ-гейт открыт. Проверь AUTH_GATE_ADMIN=1 в .env.local и пересоздай контейнеры."
+    exit 1
+  fi
+done
+echo "  ✓ админ-гейт закрыт на обоих портах (401)"
