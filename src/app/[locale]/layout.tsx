@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { PwaRegister } from "@/components/pwa-register";
+import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/v2/ThemeProvider";
 import { SiteModeProvider } from "@/components/SiteModeProvider";
 import { siteMode } from "@/lib/site-mode";
@@ -68,6 +69,18 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
+  // Per-request CSP nonce from src/middleware.ts.
+  //
+  // Reading it here also opts every route into DYNAMIC rendering — and that is
+  // REQUIRED, not incidental: a prerendered page freezes a build-time nonce in
+  // its <script> tags while the header carries a fresh one per request, so the
+  // two never match and the browser blocks EVERY chunk. Restoring static
+  // generation on 2026-09-01 did exactly that: the home page shipped with no
+  // working JavaScript at all. A nonce CSP and prerendering are mutually
+  // exclusive; if static generation is ever needed back, the nonce has to go
+  // with it.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     // Font variable classes live on <html>, NOT <body>: the runtime copies of
     // --font-serif/--font-display in globals.css are declared on :root, and a
@@ -91,7 +104,7 @@ export default async function LocaleLayout({
             next/font. */}
       </head>
       <body className="antialiased">
-        <ThemeProvider>
+        <ThemeProvider nonce={nonce}>
           <NextIntlClientProvider>
             {/* Publishes the runtime SITE_MODE to client chrome — the tutorial
                 deployment must not link to pages it only redirects away. */}

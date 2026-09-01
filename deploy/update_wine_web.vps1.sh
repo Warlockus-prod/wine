@@ -94,7 +94,15 @@ echo "  tutorial → $SITE_URL_TUTORIAL"
 # which is exactly how it sat open on production until 2026-09-01. Assert it
 # here so a deploy cannot quietly undo the fix.
 for port in 4300 4301; do
-  code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "http://172.17.0.1:${port}/api/admin/chat-analytics" || echo 000)
+  # Wait for the freshly created container to accept connections first — an
+  # unreachable port answers 000, which is not "open" and must not be read as
+  # a failure of the gate.
+  code=000
+  for _ in $(seq 1 30); do
+    code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "http://172.17.0.1:${port}/api/admin/chat-analytics" || true)
+    [ -n "$code" ] && [ "$code" != "000" ] && break
+    sleep 2
+  done
   if [[ "$code" != "401" ]]; then
     echo "‼️  ОПАСНО: :${port}/api/admin/chat-analytics вернул ${code}, ожидался 401."
     echo "   Админ-гейт открыт. Проверь AUTH_GATE_ADMIN=1 в .env.local и пересоздай контейнеры."

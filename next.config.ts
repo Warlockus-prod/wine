@@ -7,40 +7,10 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-// Origins allowed to embed the /embed/* routes (samouczek widget) in an
-// iframe. Keep this tight — only the shop + our own domain.
-const EMBED_FRAME_ANCESTORS =
-  "frame-ancestors 'self' https://winnica.pl https://*.winnica.pl https://wine.icoffio.com https://wine2.icoffio.com";
-
-// `unsafe-eval` is only needed by the webpack dev server (eval source maps).
-// Production bundles — including Mapbox GL — don't need it, so we drop it there.
-const isDev = process.env.NODE_ENV !== "production";
-
-// Shared CSP. `script/style 'unsafe-inline'` is required by Next's hydration,
-// the next-themes inline theme script, and Tailwind's injected styles.
-// `img-src https:` keeps the Unsplash/Wikimedia/QR/Mapbox photo fallbacks
-// working. OpenAI is called server-side only, so it needs no connect-src entry.
-const buildCsp = (frameAncestors: string) =>
-  [
-    "default-src 'self'",
-    "base-uri 'self'",
-    "object-src 'none'",
-    "form-action 'self'",
-    "img-src 'self' data: blob: https:",
-    // Google Fonts: the Material Icons/Symbols stylesheet is served by
-    // fonts.googleapis.com and the font files by fonts.gstatic.com. Without
-    // these, CSP blocks the icon font and icons render as ligature text
-    // (e.g. "wine_bar", "settings") for every user.
-    "font-src 'self' data: https://fonts.gstatic.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-    "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
-    "worker-src 'self' blob:",
-    frameAncestors,
-  ].join("; ");
-
-// Headers safe on every route. Framing is handled per-route below (the embed
-// widget must stay cross-origin-framable; the rest of the site must not).
+// CSP now lives in src/lib/csp.ts and is emitted per REQUEST by
+// src/middleware.ts, because it carries a per-request nonce — a static
+// header here could not. Framing rules moved with it. Only the headers that
+// are constant stay below.
 const BASE_SECURITY_HEADERS = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -55,7 +25,6 @@ const nextConfig: NextConfig = {
   async headers() {
     const embedHeaders = [
       ...BASE_SECURITY_HEADERS,
-      { key: "Content-Security-Policy", value: buildCsp(EMBED_FRAME_ANCESTORS) },
     ];
     return [
       // Embed widget — framable by the winnica shop (+ us). No X-Frame-Options
@@ -69,7 +38,6 @@ const nextConfig: NextConfig = {
         headers: [
           ...BASE_SECURITY_HEADERS,
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "Content-Security-Policy", value: buildCsp("frame-ancestors 'self'") },
         ],
       },
     ];

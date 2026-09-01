@@ -15,13 +15,40 @@ import { NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { ADMIN_GATE_ENABLED, checkBasicAuth, BASIC_AUTH_CHALLENGE } from "./lib/admin-auth";
-import { siteMode, samouczekRoute } from "./lib/site-mode";
+import { siteMode, samouczekRoute, samouczekAllowsApi } from "./lib/site-mode";
+import { buildCsp, makeNonce, EMBED_FRAME_ANCESTORS, SELF_FRAME_ANCESTORS } from "./lib/csp";
 
 const intl = createIntlMiddleware(routing);
 
 const ADMIN_PATH_RE = /^\/(?:[a-z]{2}\/)?admin(\/|$)/;
+/** Only the embeddable widget may be framed cross-origin. */
+const EMBED_PATH_RE = /^\/(?:[a-z]{2}\/)?embed(\/|$)/;
 
 export default function middleware(request: NextRequest) {
+  // ── API routes ──────────────────────────────────────────────────────────
+  // Handled before anything else and WITHOUT the intl middleware, which would
+  // try to locale-rewrite them. The matcher now includes /api purely so the
+  // site split can cover it: until 2026-09-01 the tutorial host — our most
+  // widely published origin, printed on QR codes and iframed by the shop —
+  // served the entire API, write routes included, because /api was excluded
+  // from the matcher entirely.
+  if (request.nextUrl.pathname.startsWith("/api")) {
+    if (siteMode() === "samouczek" && !samouczekAllowsApi(request.nextUrl.pathname)) {
+      // 404, not 302: an API client should get a definite answer, and
+      // redirecting a POST across hosts would silently drop its body.
+      return new NextResponse(
+        JSON.stringify({ error: "Not found on this site." }),
+        { status: 404, headers: { "Content-Type": "application/json" } },
+      );
+    }
+    // Return NOTHING for allowed API routes. `NextResponse.next()` re-issues
+    // the request internally and DROPS the body of a POST — /api/pairing then
+    // scored with no dish context and returned an unrelated wine (caught by
+    // pairing-algorithm.spec on 2026-09-01). Returning undefined lets the
+    // request continue to the route untouched.
+    return undefined;
+  }
+
   // Site split (SITE_MODE=samouczek → wine.icoffio.com). Runs FIRST: the
   // tutorial deployment must never render the product pages, and the redirect
   // is cheaper than letting i18n rewrite a path we are about to leave.
@@ -48,7 +75,26 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  const intlResponse = intl(request);
+  // ── CSP with a per-request nonce ────────────────────────────────────────
+  // Next reads the nonce out of the Content-Security-Policy REQUEST header and
+  // stamps it on the inline bootstrap scripts it emits, so the header has to be
+  // set on the request that reaches the renderer — not only on the response.
+  const nonce = makeNonce();
+  const csp = buildCsp({
+    nonce,
+    frameAncestors: EMBED_PATH_RE.test(request.nextUrl.pathname)
+      ? EMBED_FRAME_ANCESTORS
+      : SELF_FRAME_ANCESTORS,
+    isDev: process.env.NODE_ENV !== "production",
+  });
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+  const forwarded = new NextRequest(request, { headers: requestHeaders });
+
+  const intlResponse = intl(forwarded);
+  intlResponse.headers.set("Content-Security-Policy", csp);
+
   if (!ADMIN_GATE_ENABLED()) return intlResponse;
 
   const { pathname } = request.nextUrl;
@@ -65,5 +111,9 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  // /api is INCLUDED so the site split can police it (see the API branch
+  // above); _next and static files stay out.
+  // /api is INCLUDED so the site split can police it (see the API branch
+  // above); _next and static files stay out.
+  matcher: ["/((?!_next|.*\\..*).*)"],
 };

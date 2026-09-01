@@ -23,9 +23,13 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+/** `nonce` is forwarded to next-themes' inline anti-flash script. Without it
+ *  our nonce-based CSP blocks that script and a dark-preference visitor gets
+ *  a flash of the light theme before the client corrects it. */
+export function ThemeProvider({ children, nonce }: { children: ReactNode; nonce?: string }) {
   return (
     <NextThemesProvider
+      nonce={nonce}
       attribute="data-theme"
       defaultTheme="light"
       enableSystem={false}

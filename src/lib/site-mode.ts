@@ -42,6 +42,27 @@ const SAMOUCZEK_ALLOWED = [
 const ROOT_RE = /^\/(?:pl)?\/?$/;
 
 /**
+ * The ONLY API routes the tutorial deployment needs: the guide bot, the
+ * analytics sink and the guest's own taste profile.
+ *
+ * Everything else — above all the restaurant/dish/wine WRITE routes and the
+ * admin analytics — has no business being reachable from the shop-facing host,
+ * which is the most widely published origin we have (printed on QR codes,
+ * embedded in winnica.pl). Page routes were split on 2026-07-30 but API routes
+ * were not, because the middleware matcher excluded `/api` (audit 2026-09-01).
+ */
+const SAMOUCZEK_API_ALLOWED = [
+  /^\/api\/chat\/?$/,
+  /^\/api\/events\/?$/,
+  /^\/api\/profiles\/?$/,
+];
+
+/** True when the tutorial site may serve this API path. */
+export function samouczekAllowsApi(pathname: string): boolean {
+  return SAMOUCZEK_API_ALLOWED.some((re) => re.test(pathname));
+}
+
+/**
  * Where should `pathname` go on the SAMOUCZEK site?
  *   null                  → serve it here, unchanged
  *   { to, external:false} → redirect within this host (the root → tutorial)

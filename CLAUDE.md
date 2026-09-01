@@ -40,7 +40,7 @@ Repo: https://github.com/Warlockus-prod/wine.git (`main` is what ships).
 - React 19, TypeScript, Tailwind v4, Playwright
 - next-intl 4 (`localePrefix: "as-needed"`) — Polish primary, English at root
 - **Postgres 16** + Drizzle ORM + drizzle-kit migrations
-- **Auth.js v5** (Drizzle adapter, magic-link via Nodemailer) — gate currently OFF (`AUTH_GATE_ADMIN=0`). When ON, the default gate is **env HTTP Basic Auth** (`ADMIN_USER`/`ADMIN_PASSWORD`, `src/lib/admin-auth.ts`) — no SMTP needed; magic-link is the fallback.
+- **Auth.js v5** (Drizzle adapter, magic-link via Nodemailer) — gate is **ON since 2026-09-01** (`AUTH_GATE_ADMIN=1` on both hosts; it had been 0, leaving /admin and the write API open to the internet — see the security note below). The active gate is **env HTTP Basic Auth** (`ADMIN_USER`/`ADMIN_PASSWORD`, `src/lib/admin-auth.ts`) — no SMTP needed; magic-link is the fallback.
 - OpenAI (default `gpt-5.4-mini`) for `/api/chat` (Vinokompas guide bot) and `/api/pairing/explain` (2-sentence pair rationale)
 - **Mapbox GL** (`mapbox-gl`) for the homepage map — client-only (`ssr:false`); token in `NEXT_PUBLIC_MAPBOX_TOKEN` (publishable, restrict by URL in the Mapbox dashboard)
 - Seed templates live in `src/data/seed-restaurants.ts` and `src/data/seed-pairing.ts`; **canonical runtime data is Postgres**, seed runs idempotently on every deploy via `tsx scripts/db-seed.mts`.
@@ -106,11 +106,31 @@ All routable pages live under `src/app/[locale]/`. English at root, Polish at `/
 - `GET /api/admin/chat-analytics` — aggregates `chat_sessions`/`chat_messages` for the `/admin/chat` page
 - `/api/auth/[...nextauth]` — Auth.js handlers
 
+**The tutorial deployment serves only `/api/chat`, `/api/events` and
+`/api/profiles`** — `samouczekAllowsApi()` in `src/lib/site-mode.ts`, enforced by
+the middleware, whose matcher now INCLUDES `/api`. ⚠️ **Middleware must return
+`undefined` for an allowed API route, never `NextResponse.next()`** — the latter
+re-issues the request internally and DROPS the POST body, so `/api/pairing`
+scored with no dish context and returned an unrelated wine. It fails silently:
+status 200, plausible JSON, wrong answer. Caught only by
+`pairing-algorithm.spec.ts` asserting the actual wine. Until 2026-09-01 the matcher
+excluded `/api`, so the shop-facing host served the entire write API.
+
 All write routes go through `src/lib/api-acl.ts`:
- - `requireAuth(request?)` returns the active user. `AUTH_GATE_ADMIN=0` → synthetic `pilot` user (open). `=1` → validates env **Basic Auth** (`ADMIN_USER`/`ADMIN_PASSWORD` via `src/lib/admin-auth.ts`), falling back to an Auth.js magic-link session; else 401.
+ - `requireAuth(request?)` returns the active user. ⚠️ It FAILS OPEN: anything other than `AUTH_GATE_ADMIN=1` → synthetic `pilot` user, i.e. no auth at all, which is how production sat exposed until 2026-09-01. Both deploy scripts now assert `/api/admin/chat-analytics == 401` after deploying and fail otherwise. `=1` → validates env **Basic Auth** (`ADMIN_USER`/`ADMIN_PASSWORD` via `src/lib/admin-auth.ts`), falling back to an Auth.js magic-link session; else 401.
  - `requireRestaurantMember(user, slug)` resolves the restaurant + checks `restaurant_members` (bypassed in pilot mode and for the `admin` role)
  - `enforceWriteRateLimit(request)` — per-IP sliding window (120/min) on every mutation; `apiHandler(fn)` converts thrown `ApiError` into JSON+status (+ `Retry-After` on 429)
 Every write emits an `admin_*` event into the analytics table with the actor id.
+**⚠️ The client IP is NOT trustworthy today.** Public :443 is an nginx *stream*
+SNI router that proxies to 127.0.0.1:8443, so `X-Real-IP` is the loopback
+address for everyone and every per-IP limit is ONE bucket for the whole
+internet. `/api/chat` therefore keys on `anonymousId` when the IP is loopback
+and enforces a separate global ceiling (`GLOBAL_MAX_PER_WINDOW`); `trustedIp()`
+switches back to the IP automatically once nginx forwards it. Fixing it for
+real needs `proxy_protocol` on the shared stream, which forces EVERY vhost on
+that box (20+, most belonging to other projects) to be patched in the same
+change — see `docs/ops/real-client-ip.md`.
+
 **Rate limiting** (`src/lib/rate-limit.ts`) also covers the OpenAI/CPU routes: `/api/pairing/explain` 30/min·IP, `/api/pairing` 60/min, `/api/events` 120/min (client-event types only, props size-capped), `/api/profiles` 30/min (real upsert by `anonymous_id`). `/api/chat` keeps its own 30/4h·anon limiter.
 
 ## i18n notes
@@ -178,7 +198,7 @@ DNS-01 ritual documented pre-migration applied to VPS1 and is obsolete.
 - **Store modules:** `pairing-store.ts`/`usePairingDataset` is still used by the `/admin` sandbox and the no-param `/pairing`. (`restaurant-store.ts` was deleted once the read-path moved to the DB.)
 - **⚠️ Security — write API is open ONLY while the gate is off.** `AUTH_GATE_ADMIN=0` (current default) means `/admin` + all write routes accept unauthenticated requests via the synthetic `pilot` user → an open `POST/PUT/DELETE /api/restaurants/<slug>/*` **changes what guests see**. **Mitigated** (PR `security-hardening`, 2026-06): all write + OpenAI/CPU routes are now **rate-limited**, and a one-line **env Basic Auth gate** closes the hole entirely. **Until you flip the gate, the API is still open** — see `docs/audit-2026-05.md` P0-2/P1-2.
 - **Closing the gate — two options.** (a) **Simple, recommended, no SMTP:** add `AUTH_GATE_ADMIN=1` + `ADMIN_USER=admin` + `ADMIN_PASSWORD=<strong>` to `/opt/repos/wine_web_wn/.env.local`, redeploy → `/admin` + write API require HTTP Basic Auth (`src/lib/admin-auth.ts`); fails closed if `ADMIN_PASSWORD` unset. (b) **Magic-link, multi-user:** `docs/ops/auth-gate-flip.md` — SMTP env → `ADMIN_EMAIL=… npx tsx scripts/db-bootstrap-admin.mts` → `AUTH_GATE_ADMIN=1`; bootstrap BEFORE flipping or you lock yourself out. Same flag gates both; Basic Auth wins, magic-link is fallback. Open-redirect on signin `returnTo` already fixed (`safeReturnTo`).
-- **Full tech+design audit:** `docs/audit-2026-05.md` (P0/P1/P2, verified). Done: read-path→DB, open-redirect, metadata, admin consolidation; **2026-06 hardening** (PR `security-hardening`) added rate-limiting, input-validation/IDOR/prompt-injection fixes, **security headers** (CSP/HSTS/XFO/nosniff/Referrer/Permissions in `next.config.ts`), the env Basic Auth gate, `.dockerignore` + build-args + non-root container, and bumped `next`→16.2.9 (middleware-authz CVE) + `next-intl`→4.13. **Still open: C1 — flip the gate** (off by default); `nodemailer`/`next-auth` beta advisories (no upstream fix, only relevant once magic-link is live).
+- **Full tech+design audit:** `docs/audit-2026-05.md` (P0/P1/P2, verified). Done: read-path→DB, open-redirect, metadata, admin consolidation; **2026-06 hardening** (PR `security-hardening`) added rate-limiting, input-validation/IDOR/prompt-injection fixes, **security headers** (HSTS/XFO/nosniff/Referrer/Permissions in `next.config.ts`; **CSP moved to `src/lib/csp.ts` + `src/middleware.ts` on 2026-09-01** — it now carries a per-request nonce with `strict-dynamic` instead of `'unsafe-inline'`, and `img-src` lists real hosts instead of all of `https:`. Everything Next emits gets the nonce automatically — Next reads it from the CSP REQUEST header, no layout code needed. ⚠️ **`headers()` in the root layout is LOAD-BEARING** — it both supplies the nonce to next-themes AND forces dynamic rendering, which the nonce REQUIRES: a prerendered page bakes in a build-time nonce while the header sends a fresh one per request, so every chunk is blocked and the page ships with no JavaScript. That was tried on 2026-09-01 and silently broke the home page; only e2e caught it. Cost measured at 5–15 ms/render. See `memory/csp-nonce-vs-prerender.md`), the env Basic Auth gate, `.dockerignore` + build-args + non-root container, and bumped `next`→16.2.9 (middleware-authz CVE) + `next-intl`→4.13. **Still open: C1 — flip the gate** (off by default); `nodemailer`/`next-auth` beta advisories (no upstream fix, only relevant once magic-link is live).
 - **Seed wine photos and prices are placeholder-grade.** Source-back each label before any commercial pitch.
 - **Image pipeline:** every seeded dish/wine has a generated local photo under `public/{dishes,wines}/<slug>/<id>.png` (50 dishes + 40 wines), mapped in `src/data/{dish,wine}-images.ts`; **Coverage is 100% (verified 2026-06-18: 40/40 wines, 50/50 dishes) — nothing falls back to Unsplash in practice.** (The 18 AI still-lifes under `public/senses/*.png` and the 12 loose `public/senses/arc/` icons were DELETED 2026-07-31 — superseded by the client's cut-out sprites and referenced by nothing; recover from git history if ever needed.) Resolution order in `src/lib/food-photos.ts`: explicit `wine.image`/`dish.image` → local map by id → category-keyed Unsplash fallback → generic fallback (the Unsplash branch only fires for never-seeded ids). DB wines use `external_id` = the seed id (`r1-w1`…), so DB-served wines hit the local map too. Brief "empty squares" on first paint are next/image lazy-load timing, not missing files. Regenerate only if you add NEW wines/dishes: `OPENAI_API_KEY=… npx tsx scripts/gen-wine-images.mts` (dall-e-3, writes PNG + appends the map). Verify with `node scripts/shoot-mobile.mjs` (iPhone-width live screenshots → `/tmp/wn-mobile`). **Icons are now inline SVG** (`src/components/v2/Icon.tsx`) — the Material Symbols web font was removed (it flashed ligature text on mobile). **QR codes** render locally via `qrcode.react` (`<QRCodeSVG value={restaurantUrl}>`), no external `api.qrserver.com`. `public/` is now clean: `app-icon.svg`, `sw.js`, `dishes/`, `wines/`, `senses/ring/`.
 - **PL seed translations are LLM first-pass.** Polish-speaking sommelier must vet wine vocabulary before commercial pitch.

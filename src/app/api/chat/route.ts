@@ -46,11 +46,14 @@ const rateBuckets: RateBuckets =
   new Map();
 ((globalThis as unknown) as { __wn_chatBuckets?: RateBuckets }).__wn_chatBuckets = rateBuckets;
 
-const checkRate = (key: string): { ok: true } | { ok: false; retryAfter: number; usage: number } => {
+const checkRate = (
+  key: string,
+  max: number = RATE_MAX_PER_WINDOW,
+): { ok: true } | { ok: false; retryAfter: number; usage: number } => {
   const now = Date.now();
   const previous = rateBuckets.get(key) ?? [];
   const recent = previous.filter((ts) => now - ts < RATE_WINDOW_MS);
-  if (recent.length >= RATE_MAX_PER_WINDOW) {
+  if (recent.length >= max) {
     const oldest = recent[0];
     const retryAfter = Math.max(1, Math.ceil((RATE_WINDOW_MS - (now - oldest)) / 1000));
     rateBuckets.set(key, recent); // keep pruned
@@ -61,11 +64,48 @@ const checkRate = (key: string): { ok: true } | { ok: false; retryAfter: number;
   return { ok: true };
 };
 
-// Cost cap keyed ONLY on the trustworthy proxy IP (clientIp → X-Real-IP, which
-// nginx overwrites from the real TCP peer). The client-supplied anonymousId is
-// deliberately NOT used for the key — it's attacker-controlled, so keying on it
-// let anyone rotate the id to burn unlimited OpenAI tokens (audit 2026-07).
-const rateKeyFromRequest = (request: Request): string => `ip:${clientIp(request)}`;
+/**
+ * TWO limits, because neither identifier alone is sufficient here.
+ *
+ * Keying only on the IP was correct in principle but broke in practice: the
+ * public 443 listener is an SNI *stream* router that proxies to 127.0.0.1:8443,
+ * so `X-Real-IP` is the loopback address for EVERY visitor. The per-IP bucket
+ * had therefore degenerated into a single bucket shared by the whole internet —
+ * 50 chat messages per day for all users combined, after which the bot would
+ * have gone silent for everyone (audit 2026-09-01; not yet hit only because
+ * traffic is still low).
+ *
+ * Keying only on `anonymousId` is not an option either — it comes from the
+ * client, so anyone can rotate it and burn unlimited OpenAI tokens (audit
+ * 2026-07, which is why it was removed then).
+ *
+ * So: a PER-GUEST bucket for fairness (real IP when we can trust it, otherwise
+ * the anonymousId — a rotating attacker still hits the second limit), plus a
+ * GLOBAL ceiling that bounds spend no matter how identities are rotated. Once
+ * nginx forwards the real client address, `trustedIp()` starts returning it and
+ * the per-guest tier becomes strong again with no code change.
+ */
+const LOOPBACK_RE = /^(?:127\.|::1$|0:0:0:0:0:0:0:1$|172\.17\.)/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The proxy-reported IP, or null when it is obviously not the real client. */
+const trustedIp = (request: Request): string | null => {
+  const ip = clientIp(request);
+  if (!ip || ip === "unknown" || LOOPBACK_RE.test(ip)) return null;
+  return ip;
+};
+
+const rateKeyFromRequest = (request: Request, anonymousId?: string): string => {
+  const ip = trustedIp(request);
+  if (ip) return `ip:${ip}`;
+  if (anonymousId && UUID_RE.test(anonymousId)) return `anon:${anonymousId}`;
+  // No usable identity at all — such callers share one bucket by design.
+  return "anon:none";
+};
+
+/** Hard cost ceiling across all guests. Sized well above realistic organic
+ *  use (28 messages in the pilot's lifetime) but far below a bill that hurts. */
+const GLOBAL_MAX_PER_WINDOW = 1500;
 
 let openaiSingleton: OpenAI | null = null;
 const getOpenAI = () => {
@@ -125,7 +165,25 @@ export async function POST(request: Request) {
   // 4h rolling-window rate limit per anonymous id (or IP fallback).
   // Returns 429 with a friendly PL message + Retry-After header. Logs
   // the throttle event so we can spot abusive patterns later.
-  const rateKey = rateKeyFromRequest(request);
+  // Global ceiling first — it is the cost guard and must hold even when a
+  // caller rotates its anonymousId to get a fresh per-guest bucket.
+  const globalRate = checkRate("global", GLOBAL_MAX_PER_WINDOW);
+  if (!globalRate.ok) {
+    void logEvent({
+      type: "chat_rate_limited",
+      props: { key: "global", usage: globalRate.usage, retryAfterSec: globalRate.retryAfter },
+    });
+    return NextResponse.json(
+      {
+        error:
+          "Przewodnik jest teraz mocno obciążony. Spróbuj ponownie za chwilę.",
+        retryAfter: globalRate.retryAfter,
+      },
+      { status: 429, headers: { "Retry-After": String(globalRate.retryAfter) } },
+    );
+  }
+
+  const rateKey = rateKeyFromRequest(request, body.anonymousId);
   const rate = checkRate(rateKey);
   if (!rate.ok) {
     const minutes = Math.ceil(rate.retryAfter / 60);
