@@ -103,10 +103,14 @@ for port in 4300 4301; do
     [ -n "$code" ] && [ "$code" != "000" ] && break
     sleep 2
   done
-  if [[ "$code" != "401" ]]; then
-    echo "‼️  ОПАСНО: :${port}/api/admin/chat-analytics вернул ${code}, ожидался 401."
+  # 401 = gate challenged it. 404 = the tutorial site does not route it at all
+  # (samouczekAllowsApi), which is stronger. Anything else — above all 200 —
+  # means the endpoint is answering and the gate is open.
+  if [[ "$code" != "401" && "$code" != "404" ]]; then
+    echo "‼️  ОПАСНО: :${port}/api/admin/chat-analytics вернул ${code}, ожидался 401 или 404."
     echo "   Админ-гейт открыт. Проверь AUTH_GATE_ADMIN=1 в .env.local и пересоздай контейнеры."
     exit 1
   fi
+  echo "  ✓ :${port} → ${code}"
 done
-echo "  ✓ админ-гейт закрыт на обоих портах (401)"
+echo "  ✓ админ-аналитика недоступна на обоих портах"
