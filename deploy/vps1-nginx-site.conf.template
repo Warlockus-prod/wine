@@ -1,0 +1,106 @@
+# Vinovigator on VPS1 — nginx vhost TEMPLATE.
+#
+# Replace __FULL_HOST__ and __TUTORIAL_HOST__ with the client's subdomains,
+# then install it (see deploy/README-vps1.md). Do NOT install before DNS
+# resolves to this server — certbot must be able to reach the host first.
+#
+# ⚠️ SAFETY RULES for this box (it also serves the live wineassistance.pl chat):
+#   1. NEVER add `default_server` here. No server block on VPS1 declares it, so
+#      nginx falls back to the FIRST block it loads — which is default.conf,
+#      the chat's vhost. Declaring it here would silently steal every unmatched
+#      request away from the chat.
+#   2. The filename MUST sort AFTER "default.conf" (this one starts with "w").
+#      A name like 00-wine.conf would load first and become that fallback.
+#   3. Reload, never restart: `docker exec nginx_server nginx -s reload`.
+#      A restart drops the chat for a few seconds.
+
+# ── Full product ──────────────────────────────────────────────────────────
+server {
+    listen 80;
+    server_name __FULL_HOST__;
+    # certbot writes challenges to /opt/repos/certs/certs, mounted here as
+    # /etc/ssl/certs — the same convention the other vhosts on this box use.
+    location /.well-known/acme-challenge/ { root /etc/ssl/certs; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name __FULL_HOST__;
+
+    ssl_certificate     /etc/ssl/certs/__FULL_HOST__.crt;
+    ssl_certificate_key /etc/ssl/private/__FULL_HOST__.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    client_max_body_size 10M;
+    proxy_read_timeout 300;
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/json application/javascript application/xml+rss image/svg+xml;
+
+    location /.well-known/acme-challenge/ { root /etc/ssl/certs; }
+
+    location / {
+        proxy_pass http://172.17.0.1:4300;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+    }
+}
+
+# ── Tutorial site (the one the shop embeds) ───────────────────────────────
+server {
+    listen 80;
+    server_name __TUTORIAL_HOST__;
+    location /.well-known/acme-challenge/ { root /etc/ssl/certs; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name __TUTORIAL_HOST__;
+
+    ssl_certificate     /etc/ssl/certs/__TUTORIAL_HOST__.crt;
+    ssl_certificate_key /etc/ssl/private/__TUTORIAL_HOST__.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # No X-Frame-Options here on purpose: /embed/samouczek is MEANT to be
+    # iframed by the shop. Framing is controlled by the app's CSP
+    # frame-ancestors (next.config.ts), which is the modern, per-origin rule.
+
+    client_max_body_size 10M;
+    proxy_read_timeout 300;
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/json application/javascript application/xml+rss image/svg+xml;
+
+    location /.well-known/acme-challenge/ { root /etc/ssl/certs; }
+
+    location / {
+        proxy_pass http://172.17.0.1:4301;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+    }
+}
